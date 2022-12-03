@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+// 光标闪烁动画 (目前使用 animate-ping 替代)
+.type-cursor {
+  opacity: 1;
+  animation: blink-anim 0.7s infinite;
+}
+
+@keyframes blink-anim {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+// 图片下降动画
+.banner-fade-down {
+  animation: banner-fade-down-anim 1s;
+}
+
+@keyframes banner-fade-down-anim {
+  0% {
+    opacity: 0;
+    filter: alpha(opacity=0);
+    transform: translateY(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: translateY(0);
+  }
+}
+
+// 图片上升动画
+.card-fade-up {
+  animation: card-fade-up-anim 1s;
+}
+
+@keyframes card-fade-up-anim {
+  0% {
+    opacity: 0;
+    filter: alpha(opacity=0);
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: translateY(0);
+  }
+}

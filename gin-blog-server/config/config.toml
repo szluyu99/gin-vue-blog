@@ -1,0 +1,55 @@
+# 本地运行的配置文件
+[Server]
+AppMode = "debug"   # debug 开发环境, release 生产环境
+BackPort = ":8765"  # 前台服务端口
+FrontPort = ":5678" # 后台服务端口
+
+[JWT]
+SigningKey = "abc123321"
+ExpiresTime = 24         # 过期时间 (小时)
+Issuer = "gin-vue-blog"
+
+[Mysql]
+Path = "127.0.0.1"
+Port = "3306"
+Config = ""         # 其他配置, 例如时区
+Dbname = "ginblog"  # 数据库名称
+Username = "root"
+Password = "123456" # 数据库密码
+MaxIdleConns = 10
+MaxOpenConns = 100
+# 日志级别 silent, error, warn, info, 默认 info
+LogMode = "error" # silent 相当于关闭日志
+
+[Redis]
+DB = 7
+Addr = '127.0.0.1:6379'
+Password = ''
+
+[Session]
+Name = "mysession"
+Salt = "salt"
+MaxAge = 600       # 秒
+
+[Zap]
+Level = "error"            # 日志级别: debug, info, warn, error, dpanic, panic, fatal, 默认 info
+Format = "console"         # 输出格式: console, json
+Prefix = "[GIN-VUE-BLOG] " # 日志前缀
+Directory = "log"          # 存放日志的文件夹
+ShowLine = true            # 是否显示哪行调用
+LogInConsole = true        # 是否输出到控制台
+
+# TODO: 文件上传功能还待完善
+[Upload]
+OssType = "qiniu"              # 控制存储: local、qiniu
+Path = "public/uploaded/"      # 本地文件访问路径
+StorePath = "public/uploaded/" # 本地文件上传路径
+
+[Qiniu]
+ImgPath = ""          # 外链
+Zone = ""
+Bucket = ""
+AccessKey = ""
+SecretKey = ""
+UseHttps = false      # 是否使用 https 加速
+UseCdnDomains = false # 上传是否使用 CDN 上传加速

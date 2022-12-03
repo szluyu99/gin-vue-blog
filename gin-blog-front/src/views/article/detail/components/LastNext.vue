@@ -1,0 +1,40 @@
+<script setup lang="ts">
+interface Props { lastArticle: any; nextArticle: any }
+const { lastArticle, nextArticle } = defineProps<Props>()
+</script>
+
+<template>
+  <div mx-20 flex bg="#000" text-white>
+    <div v-if="lastArticle.id" class="art-card" w-full h-150 overflow-hidden relative>
+      <router-link :to="`/article/${lastArticle.id}`">
+        <img class="art-img" :src="lastArticle.img" opacity-40>
+        <!-- top:50%; translateY: -50%; 实现绝对定位中的垂直居中 -->
+        <div absolute top="1/2" translate-y="-1/2" px-40 w-full leading-25>
+          <p> 上一篇 </p>
+          <p> {{ lastArticle.title }} </p>
+        </div>
+      </router-link>
+    </div>
+    <div v-if="nextArticle.id" class="art-card" w-full h-150 overflow-hidden relative>
+      <router-link :to="`/article/${nextArticle.id}`">
+        <img class="art-img" :src="nextArticle.img" opacity-40>
+        <div absolute top="1/2" translate-y="-1/2" px-40 text-right w-full leading-25>
+          <p> 下一篇 </p>
+          <p> {{ nextArticle.title }} </p>
+        </div>
+      </router-link>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.art-img {
+  transition: all 0.6s;
+  object-fit: cover;
+}
+
+.art-card:hover .art-img {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+</style>

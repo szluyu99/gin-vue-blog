@@ -1,0 +1,53 @@
+{
+  "name": "gin-blog-admin",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "vite",
+    "lint": "eslint --ext .js,.vue .",
+    "lint:fix": "eslint --fix --ext .js,.vue .",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vueuse/core": "^9.3.0",
+    "@wangeditor/editor": "^5.1.20",
+    "@wangeditor/editor-for-vue": "^5.1.12",
+    "axios": "^0.27.2",
+    "dayjs": "^1.11.5",
+    "dotenv": "^16.0.3",
+    "highlight.js": "^11.6.0",
+    "lodash-es": "^4.17.21",
+    "md-editor-v3": "^2.2.1",
+    "mockjs": "^1.1.0",
+    "pinia": "^2.0.22",
+    "vue": "^3.2.40",
+    "vue-router": "^4.1.5"
+  },
+  "devDependencies": {
+    "@iconify/json": "^2.1.116",
+    "@iconify/vue": "^4.0.0",
+    "@vitejs/plugin-vue": "^3.1.0",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.5.1",
+    "naive-ui": "^2.33.3",
+    "prettier": "2.7.1",
+    "sass": "^1.55.0",
+    "unocss": "^0.45.26",
+    "unplugin-auto-import": "^0.11.2",
+    "unplugin-icons": "^0.14.11",
+    "unplugin-vue-components": "^0.22.7",
+    "unplugin-vue-define-options": "0.12.0-beta.1",
+    "vite": "^3.1.0",
+    "vite-plugin-html": "^3.2.0",
+    "vite-plugin-mock": "^2.9.6",
+    "vite-plugin-svg-icons": "^2.0.1"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "eslint --ext .js,.vue ."
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+# https://editorconfig.org/
+# 当前是根目录, 无需再往上层寻找
+root = true
+
+[*] # 匹配所有的文件
+indent_style = space # 空格缩进
+indent_size = 2 # 缩进空格为 2
+charset = utf-8 # 文件编码
+end_of_line = lf # 文件换行符是 Linux 的 '\n'
+trim_trailing_whitespace = true # 不保留行末的空格
+insert_final_newline = true # 文件末尾添加一个空行
+max_line_length = 100
+spaces_around_operators = true # 运算符两遍都有空格
+
+[*.md] # 只对 .md 文件生效
+trim_trailing_whitespace = false

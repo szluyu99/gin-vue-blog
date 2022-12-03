@@ -1,0 +1,13 @@
+// https://www.typescriptlang.org/tsconfig/
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      // 指定别名, 智能感知路径
+      "~/*": ["./*"],
+      "@/*": ["./src/*"]
+    },
+    "jsx": "preserve"
+  },
+  "exclude": ["node_modules", "dist"]
+}

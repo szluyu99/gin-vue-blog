@@ -1,0 +1,45 @@
+import { defineConfig, loadEnv } from 'vite'
+
+import { createVitePlugins } from './build/plugin'
+import { getRootPath, getSrcPath, convertEnv } from './build/utils'
+import { viteDefine, createViteProxy } from './build/config'
+
+// https://vitejs.dev/config/
+export default defineConfig(({ command, mode }) => {
+  // TODO 其他配置
+  // console.log('defineConfig: ', command, mode)
+  const isBuild = command === 'build' // pnpm run build
+
+  // 加载 .env 中的环境变量
+  // 设置第三个参数为 '' 可以加载所有环境变量(包括本机的), 默认只会加载 'VITE_' 前缀的变量
+  const env = loadEnv(mode, process.cwd()) // loadEnv(mode, process.cwd(), '')
+  const viteEnv = convertEnv(env)
+  // console.log('vite.config.js 中加载环境变量: ', env)
+  const { VITE_PUBLIC_PATH, VITE_PORT, VITE_USE_PROXY, VITE_PROXY_TYPE } = viteEnv
+
+  return {
+    base: VITE_PUBLIC_PATH || '/',
+    resolve: {
+      alias: {
+        '~': getRootPath(),
+        '@': getSrcPath(),
+      },
+    },
+    define: viteDefine, // 全局常量(不经过语法分析, 直接替换文本)
+    plugins: createVitePlugins(viteEnv, isBuild),
+    server: {
+      host: '0.0.0.0',
+      port: VITE_PORT,
+      // open: true, // 运行项目打开页面
+      // 设置了代理, 查看 setting/proxy-config.js
+      proxy: createViteProxy(VITE_USE_PROXY, VITE_PROXY_TYPE),
+    },
+    // https://cn.vitejs.dev/guide/api-javascript.html#build
+    build: {
+      target: 'es2015',
+      outDir: 'dist',
+      reportCompressedSize: false, // 禁用 gzip 压缩大小报告
+      chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
+    },
+  }
+})
