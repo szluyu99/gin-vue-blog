@@ -1,34 +1,9 @@
-<template>
-  <CommonPage show-footer title="在线用户">
-    <!-- 表格 -->
-    <CrudTable
-      ref="$table"
-      v-model:query-items="queryItems"
-      :columns="columns"
-      :get-data="getOnlineUsers"
-    >
-      <!-- <template #queryBar>
-        <QueryBarItem label="昵称" :label-width="40">
-          <n-input
-            v-model:value="queryItems.nickname"
-            clearable
-            type="text"
-            placeholder="请输入用户昵称"
-            @keydown.enter="$table?.handleSearch"
-          />
-        </QueryBarItem>
-      </template> -->
-    </CrudTable>
-  </CommonPage>
-</template>
-
 <script setup>
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
 // import { useCRUD } from '@/hooks'
 
-import { useUserApi } from '@/api'
-const { getOnlineUsers, forceOfflineUser } = useUserApi()
+import api from '@/api'
 
 defineOptions({ name: '在线用户' })
 
@@ -47,9 +22,9 @@ const columns = [
     align: 'center',
     render(row) {
       return h(NImage, {
-        height: 50,
-        imgProps: { style: { 'border-radius': '3px' } },
-        src: row['avatar'],
+        'height': 50,
+        'imgProps': { style: { 'border-radius': '3px' } },
+        'src': row.avatar,
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -63,7 +38,7 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row['ip_address'] || '未知')
+      return h('span', row.ip_address || '未知')
     },
   },
   {
@@ -73,7 +48,7 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row['ip_source'] || '未知')
+      return h('span', row.ip_source || '未知')
     },
   },
   {
@@ -83,7 +58,7 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row['browser'] || '未知')
+      return h('span', row.browser || '未知')
     },
   },
   {
@@ -93,7 +68,7 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row['os'] || '未知')
+      return h('span', row.os || '未知')
     },
   },
   {
@@ -110,9 +85,9 @@ const columns = [
           ghost: true,
         },
         {
-          default: () => formatDateTime(row['last_login_time'], 'YYYY-MM-DD'),
+          default: () => formatDateTime(row.last_login_time, 'YYYY-MM-DD'),
           icon: renderIcon('mdi:update', { size: 18 }),
-        }
+        },
       )
     },
   },
@@ -140,10 +115,10 @@ const columns = [
               {
                 default: () => '下线',
                 icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-              }
+              },
             ),
           default: () => h('div', {}, '确定强制该用户下线吗?'),
-        }
+        },
       )
     },
   },
@@ -152,10 +127,11 @@ const columns = [
 // 强制用户下线
 async function handleForceOffline(row) {
   try {
-    await forceOfflineUser(row)
+    await api.forceOfflineUser(row)
     $message.success('该用户已被强制下线!')
     $table.value?.handleSearch()
-  } catch (err) {
+  }
+  catch (err) {
     $message.error('强制下线失败!')
   }
 }
@@ -166,3 +142,27 @@ async function handleForceOffline(row) {
 //   refresh: () => $table.value?.handleSearch(),
 // })
 </script>
+
+<template>
+  <CommonPage show-footer title="在线用户">
+    <!-- 表格 -->
+    <CrudTable
+      ref="$table"
+      v-model:query-items="queryItems"
+      :columns="columns"
+      :get-data="api.getOnlineUsers"
+    >
+      <!-- <template #queryBar>
+        <QueryBarItem label="昵称" :label-width="40">
+          <n-input
+            v-model:value="queryItems.nickname"
+            clearable
+            type="text"
+            placeholder="请输入用户昵称"
+            @keydown.enter="$table?.handleSearch"
+          />
+        </QueryBarItem>
+      </template> -->
+    </CrudTable>
+  </CommonPage>
+</template>

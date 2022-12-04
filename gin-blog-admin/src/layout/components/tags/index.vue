@@ -1,35 +1,6 @@
-<template>
-  <ScrollX>
-    <n-tag
-      v-for="tag in tagsStore.tags"
-      :key="tag.path"
-      class="px-15 mx-5 rounded-4 cursor-pointer hover:color-primary"
-      :type="tagsStore.activeTag === tag.path ? 'primary' : 'default'"
-      :closable="tagsStore.tags.length > 1"
-      @click="handleTagClick(tag.path)"
-      @close.stop="tagsStore.removeTag(tag.path)"
-      @contextmenu.prevent="handleContextMenu($event, tag)"
-    >
-      <!-- 刷新图标 -->
-      <n-icon size="15" align-bottom cursor-pointer @click="handleRefresh">
-        <icon-mdi:refresh />
-      </n-icon>
-      {{ tag.title }}
-    </n-tag>
-    <!-- 自定义右键菜单 -->
-    <ContextMenu
-      v-if="contextMenuOption.show"
-      v-model:show="contextMenuOption.show"
-      :current-path="contextMenuOption.currentPath"
-      :x="contextMenuOption.x"
-      :y="contextMenuOption.y"
-    />
-  </ScrollX>
-</template>
-
 <script setup>
 import ContextMenu from './ContextMenu.vue'
-import { useTagsStore, useAppStore } from '@/store'
+import { useAppStore, useTagsStore } from '@/store'
 import ScrollX from '@/components/common/ScrollX.vue'
 
 const route = useRoute()
@@ -52,7 +23,7 @@ watch(
     const title = route.meta?.title
     tagsStore.addTag({ name, path, title }) // 添加标签
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const handleTagClick = (path) => {
@@ -83,15 +54,43 @@ async function handleContextMenu(e, tagItem) {
   showContextMenu()
 }
 
-// add by me
+// 刷新
 function handleRefresh() {
   // 重置 keepAlive
-  if (route.meta?.keepAlive) {
+  if (route.meta?.keepAlive)
     appStore.setAliveKeys(route.name, +new Date())
-  }
   appStore.reloadPage()
 }
 </script>
+
+<template>
+  <ScrollX>
+    <n-tag
+      v-for="tag in tagsStore.tags"
+      :key="tag.path"
+      px-15 mx-5 rounded-4 cursor-pointer hover:color-primary
+      :type="tagsStore.activeTag === tag.path ? 'primary' : 'default'"
+      :closable="tagsStore.tags.length > 1"
+      @click="handleTagClick(tag.path)"
+      @close.stop="tagsStore.removeTag(tag.path)"
+      @contextmenu.prevent="handleContextMenu($event, tag)"
+    >
+      <!-- 刷新图标 -->
+      <n-icon size="15" align-bottom cursor-pointer @click="handleRefresh">
+        <icon-mdi:refresh />
+      </n-icon>
+      {{ tag.title }}
+    </n-tag>
+    <!-- 自定义右键菜单 -->
+    <ContextMenu
+      v-if="contextMenuOption.show"
+      v-model:show="contextMenuOption.show"
+      :current-path="contextMenuOption.currentPath"
+      :x="contextMenuOption.x"
+      :y="contextMenuOption.y"
+    />
+  </ScrollX>
+</template>
 
 <style>
 .n-tag__close {

@@ -1,3 +1,14 @@
+<script setup>
+import AppHeader from './components/header/index.vue'
+import AppMain from './components/AppMain.vue'
+import Sidebar from './components/sidebar/index.vue'
+import AppTags from './components/tags/index.vue'
+import { useAppStore } from '@/store'
+import { header, tags } from '~/setting'
+
+const appStore = useAppStore()
+</script>
+
 <template>
   <n-layout has-sider wh-full>
     <!-- 左侧边栏 -->
@@ -15,13 +26,8 @@
     <article flex-1 flex-col overflow-hidden>
       <!-- 头部 -->
       <header
-        bg-white
-        px-15
-        border-b
-        bc-eee
-        flex
-        items-center
         :style="`height: ${header.height}px`"
+        bg-white px-15 border-b bc-eee flex items-center
       >
         <AppHeader />
       </header>
@@ -36,14 +42,3 @@
     </article>
   </n-layout>
 </template>
-
-<script setup>
-import AppHeader from './components/header/index.vue'
-import AppMain from './components/AppMain.vue'
-import Sidebar from './components/sidebar/index.vue'
-import AppTags from './components/tags/index.vue'
-import { useAppStore } from '@/store'
-import { header, tags } from '~/setting'
-
-const appStore = useAppStore()
-</script>

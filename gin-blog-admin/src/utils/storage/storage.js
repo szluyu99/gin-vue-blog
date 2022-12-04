@@ -1,7 +1,7 @@
 // 浏览器持久化类封装 (LocalStorage 和 SessionStorage API 完全一样)
+
 class Storage {
   /**
-   *
    * @param {*} prefixKey 前缀
    * @param {*} storage LocalStorage 或 SessionStorage
    */
@@ -15,7 +15,6 @@ class Storage {
   }
 
   /**
-   *
    * @param {*} key 键
    * @param {*} value 值
    * @param {*} expire  过期时间
@@ -36,15 +35,17 @@ class Storage {
 
   getItem(key, def = null) {
     const val = this.storage.getItem(this.getKey(key))
-    if (!val) return def
+    if (!val)
+      return def
     try {
       const { value, time, expire } = JSON.parse(val)
-      if (!expire || expire > new Date().getTime()) {
+      if (!expire || expire > new Date().getTime())
         return { value, time }
-      }
+
       this.remove(key)
       return def
-    } catch (error) {
+    }
+    catch (error) {
       this.remove(key)
       return def
     }

@@ -1,9 +1,3 @@
-<template>
-  <svg aria-hidden="true" width="1em" height="1em">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
-</template>
-
 <script setup>
 // https://github.com/vbenjs/vite-plugin-svg-icons
 const props = defineProps({
@@ -23,3 +17,9 @@ const props = defineProps({
 
 const symbolId = computed(() => `#${props.prefix}-${props.icon}`)
 </script>
+
+<template>
+  <svg aria-hidden="true" width="1em" height="1em">
+    <use :xlink:href="symbolId" :fill="color" />
+  </svg>
+</template>

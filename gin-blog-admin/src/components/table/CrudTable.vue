@@ -1,24 +1,3 @@
-<template>
-  <QueryBar v-if="$slots.queryBar" mb-30 @search="handleSearch" @reset="handleReset">
-    <slot name="queryBar" />
-  </QueryBar>
-
-  <n-data-table
-    :remote="remote"
-    :loading="loading"
-    :scroll-x="scrollX"
-    :columns="columns"
-    :data="tableData"
-    :row-key="(row) => row[rowKey]"
-    :bordered="true"
-    :single-line="singleLine"
-    :pagination="isPagination ? pagination : false"
-    :checked-row-keys="selections"
-    @update:checked-row-keys="onChecked"
-    @update:page="onPageChange"
-  />
-</template>
-
 <script setup>
 const props = defineProps({
   /** 是否不设定列的分割线 **/
@@ -128,10 +107,12 @@ async function handleQuery() {
     })
     tableData.value = data?.pageData || data
     pagination.itemCount = data?.total ?? data.length
-  } catch (error) {
+  }
+  catch (error) {
     tableData.value = []
     pagination.itemCount = 0
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -143,9 +124,9 @@ function handleSearch() {
 
 async function handleReset() {
   const queryItems = { ...props.queryItems }
-  for (const key in queryItems) {
+  for (const key in queryItems)
     queryItems[key] = null // 注意类型
-  }
+
   emit('update:queryItems', { ...queryItems, ...initQuery })
   await nextTick()
   pagination.page = 1
@@ -155,13 +136,13 @@ async function handleReset() {
 function onPageChange(currentPage) {
   pagination.page = currentPage
   // 后端分页
-  if (props.remote) handleQuery()
+  if (props.remote)
+    handleQuery()
 }
 
 function onChecked(rowKeys) {
-  if (props.columns.some((item) => item.type === 'selection')) {
+  if (props.columns.some(item => item.type === 'selection'))
     emit('onChecked', rowKeys)
-  }
 }
 
 defineExpose({
@@ -169,3 +150,24 @@ defineExpose({
   handleReset,
 })
 </script>
+
+<template>
+  <QueryBar v-if="$slots.queryBar" mb-30 @search="handleSearch" @reset="handleReset">
+    <slot name="queryBar" />
+  </QueryBar>
+
+  <n-data-table
+    :remote="remote"
+    :loading="loading"
+    :scroll-x="scrollX"
+    :columns="columns"
+    :data="tableData"
+    :row-key="(row) => row[rowKey]"
+    :bordered="true"
+    :single-line="singleLine"
+    :pagination="isPagination ? pagination : false"
+    :checked-row-keys="selections"
+    @update:checked-row-keys="onChecked"
+    @update:page="onPageChange"
+  />
+</template>

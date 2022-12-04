@@ -1,3 +1,8 @@
+<script setup>
+import { useAppStore } from '@/store'
+const { blogConfig } = storeToRefs(useAppStore())
+</script>
+
 <template>
   <footer text-14 f-c-c flex-col color="#6a6a6a">
     <p>
@@ -21,8 +26,3 @@
     </p>
   </footer>
 </template>
-
-<script setup>
-import { useAppStore } from '@/store'
-const { blogConfig } = storeToRefs(useAppStore())
-</script>

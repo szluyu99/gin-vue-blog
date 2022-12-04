@@ -1,3 +1,37 @@
+<script setup>
+import { useAppStore } from '@/store'
+import api from '@/api'
+
+defineOptions({ name: '网站管理' })
+
+// 表单数据
+const form = ref({})
+const formRef = ref(null)
+
+onMounted(async () => {
+  const res = await api.getBlogConfig()
+  form.value = res.data
+})
+
+async function handleSave() {
+  formRef.value?.validate(async (err) => {
+    if (err)
+      return
+    try {
+      $loadingBar?.start()
+      await api.updateBlogConfig(form.value)
+      $loadingBar?.finish()
+      $message.success('博客信息更新成功')
+      // 重新加载数据
+      useAppStore().getBlogInfo()
+    }
+    catch (err) {
+      $loadingBar?.error()
+    }
+  })
+}
+</script>
+
 <template>
   <CommonPage :show-header="false">
     <n-tabs type="line" animated @update:value="() => {}">
@@ -52,7 +86,9 @@
               </n-space>
             </n-checkbox-group>
           </n-form-item> -->
-          <n-button type="primary" @click="handleSave"> 确认 </n-button>
+          <n-button type="primary" @click="handleSave">
+            确认
+          </n-button>
         </n-form>
       </n-tab-pane>
       <n-tab-pane name="contact" tab="社交信息">
@@ -74,7 +110,9 @@
           <n-form-item label="Gitee" path="gitee">
             <n-input v-model:value="form.gitee" placeholder="请输入 Gitee" />
           </n-form-item>
-          <n-button type="primary" @click="handleSave"> 确认 </n-button>
+          <n-button type="primary" @click="handleSave">
+            确认
+          </n-button>
         </n-form>
       </n-tab-pane>
       <n-tab-pane name="other" tab="其他设置">
@@ -112,59 +150,39 @@
           </n-form-item>
           <n-form-item label="评论默认审核" path="is_comment_review">
             <n-radio-group v-model:value="form.is_comment_review" name="is_comment_review">
-              <n-radio :value="0"> 关闭 </n-radio>
-              <n-radio :value="1"> 开启 </n-radio>
+              <n-radio :value="0">
+                关闭
+              </n-radio>
+              <n-radio :value="1">
+                开启
+              </n-radio>
             </n-radio-group>
           </n-form-item>
           <n-form-item label="留言默认审核" path="is_message_review">
             <n-radio-group v-model:value="form.is_message_review" name="is_message_review">
-              <n-radio :value="0"> 关闭 </n-radio>
-              <n-radio :value="1"> 开启 </n-radio>
+              <n-radio :value="0">
+                关闭
+              </n-radio>
+              <n-radio :value="1">
+                开启
+              </n-radio>
             </n-radio-group>
           </n-form-item>
           <n-form-item label="邮箱通知" path="is_email_notice">
             <n-radio-group v-model:value="form.is_email_notice" name="is_email_notice">
-              <n-radio :value="0"> 关闭 </n-radio>
-              <n-radio :value="1"> 开启 </n-radio>
+              <n-radio :value="0">
+                关闭
+              </n-radio>
+              <n-radio :value="1">
+                开启
+              </n-radio>
             </n-radio-group>
           </n-form-item>
-          <n-button type="primary" @click="handleSave"> 确认 </n-button>
+          <n-button type="primary" @click="handleSave">
+            确认
+          </n-button>
         </n-form>
       </n-tab-pane>
     </n-tabs>
   </CommonPage>
 </template>
-
-<script setup>
-import { useAppStore } from '@/store'
-import { useSettingAPI } from '@/api'
-const { getBlogConfig, updateBlogConfig } = useSettingAPI()
-
-defineOptions({ name: '网站管理' })
-
-onMounted(async () => {
-  const res = await getBlogConfig()
-  form.value = res.data
-})
-
-// 表单数据
-const form = ref({})
-const formRef = ref(null)
-
-async function handleSave() {
-  formRef.value?.validate(async (err) => {
-    if (err) return
-    try {
-      $loadingBar?.start()
-      await updateBlogConfig(form.value)
-      $loadingBar?.finish()
-      $message.success('博客信息更新成功')
-      // 重新加载数据
-      // form.value = (await getBlogConfig()).data
-      useAppStore().getBlogInfo()
-    } catch (err) {
-      $loadingBar?.error()
-    }
-  })
-}
-</script>

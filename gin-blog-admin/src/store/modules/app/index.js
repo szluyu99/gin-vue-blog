@@ -1,5 +1,6 @@
-import { useSettingAPI } from '@/api'
-const { getBlogConfig } = useSettingAPI()
+import { defineStore } from 'pinia'
+import { nextTick } from 'vue'
+import api from '@/api'
 
 // 存放一些全局应用变量
 export const useAppStore = defineStore('app', {
@@ -13,10 +14,9 @@ export const useAppStore = defineStore('app', {
     }
   },
   actions: {
-    // 刷新页面: 效果并非按 F5 刷新整个网页, 而是模拟刷新(nextTick + 滚动到顶部)
+    // 刷新页面: 效果并非按 F5 刷新整个网页, 而是模拟刷新 (nextTick + 滚动到顶部)
     async reloadPage() {
-      $loadingBar.start()
-
+      window.$loadingBar.start()
       // 配合 v-if="reloadFlag" 有白屏效果
       this.reloadFlag = false
       await nextTick() // 将回调延迟到下次 DOM 更新循环之后执行
@@ -27,7 +27,7 @@ export const useAppStore = defineStore('app', {
       setTimeout(() => {
         // 滚动到顶部, 模拟刷新
         document.documentElement.scrollTo({ left: 0, top: 0 })
-        $loadingBar.finish()
+        window.$loadingBar.finish()
       }, 100)
     },
     // 切换页面展开
@@ -43,12 +43,12 @@ export const useAppStore = defineStore('app', {
     // 加载博客设置信息
     async getBlogInfo() {
       try {
-        const res = await getBlogConfig()
-        if (res.code === 0) {
-          // console.log(res.data)
+        const res = await api.getBlogConfig()
+        if (res.code === 0)
           this.blogConfig = res.data
-        } else return Promise.reject(res)
-      } catch (err) {
+        else return Promise.reject(res)
+      }
+      catch (err) {
         return Promise.reject(err)
       }
     },

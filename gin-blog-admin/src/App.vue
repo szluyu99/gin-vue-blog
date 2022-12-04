@@ -1,12 +1,3 @@
-<template>
-  <AppProvider>
-    <router-view v-slot="{ Component }">
-      <!-- 动态组件 -->
-      <component :is="Component" />
-    </router-view>
-  </AppProvider>
-</template>
-
 <script setup>
 import api from '@/api'
 import { getToken } from '@/utils'
@@ -20,3 +11,12 @@ onMounted(() => {
   }
 })
 </script>
+
+<template>
+  <AppProvider>
+    <router-view v-slot="{ Component }">
+      <!-- 动态组件 -->
+      <component :is="Component" />
+    </router-view>
+  </AppProvider>
+</template>

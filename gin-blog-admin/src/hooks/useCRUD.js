@@ -49,7 +49,8 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
       return
     }
     modalFormRef.value?.validate(async (err) => {
-      if (err) return
+      if (err)
+        return
       const actions = {
         add: {
           api: () => doCreate(modalForm.value),
@@ -68,7 +69,8 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
         action.cb()
         modalLoading.value = modalVisible.value = false
         data && refresh(data)
-      } catch (error) {
+      }
+      catch (error) {
         modalLoading.value = false
       }
     })
@@ -92,25 +94,30 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
             modalLoading.value = true
             const data = await doDelete(id)
             // 针对软删除的情况做判断
-            if (data?.code == 0) $message.success('删除成功')
+            if (data?.code == 0)
+              $message.success('删除成功')
             modalLoading.value = false
             refresh(data)
-          } catch (error) {
+          }
+          catch (error) {
             modalLoading.value = false
           }
         },
         // ...confirmOptions,
       })
-    } else {
+    }
+    else {
       // 无需弹窗确认
       try {
         modalLoading.value = true
         const data = await doDelete(id)
         // 针对软删除的情况做判断
-        if (data?.code == 0) $message.success('删除成功')
+        if (data?.code == 0)
+          $message.success('删除成功')
         modalLoading.value = false
         refresh(data)
-      } catch (error) {
+      }
+      catch (error) {
         modalLoading.value = false
       }
     }

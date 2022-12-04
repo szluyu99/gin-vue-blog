@@ -1,7 +1,3 @@
-<template>
-  <TheIcon type="custom" v-bind="props" />
-</template>
-
 <script setup>
 /** 自定义图标 */
 const props = defineProps({
@@ -20,3 +16,7 @@ const props = defineProps({
   },
 })
 </script>
+
+<template>
+  <TheIcon type="custom" v-bind="props" />
+</template>

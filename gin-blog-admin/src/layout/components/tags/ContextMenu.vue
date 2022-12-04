@@ -1,17 +1,5 @@
-<template>
-  <n-dropdown
-    :show="show"
-    :options="options"
-    :x="x"
-    :y="y"
-    placement="bottom-start"
-    @clickoutside="handleHideDropdown"
-    @select="handleSelect"
-  />
-</template>
-
 <script setup>
-import { useTagsStore, useAppStore } from '@/store'
+import { useAppStore, useTagsStore } from '@/store'
 import { renderIcon } from '@/utils'
 
 const props = defineProps({
@@ -70,8 +58,8 @@ const options = computed(() => [
     key: 'close-right',
     // 只有一个标签 或者 当前选中的是最后一个标签
     disabled:
-      tagsStore.tags.length <= 1 ||
-      props.currentPath === tagsStore.tags[tagsStore.tags.length - 1].path,
+      tagsStore.tags.length <= 1
+      || props.currentPath === tagsStore.tags[tagsStore.tags.length - 1].path,
     icon: renderIcon('mdi:arrow-expand-right', { size: '14px' }),
   },
 ])
@@ -79,9 +67,8 @@ const options = computed(() => [
 const route = useRoute()
 // 重置 KeepAlive
 function resetKeepAlive() {
-  if (route.meta?.keepAlive) {
+  if (route.meta?.keepAlive)
     appStore.setAliveKeys(route.name, +new Date())
-  }
 }
 // TODO: 标签关闭时会重置 KeepAlive
 const actionMap = new Map([
@@ -131,3 +118,15 @@ function handleSelect(key) {
   handleHideDropdown()
 }
 </script>
+
+<template>
+  <n-dropdown
+    :show="show"
+    :options="options"
+    :x="x"
+    :y="y"
+    placement="bottom-start"
+    @clickoutside="handleHideDropdown"
+    @select="handleSelect"
+  />
+</template>

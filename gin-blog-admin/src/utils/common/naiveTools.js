@@ -5,10 +5,9 @@ export function setupMessage(NMessage) {
   class Message {
     /**
      * 规则：
-     * * loading message只显示一个，新的message会替换正在显示的loading message
-     * * loading message不会自动清除，除非被替换成非loading message，非loading message默认2秒后自动清除
+     * * loading message 只显示一个，新的 message 会替换正在显示的 loading message
+     * * loading message 不会自动清除，除非被替换成非 loading message，非 loading message 默认 2 秒后自动清除
      */
-
     removeMessage(message = loadingMessage, duration = 2000) {
       setTimeout(() => {
         if (message) {
@@ -20,20 +19,21 @@ export function setupMessage(NMessage) {
 
     showMessage(type, content, option = {}) {
       if (loadingMessage && loadingMessage.type === 'loading') {
-        // 如果存在则替换正在显示的loading message
+        // 如果存在则替换正在显示的 loading message
         loadingMessage.type = type
         loadingMessage.content = content
 
         if (type !== 'loading') {
-          // 非loading message需设置自动清除
+          // 非 loading message 需设置自动清除
           this.removeMessage(loadingMessage, option.duration)
         }
-      } else {
-        // 不存在正在显示的loading则新建一个message,如果新建的message是loading message则将message赋值存储下来
-        let message = NMessage[type](content, option)
-        if (type === 'loading') {
+      }
+      else {
+        // 不存在正在显示的 loading 则新建一个 message
+        // 如果新建的 message 是 loading message 则将 message 赋值存储下来
+        const message = NMessage[type](content, option)
+        if (type === 'loading')
           loadingMessage = message
-        }
       }
     }
 

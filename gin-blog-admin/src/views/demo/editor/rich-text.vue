@@ -1,3 +1,19 @@
+<script setup>
+import { Editor as WangEditor, Toolbar as WangToolbar } from '@wangeditor/editor-for-vue'
+import '@wangeditor/editor/dist/css/style.css'
+
+defineOptions({ name: 'RichTextEditor' })
+
+const editorRef = shallowRef()
+const toolbarConfig = { excludeKeys: 'fullScreen' }
+const editorConfig = { placeholder: '请输入内容...', MENU_CONF: {} }
+const valueHtml = ref('')
+
+const handleCreated = (editor) => {
+  editorRef.value = editor
+}
+</script>
+
 <template>
   <AppPage>
     <div h-full flex-col border-1 bc-ccc>
@@ -18,19 +34,3 @@
     </div>
   </AppPage>
 </template>
-
-<script setup>
-import { Editor as WangEditor, Toolbar as WangToolbar } from '@wangeditor/editor-for-vue'
-import '@wangeditor/editor/dist/css/style.css'
-
-defineOptions({ name: 'RichTextEditor' })
-
-const editorRef = shallowRef()
-const toolbarConfig = { excludeKeys: 'fullScreen' }
-const editorConfig = { placeholder: '请输入内容...', MENU_CONF: {} }
-const valueHtml = ref('')
-
-const handleCreated = (editor) => {
-  editorRef.value = editor
-}
-</script>

@@ -1,12 +1,3 @@
-<template>
-  <n-dropdown :options="options" @select="handleSelect">
-    <div flex items-center cursor-pointer>
-      <img :src="userStore.avatar" mr10 w-35 h-35 rounded-full />
-      <span>{{ userStore.name }}</span>
-    </div>
-  </n-dropdown>
-</template>
-
 <script setup>
 import { useUserStore } from '@/store'
 import { renderIcon } from '@/utils'
@@ -28,9 +19,18 @@ function handleSelect(key) {
       type: 'info',
       content: '确认退出？',
       confirm() {
-        userStore.logoutAdmin()
+        userStore.logout()
       },
     })
   }
 }
 </script>
+
+<template>
+  <n-dropdown :options="options" @select="handleSelect">
+    <div flex items-center cursor-pointer>
+      <img :src="userStore.avatar" mr10 w-35 h-35 rounded-full>
+      <span>{{ userStore.name }}</span>
+    </div>
+  </n-dropdown>
+</template>

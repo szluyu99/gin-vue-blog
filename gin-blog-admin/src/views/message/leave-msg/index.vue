@@ -1,67 +1,17 @@
-<template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="留言管理">
-    <!-- 操作栏 -->
-    <template #action>
-      <n-button
-        ml-20
-        type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
-      >
-        <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
-      </n-button>
-      <n-button
-        ml-20
-        type="success"
-        :disabled="!selections.length"
-        @click="handleUpdateReview(selections, 1)"
-      >
-        <TheIcon icon="ic:outline-approval" :size="18" mr-5 /> 批量通过
-      </n-button>
-    </template>
-    <!-- 标签栏 -->
-    <n-tabs type="line" animated @update:value="handleChangeTab">
-      <template #prefix> 状态 </template>
-      <n-tab-pane name="all" tab="全部" />
-      <n-tab-pane name="has_review" tab="通过" />
-      <n-tab-pane name="not_review" tab="审核中" />
-    </n-tabs>
-    <!-- 表格 -->
-    <CrudTable
-      ref="$table"
-      v-model:query-items="queryItems"
-      :extra-params="extraParams"
-      :columns="columns"
-      :get-data="getMessages"
-      :selections="selections"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
-    >
-      <template #queryBar>
-        <QueryBarItem label="用户" :label-width="40" :content-width="180">
-          <n-input
-            v-model:value="queryItems.nickname"
-            clearable
-            type="text"
-            placeholder="请输入用户昵称"
-            @keydown.enter="handleSearch"
-          />
-        </QueryBarItem>
-      </template>
-    </CrudTable>
-  </CommonPage>
-</template>
-
 <script setup>
+import { NButton, NImage, NPopconfirm, NTag } from 'naive-ui'
 import TheIcon from '@/components/icon/TheIcon.vue'
-import { NButton, NImage, NTag, NPopconfirm } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
-
-import { useMessageApi } from '@/api'
-const { getMessages, deleteMessages, updateMessageReview } = useMessageApi()
+import api from '@/api'
 
 defineOptions({ name: '留言管理' })
+
+const { handleDelete } = useCRUD({
+  name: '留言',
+  doDelete: api.deleteMessages,
+  refresh: handleSearch,
+})
 
 onMounted(async () => {
   handleChangeTab('all') // 默认查看全部
@@ -81,9 +31,9 @@ const columns = [
     align: 'center',
     render(row) {
       return h(NImage, {
-        height: 70,
-        imgProps: { style: { 'border-radius': '3px' } },
-        src: row['avatar'],
+        'height': 70,
+        'imgProps': { style: { 'border-radius': '3px' } },
+        'src': row.avatar,
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -104,7 +54,7 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row['ip_source'] || '未知')
+      return h('span', row.ip_source || '未知')
     },
   },
   {
@@ -129,9 +79,9 @@ const columns = [
           // style: 'cursor: default;',
         },
         {
-          default: () => formatDateTime(row['created_at'], 'YYYY-MM-DD'),
+          default: () => formatDateTime(row.created_at, 'YYYY-MM-DD'),
           icon: renderIcon('mdi:update', { size: 18 }),
-        }
+        },
       )
     },
   },
@@ -143,8 +93,8 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: row['is_review'] == 1 ? 'success' : 'error' },
-        { default: () => (row['is_review'] == 1 ? '通过' : '审核中') }
+        { type: row.is_review === 1 ? 'success' : 'error' },
+        { default: () => (row.is_review === 1 ? '通过' : '审核中') },
       )
     },
   },
@@ -156,33 +106,33 @@ const columns = [
     fixed: 'right',
     render(row) {
       return [
-        row['is_review'] == 0
+        row.is_review === 0
           ? h(
-              NButton,
-              {
-                size: 'small',
-                type: 'success',
-                style: 'margin-left: 15px;',
-                onClick: () => handleUpdateReview([row.id], 1),
-              },
-              {
-                default: () => '通过',
-                icon: renderIcon('mi:circle-check', { size: 14 }),
-              }
-            )
+            NButton,
+            {
+              size: 'small',
+              type: 'success',
+              style: 'margin-left: 15px;',
+              onClick: () => handleUpdateReview([row.id], 1),
+            },
+            {
+              default: () => '通过',
+              icon: renderIcon('mi:circle-check', { size: 14 }),
+            },
+          )
           : h(
-              NButton,
-              {
-                size: 'small',
-                type: 'warning',
-                style: 'margin-left: 15px;',
-                onClick: () => handleUpdateReview([row.id], 0),
-              },
-              {
-                default: () => '撤下',
-                icon: renderIcon('mi:circle-error', { size: 14 }),
-              }
-            ),
+            NButton,
+            {
+              size: 'small',
+              type: 'warning',
+              style: 'margin-left: 15px;',
+              onClick: () => handleUpdateReview([row.id], 0),
+            },
+            {
+              default: () => '撤下',
+              icon: renderIcon('mi:circle-error', { size: 14 }),
+            },
+          ),
         h(
           NPopconfirm,
           {
@@ -201,10 +151,10 @@ const columns = [
                 {
                   default: () => '删除',
                   icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-                }
+                },
               ),
             default: () => h('div', {}, '确定删除该条留言吗?'),
-          }
+          },
         ),
       ]
     },
@@ -213,7 +163,7 @@ const columns = [
 
 // 修改留言审核: is_review 0-撤下审核, 1-通过审核
 async function handleUpdateReview(ids, is_review) {
-  await updateMessageReview({ ids, is_review })
+  await api.updateMessageReview({ ids, is_review })
   $message?.success(is_review ? '审核成功' : '撤下成功')
   handleSearch()
 }
@@ -239,10 +189,60 @@ function handleSearch() {
   selections.value = []
   $table.value?.handleSearch()
 }
-
-const { handleDelete } = useCRUD({
-  name: '留言',
-  doDelete: deleteMessages,
-  refresh: handleSearch,
-})
 </script>
+
+<template>
+  <!-- 业务页面 -->
+  <CommonPage show-footer title="留言管理">
+    <!-- 操作栏 -->
+    <template #action>
+      <NButton
+        ml-20
+        type="error"
+        :disabled="!selections.length"
+        @click="handleDelete(JSON.stringify(selections))"
+      >
+        <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
+      </NButton>
+      <NButton
+        ml-20
+        type="success"
+        :disabled="!selections.length"
+        @click="handleUpdateReview(selections, 1)"
+      >
+        <TheIcon icon="ic:outline-approval" :size="18" mr-5 /> 批量通过
+      </NButton>
+    </template>
+    <!-- 标签栏 -->
+    <n-tabs type="line" animated @update:value="handleChangeTab">
+      <template #prefix>
+        状态
+      </template>
+      <n-tab-pane name="all" tab="全部" />
+      <n-tab-pane name="has_review" tab="通过" />
+      <n-tab-pane name="not_review" tab="审核中" />
+    </n-tabs>
+    <!-- 表格 -->
+    <CrudTable
+      ref="$table"
+      v-model:query-items="queryItems"
+      :extra-params="extraParams"
+      :columns="columns"
+      :get-data="api.getMessages"
+      :selections="selections"
+      @on-checked="(rowKeys) => (selections = rowKeys)"
+    >
+      <template #queryBar>
+        <QueryBarItem label="用户" :label-width="40" :content-width="180">
+          <n-input
+            v-model:value="queryItems.nickname"
+            clearable
+            type="text"
+            placeholder="请输入用户昵称"
+            @keydown.enter="handleSearch"
+          />
+        </QueryBarItem>
+      </template>
+    </CrudTable>
+  </CommonPage>
+</template>

@@ -1,9 +1,5 @@
-<template>
-  <component :is="iconCom" />
-</template>
-
 <script setup>
-import { renderIcon, renderCustomIcon } from '@/utils'
+import { renderCustomIcon, renderIcon } from '@/utils'
 
 const props = defineProps({
   icon: {
@@ -28,6 +24,10 @@ const props = defineProps({
 const iconCom = computed(() =>
   props.type === 'iconify'
     ? renderIcon(props.icon, { size: props.size, color: props.color })
-    : renderCustomIcon(props.icon, { size: props.size, color: props.color })
+    : renderCustomIcon(props.icon, { size: props.size, color: props.color }),
 )
 </script>
+
+<template>
+  <component :is="iconCom" />
+</template>

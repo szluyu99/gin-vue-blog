@@ -28,7 +28,6 @@ export default [
   // 自动引入组件: 例如各种 UI 库
   Components({
     resolvers: [
-      // NaiveUI
       NaiveUiResolver(),
       // Iconify
       IconsResolver({ customCollections: ['custom'], componentPrefix: 'icon' }),

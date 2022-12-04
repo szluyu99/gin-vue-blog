@@ -1,18 +1,6 @@
-<template>
-  <n-menu
-    class="side-menu"
-    :indent="18"
-    :collapsed-icon-size="22"
-    :collapsed-width="64"
-    :options="menuOptions"
-    :value="curRoute.meta?.activeMenu || curRoute.name"
-    @update:value="handleMenuSelect"
-  />
-</template>
-
 <script setup>
-import { usePermissionStore, useAppStore } from '@/store'
-import { renderCustomIcon, renderIcon, isExternal } from '@/utils'
+import { useAppStore, usePermissionStore } from '@/store'
+import { isExternal, renderCustomIcon, renderIcon } from '@/utils'
 
 const router = useRouter() // 获取路由信息
 const curRoute = useRoute() // 进行路由跳转
@@ -22,20 +10,20 @@ const appStore = useAppStore()
 // 菜单选项
 const menuOptions = computed(() => {
   const res = permissionStore.menus
-    .map((item) => getMenuItem(item))
+    .map(item => getMenuItem(item))
     .sort((a, b) => a.order - b.order)
-  // console.log('SideMenu, menuOptions:', res)
   return res
 })
 
 function resolvePath(basePath, path) {
-  if (isExternal(path)) return path
+  if (isExternal(path))
+    return path
   return (
-    '/' +
+    `/${
     [basePath, path]
-      .filter((path) => !!path && path !== '/')
-      .map((path) => path.replace(/(^\/)|(\/$)/g, ''))
-      .join('/')
+      .filter(path => !!path && path !== '/')
+      .map(path => path.replace(/(^\/)|(\/$)/g, ''))
+      .join('/')}`
   )
 }
 
@@ -49,8 +37,11 @@ function getMenuItem(route, basePath = '') {
     icon: getIcon(route.meta),
     order: route.meta?.order || 0,
   }
-  const visibleChildren = route.children?.filter((item) => item.name && !item.isHidden) ?? []
-  if (!visibleChildren.length) return menuItem
+
+  const visibleChildren = route.children?.filter(item => item.name && !item.isHidden) ?? []
+
+  if (!visibleChildren.length)
+    return menuItem
 
   if (visibleChildren.length === 1) {
     // 单个子路由处理
@@ -62,17 +53,19 @@ function getMenuItem(route, basePath = '') {
       icon: getIcon(singleRoute.meta),
       order: menuItem.order,
     }
-    const visibleItems = singleRoute.children?.filter((item) => item.name && !item.isHidden) ?? []
+    const visibleItems = singleRoute.children?.filter(item => item.name && !item.isHidden) ?? []
     if (visibleItems.length === 1) {
       menuItem = getMenuItem(visibleItems[0], menuItem.path)
-    } else if (visibleItems.length > 1) {
+    }
+    else if (visibleItems.length > 1) {
       menuItem.children = visibleItems
-        .map((item) => getMenuItem(item, menuItem.path))
+        .map(item => getMenuItem(item, menuItem.path))
         .sort((a, b) => a.order - b.order)
     }
-  } else {
+  }
+  else {
     menuItem.children = visibleChildren
-      .map((item) => getMenuItem(item, menuItem.path))
+      .map(item => getMenuItem(item, menuItem.path))
       .sort((a, b) => a.order - b.order)
   }
 
@@ -80,21 +73,36 @@ function getMenuItem(route, basePath = '') {
 }
 
 function getIcon(meta) {
-  if (meta?.customIcon) return renderCustomIcon(meta.customIcon, { size: 18 })
-  if (meta?.icon) return renderIcon(meta.icon, { size: 18 })
+  if (meta?.customIcon)
+    return renderCustomIcon(meta.customIcon, { size: 18 })
+  if (meta?.icon)
+    return renderIcon(meta.icon, { size: 18 })
   return null
 }
 
 function handleMenuSelect(key, item) {
-  // console.log(key, item)
-  if (isExternal(item.path)) window.open(item.path)
+  if (isExternal(item.path)) {
+    window.open(item.path)
+  }
   else {
-    // console.log(item.path, curRoute.path)
-    if (item.path === curRoute.path) appStore.reloadPage()
+    if (item.path === curRoute.path)
+      appStore.reloadPage()
     else router.push(item.path)
   }
 }
 </script>
+
+<template>
+  <n-menu
+    class="side-menu"
+    :indent="18"
+    :collapsed-icon-size="22"
+    :collapsed-width="64"
+    :options="menuOptions"
+    :value="curRoute.meta?.activeMenu || curRoute.name"
+    @update:value="handleMenuSelect"
+  />
+</template>
 
 <style lang="scss">
 .side-menu:not(.n-menu--collapsed) {

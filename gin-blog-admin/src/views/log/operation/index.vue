@@ -1,14 +1,158 @@
+<script setup>
+import { NButton, NPopconfirm, NTag } from 'naive-ui'
+import { useClipboard } from '@vueuse/core'
+import { formatDateTime, renderIcon } from '@/utils'
+import { useCRUD } from '@/hooks'
+import api from '@/api'
+
+const { copy } = useClipboard()
+
+defineOptions({ name: '操作日志' })
+
+// 请求方法对应不同类型的标签 (计算属性传参)
+const tagType = computed(() => (type) => {
+  switch (type) {
+    case 'GET':
+      return 'info'
+    case 'POST':
+      return 'success'
+    case 'PUT':
+      return 'warning'
+    case 'DELETE':
+      return 'error'
+    default:
+      return 'info'
+  }
+})
+
+const $table = ref(null)
+const queryItems = ref({})
+const selections = ref([])
+
+onMounted(() => {
+  handleSearch()
+})
+
+const columns = [
+  { type: 'selection', width: 20, fixed: 'left' },
+  { title: '系统模块', key: 'opt_module', width: 70, align: 'center', ellipsis: { tooltip: true } },
+  { title: '操作类型', key: 'opt_type', width: 70, align: 'center', ellipsis: { tooltip: true } },
+  { title: '操作描述', key: 'opt_desc', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '请求方式',
+    key: 'request_method',
+    width: 80,
+    align: 'center',
+    ellipsis: { tooltip: true },
+    render(row) {
+      return h(
+        NTag,
+        { type: tagType.value(row.request_method) }, // 注意这里使用计算属性
+        { default: () => row.request_method },
+      )
+    },
+  },
+  { title: '操作人员', key: 'nickname', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  { title: '登录IP', key: 'ip_address', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  { title: '登录地址', key: 'ip_source', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '发布时间',
+    key: 'created_at',
+    align: 'center',
+    width: 80,
+    render(row) {
+      return h(
+        NButton,
+        { size: 'small', type: 'text', ghost: true },
+        {
+          default: () => formatDateTime(row.created_at, 'YYYY-MM-DD'),
+          icon: renderIcon('mdi:update', { size: 18 }),
+        },
+      )
+    },
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 120,
+    align: 'center',
+    fixed: 'right',
+    render(row) {
+      return [
+        h(
+          NButton,
+          {
+            size: 'small',
+            quaternary: true,
+            type: 'info',
+            onClick: () => handleView(row),
+          },
+          {
+            default: () => '查看',
+            icon: renderIcon('ic:outline-remove-red-eye', { size: 16 }),
+          },
+        ),
+        h(
+          NPopconfirm,
+          {
+            onPositiveClick: () => {
+              handleDelete(JSON.stringify([row.id]), false)
+            },
+            onNegativeClick: () => {},
+          },
+          {
+            trigger: () =>
+              h(
+                NButton,
+                {
+                  size: 'small',
+                  quaternary: true,
+                  type: 'error',
+                  style: 'margin-left: 15px;',
+                },
+                {
+                  default: () => '删除',
+                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+                },
+              ),
+            default: () => h('div', {}, '确定删除该日志吗?'),
+          },
+        ),
+      ]
+    },
+  },
+]
+
+function copyFormatCode(code) {
+  copy(JSON.stringify(JSON.parse(code), null, 2))
+  $message.success('内容已复制到剪切板!')
+}
+
+// 刷新时添加额外逻辑: 清空选中列表
+function handleSearch() {
+  selections.value = []
+  $table.value?.handleSearch()
+}
+
+const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
+  name: '日志',
+  doDelete: api.deleteOperationLogs,
+  refresh: handleSearch,
+})
+</script>
+
 <template>
   <!-- 业务页面 -->
   <CommonPage show-footer title="操作日志">
     <template #action>
-      <n-button
+      <NButton
         ml-20
         type="error"
         :disabled="!selections.length"
         @click="handleDelete(JSON.stringify(selections))"
-        ><TheIcon icon="material-symbols:playlist-remove" :size="18" mr-5 /> 批量删除
-      </n-button>
+      >
+        <TheIcon icon="material-symbols:playlist-remove" :size="18" mr-5 /> 批量删除
+      </NButton>
     </template>
 
     <!-- 表格 -->
@@ -17,7 +161,7 @@
       v-model:query-items="queryItems"
       :columns="columns"
       :selections="selections"
-      :get-data="logApi.getOperationLogs"
+      :get-data="api.getOperationLogs"
       @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
@@ -83,147 +227,3 @@
     </CrudModal>
   </CommonPage>
 </template>
-
-<script setup>
-import { NButton, NTag, NPopconfirm } from 'naive-ui'
-import { useClipboard } from '@vueuse/core'
-import { formatDateTime, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
-
-import logApi from '@/api/log'
-
-const { copy } = useClipboard()
-
-defineOptions({ name: '操作日志' })
-
-// 请求方法对应不同类型的标签 (计算属性传参)
-const tagType = computed(() => (type) => {
-  switch (type) {
-    case 'GET':
-      return 'info'
-    case 'POST':
-      return 'success'
-    case 'PUT':
-      return 'warning'
-    case 'DELETE':
-      return 'error'
-    default:
-      return 'info'
-  }
-})
-
-const $table = ref(null)
-const queryItems = ref({})
-const selections = ref([])
-
-onMounted(() => {
-  handleSearch()
-})
-
-const columns = [
-  { type: 'selection', width: 20, fixed: 'left' },
-  { title: '系统模块', key: 'opt_module', width: 70, align: 'center', ellipsis: { tooltip: true } },
-  { title: '操作类型', key: 'opt_type', width: 70, align: 'center', ellipsis: { tooltip: true } },
-  { title: '操作描述', key: 'opt_desc', width: 80, align: 'center', ellipsis: { tooltip: true } },
-  {
-    title: '请求方式',
-    key: 'request_method',
-    width: 80,
-    align: 'center',
-    ellipsis: { tooltip: true },
-    render(row) {
-      return h(
-        NTag,
-        { type: tagType.value(row['request_method']) }, // 注意这里使用计算属性
-        { default: () => row['request_method'] }
-      )
-    },
-  },
-  { title: '操作人员', key: 'nickname', width: 80, align: 'center', ellipsis: { tooltip: true } },
-  { title: '登录IP', key: 'ip_address', width: 80, align: 'center', ellipsis: { tooltip: true } },
-  { title: '登录地址', key: 'ip_source', width: 80, align: 'center', ellipsis: { tooltip: true } },
-  {
-    title: '发布时间',
-    key: 'created_at',
-    align: 'center',
-    width: 80,
-    render(row) {
-      return h(
-        NButton,
-        { size: 'small', type: 'text', ghost: true },
-        {
-          default: () => formatDateTime(row['created_at'], 'YYYY-MM-DD'),
-          icon: renderIcon('mdi:update', { size: 18 }),
-        }
-      )
-    },
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 120,
-    align: 'center',
-    fixed: 'right',
-    render(row) {
-      return [
-        h(
-          NButton,
-          {
-            size: 'small',
-            quaternary: true,
-            type: 'info',
-            onClick: () => handleView(row),
-          },
-          {
-            default: () => '查看',
-            icon: renderIcon('ic:outline-remove-red-eye', { size: 16 }),
-          }
-        ),
-        h(
-          NPopconfirm,
-          {
-            onPositiveClick: () => {
-              handleDelete(JSON.stringify([row.id]), false)
-            },
-            onNegativeClick: () => {},
-          },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  type: 'error',
-                  style: 'margin-left: 15px;',
-                },
-                {
-                  default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
-                }
-              ),
-            default: () => h('div', {}, '确定删除该日志吗?'),
-          }
-        ),
-      ]
-    },
-  },
-]
-
-function copyFormatCode(code) {
-  copy(JSON.stringify(JSON.parse(code), null, 2))
-  $message.success('内容已复制到剪切板!')
-}
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
-
-const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
-  name: '日志',
-  doDelete: logApi.deleteOperationLogs,
-  refresh: handleSearch,
-})
-</script>

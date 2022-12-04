@@ -1,3 +1,16 @@
+<script setup>
+import { useUserStore } from '@/store'
+import api from '@/api'
+const userStore = useUserStore()
+
+const homeInfo = ref({})
+onMounted(() => {
+  api.getHomeInfo().then((res) => {
+    homeInfo.value = res.data
+  })
+})
+</script>
+
 <template>
   <AppPage :show-footer="true">
     <div flex-1>
@@ -5,8 +18,12 @@
         <div flex items-center>
           <n-avatar round :size="60" :src="userStore.avatar" />
           <div ml-20>
-            <p text-16>Hello, {{ userStore.name }}</p>
-            <p text-12 mt-5 op-60>今天又是元气满满的一天</p>
+            <p text-16>
+              Hello, {{ userStore.name }}
+            </p>
+            <p text-12 mt-5 op-60>
+              今天又是元气满满的一天
+            </p>
           </div>
           <div ml-auto flex items-center>
             <!-- <n-statistic label="待办" :value="4">
@@ -63,7 +80,9 @@
 
       <n-card title="项目" size="small" segment mt-15 rounded-10>
         <template #header-extra>
-          <n-button text type="primary">更多</n-button>
+          <n-button text type="primary">
+            更多
+          </n-button>
         </template>
         <div flex flex-wrap justify-between>
           <n-card
@@ -74,28 +93,16 @@
             title="Gin Blog Admin"
             size="small"
           >
-            <p op-60>这是个基于 gin 开发的博客管理后台</p>
+            <p op-60>
+              这是个基于 gin 开发的博客管理后台
+            </p>
           </n-card>
-          <div w-300 h-0></div>
-          <div w-300 h-0></div>
-          <div w-300 h-0></div>
-          <div w-300 h-0></div>
+          <div w-300 h-0 />
+          <div w-300 h-0 />
+          <div w-300 h-0 />
+          <div w-300 h-0 />
         </div>
       </n-card>
     </div>
   </AppPage>
 </template>
-
-<script setup>
-import { useUserStore } from '@/store'
-import { useHomeAPI } from '@/api'
-const userStore = useUserStore()
-const { getHomeInfo } = useHomeAPI()
-
-const homeInfo = ref({})
-onMounted(() => {
-  getHomeInfo().then((res) => {
-    homeInfo.value = res.data
-  })
-})
-</script>

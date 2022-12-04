@@ -16,52 +16,54 @@
       <div flex flex-wrap justify-around p-10 rounded-10 b-1 bc-ccc>
         <!-- 点数为 1 -->
         <div w-50 h-50 b-1 rounded-5 f-c-c p-10 m-20>
-          <span w-6 h-6 rounded-3 bg-black></span>
+          <span w-6 h-6 rounded-3 bg-black />
         </div>
         <!-- 点数为 2 -->
         <div w-50 h-50 b-1 rounded-5 flex justify-between p-10 m-20>
-          <span w-6 h-6 rounded-3 bg-black></span>
-          <span w-6 h-6 rounded-3 bg-black self-end></span>
+          <span w-6 h-6 rounded-3 bg-black />
+          <span w-6 h-6 rounded-3 bg-black self-end />
         </div>
         <!-- 点数为 3 -->
         <div w-50 h-50 b-1 rounded-5 flex justify-between p-10 m-20>
-          <span w-6 h-6 rounded-3 bg-black></span>
-          <span w-6 h-6 rounded-3 bg-black self-center></span>
-          <span w-6 h-6 rounded-3 bg-black self-end></span>
+          <span w-6 h-6 rounded-3 bg-black />
+          <span w-6 h-6 rounded-3 bg-black self-center />
+          <span w-6 h-6 rounded-3 bg-black self-end />
         </div>
         <!-- 点数为 4 -->
         <div w-50 h-50 b-1 rounded-5 flex justify-between p-10 m-20>
           <div flex-col justify-between>
-            <span w-6 h-6 rounded-3 bg-black></span>
-            <span w-6 h-6 rounded-3 bg-black></span>
+            <span w-6 h-6 rounded-3 bg-black />
+            <span w-6 h-6 rounded-3 bg-black />
           </div>
           <div flex-col justify-between>
-            <span w-6 h-6 rounded-3 bg-black></span>
-            <span w-6 h-6 rounded-3 bg-black></span>
+            <span w-6 h-6 rounded-3 bg-black />
+            <span w-6 h-6 rounded-3 bg-black />
           </div>
         </div>
         <!-- 点数为 5 -->
         <div w-50 h-50 b-1 rounded-5 flex-col justify-between items-center p-10 m-20>
           <div flex w-full justify-between>
-            <span w-6 h-6 rounded-3 bg-black></span>
-            <span w-6 h-6 rounded-3 bg-black></span>
+            <span w-6 h-6 rounded-3 bg-black />
+            <span w-6 h-6 rounded-3 bg-black />
           </div>
-          <div w-6 h-6 rounded-3 bg-black></div>
+          <div w-6 h-6 rounded-3 bg-black />
           <div flex w-full justify-between>
-            <span w-6 h-6 rounded-3 bg-black></span>
-            <span w-6 h-6 rounded-3 bg-black></span>
+            <span w-6 h-6 rounded-3 bg-black />
+            <span w-6 h-6 rounded-3 bg-black />
           </div>
         </div>
         <!-- 点数为 6 -->
         <div w-50 h-50 b-1 rounded-5 flex-col justify-between p-10 m-20>
           <div v-for="i in 3" :key="i" flex justify-between>
-            <span w-6 h-6 rounded-3 bg-black></span>
-            <span w-6 h-6 rounded-3 bg-black></span>
+            <span w-6 h-6 rounded-3 bg-black />
+            <span w-6 h-6 rounded-3 bg-black />
           </div>
         </div>
       </div>
 
-      <h2 font-normal text-14 mt-10 color-gray>Flex 骰子</h2>
+      <h2 font-normal text-14 mt-10 color-gray>
+        Flex 骰子
+      </h2>
     </div>
   </CommonPage>
 </template>

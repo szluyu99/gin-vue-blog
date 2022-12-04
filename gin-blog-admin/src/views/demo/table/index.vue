@@ -1,10 +1,154 @@
+<script setup>
+import { NButton, NSwitch } from 'naive-ui'
+import api from './api'
+import { formatDateTime, isNullOrUndef, renderIcon } from '@/utils'
+import { useCRUD } from '@/hooks'
+
+defineOptions({ name: 'CrudTable' })
+
+const $table = ref(null)
+/** QueryBar筛选参数（可选） */
+const queryItems = ref({})
+/** 补充参数（可选） */
+const extraParams = ref({})
+
+const {
+  modalVisible,
+  modalAction,
+  modalTitle,
+  modalLoading,
+  handleAdd,
+  handleDelete,
+  handleEdit,
+  handleView,
+  handleSave,
+  modalForm,
+  modalFormRef,
+} = useCRUD({
+  name: '文章',
+  initForm: { author: '大脸怪' },
+  doCreate: api.addPost,
+  doDelete: api.deletePost,
+  doUpdate: api.updatePost,
+  refresh: () => $table.value?.handleSearch(),
+})
+
+onMounted(() => {
+  // 调用子组件中的方法
+  $table.value?.handleSearch()
+})
+
+const columns = [
+  { type: 'selection', fixed: 'left' },
+  {
+    title: '发布',
+    key: 'isPublish',
+    width: 60,
+    align: 'center',
+    fixed: 'left',
+    render(row) {
+      return h(NSwitch, {
+        size: 'small',
+        rubberBand: false,
+        value: row.isPublish,
+        loading: !!row.publishing,
+        onUpdateValue: () => handlePublish(row),
+      })
+    },
+  },
+  { title: '标题', key: 'title', width: 150, ellipsis: { tooltip: true } },
+  { title: '分类', key: 'category', width: 80, ellipsis: { tooltip: true } },
+  { title: '创建人', key: 'author', width: 80 },
+  {
+    title: '创建时间',
+    key: 'createDate',
+    width: 150,
+    render(row) {
+      return h('span', formatDateTime(row.createDate))
+    },
+  },
+  {
+    title: '最后更新时间',
+    key: 'updateDate',
+    width: 150,
+    render(row) {
+      return h('span', formatDateTime(row.updateDate))
+    },
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 240,
+    align: 'center',
+    fixed: 'right',
+    render(row) {
+      return [
+        h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            secondary: true,
+            onClick: () => handleView(row),
+          },
+          { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
+        ),
+        h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            style: 'margin-left: 15px;',
+            onClick: () => handleEdit(row),
+          },
+          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
+        ),
+
+        h(
+          NButton,
+          {
+            size: 'small',
+            type: 'error',
+            style: 'margin-left: 15px;',
+            onClick: () => handleDelete(row.id),
+          },
+          {
+            default: () => '删除',
+            icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+          },
+        ),
+      ]
+    },
+  },
+]
+
+// 选中事件
+function onChecked(rowKeys) {
+  if (rowKeys.length)
+    $message.info(`选中 ${rowKeys.join(' ')}`)
+}
+
+// 发布
+function handlePublish(row) {
+  if (isNullOrUndef(row.id))
+    return
+
+  row.publishing = true
+  setTimeout(() => {
+    row.isPublish = !row.isPublish
+    row.publishing = false
+    $message?.success(row.isPublish ? '已发布' : '已取消发布')
+  }, 1000)
+}
+</script>
+
 <template>
   <!-- 业务页面 -->
   <CommonPage show-footer title="文章">
     <template #action>
-      <n-button type="primary" @click="handleAdd">
+      <NButton type="primary" @click="handleAdd">
         <TheIcon icon="material-symbols:add" :size="18" class="mr-5" /> 新建文章
-      </n-button>
+      </NButton>
     </template>
 
     <!-- 表格 -->
@@ -84,145 +228,3 @@
     </CrudModal>
   </CommonPage>
 </template>
-
-<script setup>
-import { NButton, NSwitch } from 'naive-ui'
-import { formatDateTime, renderIcon, isNullOrUndef } from '@/utils'
-import { useCRUD } from '@/hooks'
-import api from './api'
-
-defineOptions({ name: 'CrudTable' })
-
-const $table = ref(null)
-/** QueryBar筛选参数（可选） */
-const queryItems = ref({})
-/** 补充参数（可选） */
-const extraParams = ref({})
-
-onMounted(() => {
-  // 调用子组件中的方法
-  $table.value?.handleSearch()
-})
-
-const columns = [
-  { type: 'selection', fixed: 'left' },
-  {
-    title: '发布',
-    key: 'isPublish',
-    width: 60,
-    align: 'center',
-    fixed: 'left',
-    render(row) {
-      return h(NSwitch, {
-        size: 'small',
-        rubberBand: false,
-        value: row['isPublish'],
-        loading: !!row.publishing,
-        onUpdateValue: () => handlePublish(row),
-      })
-    },
-  },
-  { title: '标题', key: 'title', width: 150, ellipsis: { tooltip: true } },
-  { title: '分类', key: 'category', width: 80, ellipsis: { tooltip: true } },
-  { title: '创建人', key: 'author', width: 80 },
-  {
-    title: '创建时间',
-    key: 'createDate',
-    width: 150,
-    render(row) {
-      return h('span', formatDateTime(row['createDate']))
-    },
-  },
-  {
-    title: '最后更新时间',
-    key: 'updateDate',
-    width: 150,
-    render(row) {
-      return h('span', formatDateTime(row['updateDate']))
-    },
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 240,
-    align: 'center',
-    fixed: 'right',
-    render(row) {
-      return [
-        h(
-          NButton,
-          {
-            size: 'small',
-            type: 'primary',
-            secondary: true,
-            onClick: () => handleView(row),
-          },
-          { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 14 }) }
-        ),
-        h(
-          NButton,
-          {
-            size: 'small',
-            type: 'primary',
-            style: 'margin-left: 15px;',
-            onClick: () => handleEdit(row),
-          },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) }
-        ),
-
-        h(
-          NButton,
-          {
-            size: 'small',
-            type: 'error',
-            style: 'margin-left: 15px;',
-            onClick: () => handleDelete(row.id),
-          },
-          {
-            default: () => '删除',
-            icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-          }
-        ),
-      ]
-    },
-  },
-]
-
-// 选中事件
-function onChecked(rowKeys) {
-  if (rowKeys.length) $message.info(`选中 ${rowKeys.join(' ')}`)
-}
-
-// 发布
-function handlePublish(row) {
-  if (isNullOrUndef(row.id)) return
-
-  row.publishing = true
-  setTimeout(() => {
-    row.isPublish = !row.isPublish
-    row.publishing = false
-    $message?.success(row.isPublish ? '已发布' : '已取消发布')
-  }, 1000)
-}
-
-const {
-  modalVisible,
-  modalAction,
-  modalTitle,
-  modalLoading,
-  handleAdd,
-  handleDelete,
-  handleEdit,
-  handleView,
-  handleSave,
-  modalForm,
-  modalFormRef,
-} = useCRUD({
-  name: '文章',
-  initForm: { author: '大脸怪' },
-  doCreate: api.addPost,
-  doDelete: api.deletePost,
-  doUpdate: api.updatePost,
-  refresh: () => $table.value?.handleSearch(),
-})
-</script>

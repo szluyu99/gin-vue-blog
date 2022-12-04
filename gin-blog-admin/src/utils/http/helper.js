@@ -1,9 +1,8 @@
 import { useUserStore } from '@/store'
 
 export function addBaseParams(params) {
-  if (!params.userId) {
+  if (!params.userId)
     params.userId = useUserStore().userId
-  }
 }
 
 export function resolveResError(code, message) {
@@ -14,7 +13,7 @@ export function resolveResError(code, message) {
       break
     case 401:
       message = message ?? '登录已过期'
-      useUserStore().forceOffline()
+      useUserStore().forceOffline() // 被迫过期, 强制离线
       break
     case 403:
       message = message ?? '没有权限'

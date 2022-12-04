@@ -1,21 +1,21 @@
 import { defineStore } from 'pinia'
-import { asyncRoutes, basicRoutes, asyncViewMap } from '@/router/routes'
-
-import { useAuthApi } from '@/api'
-const { getUserMenus } = useAuthApi()
-
+import { shallowRef } from 'vue'
+import { asyncRoutes, asyncViewMap, basicRoutes } from '@/router/routes'
 import Layout from '@/layout/index.vue'
+import api from '@/api'
 
 // 判断用户角色是否有权限访问路由
 function hasPermission(route, role) {
   // 路由不需要权限直接返回 true
-  if (!route.meta?.requireAuth) return true
+  if (!route.meta?.requireAuth)
+    return true
   // 路由需要的角色
   const routeRole = route.meta?.role ?? []
   // 登录用户没有角色 或者 路由没有设置角色判断, 为没有权限
-  if (!role.length || !routeRole.length) return false
+  if (!role.length || !routeRole.length)
+    return false
   // 路由指定的角色包含任登录用户角色则判定有权限
-  return role.some((item) => routeRole.includes(item))
+  return role.some(item => routeRole.includes(item))
 }
 
 // 过滤出有权限访问的路由
@@ -25,15 +25,13 @@ function filterAsyncRoutes(routes = [], role) {
     // FIXME: 需要先判断 route 不为 null, 什么原因会加入 null? 初步估计是 route.js 中的配置...
     if (route && hasPermission(route, role)) {
       const curRoute = { ...route, children: [] }
-      if (route.children?.length) {
+      if (route.children?.length)
         curRoute.children = filterAsyncRoutes(route.children, role)
-      } else {
+      else
         Reflect.deleteProperty(curRoute, 'children')
-      }
       res.push(curRoute)
     }
   })
-  // console.log('filterAsyncRoutes: ', res)
   return res
 }
 
@@ -50,14 +48,14 @@ export const usePermissionStore = defineStore('permission', {
     },
     menus() {
       // 过滤掉 isHidden 的路由
-      return this.routes.filter((route) => route.name && !route.isHidden)
+      return this.routes.filter(route => route.name && !route.isHidden)
     },
   },
   actions: {
     // ! 后端生成路由
     async generateRoutesFromBack() {
-      const res = await getUserMenus()
-      this.accessRoutes = res.data.map((e) => ({
+      const res = await api.getUserMenus()
+      this.accessRoutes = res.data.map(e => ({
         name: e.name,
         path: e.component !== 'Layout' ? '/' : e.path, // 处理目录是一级菜单的情况
         component: shallowRef(Layout), // 不使用 shallowRef 控制台会有 warning
@@ -69,10 +67,9 @@ export const usePermissionStore = defineStore('permission', {
           order: e.order_num,
           keepAlive: e.keep_alive,
         },
-        children: e.children.map((ee) => ({
+        children: e.children.map(ee => ({
           name: ee.name,
           path: ee.path, // 父路径 + 当前菜单路径
-          // component: () => import(`../../../../src/views${ee.component}`), // 方法1: 不优雅
           component: shallowRef(asyncViewMap.get(`/src/views${ee.component}/index.vue`)), // *
           isHidden: ee.is_hidden,
           meta: {
@@ -83,7 +80,6 @@ export const usePermissionStore = defineStore('permission', {
           },
         })),
       }))
-      // console.log(this.accessRoutes)
       return this.accessRoutes
     },
     // ! 前端控制路由权限: 根据角色过滤路由

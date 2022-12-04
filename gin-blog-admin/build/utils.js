@@ -7,7 +7,7 @@ import path from 'path'
  * @descrition 结尾不带 '/'
  */
 export function getRootPath() {
-  return path.resolve(process.cwd()) // current work directory
+  return path.resolve(process.cwd()) // cwd - current work directory
 }
 
 /**
@@ -28,11 +28,14 @@ export function getSrcPath(srcName = 'src') {
 // '3000' -> 3000
 export function convertEnv(envObj) {
   const result = {}
-  if (!envObj) return result
+  if (!envObj)
+    return result
   for (const envKey in envObj) {
     let envVal = envObj[envKey]
-    if (['true', 'false'].includes(envVal)) envVal = envVal === 'true'
-    if (['VITE_PORT'].includes(envKey)) envVal = +envVal
+    if (['true', 'false'].includes(envVal))
+      envVal = envVal === 'true'
+    if (['VITE_PORT'].includes(envKey))
+      envVal = +envVal
     result[envKey] = envVal
   }
   return result

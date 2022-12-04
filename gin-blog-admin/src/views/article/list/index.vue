@@ -1,29 +1,265 @@
+<script setup>
+import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
+import { formatDateTime, renderIcon } from '@/utils'
+import { useCRUD } from '@/hooks'
+import { router } from '@/router'
+import { artTypeMap, artTypeOptions } from '@/constant/data'
+import api from '@/api'
+
+// 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
+defineOptions({ name: '文章列表' })
+
+const route = useRoute()
+const categoryOptions = ref([])
+const tagOptions = ref([])
+
+onMounted(async () => {
+  api.getCategoryOption().then(res => (categoryOptions.value = res.data))
+  api.getTagOption().then(res => (tagOptions.value = res.data))
+  handleChangeTab('all') // 默认查看全部
+})
+
+// ! 切换页面时, 如果是 [写文章] 页面跳转过来, 会携带 needRefresh 参数
+onActivated(() => {
+  const { needRefresh } = route.query
+  needRefresh && handleSearch()
+})
+
+const $table = ref(null)
+const queryItems = ref({})
+const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
+const selections = ref([])
+
+const { handleDelete } = useCRUD({
+  name: '文章',
+  doDelete: updateOrDeleteArticles, // 软删除
+  refresh: () => handleSearch(),
+})
+
+const columns = [
+  { type: 'selection', width: 20, fixed: 'left' },
+  {
+    title: '文章封面',
+    key: 'img',
+    width: 80,
+    align: 'center',
+    render(row) {
+      return h(NImage, {
+        'height': 90,
+        'imgProps': { style: { 'border-radius': '3px' } },
+        // 特殊处理本地图片, TODO: 更好的做法
+        'src': row.img.startsWith('http') ? row.img : `http://localhost:8765/${row.img}`,
+        'fallback-src': 'http://dummyimage.com/400x400',
+        'show-toolbar-tooltip': true,
+      })
+    },
+  },
+  { title: '文章标题', key: 'title', width: 120, align: 'center', ellipsis: { tooltip: true } },
+  { title: '分类', key: 'category.name', width: 60, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '标签',
+    key: 'tags',
+    width: 120,
+    align: 'center',
+    render(row) {
+      const tags = row.tags ?? []
+      const group = []
+      for (let i = 0; i < tags.length; i++) {
+        group.push(
+          h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => tags[i].name }),
+        )
+      }
+      return h('div', group)
+    },
+  },
+  {
+    title: '类型',
+    key: 'type',
+    width: 50,
+    align: 'center',
+    render(row) {
+      return h(
+        NTag,
+        { type: artTypeMap[row.type].tag },
+        { default: () => artTypeMap[row.type].name },
+      )
+    },
+  },
+  {
+    title: '发布时间',
+    key: 'updateDate',
+    align: 'center',
+    width: 80,
+    render(row) {
+      return h(
+        NButton,
+        { size: 'small', type: 'text', ghost: true },
+        {
+          default: () => formatDateTime(row.updated_at, 'YYYY-MM-DD'),
+          icon: renderIcon('mdi:update', { size: 18 }),
+        },
+      )
+    },
+  },
+  {
+    title: '置顶',
+    key: 'is_top',
+    width: 50,
+    align: 'center',
+    fixed: 'left',
+    render(row) {
+      return h(NSwitch, {
+        size: 'small',
+        rubberBand: false,
+        value: row.is_top,
+        loading: !!row.publishing,
+        checkedValue: 1,
+        uncheckedValue: 0,
+        onUpdateValue: () => handleUpdateTop(row),
+      })
+    },
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 120,
+    align: 'center',
+    fixed: 'right',
+    render(row) {
+      return [
+        row.is_delete
+          ? h(
+            NButton,
+            {
+              size: 'small',
+              type: 'success',
+              secondary: true,
+              onClick: async () => {
+                // 软删除恢复
+                await api.softDeleteArticle({ ids: [row.id], is_delete: 0 })
+                await $table?.value.handleSearch()
+              },
+            },
+            { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
+          )
+          : h(
+            NButton,
+            {
+              size: 'small',
+              type: 'primary',
+              secondary: true,
+              onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
+            },
+            { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
+          ),
+        h(
+          NPopconfirm,
+          {
+            onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false),
+          },
+          {
+            trigger: () =>
+              h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'error',
+                  style: 'margin-left: 15px;',
+                },
+                {
+                  default: () => '删除',
+                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+                },
+              ),
+            default: () => h('div', {}, '确定删除该文章吗?'),
+          },
+        ),
+      ]
+    },
+  },
+]
+
+// extraParams 中的 is_delete 为 0 则软删除, is_delete 为 1 则物理删除
+function updateOrDeleteArticles(ids) {
+  extraParams.value.is_delete === 0
+    ? api.softDeleteArticle({ ids: JSON.parse(ids), is_delete: 1 })
+    : api.deleteArticle(ids)
+}
+
+// 修改文章置顶
+async function handleUpdateTop(row) {
+  if (!row.id)
+    return
+  row.publishing = true
+  row.is_top = row.is_top === 0 ? 1 : 0
+  await api.updateArticleTop(row)
+  row.publishing = false
+  $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
+  handleSearch()
+}
+
+// 切换标签页: [全部, 公开, 私密, 草稿箱, 回收站]
+function handleChangeTab(value) {
+  switch (value) {
+    case 'all':
+      extraParams.value.is_delete = 0
+      extraParams.value.status = null
+      break
+    case 'public':
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 1
+      break
+    case 'secret':
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 2
+      break
+    case 'draft':
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 3
+      break
+    case 'delete':
+      extraParams.value.is_delete = 1
+      extraParams.value.status = null
+      break
+  }
+  handleSearch()
+}
+
+// 刷新时添加额外逻辑: 清空选中列表
+function handleSearch() {
+  selections.value = []
+  $table.value?.handleSearch()
+}
+</script>
+
 <template>
   <!-- 业务页面 -->
   <CommonPage show-footer title="文章列表">
     <!-- 操作栏 -->
     <template #action>
-      <n-button type="primary" @click="router.replace('/article/write')">
+      <NButton type="primary" @click="router.replace('/article/write')">
         <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建文章
-      </n-button>
-      <n-button
+      </NButton>
+      <NButton
         ml-20
         type="error"
         :disabled="!selections.length"
         @click="handleDelete(JSON.stringify(selections))"
       >
         <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
-      </n-button>
-      <n-button ml-20 type="info" :disabled="!selections.length" @click="() => {}">
+      </NButton>
+      <NButton ml-20 type="info" :disabled="!selections.length" @click="() => {}">
         <TheIcon icon="mdi:export" :size="18" mr-5 /> 批量导出
-      </n-button>
-      <n-button ml-20 type="success" @click="() => {}">
+      </NButton>
+      <NButton ml-20 type="success" @click="() => {}">
         <TheIcon icon="mdi:import" :size="18" mr-5 /> 批量导入
-      </n-button>
+      </NButton>
     </template>
     <!-- 导航栏 -->
     <n-tabs type="line" animated @update:value="handleChangeTab">
-      <template #prefix> 状态 </template>
+      <template #prefix>
+        状态
+      </template>
       <n-tab-pane name="all" tab="全部" />
       <n-tab-pane name="public" tab="公开" />
       <n-tab-pane name="secret" tab="私密" />
@@ -36,7 +272,7 @@
       v-model:query-items="queryItems"
       :extra-params="extraParams"
       :columns="columns"
-      :get-data="getArticles"
+      :get-data="api.getArticles"
       :selections="selections"
       @on-checked="(rowKeys) => (selections = rowKeys)"
     >
@@ -83,243 +319,3 @@
     </CrudTable>
   </CommonPage>
 </template>
-
-<script setup>
-import { NButton, NImage, NSwitch, NTag, NPopconfirm } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
-import { router } from '@/router'
-
-import { artTypeOptions, artTypeMap } from '@/constant/data'
-
-import { useArticleApi, useCategoryApi, useTagApi } from '@/api'
-const { getArticles, deleteArticle, updateArticleTop, softDeleteArticle } = useArticleApi()
-const { getCategoryOption } = useCategoryApi()
-const { getTagOption } = useTagApi()
-
-const route = useRoute()
-
-// 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
-defineOptions({ name: '文章列表' })
-
-const categoryOptions = ref([])
-const tagOptions = ref([])
-
-onMounted(async () => {
-  getCategoryOption().then((res) => (categoryOptions.value = res.data))
-  getTagOption().then((res) => (tagOptions.value = res.data))
-  handleChangeTab('all') // 默认查看全部
-})
-
-//! 切换页面时, 如果是 [写文章] 页面跳转过来, 会携带 needRefresh 参数
-onActivated(() => {
-  const { needRefresh } = route.query
-  needRefresh && handleSearch()
-})
-
-const $table = ref(null)
-const queryItems = ref({})
-const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
-const selections = ref([])
-
-const columns = [
-  { type: 'selection', width: 20, fixed: 'left' },
-  {
-    title: '文章封面',
-    key: 'img',
-    width: 80,
-    align: 'center',
-    render(row) {
-      return h(NImage, {
-        height: 90,
-        imgProps: { style: { 'border-radius': '3px' } },
-        // 特殊处理本地图片, TODO: 更好的做法
-        src: row['img'].startsWith('http') ? row['img'] : 'http://localhost:8765/' + row['img'],
-        'fallback-src': 'http://dummyimage.com/400x400',
-        'show-toolbar-tooltip': true,
-      })
-    },
-  },
-  { title: '文章标题', key: 'title', width: 120, align: 'center', ellipsis: { tooltip: true } },
-  { title: '分类', key: 'category.name', width: 60, align: 'center', ellipsis: { tooltip: true } },
-  {
-    title: '标签',
-    key: 'tags',
-    width: 120,
-    align: 'center',
-    render(row) {
-      const tags = row.tags ?? []
-      let group = []
-      for (let i = 0; i < tags.length; i++) {
-        group.push(
-          h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => tags[i].name })
-        )
-      }
-      return h('div', group)
-    },
-  },
-  {
-    title: '类型',
-    key: 'type',
-    width: 50,
-    align: 'center',
-    render(row) {
-      return h(
-        NTag,
-        { type: artTypeMap[row['type']].tag },
-        { default: () => artTypeMap[row['type']].name }
-      )
-    },
-  },
-  // { title: '文章描述', key: 'desc', width: 150, align: 'center', ellipsis: { tooltip: true } },
-  {
-    title: '发布时间',
-    key: 'updateDate',
-    align: 'center',
-    width: 80,
-    render(row) {
-      return h(
-        NButton,
-        { size: 'small', type: 'text', ghost: true },
-        {
-          default: () => formatDateTime(row['updated_at'], 'YYYY-MM-DD'),
-          icon: renderIcon('mdi:update', { size: 18 }),
-        }
-      )
-    },
-  },
-  {
-    title: '置顶',
-    key: 'is_top',
-    width: 50,
-    align: 'center',
-    fixed: 'left',
-    render(row) {
-      return h(NSwitch, {
-        size: 'small',
-        rubberBand: false,
-        value: row['is_top'],
-        loading: !!row.publishing,
-        checkedValue: 1,
-        uncheckedValue: 0,
-        onUpdateValue: () => handleUpdateTop(row),
-      })
-    },
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 120,
-    align: 'center',
-    fixed: 'right',
-    render(row) {
-      return [
-        row['is_delete']
-          ? h(
-              NButton,
-              {
-                size: 'small',
-                type: 'success',
-                secondary: true,
-                onClick: async () => {
-                  // 软删除恢复
-                  await softDeleteArticle({ ids: [row.id], is_delete: 0 })
-                  await $table?.value.handleSearch()
-                },
-              },
-              { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 14 }) }
-            )
-          : h(
-              NButton,
-              {
-                size: 'small',
-                type: 'primary',
-                secondary: true,
-                onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
-              },
-              { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 14 }) }
-            ),
-        h(
-          NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false),
-          },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'error',
-                  style: 'margin-left: 15px;',
-                },
-                {
-                  default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-                }
-              ),
-            default: () => h('div', {}, '确定删除该文章吗?'),
-          }
-        ),
-      ]
-    },
-  },
-]
-
-// extraParams 中的 is_delete 为 0 则软删除, is_delete 为 1 则物理删除
-function updateOrDeleteArticles(ids) {
-  extraParams.value.is_delete == 0
-    ? softDeleteArticle({ ids: JSON.parse(ids), is_delete: 1 })
-    : deleteArticle(ids)
-}
-
-// 修改文章置顶
-async function handleUpdateTop(row) {
-  if (!row.id) return
-  row.publishing = true
-  row.is_top = row.is_top === 0 ? 1 : 0
-  await updateArticleTop(row)
-  row.publishing = false
-  $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
-  handleSearch()
-}
-
-// 切换标签页: [全部, 公开, 私密, 草稿箱, 回收站]
-function handleChangeTab(value) {
-  switch (value) {
-    case 'all':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = null
-      break
-    case 'public':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 1
-      break
-    case 'secret':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 2
-      break
-    case 'draft':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 3
-      break
-    case 'delete':
-      extraParams.value.is_delete = 1
-      extraParams.value.status = null
-      break
-  }
-  handleSearch()
-}
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
-
-const { handleDelete } = useCRUD({
-  name: '文章',
-  doDelete: updateOrDeleteArticles, // 软删除
-  refresh: () => handleSearch(),
-})
-</script>

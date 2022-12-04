@@ -1,19 +1,19 @@
-import { getToken } from '@/utils'
 import { resolveResError } from './helper'
+import { getToken } from '@/utils'
 
 // 发送请求前的操作
 export function reqResolve(config) {
-  // console.log(config.url)
-
   // 发送请求前的配置: 不需要 token, 直接发送即可
-  if (config.noNeedToken) return config
+  if (config.noNeedToken)
+    return config
 
   // 获取本地存储的 token, 不存在则登录过期
   const token = getToken()
-  if (!token) return Promise.reject({ code: 401, message: '登录已过期，请重新登陆！' })
+  if (!token)
+    return Promise.reject({ code: 401, message: '登录已过期，请重新登陆！' })
 
   // * JWT Bearer 认证: 在请求头 Authorization 添加 token
-  config.headers.Authorization = config.headers.Authorization || 'Bearer ' + token
+  config.headers.Authorization = config.headers.Authorization || `Bearer ${token}`
   return config
 }
 
@@ -26,7 +26,7 @@ export function reqReject(err) {
 // 响应成功的操作
 export function resResolve(resp) {
   // console.log('响应成功', resp)
-  // TODO: 处理不同的 r.headers
+  // TODO: 处理不同的 resp.headers
   // 响应结构 http://axios-js.com/zh-cn/docs/#响应结构
   const { data, status, config, statusText } = resp
   // 处理请求异常: 自定义状态码异常
