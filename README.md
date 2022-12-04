@@ -40,6 +40,7 @@ Gitee地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu
 在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)
 
 > 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改
+>
 > 并且由于一开始不会用 Apifox，接口文档生成的信息不全（如返回响应、响应示例），抽空完善一下
 
 ## 目录结构
@@ -52,8 +53,6 @@ gin-vue-blog
 ├── gin-blog-front      -- 博客前台前端
 ├── gin-blog-server     -- 博客后端
 ```
-
-需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。
 
 > 项目运行参考：[快速开始](#快速开始)
 
@@ -115,7 +114,7 @@ gin-blog-server
 
 ## 技术介绍
 
-> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件
+> 这里只写一些主流的通用技术，详细第三方库：前端参考 `package.json` 文件，后端参考 `go.mod` 文件
 
 前台前端：使用 pnpm 包管理工具
 - 基于 TypeScript
@@ -130,7 +129,6 @@ gin-blog-server
 
 后台前端：使用 pnpm 包管理工具
 - 基于 JavaSciprt 
-- pnpm: 包管理工具
 - Vue3
 - Unocss: 原子化 CSS
 - Pinia 
@@ -215,7 +213,11 @@ gin-blog-server
 ### 本地运行
 
 > 目前需要自行安装 Golang、Node、MySQL、Redis 环境
+>
 > TODO: 完全基于 Docker 的运行教程（Docker 实在太好用了！）
+
+
+需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。
 
 拉取项目到本地：
 
@@ -274,7 +276,7 @@ pnpm run dev
 
 ### 项目部署
 
-**目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善**。
+**目前暂时不推荐将本博客部署上生产环境，因为还有很多功能未完善**。
 
 但是相信本项目对于 Golang 学习者绝对是个合适的项目！
 
@@ -294,7 +296,7 @@ Docker 打包成镜像指令：
 docker build -t ginblog .
 ```
 
-> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。
+> 以上只是简单说明，等功能全部完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。
 
 ## 项目总结
 
@@ -326,9 +328,9 @@ docker build -t ginblog .
 - 后端日志切割
 - 后台修改背景图片，博客配置等
 - 后端的 IP 地址检测 BUG 待修复
+- 博客前台适配移动端
 
 后续有空安排上：
-- 适配移动端
 - 黑夜模式
 - 前台收缩侧边信息功能
 - 说说
