@@ -18,7 +18,7 @@
     </a>
 </p>
 
-[在线预览](#在线预览) | [目录结构](#目录结构) | [技术介绍](#技术介绍) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [项目总结](#项目总结) 
+[在线预览](#在线预览) | [目录结构](#目录结构) | [技术介绍](#技术介绍) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [项目总结](#项目总结)  | [鸣谢项目](#鸣谢项目) | [后续计划](#后续计划)
 
 因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。
 
@@ -40,6 +40,7 @@ Gitee地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu
 在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)
 
 > 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改
+> 并且由于一开始不会用 Apifox，接口文档生成的信息不全（如返回响应、响应示例），抽空完善一下
 
 ## 目录结构
 
@@ -84,7 +85,11 @@ gin-blog-server
 └── main.go
 ```
 
+前端目录：自行参考代码文件
+
 ## 项目介绍
+
+市面上有太多优秀的前后台框架，本项目也是参考了很多开源项目，但是大多项目过于重量级（并非坏处），如果从学习的角度来看对初学者并不是很友好。本项目在以**博客**这个业务为主的前提下，提供一个完整的全栈项目代码（前台前端 + 后台前端 + 后端），技术点基本都是最新 + 最火的技术，代码轻量级，注释完善，适合学习。
 
 前台：
 - 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁
@@ -99,10 +104,14 @@ gin-blog-server
 - 支持动态权限修改，前端菜单由后端生成
 - 文章编辑使用 Markdown 编辑器
 - 常规后台功能齐全：侧边栏、面包屑、标签栏等
+- 实现记录操作日志功能（GET 不记录）
+- 实现监听在线用户、强制下线功能
 
 其他：
+- 采用 Restful 风格的 API
 - 前后端分离部署，前端使用 Nginx，后端使用 Docker
 - 代码整洁层次清晰，利于开发者学习
+- 技术点新颖，代码轻量级
 
 ## 技术介绍
 
@@ -163,18 +172,50 @@ gin-blog-server
 | MobaXterm                     | Linux 远程工具          |
 | Apifox                        | 接口调试 + 文档生成     |
 
-
 | 开发环境 | 版本 |
 | -------- | ---- |
 | Golang   | 1.19 |
 | MySQL    | 8.x  |
 | Redis    | 7.x  |
 
+
+### Vscode 插件
+
+如果使用 Vscode 开发，推荐安装一下以下插件。
+
+> 前后端相关插件属于**开发必须插件**，还有很多提升开发效果的插件后面推荐一下
+
+前端开发插件：
+
+| 插件 | 作用 |
+| -------- | ---- |
+| Volar   | Vue 官方插件 |
+| UnoCSS | Unocss 官方插件 |
+| Tailwind CSS IntelliSense | Tailwind 官方插件 |
+| Iconify IntelliSense | Iconify 提示插件 |
+
+后端开发插件：
+
+| 插件 | 作用 |
+| -------- | ---- |
+| Go | Golang 官方插件 |
+
+
+通用插件：（非开发必须，个人推荐）
+
+| 名称 | 作用 |
+| -------- | ---- |
+| Better Comments   | 优化代码注释显示效果 |
+| TODO Highlight | 高亮 TODO |
+| Highlight Matching Tag | 高亮匹配的标签 | 
+
+
 ## 快速开始
 
 ### 本地运行
 
-> 自行安装 Golang、Node、MySQL、Redis 环境
+> 目前需要自行安装 Golang、Node、MySQL、Redis 环境
+> TODO: 完全基于 Docker 的运行教程（Docker 实在太好用了！）
 
 拉取项目到本地：
 
@@ -233,7 +274,7 @@ pnpm run dev
 
 ### 项目部署
 
-目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。
+**目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善**。
 
 但是相信本项目对于 Golang 学习者绝对是个合适的项目！
 
@@ -261,6 +302,17 @@ docker build -t ginblog .
 
 最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。
 
+## 鸣谢项目
+
+- [https://butterfly.js.org/](https://butterfly.js.org/)
+- [https://github.com/flipped-aurora/gin-vue-admin](https://github.com/flipped-aurora/gin-vue-admin)
+- [https://github.com/qifengzhang007/GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
+- [https://github.com/X1192176811/blog](https://github.com/X1192176811/blog)
+- [https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin)
+- ...
+
+> 需要感谢的绝不止以上这些开源项目，但是一时难以全部列出，后面会慢慢补上。
+
 ## 后续计划
 
 高优先级: 
@@ -273,13 +325,14 @@ docker build -t ginblog .
 - 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）
 - 后端日志切割
 - 后台修改背景图片，博客配置等
-- 相册
+- 后端的 IP 地址检测 BUG 待修复
 
 后续有空安排上：
 - 适配移动端
 - 黑夜模式
 - 前台收缩侧边信息功能
 - 说说
+- 相册
 - 音乐播放器
 - 鼠标左击特效
 - 看板娘
@@ -291,3 +344,4 @@ docker build -t ginblog .
 其他：
 - 写一份好的文档
 - 补全 README.md
+- 完善 Apifox 生成的接口文档
