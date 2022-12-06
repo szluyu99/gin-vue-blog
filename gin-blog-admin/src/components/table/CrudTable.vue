@@ -30,12 +30,12 @@ const props = defineProps({
     required: true,
   },
   /** 选中的列 **/
-  selections: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
+  // selections: {
+  //   type: Array,
+  //   default() {
+  //     return []
+  //   },
+  // },
   /** queryBar 中的参数 */
   queryItems: {
     type: Object,
@@ -66,6 +66,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:queryItems', 'onChecked'])
+
+const selections = ref([]) // 多选
+
 const loading = ref(false)
 const initQuery = { ...props.queryItems }
 const tableData = ref([])
@@ -90,6 +93,8 @@ const pagination = reactive({
 })
 
 async function handleQuery() {
+  selections.value = [] // 重置选中
+
   try {
     loading.value = true
     let paginationParams = {}
@@ -141,6 +146,8 @@ function onPageChange(currentPage) {
 }
 
 function onChecked(rowKeys) {
+  selections.value = rowKeys
+  // 包含 selection
   if (props.columns.some(item => item.type === 'selection'))
     emit('onChecked', rowKeys)
 }
@@ -148,11 +155,17 @@ function onChecked(rowKeys) {
 defineExpose({
   handleSearch,
   handleReset,
+  selections,
 })
 </script>
 
 <template>
-  <QueryBar v-if="$slots.queryBar" mb-30 @search="handleSearch" @reset="handleReset">
+  <QueryBar
+    v-if="$slots.queryBar"
+    mb-30
+    @search="handleSearch"
+    @reset="handleReset"
+  >
     <slot name="queryBar" />
   </QueryBar>
 

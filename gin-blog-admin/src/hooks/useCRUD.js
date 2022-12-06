@@ -1,3 +1,5 @@
+import { computed, ref } from 'vue'
+
 const ACTIONS = {
   view: '查看',
   edit: '编辑',
@@ -54,11 +56,11 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
       const actions = {
         add: {
           api: () => doCreate(modalForm.value),
-          cb: () => $message.success('新增成功'),
+          cb: () => window.$message.success('新增成功'),
         },
         edit: {
           api: () => doUpdate(modalForm.value),
-          cb: () => $message.success('编辑成功'),
+          cb: () => window.$message.success('编辑成功'),
         },
       }
       const action = actions[modalAction.value]
@@ -77,25 +79,25 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
   }
 
   /**
-   * 删除(可批量删除)
+   * 删除
    **/
   async function handleDelete(id, needConfirm = true) {
-    if (!id || id == '[]') {
-      $message.info('请选择要删除的数据')
+    if (!id || id === '[]') {
+      window.$message.info('请选择要删除的数据')
       return
     }
 
     if (needConfirm) {
       // 需要弹窗确认
-      $dialog.confirm({
+      window.$dialog.confirm({
         content: '确定删除？',
         async confirm() {
           try {
             modalLoading.value = true
             const data = await doDelete(id)
             // 针对软删除的情况做判断
-            if (data?.code == 0)
-              $message.success('删除成功')
+            if (data?.code === 0)
+              window.$message.success('删除成功')
             modalLoading.value = false
             refresh(data)
           }
@@ -112,8 +114,8 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
         modalLoading.value = true
         const data = await doDelete(id)
         // 针对软删除的情况做判断
-        if (data?.code == 0)
-          $message.success('删除成功')
+        if (data?.code === 0)
+          window.$message.success('删除成功')
         modalLoading.value = false
         refresh(data)
       }

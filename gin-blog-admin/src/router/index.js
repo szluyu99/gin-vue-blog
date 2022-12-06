@@ -4,10 +4,9 @@ import { setupRouterGuard } from './guard'
 import { getToken } from '@/utils'
 import { usePermissionStore, useUserStore } from '@/store'
 
-const basePath = import.meta.env.VITE_PUBLIC_PATH // '/blog-admin'
 export const router = createRouter({
-  history: createWebHistory(basePath),
-  routes: basicRoutes,
+  history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/blog-admin'
+  routes: basicRoutes, // FIXME: 刷新时有时候加载不到?
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })
 
@@ -55,7 +54,6 @@ export async function addDynamicRoutes() {
     router.addRoute(NOT_FOUND_ROUTE)
   }
   catch (err) {
-    // console.log(err)
     window.$message.error('addDynamicRoutes Error')
   }
 }

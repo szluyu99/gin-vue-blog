@@ -132,23 +132,13 @@ const columns = [
         ),
         h(
           NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(row.id, false),
-            onNegativeClick: () => {},
-          },
+          { onPositiveClick: () => handleDelete(row.id, false) },
           {
             trigger: () =>
               h(
                 NButton,
-                {
-                  size: 'tiny',
-                  quaternary: true,
-                  type: 'error',
-                },
-                {
-                  default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-                },
+                { size: 'tiny', quaternary: true, type: 'error' },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
               ),
             default: () => h('div', {}, '确定删除该接口吗?'),
           },
@@ -169,7 +159,7 @@ async function handleUpdateAnonymous(row) {
   $message?.success(row.is_anonymous ? '已允许匿名访问' : '已禁止匿名访问')
 }
 
-// 添加模块
+// 模块相关
 const moduleModalVisible = ref(false)
 function handleAddModule() {
   modalAction.value = 'add'
@@ -192,7 +182,7 @@ async function handleModuleSave() {
   <CommonPage show-footer title="接口管理">
     <template #action>
       <NButton type="primary" @click="handleAddModule">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新增模块
+        <TheIcon icon="material-symbols:add" :size="18" /> 新增模块
       </NButton>
     </template>
 

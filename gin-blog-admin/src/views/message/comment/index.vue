@@ -12,26 +12,25 @@ onMounted(() => {
 })
 
 const $table = ref(null)
-const queryItems = ref({})
-const extraParams = ref({})
-const selections = ref([])
+const queryItems = ref({}) // 条件查询参数
+const extraParams = ref({}) // 额外参数
 
 const { handleDelete } = useCRUD({
   name: '评论',
   doDelete: api.deleteComments,
-  refresh: handleSearch,
+  refresh: $table.value?.handleSearch(),
 })
 
 const columns = [
-  { type: 'selection', width: 20, fixed: 'left' },
+  { type: 'selection', width: 15, fixed: 'left' },
   {
     title: '头像',
     key: 'avatar',
-    width: 40,
+    width: 50,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 70,
+        'height': 50,
         'imgProps': { style: { 'border-radius': '3px' } },
         'src': row.avatar,
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
@@ -39,7 +38,13 @@ const columns = [
       })
     },
   },
-  { title: '评论人', key: 'nickname', width: 50, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '评论人',
+    key: 'nickname',
+    width: 50,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '回复对象',
     key: 'reply_nick_name',
@@ -80,8 +85,8 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: row.is_review === 1 ? 'success' : 'error' },
-        { default: () => (row.is_review === 1 ? '通过' : '审核中') },
+        { type: row.is_review ? 'success' : 'error' },
+        { default: () => (row.is_review ? '通过' : '审核中') },
       )
     },
   },
@@ -106,21 +111,8 @@ const columns = [
     fixed: 'right',
     render(row) {
       return [
-        row.is_review === 0
+        row.is_review
           ? h(
-            NButton,
-            {
-              size: 'small',
-              type: 'success',
-              style: 'margin-left: 15px;',
-              onClick: () => handleUpdateReview([row.id], 1),
-            },
-            {
-              default: () => '通过',
-              icon: renderIcon('mi:circle-check', { size: 14 }),
-            },
-          )
-          : h(
             NButton,
             {
               size: 'small',
@@ -132,26 +124,29 @@ const columns = [
               default: () => '撤下',
               icon: renderIcon('mi:circle-error', { size: 14 }),
             },
+          )
+          : h(
+            NButton,
+            {
+              size: 'small',
+              type: 'success',
+              style: 'margin-left: 15px;',
+              onClick: () => handleUpdateReview([row.id], 1),
+            },
+            {
+              default: () => '通过',
+              icon: renderIcon('mi:circle-check', { size: 14 }),
+            },
           ),
         h(
           NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false),
-            onNegativeClick: () => {},
-          },
+          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
           {
             trigger: () =>
               h(
                 NButton,
-                {
-                  size: 'small',
-                  type: 'error',
-                  style: 'margin-left: 15px;',
-                },
-                {
-                  default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-                },
+                { size: 'small', type: 'error', style: 'margin-left: 15px;' },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
               ),
             default: () => h('div', {}, '确定删除该条评论吗?'),
           },
@@ -161,11 +156,15 @@ const columns = [
   },
 ]
 
-// 修改评论审核> is_review 0-撤下审核, 1-通过审核
+// 修改评论审核: is_review 0-撤下审核, 1-通过审核
 async function handleUpdateReview(ids, is_review) {
+  if (!ids.length) {
+    $message.info('请选择要审核的数据')
+    return
+  }
   await api.updateCommentReview({ ids, is_review })
   $message?.success(is_review ? '审核成功' : '撤下成功')
-  handleSearch()
+  $table.value?.handleSearch()
 }
 
 // 切换标签页: [全部, 通过, 审核中]
@@ -181,12 +180,6 @@ function handleChangeTab(value) {
       extraParams.value.is_review = 0
       break
   }
-  handleSearch()
-}
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
   $table.value?.handleSearch()
 }
 </script>
@@ -199,22 +192,26 @@ function handleSearch() {
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table.selections))"
       >
         <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
       </NButton>
       <NButton
         ml-20
         type="success"
-        :disabled="!selections.length"
-        @click="handleUpdateReview(selections, 1)"
+        :disabled="!$table?.selections.length"
+        @click="handleUpdateReview($table.selections, 1)"
       >
         <TheIcon icon="ic:outline-approval" :size="18" mr-5 /> 批量通过
       </NButton>
     </template>
     <!-- 标签栏 -->
-    <n-tabs type="line" animated @update:value="handleChangeTab">
+    <n-tabs
+      type="line"
+      animated
+      @update:value="handleChangeTab"
+    >
       <template #prefix>
         状态
       </template>
@@ -229,8 +226,6 @@ function handleSearch() {
       :extra-params="extraParams"
       :columns="columns"
       :get-data="api.getComments"
-      :selections="selections"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="用户" :label-width="40" :content-width="180">
@@ -239,7 +234,7 @@ function handleSearch() {
             clearable
             type="text"
             placeholder="请输入用户昵称"
-            @keydown.enter="handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
         </QueryBarItem>
         <QueryBarItem label="来源" :label-width="40" :content-width="160">
@@ -249,7 +244,7 @@ function handleSearch() {
             filterable
             placeholder="请选择评论来源"
             :options="commentTypeOptions"
-            @update:value="handleSearch"
+            @update:value="$table?.handleSearch()"
           />
         </QueryBarItem>
       </template>

@@ -8,8 +8,9 @@ defineOptions({ name: '关于我' })
 const aboutContent = ref('')
 const btnLoading = ref(false)
 
-onMounted(() => {
-  api.getAbout().then(res => (aboutContent.value = res.data))
+onMounted(async () => {
+  const res = await api.getAbout()
+  aboutContent.value = res.data
 })
 
 async function handleSave() {

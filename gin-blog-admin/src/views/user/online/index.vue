@@ -1,14 +1,11 @@
 <script setup>
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
-// import { useCRUD } from '@/hooks'
-
 import api from '@/api'
 
 defineOptions({ name: '在线用户' })
 
 const $table = ref(null)
-const queryItems = ref({})
 
 onMounted(() => {
   $table.value?.handleSearch()
@@ -18,7 +15,7 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 40,
+    width: 50,
     align: 'center',
     render(row) {
       return h(NImage, {
@@ -30,7 +27,13 @@ const columns = [
       })
     },
   },
-  { title: '昵称', key: 'nickname', width: 60, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '昵称',
+    key: 'nickname',
+    width: 60,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '登录 IP',
     key: 'ip_address',
@@ -79,11 +82,7 @@ const columns = [
     render(row) {
       return h(
         NButton,
-        {
-          size: 'small',
-          type: 'text',
-          ghost: true,
-        },
+        { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDateTime(row.last_login_time, 'YYYY-MM-DD'),
           icon: renderIcon('mdi:update', { size: 18 }),
@@ -100,18 +99,12 @@ const columns = [
     render(row) {
       return h(
         NPopconfirm,
-        {
-          onPositiveClick: () => handleForceOffline(row),
-          onNegativeClick: () => {},
-        },
+        { onPositiveClick: () => handleForceOffline(row) },
         {
           trigger: () =>
             h(
               NButton,
-              {
-                size: 'small',
-                type: 'primary',
-              },
+              { size: 'small', type: 'primary' },
               {
                 default: () => '下线',
                 icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
@@ -135,34 +128,14 @@ async function handleForceOffline(row) {
     $message.error('强制下线失败!')
   }
 }
-
-// useCRUD({
-//   name: '用户',
-//   doUpdate: updateUser,
-//   refresh: () => $table.value?.handleSearch(),
-// })
 </script>
 
 <template>
   <CommonPage show-footer title="在线用户">
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
-      v-model:query-items="queryItems"
       :columns="columns"
       :get-data="api.getOnlineUsers"
-    >
-      <!-- <template #queryBar>
-        <QueryBarItem label="昵称" :label-width="40">
-          <n-input
-            v-model:value="queryItems.nickname"
-            clearable
-            type="text"
-            placeholder="请输入用户昵称"
-            @keydown.enter="$table?.handleSearch"
-          />
-        </QueryBarItem>
-      </template> -->
-    </CrudTable>
+    />
   </CommonPage>
 </template>

@@ -2,18 +2,28 @@
 import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
-import { router } from '@/router'
 import { artTypeMap, artTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
 
-const route = useRoute()
+const [route, router] = [useRoute(), useRouter()]
+
 const categoryOptions = ref([])
 const tagOptions = ref([])
 
-onMounted(async () => {
+const $table = ref(null)
+const queryItems = ref({}) // 条件搜索
+const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
+
+const { handleDelete } = useCRUD({
+  name: '文章',
+  doDelete: updateOrDeleteArticles, // 软删除
+  refresh: () => $table.value?.handleSearch(),
+})
+
+onMounted(() => {
   api.getCategoryOption().then(res => (categoryOptions.value = res.data))
   api.getTagOption().then(res => (tagOptions.value = res.data))
   handleChangeTab('all') // 默认查看全部
@@ -22,22 +32,11 @@ onMounted(async () => {
 // ! 切换页面时, 如果是 [写文章] 页面跳转过来, 会携带 needRefresh 参数
 onActivated(() => {
   const { needRefresh } = route.query
-  needRefresh && handleSearch()
-})
-
-const $table = ref(null)
-const queryItems = ref({})
-const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
-const selections = ref([])
-
-const { handleDelete } = useCRUD({
-  name: '文章',
-  doDelete: updateOrDeleteArticles, // 软删除
-  refresh: () => handleSearch(),
+  needRefresh && ($table.value?.handleSearch())
 })
 
 const columns = [
-  { type: 'selection', width: 20, fixed: 'left' },
+  { type: 'selection', width: 15, fixed: 'left' },
   {
     title: '文章封面',
     key: 'img',
@@ -154,22 +153,13 @@ const columns = [
           ),
         h(
           NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false),
-          },
+          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
           {
             trigger: () =>
               h(
                 NButton,
-                {
-                  size: 'small',
-                  type: 'error',
-                  style: 'margin-left: 15px;',
-                },
-                {
-                  default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
-                },
+                { size: 'small', type: 'error', style: 'margin-left: 15px;' },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
               ),
             default: () => h('div', {}, '确定删除该文章吗?'),
           },
@@ -195,7 +185,7 @@ async function handleUpdateTop(row) {
   await api.updateArticleTop(row)
   row.publishing = false
   $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
-  handleSearch()
+  $table.value?.handleSearch()
 }
 
 // 切换标签页: [全部, 公开, 私密, 草稿箱, 回收站]
@@ -222,12 +212,6 @@ function handleChangeTab(value) {
       extraParams.value.status = null
       break
   }
-  handleSearch()
-}
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
   $table.value?.handleSearch()
 }
 </script>
@@ -243,12 +227,16 @@ function handleSearch() {
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table?.selections))"
       >
         <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
       </NButton>
-      <NButton ml-20 type="info" :disabled="!selections.length" @click="() => {}">
+      <NButton
+        ml-20 type="info"
+        :disabled="!$table?.selections.length"
+        @click="() => {}"
+      >
         <TheIcon icon="mdi:export" :size="18" mr-5 /> 批量导出
       </NButton>
       <NButton ml-20 type="success" @click="() => {}">
@@ -273,8 +261,6 @@ function handleSearch() {
       :extra-params="extraParams"
       :columns="columns"
       :get-data="api.getArticles"
-      :selections="selections"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="标题" :label-width="40" :content-width="180">
@@ -283,7 +269,7 @@ function handleSearch() {
             clearable
             type="text"
             placeholder="请输入标题"
-            @keydown.enter="handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
         </QueryBarItem>
         <QueryBarItem label="类型" :label-width="40" :content-width="160">
@@ -292,7 +278,7 @@ function handleSearch() {
             clearable
             placeholder="请选择文章类型"
             :options="artTypeOptions"
-            @update:value="handleSearch"
+            @update:value="$table?.handleSearch()"
           />
         </QueryBarItem>
         <QueryBarItem label="分类" :label-width="40" :content-width="160">
@@ -302,7 +288,7 @@ function handleSearch() {
             filterable
             placeholder="请选择文章分类"
             :options="categoryOptions"
-            @update:value="handleSearch"
+            @update:value="$table?.handleSearch()"
           />
         </QueryBarItem>
         <QueryBarItem label="标签" :label-width="40" :content-width="160">
@@ -312,7 +298,7 @@ function handleSearch() {
             filterable
             placeholder="请选择文章标签"
             :options="tagOptions"
-            @update:value="handleSearch"
+            @update:value="$table?.handleSearch()"
           />
         </QueryBarItem>
       </template>

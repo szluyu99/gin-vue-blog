@@ -1,5 +1,5 @@
 <script setup>
-import { NButton, NTag } from 'naive-ui'
+import { NButton, NPopconfirm, NTag } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import api from '@/api'
@@ -8,7 +8,6 @@ defineOptions({ name: '标签管理' })
 
 const $table = ref(null)
 const queryItems = ref({})
-const selections = ref([])
 
 const {
   modalVisible,
@@ -26,11 +25,11 @@ const {
   doCreate: api.saveOrUpdateTag,
   doDelete: api.deleteTag,
   doUpdate: api.saveOrUpdateTag,
-  refresh: handleSearch,
+  refresh: $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -49,7 +48,6 @@ const columns = [
     key: 'article_count',
     width: 30,
     align: 'center',
-    ellipsis: { tooltip: true },
   },
   {
     title: '创建日期',
@@ -93,37 +91,25 @@ const columns = [
       return [
         h(
           NButton,
-          {
-            size: 'small',
-            type: 'primary',
-            style: 'margin-left: 15px;',
-            onClick: () => handleEdit(row),
-          },
+          { size: 'small', type: 'primary', onClick: () => handleEdit(row) },
           { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
         ),
         h(
-          NButton,
+          NPopconfirm,
+          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
           {
-            size: 'small',
-            type: 'error',
-            style: 'margin-left: 15px;',
-            onClick: () => handleDelete(JSON.stringify([row.id])),
-          },
-          {
-            default: () => '删除',
-            icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+            trigger: () => h(
+              NButton,
+              { size: 'small', type: 'error', style: 'margin-left: 15px;' },
+              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+            ),
+            default: () => h('div', {}, '确定删除该标签吗?'),
           },
         ),
       ]
     },
   },
 ]
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
 </script>
 
 <template>
@@ -131,15 +117,15 @@ function handleSearch() {
   <CommonPage show-footer title="标签管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建标签
+        <TheIcon icon="material-symbols:add" :size="18" /> 新建标签
       </NButton>
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table.selections))"
       >
-        <TheIcon icon="material-symbols:delete" :size="18" mr-5 /> 批量删除
+        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>
     </template>
 
@@ -149,8 +135,6 @@ function handleSearch() {
       v-model:query-items="queryItems"
       :columns="columns"
       :get-data="api.getTags"
-      :selections="selections"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="标签名" :label-width="50">
@@ -159,7 +143,7 @@ function handleSearch() {
             clearable
             type="text"
             placeholder="请输入标签名"
-            @keydown.enter="handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
         </QueryBarItem>
       </template>
@@ -185,7 +169,11 @@ function handleSearch() {
           path="name"
           :rule="{ required: true, message: '请输入标签名称', trigger: ['input', 'blur'] }"
         >
-          <n-input v-model:value="modalForm.name" placeholder="请输入标签名称" />
+          <n-input
+            v-model:value="modalForm.name"
+            placeholder="请输入标签名称"
+            clearable
+          />
         </n-form-item>
       </n-form>
     </CrudModal>

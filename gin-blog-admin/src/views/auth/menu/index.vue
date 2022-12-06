@@ -185,7 +185,7 @@ function handleClickAddMenu() {
   <CommonPage show-footer title="菜单管理">
     <template #action>
       <NButton type="primary" @click="handleClickAddMenu">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建菜单
+        <TheIcon icon="material-symbols:add" :size="18" /> 新建菜单
       </NButton>
     </template>
 
@@ -197,7 +197,6 @@ function handleClickAddMenu() {
       :columns="columns"
       :get-data="api.getMenus"
       :single-line="true"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="菜单名" :label-width="50">
@@ -217,7 +216,6 @@ function handleClickAddMenu() {
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
-      :show-footer="modalAction !== 'view'"
       @on-save="handleSave"
     >
       <!-- 表单 -->
@@ -227,7 +225,6 @@ function handleClickAddMenu() {
         label-align="left"
         :label-width="80"
         :model="modalForm"
-        :disabled="modalAction === 'view'"
       >
         <n-form-item v-if="showMenuType" label="菜单类型" path="type">
           <n-radio-group v-model:value="modalForm.is_catelogue" name="radiogroup">

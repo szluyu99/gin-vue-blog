@@ -35,6 +35,12 @@ Gitee地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu
 
 博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)
 
+> 因为博客备案还在申请中，可能无法通过域名访问，可尝试 IP 访问：
+>
+> 博客前台链接：[http://106.52.70.138/](http://106.52.70.138/)
+>
+> 博客后台链接：[http://106.52.70.138/blog-admin](http://106.52.70.138/)
+
 测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
 
 在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)

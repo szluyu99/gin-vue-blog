@@ -1,11 +1,8 @@
 <script setup>
 import { NButton, NPopconfirm, NTag } from 'naive-ui'
-import { useClipboard } from '@vueuse/core'
 import { formatDateTime, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import api from '@/api'
-
-const { copy } = useClipboard()
 
 defineOptions({ name: '操作日志' })
 
@@ -27,10 +24,15 @@ const tagType = computed(() => (type) => {
 
 const $table = ref(null)
 const queryItems = ref({})
-const selections = ref([])
+
+const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
+  name: '日志',
+  doDelete: api.deleteOperationLogs,
+  refresh: $table.value?.handleSearch(),
+})
 
 onMounted(() => {
-  handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -94,12 +96,7 @@ const columns = [
         ),
         h(
           NPopconfirm,
-          {
-            onPositiveClick: () => {
-              handleDelete(JSON.stringify([row.id]), false)
-            },
-            onNegativeClick: () => {},
-          },
+          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
           {
             trigger: () =>
               h(
@@ -124,21 +121,10 @@ const columns = [
 ]
 
 function copyFormatCode(code) {
+  const { copy } = useClipboard()
   copy(JSON.stringify(JSON.parse(code), null, 2))
   $message.success('内容已复制到剪切板!')
 }
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
-
-const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
-  name: '日志',
-  doDelete: api.deleteOperationLogs,
-  refresh: handleSearch,
-})
 </script>
 
 <template>
@@ -148,10 +134,10 @@ const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handl
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table?.selections))"
       >
-        <TheIcon icon="material-symbols:playlist-remove" :size="18" mr-5 /> 批量删除
+        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>
     </template>
 
@@ -160,9 +146,7 @@ const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handl
       ref="$table"
       v-model:query-items="queryItems"
       :columns="columns"
-      :selections="selections"
       :get-data="api.getOperationLogs"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="模块名" :label-width="50">
@@ -171,7 +155,7 @@ const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handl
             clearable
             type="text"
             placeholder="请输入模块名或描述"
-            @keydown.enter="handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
         </QueryBarItem>
       </template>
@@ -202,22 +186,27 @@ const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handl
           {{ modalForm.opt_type }}
         </n-form-item>
         <n-form-item label="操作方法: " path="opt_method">
-          <n-code :code="modalForm.opt_method" language="javascript" />
+          <n-code
+            :code="modalForm.opt_method"
+            code-wrap
+            language="javascript"
+          />
         </n-form-item>
         <n-form-item label="操作人员: " path="nickname">
           {{ modalForm.nickname }}
         </n-form-item>
         <n-form-item label="请求参数: " path="request_param">
           <n-code
-            class="p-7 cursor-pointer"
-            :code="JSON.stringify(JSON.parse(modalForm.request_param), null, 2)"
+            p-7 cursor-pointer
+            word-wrap
+            :code="modalForm.request_param"
             language="javascript"
             @click="copyFormatCode(modalForm.request_param)"
           />
         </n-form-item>
         <n-form-item label="返回数据: " path="response_data">
           <n-code
-            class="p-7 cursor-pointer"
+            p-7 cursor-pointer
             :code="JSON.stringify(JSON.parse(modalForm.response_data), null, 2)"
             language="javascript"
             @click="copyFormatCode(modalForm.response_data)"

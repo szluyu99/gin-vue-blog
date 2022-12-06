@@ -1,18 +1,13 @@
 <script setup>
-import { NButton, NImage } from 'naive-ui'
-import { useClipboard } from '@vueuse/core'
+import { NButton, NImage, NPopconfirm } from 'naive-ui'
 import { formatDateTime, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import api from '@/api'
-
-// vueues - 剪切板操作
-const { copy } = useClipboard()
 
 defineOptions({ name: '友链管理' })
 
 const $table = ref(null)
 const queryItems = ref({})
-const selections = ref([])
 
 const {
   modalVisible,
@@ -30,19 +25,19 @@ const {
   doCreate: api.saveOrUpdateLink,
   doDelete: api.deleteLinks,
   doUpdate: api.saveOrUpdateLink,
-  refresh: () => handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
-  { type: 'selection', width: 20, fixed: 'left' },
+  { type: 'selection', width: 15, fixed: 'left' },
   {
     title: '头像',
     key: 'avatar',
-    width: 40,
+    width: 50,
     align: 'center',
     render(row) {
       return h(NImage, {
@@ -54,7 +49,13 @@ const columns = [
       })
     },
   },
-  { title: '链接名', key: 'name', width: 100, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '链接名',
+    key: 'name',
+    width: 100,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '链接地址',
     key: 'address',
@@ -69,6 +70,7 @@ const columns = [
           // target: '_blank',
           style: 'cursor: pointer',
           onClick: () => {
+            const { copy } = useClipboard()
             copy(row.address)
             $message.info('复制到剪切板!')
           },
@@ -77,7 +79,13 @@ const columns = [
       )
     },
   },
-  { title: '链接介绍', key: 'intro', width: 120, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '链接介绍',
+    key: 'intro',
+    width: 120,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '创建日期',
     key: 'created_at',
@@ -112,27 +120,21 @@ const columns = [
           { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
         ),
         h(
-          NButton,
+          NPopconfirm,
+          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
           {
-            size: 'small',
-            type: 'error',
-            style: 'margin-left: 15px;',
-            onClick: () => handleDelete(JSON.stringify([row.id])),
-          },
-          {
-            default: () => '删除',
-            icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+            trigger: () => h(
+              NButton,
+              { size: 'small', type: 'error', style: 'margin-left: 15px;' },
+              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+            ),
+            default: () => h('div', {}, '确定删除该分类吗?'),
           },
         ),
       ]
     },
   },
 ]
-
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
 </script>
 
 <template>
@@ -140,15 +142,15 @@ function handleSearch() {
   <CommonPage show-footer title="友链管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建友链
+        <TheIcon icon="material-symbols:add" :size="18" /> 新建友链
       </NButton>
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table?.selections))"
       >
-        <TheIcon icon="material-symbols:delete" :size="18" mr-5 /> 批量删除
+        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>
     </template>
 
@@ -158,8 +160,6 @@ function handleSearch() {
       v-model:query-items="queryItems"
       :columns="columns"
       :get-data="api.getLinks"
-      :selections="selections"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="友链名" :label-width="50">
@@ -168,7 +168,7 @@ function handleSearch() {
             clearable
             type="text"
             placeholder="请输入友链名"
-            @keydown.enter="handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
         </QueryBarItem>
       </template>

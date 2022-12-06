@@ -8,7 +8,6 @@ defineOptions({ name: '角色管理' })
 
 const $table = ref(null)
 const queryItems = ref({})
-const selections = ref([])
 
 const {
   modalVisible,
@@ -27,7 +26,7 @@ const {
   doCreate: api.saveOrUpdateRole,
   doDelete: api.deleteRole,
   doUpdate: api.saveOrUpdateRole,
-  refresh: handleSearch,
+  refresh: $table.value?.handleSearch(),
 })
 
 // 菜单, 资源 跳出菜单的选项不同
@@ -36,7 +35,7 @@ const resourceOption = ref([]) // 资源选项
 const menuOption = ref([]) // 菜单选项
 
 onMounted(() => {
-  handleSearch()
+  $table.value?.handleSearch()
   api.getResourceOption().then(res => (resourceOption.value = res.data))
   api.getMenuOption().then(res => (menuOption.value = res.data))
 })
@@ -147,12 +146,6 @@ const columns = [
     },
   },
 ]
-
-// 刷新时添加额外逻辑: 清空选中列表
-function handleSearch() {
-  selections.value = []
-  $table.value?.handleSearch()
-}
 </script>
 
 <template>
@@ -160,15 +153,15 @@ function handleSearch() {
   <CommonPage show-footer title="角色管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建角色
+        <TheIcon icon="material-symbols:add" :size="18" /> 新建角色
       </NButton>
       <NButton
         ml-20
         type="error"
-        :disabled="!selections.length"
-        @click="handleDelete(JSON.stringify(selections))"
+        :disabled="!$table?.selections.length"
+        @click="handleDelete(JSON.stringify($table?.selections))"
       >
-        <TheIcon icon="material-symbols:playlist-remove" :size="18" mr-5 /> 批量删除
+        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>
     </template>
 
@@ -177,9 +170,7 @@ function handleSearch() {
       ref="$table"
       v-model:query-items="queryItems"
       :columns="columns"
-      :selections="selections"
       :get-data="api.getRoles"
-      @on-checked="(rowKeys) => (selections = rowKeys)"
     >
       <template #queryBar>
         <QueryBarItem label="角色名" :label-width="50">
@@ -188,7 +179,7 @@ function handleSearch() {
             clearable
             type="text"
             placeholder="请输入角色名"
-            @keydown.enter="handleSearch"
+            @keydown.enter=" $table?.handleSearch()"
           />
         </QueryBarItem>
       </template>

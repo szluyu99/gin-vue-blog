@@ -20,9 +20,9 @@ const customIconPath = resolve(getSrcPath(), 'assets/svg')
 export default [
   // 在 <script setup> 中使用 Options API
   DefineOptions(),
-  // 自动引入 Vue 官方 Api
+  // 自动引入 Vue 官方 Api, 只在 .vue 中生效, .js 中不行
   AutoImport({
-    imports: ['vue', 'vue-router', 'pinia'],
+    imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
     dts: false,
   }),
   // 自动引入组件: 例如各种 UI 库

@@ -5,7 +5,7 @@ import { useCRUD } from '@/hooks'
 import { loginTypeMap, loginTypeOptions } from '@/constant/data'
 import api from '@/api'
 
-defineOptions({ name: 'UserList' })
+defineOptions({ name: '用户列表' })
 
 const $table = ref(null)
 const queryItems = ref({})
@@ -27,7 +27,7 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 40,
+    width: 50,
     align: 'center',
     render(row) {
       return h(NImage, {
@@ -39,7 +39,13 @@ const columns = [
       })
     },
   },
-  { title: '昵称', key: 'nickname', width: 60, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '昵称',
+    key: 'nickname',
+    width: 60,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '登录方式',
     key: 'login_type',
@@ -61,11 +67,8 @@ const columns = [
     render(row) {
       const roles = row.roles ?? []
       const group = []
-      for (let i = 0; i < roles.length; i++) {
-        group.push(
-          h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => roles[i].name }),
-        )
-      }
+      for (let i = 0; i < roles.length; i++)
+        group.push(h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => roles[i].name }))
       return h('span', group)
     },
   },
@@ -97,11 +100,7 @@ const columns = [
     render(row) {
       return h(
         NButton,
-        {
-          size: 'small',
-          type: 'text',
-          ghost: true,
-        },
+        { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDateTime(row.created_at, 'YYYY-MM-DD'),
           icon: renderIcon('mdi:update', { size: 18 }),
@@ -117,11 +116,7 @@ const columns = [
     render(row) {
       return h(
         NButton,
-        {
-          size: 'small',
-          type: 'text',
-          ghost: true,
-        },
+        { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDateTime(row.last_login_time, 'YYYY-MM-DD'),
           icon: renderIcon('mdi:update', { size: 18 }),
@@ -245,7 +240,11 @@ async function handleUpdateDisable(row) {
         :model="modalForm"
       >
         <n-form-item label="用户昵称" path="name">
-          <n-input v-model:value="modalForm.nickname" placeholder="请输入用户昵称" />
+          <n-input
+            v-model:value="modalForm.nickname"
+            clearable
+            placeholder="请输入用户昵称"
+          />
         </n-form-item>
         <n-form-item label="角色" path="role_ids">
           <n-checkbox-group v-model:value="modalForm.role_ids">

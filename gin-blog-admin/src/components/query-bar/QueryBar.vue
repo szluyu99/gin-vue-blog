@@ -1,4 +1,5 @@
 <script setup>
+// 父组件传来的方法
 const emit = defineEmits(['search', 'reset'])
 </script>
 
@@ -7,7 +8,6 @@ const emit = defineEmits(['search', 'reset'])
     <n-space wrap :size="[35, 15]">
       <slot />
     </n-space>
-
     <div flex-shrink-0>
       <n-button ml-20 secondary type="primary" @click="emit('reset')">
         重置
