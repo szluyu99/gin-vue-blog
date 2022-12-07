@@ -10,7 +10,6 @@ import Unocss from 'unocss/vite'
 // TODO 压缩插件 vite-plugin-compression
 
 import unplugin from './unplugin'
-// import { configMockPlugin } from './mock'
 import { configHtmlPlugin } from './html'
 
 export function createVitePlugins(viteEnv, isBuild) {

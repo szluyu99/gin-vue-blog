@@ -49,11 +49,4 @@ Object.keys(modules).forEach((key) => {
   asyncRoutes.push(modules[key].default)
 })
 
-// 加载 views 下每个模块的 index.vue 文件
-const asyncViewMap = new Map()
-const vueModules = import.meta.glob('@/views/**/index.vue', { eager: true })
-Object.keys(vueModules).forEach((key) => {
-  asyncViewMap.set(key, vueModules[key].default)
-})
-
-export { asyncRoutes, asyncViewMap }
+export { asyncRoutes }

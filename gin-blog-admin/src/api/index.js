@@ -48,6 +48,8 @@ export default {
 
   // 用户相关接口
   getUser: () => request.get('/user/info'),
+  updateCurrent: data => request.put('/user/current', data), // 更新当前用户信息
+  updateCurrentPassword: data => request.put('/user/current/password', data), // 修改当前用户密码
   getUsers: (params = {}) => request.get('/user/list', { params }),
   updateUser: data => request.put('/user', data),
   updateUserDisable: data => request.put('/user/disable', data),

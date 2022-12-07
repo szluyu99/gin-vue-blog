@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"gin-blog/model/req"
 	"gin-blog/utils"
 	"gin-blog/utils/r"
@@ -14,6 +15,7 @@ type User struct{}
 func (*User) UpdateCurrent(c *gin.Context) {
 	currentUser := utils.BindValidJson[req.UpdateCurrentUser](c)
 	currentUser.ID = utils.GetFromContext[int](c, "user_info_id")
+	fmt.Println(currentUser.ID)
 	r.SendCode(c, userService.UpdateCurrent(currentUser))
 }
 
@@ -38,11 +40,11 @@ func (*User) UpdatePassword(c *gin.Context) {
 	r.SendCode(c, userService.UpdatePassword(utils.BindJson[req.UpdatePassword](c)))
 }
 
-// 修改管理员密码: 需要输入旧密码进行验证
-func (*User) UpdateAdminPassword(c *gin.Context) {
-	r.SendCode(c, userService.UpdateAdminPassword(
+// 修改当前用户密码: 需要输入旧密码进行验证
+func (*User) UpdateCurrentPassword(c *gin.Context) {
+	r.SendCode(c, userService.UpdateCurrentPassword(
 		utils.BindJson[req.UpdateAdminPassword](c),
-		utils.GetIntParam(c, "user_info_id")))
+		utils.GetFromContext[int](c, "user_info_id")))
 }
 
 // 获取在线用户列表

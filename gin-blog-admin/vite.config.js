@@ -26,9 +26,9 @@ export default defineConfig(({ command, mode }) => {
     define: viteDefine, // 全局常量 (不经过语法分析, 直接替换文本)
     plugins: createVitePlugins(viteEnv, isBuild),
     server: {
+      hmr: true,
       host: '0.0.0.0',
       port: VITE_PORT,
-      // open: true, // 运行项目打开页面
       // 设置了代理, 查看 setting/proxy-config.js
       proxy: createViteProxy(VITE_USE_PROXY, VITE_PROXY_TYPE),
     },

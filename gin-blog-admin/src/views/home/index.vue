@@ -19,7 +19,7 @@ onMounted(() => {
           <n-avatar round :size="60" :src="userStore.avatar" />
           <div ml-20>
             <p text-16>
-              Hello, {{ userStore.name }}
+              Hello, {{ userStore.nickname }}
             </p>
             <p text-12 mt-5 op-60>
               今天又是元气满满的一天

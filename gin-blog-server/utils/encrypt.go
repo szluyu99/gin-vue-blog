@@ -10,12 +10,12 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-type encrypt struct{}
+type _encrypt struct{}
 
-var Encryptor = new(encrypt)
+var Encryptor = new(_encrypt)
 
 // 使用 scrypt 对密码进行加密生成一个哈希值
-func (*encrypt) ScryptHash(pasword string) string {
+func (*_encrypt) ScryptHash(pasword string) string {
 	const KeyLen = 10
 	salt := []byte{12, 32, 4, 6, 66, 22, 222, 11} // 随便写
 
@@ -27,24 +27,24 @@ func (*encrypt) ScryptHash(pasword string) string {
 }
 
 // 使用 scrypt 对比 明文密码 和 数据库中哈希值
-func (c *encrypt) ScryptCheck(password, hash string) bool {
+func (c *_encrypt) ScryptCheck(password, hash string) bool {
 	return c.ScryptHash(password) == hash
 }
 
 // 使用 bcrypt 对密码进行加密生成一个哈希值
-func (*encrypt) BcryptHash(password string) string {
+func (*_encrypt) BcryptHash(password string) string {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes)
 }
 
 // 使用 bcrypt 对比 明文密码 和 数据库中哈希值
-func (*encrypt) BcryptCheck(password, hash string) bool {
+func (*_encrypt) BcryptCheck(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
 // MD5 加密
-func (*encrypt) MD5(str string, b ...byte) string {
+func (*_encrypt) MD5(str string, b ...byte) string {
 	h := md5.New()
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(b))

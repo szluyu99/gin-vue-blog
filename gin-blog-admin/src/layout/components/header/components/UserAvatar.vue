@@ -1,10 +1,15 @@
 <script setup>
-import { useUserStore } from '@/store'
 import { renderIcon } from '@/utils'
-
+import { useUserStore } from '@/store'
 const userStore = useUserStore()
+const router = useRouter()
 
 const options = [
+  {
+    label: '个人中心',
+    key: 'profile',
+    icon: renderIcon('mdi:account', { size: '14px' }),
+  },
   {
     label: '退出登录',
     key: 'logout',
@@ -23,6 +28,9 @@ function handleSelect(key) {
       },
     })
   }
+  else if (key === 'profile') {
+    router.push('/profile')
+  }
 }
 </script>
 
@@ -30,7 +38,7 @@ function handleSelect(key) {
   <n-dropdown :options="options" @select="handleSelect">
     <div flex items-center cursor-pointer>
       <img :src="userStore.avatar" mr10 w-35 h-35 rounded-full>
-      <span>{{ userStore.name }}</span>
+      <span>{{ userStore.nickname }}</span>
     </div>
   </n-dropdown>
 </template>

@@ -11,6 +11,7 @@ type OSS interface {
 	DeleteFile(key string) error
 }
 
+// 根据配置文件中的配置判断文件上传实例
 func NewOSS() OSS {
 	switch config.Cfg.Upload.OssType {
 	case "local":

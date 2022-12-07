@@ -12,13 +12,22 @@ export const useUserStore = defineStore('user', {
   },
   getters: {
     userId() {
-      return this.userInfo?.id
+      return this.userInfo.id
     },
-    name() {
-      return this.userInfo?.nickname
+    nickname() {
+      return this.userInfo.nickname
     },
     avatar() {
-      return this.userInfo?.avatar
+      const SERVER_URL = 'http://localhost:8765/'
+      if (this.userInfo.avatar.startsWith('http'))
+        return this.userInfo.avatar
+      return `${SERVER_URL}${this.userInfo.avatar}`
+    },
+    intro() {
+      return this.userInfo.intro
+    },
+    website() {
+      return this.userInfo.website
     },
   },
   actions: {
@@ -26,13 +35,18 @@ export const useUserStore = defineStore('user', {
     async getUserInfo() {
       try {
         const res = await api.getUser()
-        const { id, nickname, avatar } = res.data
-        this.userInfo = { id, nickname, avatar }
+        const { id, nickname, avatar, intro, website } = res.data
+        this.userInfo = { id, nickname, avatar, intro, website }
         return Promise.resolve(res.data)
       }
       catch (err) {
         return Promise.reject(err)
       }
+    },
+    setUserInfo(user) {
+      Object.keys(user).forEach((key) => {
+        this.userInfo[key] = user[key]
+      })
     },
     // 退出登录: 主动行为, 需要调用退出登录接口
     async logout() {

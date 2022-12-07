@@ -214,14 +214,14 @@ func (*User) UpdatePassword(req req.UpdatePassword) int {
 }
 
 // 修改管理员密码, 需要旧密码验证
-func (*User) UpdateAdminPassword(req req.UpdateAdminPassword, id int) int {
+func (*User) UpdateCurrentPassword(req req.UpdateAdminPassword, id int) int {
 	user := dao.GetOne(model.UserAuth{}, "id", id)
 	if !user.IsEmpty() && utils.Encryptor.BcryptCheck(req.OldPassword, user.Password) {
 		user.Password = utils.Encryptor.BcryptHash(req.NewPassword)
 		dao.Update(&user, "password")
 		return r.OK
 	} else {
-		return r.ERROR_PASSWORD_WRONG
+		return r.ERROR_OLD_PASSWORD
 	}
 }
 

@@ -73,15 +73,15 @@ func BackRouter() http.Handler {
 		// 用户模块
 		user := auth.Group("/user")
 		{
-			user.GET("/list", userAPI.GetList)                       // 用户列表
-			user.PUT("", userAPI.Update)                             // 更新用户信息
-			user.PUT("/disable", userAPI.UpdateDisable)              // 修改用户禁用状态
-			user.PUT("/password", userAPI.UpdatePassword)            // 修改普通用户密码
-			user.PUT("/admin/password", userAPI.UpdateAdminPassword) // 修改管理员密码
-			user.GET("/info", userAPI.GetInfo)                       // 获取当前用户信息
-			user.PUT("/current", userAPI.UpdateCurrent)              // 修改当前用户信息
-			user.GET("/online", userAPI.GetOnlineList)               // 获取在线用户
-			user.DELETE("/offline", userAPI.ForceOffline)            // 强制用户下线
+			user.GET("/list", userAPI.GetList)                           // 用户列表
+			user.PUT("", userAPI.Update)                                 // 更新用户信息
+			user.PUT("/disable", userAPI.UpdateDisable)                  // 修改用户禁用状态
+			user.PUT("/password", userAPI.UpdatePassword)                // 修改普通用户密码
+			user.PUT("/current/password", userAPI.UpdateCurrentPassword) // 修改管理员密码
+			user.GET("/info", userAPI.GetInfo)                           // 获取当前用户信息
+			user.PUT("/current", userAPI.UpdateCurrent)                  // 修改当前用户信息
+			user.GET("/online", userAPI.GetOnlineList)                   // 获取在线用户
+			user.DELETE("/offline", userAPI.ForceOffline)                // 强制用户下线
 		}
 		// 分类模块
 		category := auth.Group("/category")

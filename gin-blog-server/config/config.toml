@@ -41,15 +41,31 @@ LogInConsole = true        # 是否输出到控制台
 
 # TODO: 文件上传功能还待完善
 [Upload]
-OssType = "qiniu"              # 控制存储: local、qiniu
-Path = "public/uploaded/"      # 本地文件访问路径
-StorePath = "public/uploaded/" # 本地文件上传路径
+OssType = "local"              # 控制存储: local、qiniu
+Path = "public/uploaded"      # 本地文件访问路径
+StorePath = "public/uploaded" # 本地文件上传路径
 
+# [Qiniu]
+# ImgPath = ""          # 外链
+# Zone = ""
+# Bucket = ""
+# AccessKey = ""
+# SecretKey = ""
+# UseHttps = false      # 是否使用 https 加速
+# UseCdnDomains = false # 上传是否使用 CDN 上传加速
 [Qiniu]
-ImgPath = ""          # 外链
-Zone = ""
-Bucket = ""
-AccessKey = ""
-SecretKey = ""
-UseHttps = false      # 是否使用 https 加速
-UseCdnDomains = false # 上传是否使用 CDN 上传加速
+ImgPath = "http://rjh34xerw.hn-bkt.clouddn.com"        # 外链
+Zone = "ZoneHuaDong"
+Bucket = "yusael-ginblog"
+AccessKey = "EB0heiSomzwk7-Em_5M5PzY-5w1xvD1XOMvMdblW"
+SecretKey = "OjXt9g4XGZUKEKiaEfTOvgYdCXbPZFspdSIULxUY"
+UseHttps = false                                       # 是否使用 https 加速
+UseCdnDomains = false                                  # 上传是否使用 CDN 上传加速
+
+[Tencent]
+Bucket = "xxxxx-10005608"
+Region = "ap-shanghai"
+SecretId = "xxxxxxxx"
+SecretKey = "xxxxxxxx"
+BaseUrl = "https://gin.vue.admin"
+PathPrefix = "github.com/flipped-aurora/gin-vue-admin/server"

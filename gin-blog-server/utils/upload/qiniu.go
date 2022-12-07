@@ -17,6 +17,43 @@ import (
 // 七牛云文件上传
 type Qiniu struct{}
 
+func (*Qiniu) UploadFile(file *multipart.FileHeader) (filePath, fileName string, err error) {
+	putPolicy := storage.PutPolicy{Scope: config.Cfg.Qiniu.Bucket}
+	mac := qbox.NewMac(config.Cfg.Qiniu.AccessKey, config.Cfg.Qiniu.SecretKey)
+	upToken := putPolicy.UploadToken(mac)
+	cfg := qiniuConfig()
+	formUploader := storage.NewFormUploader(cfg)
+	ret := storage.PutRet{}
+	putExtra := storage.PutExtra{Params: map[string]string{"x:name": "github logo"}}
+
+	f, openError := file.Open()
+	if openError != nil {
+		utils.Logger.Error("function file.Open() Filed", zap.Any("err", openError.Error()))
+		return "", "", errors.New("function file.Open() Filed, err:" + openError.Error())
+	}
+	defer f.Close()
+
+	// 文件名格式 建议保证唯一性
+	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), utils.Encryptor.MD5(file.Filename))
+	putErr := formUploader.Put(context.Background(), &ret, upToken, fileKey, f, file.Size, &putExtra)
+	if putErr != nil {
+		utils.Logger.Error("function formUploader.Put() Filed", zap.Any("err", putErr.Error()))
+		return "", "", errors.New("function formUploader.Put() Filed, err:" + putErr.Error())
+	}
+	return config.Cfg.Qiniu.ImgPath + "/" + ret.Key, ret.Key, nil
+}
+
+func (*Qiniu) DeleteFile(key string) error {
+	mac := qbox.NewMac(config.Cfg.Qiniu.AccessKey, config.Cfg.Qiniu.SecretKey)
+	cfg := qiniuConfig()
+	bucketManager := storage.NewBucketManager(mac, cfg)
+	if err := bucketManager.Delete(config.Cfg.Qiniu.Bucket, key); err != nil {
+		utils.Logger.Error("function bucketManager.Delete() Filed", zap.Any("err", err.Error()))
+		return errors.New("function bucketManager.Delete() Filed, err:" + err.Error())
+	}
+	return nil
+}
+
 // 七牛云配置信息
 func qiniuConfig() *storage.Config {
 	cfg := storage.Config{
@@ -36,33 +73,4 @@ func qiniuConfig() *storage.Config {
 		cfg.Zone = &storage.ZoneXinjiapo
 	}
 	return &cfg
-}
-
-func (*Qiniu) UploadFile(file *multipart.FileHeader) (filePath, fileName string, err error) {
-	putPolicy := storage.PutPolicy{Scope: config.Cfg.Qiniu.Bucket}
-	mac := qbox.NewMac(config.Cfg.Qiniu.AccessKey, config.Cfg.Qiniu.SecretKey)
-	upToken := putPolicy.UploadToken(mac)
-	cfg := qiniuConfig()
-	formUploader := storage.NewFormUploader(cfg)
-	ret := storage.PutRet{}
-	putExtra := storage.PutExtra{Params: map[string]string{"x:name": "github logo"}}
-
-	f, openError := file.Open()
-	if openError != nil {
-		utils.Logger.Error("function file.Open() Filed", zap.Any("err", openError.Error()))
-		return "", "", errors.New("function file.Open() Filed, err:" + openError.Error())
-	}
-	defer f.Close()
-
-	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), utils.Encryptor.MD5(file.Filename)) // 文件名格式 建议保证唯一性
-	putErr := formUploader.Put(context.Background(), &ret, upToken, fileKey, f, file.Size, &putExtra)
-	if putErr != nil {
-		utils.Logger.Error("function formUploader.Put() Filed", zap.Any("err", putErr.Error()))
-		return "", "", errors.New("function formUploader.Put() Filed, err:" + putErr.Error())
-	}
-	return config.Cfg.Qiniu.ImgPath + "/" + ret.Key, ret.Key, nil
-}
-
-func (*Qiniu) DeleteFile(key string) error {
-	return nil
 }

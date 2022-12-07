@@ -18,6 +18,10 @@ func FrontRouter() http.Handler {
 	r := gin.New()
 	r.SetTrustedProxies([]string{"*"})
 
+	// 静态文件服务
+	r.Static("/public", "./public")
+	r.StaticFS("/dir", http.Dir("./public")) // 将 public 目录内的文件列举展示
+
 	// 开发模式同时把日志写到控制台
 	// if config.Cfg.Server.AppMode == "debug" {
 	// 	r.Use(gin.Logger()) // gin 默认日志挺好看的

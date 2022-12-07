@@ -15,4 +15,5 @@ var (
 	menuService         service.Menu
 	blogInfoService     service.BlogInfo
 	operationLogService service.OperationLog
+	fileService         service.File // 文件相关: 上传、导入、导出...
 )

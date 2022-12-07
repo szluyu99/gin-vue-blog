@@ -1,8 +1,17 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
-import { asyncRoutes, asyncViewMap, basicRoutes } from '@/router/routes'
+import { asyncRoutes, basicRoutes } from '@/router/routes'
 import Layout from '@/layout/index.vue'
 import api from '@/api'
+
+// 加载 views 下每个模块的 index.vue 文件
+// const asyncViewMap = new Map()
+// const vueModules = import.meta.glob('@/views/**/index.vue', { eager: true })
+// Object.keys(vueModules).forEach((key) => {
+//   asyncViewMap.set(key, vueModules[key].default)
+// })
+// 加载 views 下每个模块的 index.vue 文件
+const modules = import.meta.glob('@/views/**/index.vue')
 
 // 判断用户角色是否有权限访问路由
 function hasPermission(route, role) {
@@ -70,7 +79,7 @@ export const usePermissionStore = defineStore('permission', {
         children: e.children.map(ee => ({
           name: ee.name,
           path: ee.path, // 父路径 + 当前菜单路径
-          component: shallowRef(asyncViewMap.get(`/src/views${ee.component}/index.vue`)), // *
+          component: modules[`/src/views${ee.component}/index.vue`], // ! 读取动态加载的路由模块
           isHidden: ee.is_hidden,
           meta: {
             title: ee.name,

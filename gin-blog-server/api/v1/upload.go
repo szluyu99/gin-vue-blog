@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"gin-blog/service"
 	"gin-blog/utils"
 	"gin-blog/utils/r"
 
@@ -9,11 +8,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type Upload struct {
-	serv service.Upload
-}
+type Upload struct{}
 
-func (api *Upload) UploadFile(c *gin.Context) {
+func (*Upload) UploadFile(c *gin.Context) {
 	_, fileHeader, err := c.Request.FormFile("file")
 	// 处理文件接收错误
 	if err != nil {
@@ -21,7 +18,7 @@ func (api *Upload) UploadFile(c *gin.Context) {
 		utils.Logger.Error(r.GetMsg(code), zap.Error(err))
 		r.SendCode(c, code)
 	}
-	// 上传文件获取文件路径
-	url, code := api.serv.UploadFile(fileHeader)
+	// 上传文件, 获取文件路径
+	url, code := fileService.UploadFile(fileHeader)
 	r.SendData(c, code, url)
 }

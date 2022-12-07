@@ -38,7 +38,7 @@ export default {
       },
     },
     {
-      // name: 'ArticleEdit',
+      name: 'ArticleEdit',
       path: 'write/:id',
       component: () => import('./write/index.vue'),
       isHidden: true,

@@ -11,7 +11,7 @@
  Target Server Version : 80031 (8.0.31)
  File Encoding         : 65001
 
- Date: 04/12/2022 00:47:44
+ Date: 07/12/2022 20:55:52
 */
 
 SET NAMES utf8mb4;
@@ -45,7 +45,7 @@ CREATE TABLE `article`  (
 -- ----------------------------
 -- Records of article
 -- ----------------------------
-INSERT INTO `article` VALUES (1, '2022-12-03 22:07:01.638', '2022-12-04 00:46:13.940', '测试文章', 1, '', '## 博客介绍\n\n<p  align=center>\n<a  href=\"http://www.hahacode.cn\">\n<img  src=\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\"  width=\"200\"  hight=\"200\"  alt=\"阵、雨的个人博客\"  style=\"border-radius: 50%\">\n</a>\n</p>\n\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\n\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\n\n\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\n\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\n\n## 在线地址\n\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\n\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\n\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\n\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\n\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\n\n## 目录结构\n\n代码仓库目录：\n\n```bash\ngin-vue-blog\n├── gin-blog-admin      -- 博客后台前端\n├── gin-blog-front      -- 博客前台前端\n├── gin-blog-server     -- 博客后端\n```\n\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\n\n> 项目运行参考：[快速开始](#快速开始)\n\n后端目录：\n\n```bash\ngin-blog-server\n├── api             -- API\n│   ├── front       -- 前台接口\n│   └── v1          -- 后台接口\n├── dao             -- 数据库操作模块\n├── service         -- 服务模块\n├── model           -- 数据模型\n│   ├── req             -- 请求 VO 模型\n│   ├── resp            -- 响应 VO 模型\n│   ├── dto             -- 内部传输 DTO 模型\n│   └── ...             -- 数据库模型对象 PO 模型\n├── routes          -- 路由模块\n│   └── middleware      -- 路由中间件\n├── utils           -- 工具模块\n│   ├── r               -- 响应封装\n│   ├── upload          -- 文件上传\n│   └── ...\n├── routes          -- 路由模块\n├── config          -- 配置文件\n├── test            -- 测试模块\n├── log             -- 日志文件\n├── Dockerfile\n└── main.go\n```\n\n## 项目介绍\n\n前台：\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\n- 实现点赞，统计用户等功能 (Redis)\n- 评论 + 回复评论功能\n- 留言采用弹幕墙，效果炫酷\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\n\n后台：\n- 鉴权使用 JWT\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\n- 支持动态权限修改，前端菜单由后端生成\n- 文章编辑使用 Markdown 编辑器\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\n\n其他：\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\n- 代码整洁层次清晰，利于开发者学习\n\n## 技术介绍\n\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\n\n前台前端：使用 pnpm 包管理工具\n- 基于 TypeScript\n- Vue3\n- Unocss: 原子化 CSS\n- Pinia\n- Vue Router \n- Axios \n- Naive UI\n- Vuetify\n- ...\n\n后台前端：使用 pnpm 包管理工具\n- 基于 JavaSciprt \n- pnpm: 包管理工具\n- Vue3\n- Unocss: 原子化 CSS\n- Pinia \n- Vue Router \n- Axios \n- Naive UI\n- ...\n\n后端技术栈：\n- 基于 Golang\n- Docker\n- Gin\n- GORM\n- Viper: 使用 TOML 作为配置文件\n- Zap\n- MySQL\n- Redis\n- Nginx: 部署静态资源 + 反向代理\n- ...\n\n其他：\n- 腾讯云人机验证\n- 七牛云对象存储\n- ...\n\n## 运行环境\n\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\n\n对象存储：七牛云\n\n## 开发环境\n\n| 开发工具                      | 说明                    |\n| ----------------------------- | ----------------------- |\n| Vscode                        | Golang 后端 +  Vue 前端 |\n| Navicat                       | MySQL 远程连接工具      |\n| Another Redis Desktop Manager | Redis 远程连接工具      |\n| MobaXterm                     | Linux 远程工具          |\n| Apifox                        | 接口调试 + 文档生成     |\n\n\n| 开发环境 | 版本 |\n| -------- | ---- |\n| Golang   | 1.19 |\n| MySQL    | 8.x  |\n| Redis    | 7.x  |\n\n## 快速开始\n\n### 本地运行\n\n> 自行安装 Golang、Node、MySQL、Redis 环境\n\n拉取项目到本地：\n\n```bash\ngit clone https://github.com/szluyu99/gin-vue-blog.git\n```\n\n后端项目运行：\n\n```bash\n# 1、进入后端项目根目录 \ncd gin-blog-server\n\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \n\n# 3、MySQL 导入 ginblog.sql\n\n# 4、启动 Redis \n\n# 5、运行项目\ngo mod tidy\ngo run main.go\n```\n\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\n\n```bash\nnpm install -g pnpm\n```\n\n前台前端：\n\n```bash\n# 1、进入前台前端项目根目录\ncd gin-blog-front\n\n# 2、安装依赖\npnpm install\n\n# 3、运行项目\npnpm run dev\n```\n\n后台前端：\n\n```bash\n# 1、进入后台前端项目根目录\ncd gin-blog-admin\n\n# 2、安装依赖\npnpm install\n\n# 3、运行项目\npnpm run dev\n```\n\n### 项目部署\n\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\n\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\n\n等功能开发的差不多了，再专门针对部署写一篇文章。\n\n---\n\n这里简单介绍一下，有基础的同学可以自行折腾。\n\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\n\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\n\nDocker 打包成镜像指令：\n\n```bash\ndocker build -t ginblog .\n```\n\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\n\n## 项目总结\n\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\n\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\n\n## 后续计划\n\n高优先级: \n\n- 完善图片上传功能, 目前文件上传还没怎么处理\n- 后台首页重新设计（目前没放什么内容）\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\n- 前台首页搜索文章（ElasticSearch 搜索）\n- 博客文章导入导出 (.md 文件)\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\n- 后端日志切割\n- 后台修改背景图片，博客配置等\n- 相册\n\n后续有空安排上：\n- 适配移动端\n- 黑夜模式\n- 前台收缩侧边信息功能\n- 说说\n- 音乐播放器\n- 鼠标左击特效\n- 看板娘\n- 文章目录锚点跟随\n- 第三方登录\n- 评论时支持选择表情，参考 Valine\n- 若干细节需要完善...\n', 'https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg', 0, 0, 0, '', 1, 1, 0, 1);
+INSERT INTO `article` VALUES (1, '2022-12-03 22:07:01.638', '2022-12-07 20:53:17.517', '测试文章', 1, '', '## 博客介绍\n\n<p  align=center>\n<a  href=\"http://www.hahacode.cn\">\n<img  src=\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\"  width=\"200\"  hight=\"200\"  alt=\"阵、雨的个人博客\"  style=\"border-radius: 50%\">\n</a>\n</p>\n\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\n\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\n\n\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\n\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\n\n## 在线地址\n\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\n\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\n\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\n\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\n\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\n\n## 目录结构\n\n代码仓库目录：\n\n```bash\ngin-vue-blog\n├── gin-blog-admin      -- 博客后台前端\n├── gin-blog-front      -- 博客前台前端\n├── gin-blog-server     -- 博客后端\n```\n\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\n\n> 项目运行参考：[快速开始](#快速开始)\n\n后端目录：\n\n```bash\ngin-blog-server\n├── api             -- API\n│   ├── front       -- 前台接口\n│   └── v1          -- 后台接口\n├── dao             -- 数据库操作模块\n├── service         -- 服务模块\n├── model           -- 数据模型\n│   ├── req             -- 请求 VO 模型\n│   ├── resp            -- 响应 VO 模型\n│   ├── dto             -- 内部传输 DTO 模型\n│   └── ...             -- 数据库模型对象 PO 模型\n├── routes          -- 路由模块\n│   └── middleware      -- 路由中间件\n├── utils           -- 工具模块\n│   ├── r               -- 响应封装\n│   ├── upload          -- 文件上传\n│   └── ...\n├── routes          -- 路由模块\n├── config          -- 配置文件\n├── test            -- 测试模块\n├── log             -- 日志文件\n├── Dockerfile\n└── main.go\n```\n\n## 项目介绍\n\n前台：\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\n- 实现点赞，统计用户等功能 (Redis)\n- 评论 + 回复评论功能\n- 留言采用弹幕墙，效果炫酷\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\n\n后台：\n- 鉴权使用 JWT\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\n- 支持动态权限修改，前端菜单由后端生成\n- 文章编辑使用 Markdown 编辑器\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\n\n其他：\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\n- 代码整洁层次清晰，利于开发者学习\n\n## 技术介绍\n\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\n\n前台前端：使用 pnpm 包管理工具\n- 基于 TypeScript\n- Vue3\n- Unocss: 原子化 CSS\n- Pinia\n- Vue Router \n- Axios \n- Naive UI\n- Vuetify\n- ...\n\n后台前端：使用 pnpm 包管理工具\n- 基于 JavaSciprt \n- pnpm: 包管理工具\n- Vue3\n- Unocss: 原子化 CSS\n- Pinia \n- Vue Router \n- Axios \n- Naive UI\n- ...\n\n后端技术栈：\n- 基于 Golang\n- Docker\n- Gin\n- GORM\n- Viper: 使用 TOML 作为配置文件\n- Zap\n- MySQL\n- Redis\n- Nginx: 部署静态资源 + 反向代理\n- ...\n\n其他：\n- 腾讯云人机验证\n- 七牛云对象存储\n- ...\n\n## 运行环境\n\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\n\n对象存储：七牛云\n\n## 开发环境\n\n| 开发工具                      | 说明                    |\n| ----------------------------- | ----------------------- |\n| Vscode                        | Golang 后端 +  Vue 前端 |\n| Navicat                       | MySQL 远程连接工具      |\n| Another Redis Desktop Manager | Redis 远程连接工具      |\n| MobaXterm                     | Linux 远程工具          |\n| Apifox                        | 接口调试 + 文档生成     |\n\n\n| 开发环境 | 版本 |\n| -------- | ---- |\n| Golang   | 1.19 |\n| MySQL    | 8.x  |\n| Redis    | 7.x  |\n\n## 快速开始\n\n### 本地运行\n\n> 自行安装 Golang、Node、MySQL、Redis 环境\n\n拉取项目到本地：\n\n```bash\ngit clone https://github.com/szluyu99/gin-vue-blog.git\n```\n\n后端项目运行：\n\n```bash\n# 1、进入后端项目根目录 \ncd gin-blog-server\n\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \n\n# 3、MySQL 导入 ginblog.sql\n\n# 4、启动 Redis \n\n# 5、运行项目\ngo mod tidy\ngo run main.go\n```\n\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\n\n```bash\nnpm install -g pnpm\n```\n\n前台前端：\n\n```bash\n# 1、进入前台前端项目根目录\ncd gin-blog-front\n\n# 2、安装依赖\npnpm install\n\n# 3、运行项目\npnpm run dev\n```\n\n后台前端：\n\n```bash\n# 1、进入后台前端项目根目录\ncd gin-blog-admin\n\n# 2、安装依赖\npnpm install\n\n# 3、运行项目\npnpm run dev\n```\n\n### 项目部署\n\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\n\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\n\n等功能开发的差不多了，再专门针对部署写一篇文章。\n\n---\n\n这里简单介绍一下，有基础的同学可以自行折腾。\n\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\n\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\n\nDocker 打包成镜像指令：\n\n```bash\ndocker build -t ginblog .\n```\n\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\n\n## 项目总结\n\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\n\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\n\n## 后续计划\n\n高优先级: \n\n- 完善图片上传功能, 目前文件上传还没怎么处理\n- 后台首页重新设计（目前没放什么内容）\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\n- 前台首页搜索文章（ElasticSearch 搜索）\n- 博客文章导入导出 (.md 文件)\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\n- 后端日志切割\n- 后台修改背景图片，博客配置等\n- 相册\n\n后续有空安排上：\n- 适配移动端\n- 黑夜模式\n- 前台收缩侧边信息功能\n- 说说\n- 音乐播放器\n- 鼠标左击特效\n- 看板娘\n- 文章目录锚点跟随\n- 第三方登录\n- 评论时支持选择表情，参考 Valine\n- 若干细节需要完善...\n', 'https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg', 0, 0, 0, '', 1, 1, 0, 1);
 
 -- ----------------------------
 -- Table structure for article_tag
@@ -95,7 +95,7 @@ CREATE TABLE `casbin_rule`  (
   `v5` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_casbin_rule`(`ptype` ASC, `v0` ASC, `v1` ASC, `v2` ASC, `v3` ASC, `v4` ASC, `v5` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2082 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2280 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of casbin_rule
@@ -106,102 +106,105 @@ INSERT INTO `casbin_rule` VALUES (1420, 'g', 'test', 'anonymous', NULL, NULL, NU
 INSERT INTO `casbin_rule` VALUES (1421, 'g', 'test', 'logout', NULL, NULL, NULL, NULL);
 INSERT INTO `casbin_rule` VALUES (1417, 'g', 'user', 'anonymous', NULL, NULL, NULL, NULL);
 INSERT INTO `casbin_rule` VALUES (1419, 'g', 'user', 'logout', NULL, NULL, NULL, NULL);
-INSERT INTO `casbin_rule` VALUES (2047, 'p', 'admin', '/article', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2045, 'p', 'admin', '/article', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2044, 'p', 'admin', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2043, 'p', 'admin', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2046, 'p', 'admin', '/article/soft-delete', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2048, 'p', 'admin', '/article/top', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2051, 'p', 'admin', '/category', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2050, 'p', 'admin', '/category', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2049, 'p', 'admin', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2052, 'p', 'admin', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2061, 'p', 'admin', '/comment', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2060, 'p', 'admin', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2062, 'p', 'admin', '/comment/review', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2080, 'p', 'admin', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2069, 'p', 'admin', '/link', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2068, 'p', 'admin', '/link', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2067, 'p', 'admin', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2039, 'p', 'admin', '/menu', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2040, 'p', 'admin', '/menu/:id', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2038, 'p', 'admin', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2041, 'p', 'admin', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2042, 'p', 'admin', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2058, 'p', 'admin', '/message', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2057, 'p', 'admin', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2059, 'p', 'admin', '/message/review', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2079, 'p', 'admin', '/operation/log', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2078, 'p', 'admin', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2034, 'p', 'admin', '/resource', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2037, 'p', 'admin', '/resource/:id', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2033, 'p', 'admin', '/resource/anonymous', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2035, 'p', 'admin', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2036, 'p', 'admin', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2065, 'p', 'admin', '/role', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2064, 'p', 'admin', '/role', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2063, 'p', 'admin', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2066, 'p', 'admin', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2072, 'p', 'admin', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2076, 'p', 'admin', '/setting/about', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2071, 'p', 'admin', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2073, 'p', 'admin', '/setting/blog-config', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2055, 'p', 'admin', '/tag', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2054, 'p', 'admin', '/tag', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2053, 'p', 'admin', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2056, 'p', 'admin', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2075, 'p', 'admin', '/user', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2074, 'p', 'admin', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2070, 'p', 'admin', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2081, 'p', 'admin', '/user/offline', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2077, 'p', 'admin', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2242, 'p', 'admin', '/article', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2240, 'p', 'admin', '/article', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2239, 'p', 'admin', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2238, 'p', 'admin', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2241, 'p', 'admin', '/article/soft-delete', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2243, 'p', 'admin', '/article/top', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2246, 'p', 'admin', '/category', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2245, 'p', 'admin', '/category', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2244, 'p', 'admin', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2247, 'p', 'admin', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2256, 'p', 'admin', '/comment', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2255, 'p', 'admin', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2257, 'p', 'admin', '/comment/review', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2275, 'p', 'admin', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2264, 'p', 'admin', '/link', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2263, 'p', 'admin', '/link', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2262, 'p', 'admin', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2234, 'p', 'admin', '/menu', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2235, 'p', 'admin', '/menu/:id', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2233, 'p', 'admin', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2236, 'p', 'admin', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2237, 'p', 'admin', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2253, 'p', 'admin', '/message', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2252, 'p', 'admin', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2254, 'p', 'admin', '/message/review', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2274, 'p', 'admin', '/operation/log', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2273, 'p', 'admin', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2229, 'p', 'admin', '/resource', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2232, 'p', 'admin', '/resource/:id', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2228, 'p', 'admin', '/resource/anonymous', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2230, 'p', 'admin', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2231, 'p', 'admin', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2260, 'p', 'admin', '/role', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2259, 'p', 'admin', '/role', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2258, 'p', 'admin', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2261, 'p', 'admin', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2267, 'p', 'admin', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2271, 'p', 'admin', '/setting/about', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2266, 'p', 'admin', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2268, 'p', 'admin', '/setting/blog-config', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2250, 'p', 'admin', '/tag', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2249, 'p', 'admin', '/tag', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2248, 'p', 'admin', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2251, 'p', 'admin', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2270, 'p', 'admin', '/user', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2278, 'p', 'admin', '/user/current', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2277, 'p', 'admin', '/user/current/password', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2279, 'p', 'admin', '/user/disable', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2269, 'p', 'admin', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2265, 'p', 'admin', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2276, 'p', 'admin', '/user/offline', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2272, 'p', 'admin', '/user/online', 'GET', '', '', '');
 INSERT INTO `casbin_rule` VALUES (1488, 'p', 'logout', '/logout', 'GET', NULL, NULL, NULL);
-INSERT INTO `casbin_rule` VALUES (1993, 'p', 'test', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1992, 'p', 'test', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1994, 'p', 'test', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1995, 'p', 'test', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1999, 'p', 'test', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2009, 'p', 'test', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2002, 'p', 'test', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1989, 'p', 'test', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1990, 'p', 'test', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1991, 'p', 'test', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1998, 'p', 'test', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2008, 'p', 'test', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1987, 'p', 'test', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1988, 'p', 'test', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2000, 'p', 'test', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2001, 'p', 'test', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2005, 'p', 'test', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2004, 'p', 'test', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1996, 'p', 'test', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (1997, 'p', 'test', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2006, 'p', 'test', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2003, 'p', 'test', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2007, 'p', 'test', '/user/online', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2016, 'p', 'user', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2015, 'p', 'user', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2017, 'p', 'user', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2018, 'p', 'user', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2022, 'p', 'user', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2032, 'p', 'user', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2025, 'p', 'user', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2012, 'p', 'user', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2013, 'p', 'user', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2014, 'p', 'user', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2021, 'p', 'user', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2031, 'p', 'user', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2010, 'p', 'user', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2011, 'p', 'user', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2023, 'p', 'user', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2024, 'p', 'user', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2028, 'p', 'user', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2027, 'p', 'user', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2019, 'p', 'user', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2020, 'p', 'user', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2029, 'p', 'user', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2026, 'p', 'user', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2030, 'p', 'user', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2160, 'p', 'test', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2159, 'p', 'test', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2161, 'p', 'test', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2162, 'p', 'test', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2166, 'p', 'test', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2176, 'p', 'test', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2169, 'p', 'test', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2156, 'p', 'test', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2157, 'p', 'test', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2158, 'p', 'test', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2165, 'p', 'test', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2175, 'p', 'test', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2154, 'p', 'test', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2155, 'p', 'test', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2167, 'p', 'test', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2168, 'p', 'test', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2172, 'p', 'test', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2171, 'p', 'test', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2163, 'p', 'test', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2164, 'p', 'test', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2173, 'p', 'test', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2170, 'p', 'test', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2174, 'p', 'test', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2137, 'p', 'user', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2136, 'p', 'user', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2138, 'p', 'user', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2139, 'p', 'user', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2143, 'p', 'user', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2153, 'p', 'user', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2146, 'p', 'user', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2133, 'p', 'user', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2134, 'p', 'user', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2135, 'p', 'user', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2142, 'p', 'user', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2152, 'p', 'user', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2131, 'p', 'user', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2132, 'p', 'user', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2144, 'p', 'user', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2145, 'p', 'user', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2149, 'p', 'user', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2148, 'p', 'user', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2140, 'p', 'user', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2141, 'p', 'user', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2150, 'p', 'user', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2147, 'p', 'user', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2151, 'p', 'user', '/user/online', 'GET', '', '', '');
 
 -- ----------------------------
 -- Table structure for category
@@ -284,7 +287,7 @@ CREATE TABLE `menu`  (
   `keep_alive` tinyint(1) NULL DEFAULT 1,
   `redirect` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '跳转路径',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 40 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menu
@@ -309,11 +312,12 @@ INSERT INTO `menu` VALUES (29, '2022-10-31 10:59:33.255', '2022-11-01 01:30:20.6
 INSERT INTO `menu` VALUES (30, '2022-10-31 11:00:09.997', '2022-11-01 01:30:24.097', '页面管理', 'page', '/setting/page', 'iconoir:journal-page', 2, 5, 0, 1, '');
 INSERT INTO `menu` VALUES (31, '2022-10-31 11:00:33.543', '2022-11-01 01:30:28.497', '友链管理', 'link', '/setting/link', 'mdi:telegram', 3, 5, 0, 1, '');
 INSERT INTO `menu` VALUES (32, '2022-10-31 11:01:00.444', '2022-11-01 01:30:33.186', '关于我', 'about', '/setting/about', 'cib:about-me', 4, 5, 0, 1, '');
-INSERT INTO `menu` VALUES (33, '2022-11-01 01:43:10.142', '2022-11-01 01:58:20.981', '首页', '/home', '/home', 'ic:sharp-home', 0, 0, 0, 1, '');
+INSERT INTO `menu` VALUES (33, '2022-11-01 01:43:10.142', '2022-12-07 20:53:27.473', '首页', '/home', '/home', 'ic:sharp-home', 0, 0, 0, 1, '');
 INSERT INTO `menu` VALUES (34, '2022-11-01 09:54:36.252', '2022-11-01 10:07:00.254', '修改文章', 'write/:id', '/article/write', 'icon-park-outline:write', 1, 2, 1, 1, '');
 INSERT INTO `menu` VALUES (36, '2022-11-04 15:50:45.993', '2022-11-04 15:58:14.443', '日志管理', '/log', 'Layout', 'material-symbols:receipt-long-outline-rounded', 6, 0, 0, 1, '/log/operation');
 INSERT INTO `menu` VALUES (37, '2022-11-04 15:53:00.251', '2022-11-04 15:58:36.560', '操作日志', 'operation', '/log/operation', 'mdi:book-open-page-variant-outline', 1, 36, 0, 1, '');
 INSERT INTO `menu` VALUES (38, '2022-11-04 16:02:42.306', '2022-11-04 16:05:35.761', '登录日志', 'login', '/log/login', 'material-symbols:login', 2, 36, 0, 1, '');
+INSERT INTO `menu` VALUES (39, '2022-12-07 20:47:08.349', '2022-12-07 20:53:33.851', '个人中心', '/profile', '/profile', 'mdi:account', 7, 0, 0, 1, '');
 
 -- ----------------------------
 -- Table structure for message
@@ -361,7 +365,7 @@ CREATE TABLE `operation_log`  (
   `ip_address` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '操作IP',
   `ip_source` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '操作地址',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
@@ -376,6 +380,25 @@ INSERT INTO `operation_log` VALUES (7, '2022-12-03 22:19:51.943', '2022-12-03 22
 INSERT INTO `operation_log` VALUES (8, '2022-12-04 00:38:20.583', '2022-12-04 00:38:20.583', '文章', '新增或修改', 'gin-blog/api/v1.(*Article).SaveOrUpdate-fm', '/api/article', '新增或修改文章', '{\"id\":1,\"title\":\"测试文章\",\"desc\":\"\",\"content\":\"## 博客介绍\\n\\n<p  align=center>\\n<a  href=\\\"http://www.hahacode.cn\\\">\\n<img  src=\\\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\\\"  width=\\\"200\\\"  hight=\\\"200\\\"  alt=\\\"阵、雨的个人博客\\\"  style=\\\"border-radius: 50%\\\">\\n</a>\\n</p>\\n\\n<p align=\\\"center\\\">\\n   <a target=\\\"_blank\\\" href=\\\"#\\\">\\n      <img src=\\\"https://img.shields.io/badge/Go-1.19-blue\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/Gin-v1.8.1-blue\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/Casbin-v2.56.0-blue\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/mysql-8.0-blue\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/GORM-v1.24.0-blue\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/redis-7.0-red\\\"/>\\n      <img src=\\\"https://img.shields.io/badge/vue-v3.X-green\\\"/>\\n    </a>\\n</p>\\n\\n[在线地址](#在线地址) | [目录结构](#目录结构) | [技术介绍](#技术介绍) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [项目总结](#项目总结) \\n\\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\\n\\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\\n\\n\\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\n## 在线地址\\n\\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\\n\\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\\n\\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\\n\\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\\n\\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\\n\\n## 目录结构\\n\\n代码仓库目录：\\n\\n```bash\\ngin-vue-blog\\n├── gin-blog-admin      -- 博客后台前端\\n├── gin-blog-front      -- 博客前台前端\\n├── gin-blog-server     -- 博客后端\\n```\\n\\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\\n\\n> 项目运行参考：[快速开始](#快速开始)\\n\\n后端目录：\\n\\n```bash\\ngin-blog-server\\n├── api             -- API\\n│   ├── front       -- 前台接口\\n│   └── v1          -- 后台接口\\n├── dao             -- 数据库操作模块\\n├── service         -- 服务模块\\n├── model           -- 数据模型\\n│   ├── req             -- 请求 VO 模型\\n│   ├── resp            -- 响应 VO 模型\\n│   ├── dto             -- 内部传输 DTO 模型\\n│   └── ...             -- 数据库模型对象 PO 模型\\n├── routes          -- 路由模块\\n│   └── middleware      -- 路由中间件\\n├── utils           -- 工具模块\\n│   ├── r               -- 响应封装\\n│   ├── upload          -- 文件上传\\n│   └── ...\\n├── routes          -- 路由模块\\n├── config          -- 配置文件\\n├── test            -- 测试模块\\n├── log             -- 日志文件\\n├── Dockerfile\\n└── main.go\\n```\\n\\n## 项目介绍\\n\\n前台：\\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\\n- 实现点赞，统计用户等功能 (Redis)\\n- 评论 + 回复评论功能\\n- 留言采用弹幕墙，效果炫酷\\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\\n\\n后台：\\n- 鉴权使用 JWT\\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\\n- 支持动态权限修改，前端菜单由后端生成\\n- 文章编辑使用 Markdown 编辑器\\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\\n\\n其他：\\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\\n- 代码整洁层次清晰，利于开发者学习\\n\\n## 技术介绍\\n\\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\\n\\n前台前端：使用 pnpm 包管理工具\\n- 基于 TypeScript\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia\\n- Vue Router \\n- Axios \\n- Naive UI\\n- Vuetify\\n- ...\\n\\n后台前端：使用 pnpm 包管理工具\\n- 基于 JavaSciprt \\n- pnpm: 包管理工具\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia \\n- Vue Router \\n- Axios \\n- Naive UI\\n- ...\\n\\n后端技术栈：\\n- 基于 Golang\\n- Docker\\n- Gin\\n- GORM\\n- Viper: 使用 TOML 作为配置文件\\n- Zap\\n- MySQL\\n- Redis\\n- Nginx: 部署静态资源 + 反向代理\\n- ...\\n\\n其他：\\n- 腾讯云人机验证\\n- 七牛云对象存储\\n- ...\\n\\n## 运行环境\\n\\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\\n\\n对象存储：七牛云\\n\\n## 开发环境\\n\\n| 开发工具                      | 说明                    |\\n| ----------------------------- | ----------------------- |\\n| Vscode                        | Golang 后端 +  Vue 前端 |\\n| Navicat                       | MySQL 远程连接工具      |\\n| Another Redis Desktop Manager | Redis 远程连接工具      |\\n| MobaXterm                     | Linux 远程工具          |\\n| Apifox                        | 接口调试 + 文档生成     |\\n\\n\\n| 开发环境 | 版本 |\\n| -------- | ---- |\\n| Golang   | 1.19 |\\n| MySQL    | 8.x  |\\n| Redis    | 7.x  |\\n\\n## 快速开始\\n\\n### 本地运行\\n\\n> 自行安装 Golang、Node、MySQL、Redis 环境\\n\\n拉取项目到本地：\\n\\n```bash\\ngit clone https://github.com/szluyu99/gin-vue-blog.git\\n```\\n\\n后端项目运行：\\n\\n```bash\\n# 1、进入后端项目根目录 \\ncd gin-blog-server\\n\\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \\n\\n# 3、MySQL 导入 ginblog.sql\\n\\n# 4、启动 Redis \\n\\n# 5、运行项目\\ngo mod tidy\\ngo run main.go\\n```\\n\\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\\n\\n```bash\\nnpm install -g pnpm\\n```\\n\\n前台前端：\\n\\n```bash\\n# 1、进入前台前端项目根目录\\ncd gin-blog-front\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n后台前端：\\n\\n```bash\\n# 1、进入后台前端项目根目录\\ncd gin-blog-admin\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n### 项目部署\\n\\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\\n\\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\\n\\n等功能开发的差不多了，再专门针对部署写一篇文章。\\n\\n---\\n\\n这里简单介绍一下，有基础的同学可以自行折腾。\\n\\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\\n\\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\\n\\nDocker 打包成镜像指令：\\n\\n```bash\\ndocker build -t ginblog .\\n```\\n\\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\\n\\n## 项目总结\\n\\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\\n\\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\\n\\n## 后续计划\\n\\n高优先级: \\n\\n- 完善图片上传功能, 目前文件上传还没怎么处理\\n- 后台首页重新设计（目前没放什么内容）\\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\\n- 前台首页搜索文章（ElasticSearch 搜索）\\n- 博客文章导入导出 (.md 文件)\\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\\n- 后端日志切割\\n- 后台修改背景图片，博客配置等\\n- 相册\\n\\n后续有空安排上：\\n- 适配移动端\\n- 黑夜模式\\n- 前台收缩侧边信息功能\\n- 说说\\n- 音乐播放器\\n- 鼠标左击特效\\n- 看板娘\\n- 文章目录锚点跟随\\n- 第三方登录\\n- 评论时支持选择表情，参考 Valine\\n- 若干细节需要完善...\\n\",\"img\":\"https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg\",\"category_name\":\"后端\",\"tag_names\":[\"Golang\",\"Vue\"],\"type\":1,\"original_url\":\"\",\"is_top\":0,\"status\":1}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58096', '未知');
 INSERT INTO `operation_log` VALUES (9, '2022-12-04 00:45:54.335', '2022-12-04 00:45:54.335', '文章', '新增或修改', 'gin-blog/api/v1.(*Article).SaveOrUpdate-fm', '/api/article', '新增或修改文章', '{\"id\":1,\"title\":\"测试文章\",\"desc\":\"\",\"content\":\"## 博客介绍\\n\\n<p  align=center>\\n<a  href=\\\"http://www.hahacode.cn\\\">\\n<img  src=\\\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\\\"  width=\\\"200\\\"  hight=\\\"200\\\"  alt=\\\"阵、雨的个人博客\\\"  style=\\\"border-radius: 50%\\\">\\n</a>\\n</p>\\n\\n[在线地址](#在线地址) | [目录结构](#目录结构) | [技术介绍](#技术介绍) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [项目总结](#项目总结) \\n\\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\\n\\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\\n\\n\\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\n## 在线地址\\n\\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\\n\\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\\n\\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\\n\\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\\n\\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\\n\\n## 目录结构\\n\\n代码仓库目录：\\n\\n```bash\\ngin-vue-blog\\n├── gin-blog-admin      -- 博客后台前端\\n├── gin-blog-front      -- 博客前台前端\\n├── gin-blog-server     -- 博客后端\\n```\\n\\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\\n\\n> 项目运行参考：[快速开始](#快速开始)\\n\\n后端目录：\\n\\n```bash\\ngin-blog-server\\n├── api             -- API\\n│   ├── front       -- 前台接口\\n│   └── v1          -- 后台接口\\n├── dao             -- 数据库操作模块\\n├── service         -- 服务模块\\n├── model           -- 数据模型\\n│   ├── req             -- 请求 VO 模型\\n│   ├── resp            -- 响应 VO 模型\\n│   ├── dto             -- 内部传输 DTO 模型\\n│   └── ...             -- 数据库模型对象 PO 模型\\n├── routes          -- 路由模块\\n│   └── middleware      -- 路由中间件\\n├── utils           -- 工具模块\\n│   ├── r               -- 响应封装\\n│   ├── upload          -- 文件上传\\n│   └── ...\\n├── routes          -- 路由模块\\n├── config          -- 配置文件\\n├── test            -- 测试模块\\n├── log             -- 日志文件\\n├── Dockerfile\\n└── main.go\\n```\\n\\n## 项目介绍\\n\\n前台：\\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\\n- 实现点赞，统计用户等功能 (Redis)\\n- 评论 + 回复评论功能\\n- 留言采用弹幕墙，效果炫酷\\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\\n\\n后台：\\n- 鉴权使用 JWT\\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\\n- 支持动态权限修改，前端菜单由后端生成\\n- 文章编辑使用 Markdown 编辑器\\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\\n\\n其他：\\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\\n- 代码整洁层次清晰，利于开发者学习\\n\\n## 技术介绍\\n\\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\\n\\n前台前端：使用 pnpm 包管理工具\\n- 基于 TypeScript\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia\\n- Vue Router \\n- Axios \\n- Naive UI\\n- Vuetify\\n- ...\\n\\n后台前端：使用 pnpm 包管理工具\\n- 基于 JavaSciprt \\n- pnpm: 包管理工具\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia \\n- Vue Router \\n- Axios \\n- Naive UI\\n- ...\\n\\n后端技术栈：\\n- 基于 Golang\\n- Docker\\n- Gin\\n- GORM\\n- Viper: 使用 TOML 作为配置文件\\n- Zap\\n- MySQL\\n- Redis\\n- Nginx: 部署静态资源 + 反向代理\\n- ...\\n\\n其他：\\n- 腾讯云人机验证\\n- 七牛云对象存储\\n- ...\\n\\n## 运行环境\\n\\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\\n\\n对象存储：七牛云\\n\\n## 开发环境\\n\\n| 开发工具                      | 说明                    |\\n| ----------------------------- | ----------------------- |\\n| Vscode                        | Golang 后端 +  Vue 前端 |\\n| Navicat                       | MySQL 远程连接工具      |\\n| Another Redis Desktop Manager | Redis 远程连接工具      |\\n| MobaXterm                     | Linux 远程工具          |\\n| Apifox                        | 接口调试 + 文档生成     |\\n\\n\\n| 开发环境 | 版本 |\\n| -------- | ---- |\\n| Golang   | 1.19 |\\n| MySQL    | 8.x  |\\n| Redis    | 7.x  |\\n\\n## 快速开始\\n\\n### 本地运行\\n\\n> 自行安装 Golang、Node、MySQL、Redis 环境\\n\\n拉取项目到本地：\\n\\n```bash\\ngit clone https://github.com/szluyu99/gin-vue-blog.git\\n```\\n\\n后端项目运行：\\n\\n```bash\\n# 1、进入后端项目根目录 \\ncd gin-blog-server\\n\\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \\n\\n# 3、MySQL 导入 ginblog.sql\\n\\n# 4、启动 Redis \\n\\n# 5、运行项目\\ngo mod tidy\\ngo run main.go\\n```\\n\\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\\n\\n```bash\\nnpm install -g pnpm\\n```\\n\\n前台前端：\\n\\n```bash\\n# 1、进入前台前端项目根目录\\ncd gin-blog-front\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n后台前端：\\n\\n```bash\\n# 1、进入后台前端项目根目录\\ncd gin-blog-admin\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n### 项目部署\\n\\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\\n\\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\\n\\n等功能开发的差不多了，再专门针对部署写一篇文章。\\n\\n---\\n\\n这里简单介绍一下，有基础的同学可以自行折腾。\\n\\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\\n\\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\\n\\nDocker 打包成镜像指令：\\n\\n```bash\\ndocker build -t ginblog .\\n```\\n\\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\\n\\n## 项目总结\\n\\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\\n\\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\\n\\n## 后续计划\\n\\n高优先级: \\n\\n- 完善图片上传功能, 目前文件上传还没怎么处理\\n- 后台首页重新设计（目前没放什么内容）\\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\\n- 前台首页搜索文章（ElasticSearch 搜索）\\n- 博客文章导入导出 (.md 文件)\\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\\n- 后端日志切割\\n- 后台修改背景图片，博客配置等\\n- 相册\\n\\n后续有空安排上：\\n- 适配移动端\\n- 黑夜模式\\n- 前台收缩侧边信息功能\\n- 说说\\n- 音乐播放器\\n- 鼠标左击特效\\n- 看板娘\\n- 文章目录锚点跟随\\n- 第三方登录\\n- 评论时支持选择表情，参考 Valine\\n- 若干细节需要完善...\\n\",\"img\":\"https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg\",\"category_name\":\"后端\",\"tag_names\":[\"Golang\",\"Vue\"],\"type\":1,\"original_url\":\"\",\"is_top\":0,\"status\":1}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58096', '未知');
 INSERT INTO `operation_log` VALUES (10, '2022-12-04 00:46:13.963', '2022-12-04 00:46:13.963', '文章', '新增或修改', 'gin-blog/api/v1.(*Article).SaveOrUpdate-fm', '/api/article', '新增或修改文章', '{\"id\":1,\"title\":\"测试文章\",\"desc\":\"\",\"content\":\"## 博客介绍\\n\\n<p  align=center>\\n<a  href=\\\"http://www.hahacode.cn\\\">\\n<img  src=\\\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\\\"  width=\\\"200\\\"  hight=\\\"200\\\"  alt=\\\"阵、雨的个人博客\\\"  style=\\\"border-radius: 50%\\\">\\n</a>\\n</p>\\n\\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\\n\\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\\n\\n\\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\n## 在线地址\\n\\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\\n\\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\\n\\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\\n\\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\\n\\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\\n\\n## 目录结构\\n\\n代码仓库目录：\\n\\n```bash\\ngin-vue-blog\\n├── gin-blog-admin      -- 博客后台前端\\n├── gin-blog-front      -- 博客前台前端\\n├── gin-blog-server     -- 博客后端\\n```\\n\\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\\n\\n> 项目运行参考：[快速开始](#快速开始)\\n\\n后端目录：\\n\\n```bash\\ngin-blog-server\\n├── api             -- API\\n│   ├── front       -- 前台接口\\n│   └── v1          -- 后台接口\\n├── dao             -- 数据库操作模块\\n├── service         -- 服务模块\\n├── model           -- 数据模型\\n│   ├── req             -- 请求 VO 模型\\n│   ├── resp            -- 响应 VO 模型\\n│   ├── dto             -- 内部传输 DTO 模型\\n│   └── ...             -- 数据库模型对象 PO 模型\\n├── routes          -- 路由模块\\n│   └── middleware      -- 路由中间件\\n├── utils           -- 工具模块\\n│   ├── r               -- 响应封装\\n│   ├── upload          -- 文件上传\\n│   └── ...\\n├── routes          -- 路由模块\\n├── config          -- 配置文件\\n├── test            -- 测试模块\\n├── log             -- 日志文件\\n├── Dockerfile\\n└── main.go\\n```\\n\\n## 项目介绍\\n\\n前台：\\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\\n- 实现点赞，统计用户等功能 (Redis)\\n- 评论 + 回复评论功能\\n- 留言采用弹幕墙，效果炫酷\\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\\n\\n后台：\\n- 鉴权使用 JWT\\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\\n- 支持动态权限修改，前端菜单由后端生成\\n- 文章编辑使用 Markdown 编辑器\\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\\n\\n其他：\\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\\n- 代码整洁层次清晰，利于开发者学习\\n\\n## 技术介绍\\n\\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\\n\\n前台前端：使用 pnpm 包管理工具\\n- 基于 TypeScript\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia\\n- Vue Router \\n- Axios \\n- Naive UI\\n- Vuetify\\n- ...\\n\\n后台前端：使用 pnpm 包管理工具\\n- 基于 JavaSciprt \\n- pnpm: 包管理工具\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia \\n- Vue Router \\n- Axios \\n- Naive UI\\n- ...\\n\\n后端技术栈：\\n- 基于 Golang\\n- Docker\\n- Gin\\n- GORM\\n- Viper: 使用 TOML 作为配置文件\\n- Zap\\n- MySQL\\n- Redis\\n- Nginx: 部署静态资源 + 反向代理\\n- ...\\n\\n其他：\\n- 腾讯云人机验证\\n- 七牛云对象存储\\n- ...\\n\\n## 运行环境\\n\\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\\n\\n对象存储：七牛云\\n\\n## 开发环境\\n\\n| 开发工具                      | 说明                    |\\n| ----------------------------- | ----------------------- |\\n| Vscode                        | Golang 后端 +  Vue 前端 |\\n| Navicat                       | MySQL 远程连接工具      |\\n| Another Redis Desktop Manager | Redis 远程连接工具      |\\n| MobaXterm                     | Linux 远程工具          |\\n| Apifox                        | 接口调试 + 文档生成     |\\n\\n\\n| 开发环境 | 版本 |\\n| -------- | ---- |\\n| Golang   | 1.19 |\\n| MySQL    | 8.x  |\\n| Redis    | 7.x  |\\n\\n## 快速开始\\n\\n### 本地运行\\n\\n> 自行安装 Golang、Node、MySQL、Redis 环境\\n\\n拉取项目到本地：\\n\\n```bash\\ngit clone https://github.com/szluyu99/gin-vue-blog.git\\n```\\n\\n后端项目运行：\\n\\n```bash\\n# 1、进入后端项目根目录 \\ncd gin-blog-server\\n\\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \\n\\n# 3、MySQL 导入 ginblog.sql\\n\\n# 4、启动 Redis \\n\\n# 5、运行项目\\ngo mod tidy\\ngo run main.go\\n```\\n\\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\\n\\n```bash\\nnpm install -g pnpm\\n```\\n\\n前台前端：\\n\\n```bash\\n# 1、进入前台前端项目根目录\\ncd gin-blog-front\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n后台前端：\\n\\n```bash\\n# 1、进入后台前端项目根目录\\ncd gin-blog-admin\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n### 项目部署\\n\\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\\n\\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\\n\\n等功能开发的差不多了，再专门针对部署写一篇文章。\\n\\n---\\n\\n这里简单介绍一下，有基础的同学可以自行折腾。\\n\\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\\n\\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\\n\\nDocker 打包成镜像指令：\\n\\n```bash\\ndocker build -t ginblog .\\n```\\n\\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\\n\\n## 项目总结\\n\\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\\n\\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\\n\\n## 后续计划\\n\\n高优先级: \\n\\n- 完善图片上传功能, 目前文件上传还没怎么处理\\n- 后台首页重新设计（目前没放什么内容）\\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\\n- 前台首页搜索文章（ElasticSearch 搜索）\\n- 博客文章导入导出 (.md 文件)\\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\\n- 后端日志切割\\n- 后台修改背景图片，博客配置等\\n- 相册\\n\\n后续有空安排上：\\n- 适配移动端\\n- 黑夜模式\\n- 前台收缩侧边信息功能\\n- 说说\\n- 音乐播放器\\n- 鼠标左击特效\\n- 看板娘\\n- 文章目录锚点跟随\\n- 第三方登录\\n- 评论时支持选择表情，参考 Valine\\n- 若干细节需要完善...\\n\",\"img\":\"https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg\",\"category_name\":\"后端\",\"tag_names\":[\"Golang\",\"Vue\"],\"type\":1,\"original_url\":\"\",\"is_top\":0,\"status\":1}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58096', '未知');
+INSERT INTO `operation_log` VALUES (11, '2022-12-07 20:47:08.356', '2022-12-07 20:47:08.356', '菜单', '新增或修改', 'gin-blog/api/v1.(*Menu).SaveOrUpdate-fm', '/api/menu', '新增或修改菜单', '{\"order_num\":7,\"is_hidden\":0,\"is_catelogue\":false,\"component\":\"/profile\",\"parent_id\":0,\"name\":\"个人中心\",\"icon\":\"mdi:account\",\"path\":\"/profile\",\"keep_alive\":1}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (12, '2022-12-07 20:47:21.159', '2022-12-07 20:47:21.159', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":1,\"name\":\"管理员\",\"label\":\"admin\",\"created_at\":\"2022-10-20T21:24:28+08:00\",\"is_disable\":0,\"resource_ids\":[3,43,44,45,46,47,48,6,59,60,61,7,38,39,40,41,42,8,65,66,67,68,9,62,63,64,10,23,34,35,36,37,79,80,81,85,49,51,52,53,54,50,55,56,57,58,69,70,71,72,91,92,93,74,78,82,84,86,98,95,11],\"menu_ids\":[2,3,4,5,6,7,8,9,16,17,23,24,25,26,27,28,29,30,31,32,33,36,37,38,34,10,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (13, '2022-12-07 20:47:23.403', '2022-12-07 20:47:23.403', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":2,\"name\":\"用户\",\"label\":\"user\",\"created_at\":\"2022-10-20T21:25:07+08:00\",\"is_disable\":0,\"resource_ids\":[43,44,59,38,42,65,68,62,35,36,51,54,55,58,70,78,82,79,80,86,92,95,41],\"menu_ids\":[1,2,6,8,9,10,3,25,26,16,17,23,24,4,27,28,29,5,30,32,31,33,34,36,37,38,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (14, '2022-12-07 20:47:25.953', '2022-12-07 20:47:25.953', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":3,\"name\":\"测试\",\"label\":\"test\",\"created_at\":\"2022-10-20T21:25:09+08:00\",\"is_disable\":0,\"resource_ids\":[43,44,59,38,41,42,65,68,62,35,36,79,80,51,54,55,58,70,78,82,92,95,86],\"menu_ids\":[1,2,3,4,33,6,34,8,9,10,25,26,16,17,23,24,5,29,30,32,31,27,28,36,37,38,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (15, '2022-12-07 20:48:05.951', '2022-12-07 20:48:05.951', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":74,\"name\":\"修改当前用户密码\",\"url\":\"/user/current/password\",\"request_method\":\"PUT\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (16, '2022-12-07 20:48:35.522', '2022-12-07 20:48:35.522', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":74,\"name\":\"修改当前用户信息\",\"url\":\"/user/current\",\"request_method\":\"PUT\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (17, '2022-12-07 20:48:56.232', '2022-12-07 20:48:56.232', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":1,\"name\":\"管理员\",\"label\":\"admin\",\"created_at\":\"2022-10-20T21:24:28+08:00\",\"is_disable\":0,\"resource_ids\":[3,43,44,45,46,47,48,6,59,60,61,7,38,39,40,41,42,8,65,66,67,68,9,62,63,64,10,23,34,35,36,37,79,80,81,85,49,51,52,53,54,50,55,56,57,58,69,70,71,72,91,92,93,78,82,84,86,98,95,11,99,100,74],\"menu_ids\":[2,3,4,5,6,7,8,9,16,17,23,24,25,26,27,28,29,30,31,32,33,36,37,38,34,10,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (18, '2022-12-07 20:49:09.822', '2022-12-07 20:49:09.822', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateCurrent-fm', '/api/user/current', '修改用户', '{\"avatar\":\"https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png\",\"nickname\":\"管理员\",\"intro\":\"我是管理员用户！\",\"website\":\"https://www.baidu.com\"}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (19, '2022-12-07 20:49:20.794', '2022-12-07 20:49:20.794', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateCurrentPassword-fm', '/api/user/current/password', '修改用户', '{\"old_password\":\"1234567\",\"new_password\":\"1234567\",\"confirm_password\":\"1234567\"}', 'PUT', '{\"code\":1010,\"message\":\"旧密码不正确\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (20, '2022-12-07 20:53:16.642', '2022-12-07 20:53:16.642', '文章', '修改', 'gin-blog/api/v1.(*Article).UpdateTop-fm', '/api/article/top', '修改文章', '{\"id\":1,\"created_at\":\"2022-12-03T22:07:01.638+08:00\",\"updated_at\":\"2022-12-04T00:46:13.94+08:00\",\"category_id\":1,\"category\":{\"id\":1,\"created_at\":\"2022-12-03T22:01:29.106+08:00\",\"updated_at\":\"2022-12-03T22:01:29.106+08:00\",\"name\":\"后端\",\"Articles\":null},\"tags\":[{\"id\":1,\"created_at\":\"2022-12-03T22:01:51.624+08:00\",\"updated_at\":\"2022-12-03T22:01:51.624+08:00\",\"articles\":null,\"name\":\"Golang\"},{\"id\":2,\"created_at\":\"2022-12-03T22:01:56.984+08:00\",\"updated_at\":\"2022-12-03T22:01:56.984+08:00\",\"articles\":null,\"name\":\"Vue\"}],\"user_id\":1,\"title\":\"测试文章\",\"desc\":\"\",\"content\":\"## 博客介绍\\n\\n<p  align=center>\\n<a  href=\\\"http://www.hahacode.cn\\\">\\n<img  src=\\\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\\\"  width=\\\"200\\\"  hight=\\\"200\\\"  alt=\\\"阵、雨的个人博客\\\"  style=\\\"border-radius: 50%\\\">\\n</a>\\n</p>\\n\\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\\n\\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\\n\\n\\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\n## 在线地址\\n\\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\\n\\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\\n\\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\\n\\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\\n\\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\\n\\n## 目录结构\\n\\n代码仓库目录：\\n\\n```bash\\ngin-vue-blog\\n├── gin-blog-admin      -- 博客后台前端\\n├── gin-blog-front      -- 博客前台前端\\n├── gin-blog-server     -- 博客后端\\n```\\n\\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\\n\\n> 项目运行参考：[快速开始](#快速开始)\\n\\n后端目录：\\n\\n```bash\\ngin-blog-server\\n├── api             -- API\\n│   ├── front       -- 前台接口\\n│   └── v1          -- 后台接口\\n├── dao             -- 数据库操作模块\\n├── service         -- 服务模块\\n├── model           -- 数据模型\\n│   ├── req             -- 请求 VO 模型\\n│   ├── resp            -- 响应 VO 模型\\n│   ├── dto             -- 内部传输 DTO 模型\\n│   └── ...             -- 数据库模型对象 PO 模型\\n├── routes          -- 路由模块\\n│   └── middleware      -- 路由中间件\\n├── utils           -- 工具模块\\n│   ├── r               -- 响应封装\\n│   ├── upload          -- 文件上传\\n│   └── ...\\n├── routes          -- 路由模块\\n├── config          -- 配置文件\\n├── test            -- 测试模块\\n├── log             -- 日志文件\\n├── Dockerfile\\n└── main.go\\n```\\n\\n## 项目介绍\\n\\n前台：\\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\\n- 实现点赞，统计用户等功能 (Redis)\\n- 评论 + 回复评论功能\\n- 留言采用弹幕墙，效果炫酷\\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\\n\\n后台：\\n- 鉴权使用 JWT\\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\\n- 支持动态权限修改，前端菜单由后端生成\\n- 文章编辑使用 Markdown 编辑器\\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\\n\\n其他：\\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\\n- 代码整洁层次清晰，利于开发者学习\\n\\n## 技术介绍\\n\\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\\n\\n前台前端：使用 pnpm 包管理工具\\n- 基于 TypeScript\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia\\n- Vue Router \\n- Axios \\n- Naive UI\\n- Vuetify\\n- ...\\n\\n后台前端：使用 pnpm 包管理工具\\n- 基于 JavaSciprt \\n- pnpm: 包管理工具\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia \\n- Vue Router \\n- Axios \\n- Naive UI\\n- ...\\n\\n后端技术栈：\\n- 基于 Golang\\n- Docker\\n- Gin\\n- GORM\\n- Viper: 使用 TOML 作为配置文件\\n- Zap\\n- MySQL\\n- Redis\\n- Nginx: 部署静态资源 + 反向代理\\n- ...\\n\\n其他：\\n- 腾讯云人机验证\\n- 七牛云对象存储\\n- ...\\n\\n## 运行环境\\n\\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\\n\\n对象存储：七牛云\\n\\n## 开发环境\\n\\n| 开发工具                      | 说明                    |\\n| ----------------------------- | ----------------------- |\\n| Vscode                        | Golang 后端 +  Vue 前端 |\\n| Navicat                       | MySQL 远程连接工具      |\\n| Another Redis Desktop Manager | Redis 远程连接工具      |\\n| MobaXterm                     | Linux 远程工具          |\\n| Apifox                        | 接口调试 + 文档生成     |\\n\\n\\n| 开发环境 | 版本 |\\n| -------- | ---- |\\n| Golang   | 1.19 |\\n| MySQL    | 8.x  |\\n| Redis    | 7.x  |\\n\\n## 快速开始\\n\\n### 本地运行\\n\\n> 自行安装 Golang、Node、MySQL、Redis 环境\\n\\n拉取项目到本地：\\n\\n```bash\\ngit clone https://github.com/szluyu99/gin-vue-blog.git\\n```\\n\\n后端项目运行：\\n\\n```bash\\n# 1、进入后端项目根目录 \\ncd gin-blog-server\\n\\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \\n\\n# 3、MySQL 导入 ginblog.sql\\n\\n# 4、启动 Redis \\n\\n# 5、运行项目\\ngo mod tidy\\ngo run main.go\\n```\\n\\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\\n\\n```bash\\nnpm install -g pnpm\\n```\\n\\n前台前端：\\n\\n```bash\\n# 1、进入前台前端项目根目录\\ncd gin-blog-front\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n后台前端：\\n\\n```bash\\n# 1、进入后台前端项目根目录\\ncd gin-blog-admin\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n### 项目部署\\n\\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\\n\\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\\n\\n等功能开发的差不多了，再专门针对部署写一篇文章。\\n\\n---\\n\\n这里简单介绍一下，有基础的同学可以自行折腾。\\n\\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\\n\\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\\n\\nDocker 打包成镜像指令：\\n\\n```bash\\ndocker build -t ginblog .\\n```\\n\\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\\n\\n## 项目总结\\n\\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\\n\\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\\n\\n## 后续计划\\n\\n高优先级: \\n\\n- 完善图片上传功能, 目前文件上传还没怎么处理\\n- 后台首页重新设计（目前没放什么内容）\\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\\n- 前台首页搜索文章（ElasticSearch 搜索）\\n- 博客文章导入导出 (.md 文件)\\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\\n- 后端日志切割\\n- 后台修改背景图片，博客配置等\\n- 相册\\n\\n后续有空安排上：\\n- 适配移动端\\n- 黑夜模式\\n- 前台收缩侧边信息功能\\n- 说说\\n- 音乐播放器\\n- 鼠标左击特效\\n- 看板娘\\n- 文章目录锚点跟随\\n- 第三方登录\\n- 评论时支持选择表情，参考 Valine\\n- 若干细节需要完善...\\n\",\"img\":\"https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg\",\"type\":1,\"status\":1,\"is_top\":1,\"is_delete\":0,\"original_url\":\"\",\"comment_count\":0,\"read_count\":0,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (21, '2022-12-07 20:53:17.524', '2022-12-07 20:53:17.524', '文章', '修改', 'gin-blog/api/v1.(*Article).UpdateTop-fm', '/api/article/top', '修改文章', '{\"id\":1,\"created_at\":\"2022-12-03T22:07:01.638+08:00\",\"updated_at\":\"2022-12-07T20:53:16.635+08:00\",\"category_id\":1,\"category\":{\"id\":1,\"created_at\":\"2022-12-03T22:01:29.106+08:00\",\"updated_at\":\"2022-12-03T22:01:29.106+08:00\",\"name\":\"后端\",\"Articles\":null},\"tags\":[{\"id\":1,\"created_at\":\"2022-12-03T22:01:51.624+08:00\",\"updated_at\":\"2022-12-03T22:01:51.624+08:00\",\"articles\":null,\"name\":\"Golang\"},{\"id\":2,\"created_at\":\"2022-12-03T22:01:56.984+08:00\",\"updated_at\":\"2022-12-03T22:01:56.984+08:00\",\"articles\":null,\"name\":\"Vue\"}],\"user_id\":1,\"title\":\"测试文章\",\"desc\":\"\",\"content\":\"## 博客介绍\\n\\n<p  align=center>\\n<a  href=\\\"http://www.hahacode.cn\\\">\\n<img  src=\\\"https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg\\\"  width=\\\"200\\\"  hight=\\\"200\\\"  alt=\\\"阵、雨的个人博客\\\"  style=\\\"border-radius: 50%\\\">\\n</a>\\n</p>\\n\\n因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。\\n\\n您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。\\n\\n\\nGithub地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\nGitee地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)\\n\\n## 在线地址\\n\\n博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)\\n\\n博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)\\n\\n测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录\\n\\n在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)\\n\\n> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改\\n\\n## 目录结构\\n\\n代码仓库目录：\\n\\n```bash\\ngin-vue-blog\\n├── gin-blog-admin      -- 博客后台前端\\n├── gin-blog-front      -- 博客前台前端\\n├── gin-blog-server     -- 博客后端\\n```\\n\\n需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。\\n\\n> 项目运行参考：[快速开始](#快速开始)\\n\\n后端目录：\\n\\n```bash\\ngin-blog-server\\n├── api             -- API\\n│   ├── front       -- 前台接口\\n│   └── v1          -- 后台接口\\n├── dao             -- 数据库操作模块\\n├── service         -- 服务模块\\n├── model           -- 数据模型\\n│   ├── req             -- 请求 VO 模型\\n│   ├── resp            -- 响应 VO 模型\\n│   ├── dto             -- 内部传输 DTO 模型\\n│   └── ...             -- 数据库模型对象 PO 模型\\n├── routes          -- 路由模块\\n│   └── middleware      -- 路由中间件\\n├── utils           -- 工具模块\\n│   ├── r               -- 响应封装\\n│   ├── upload          -- 文件上传\\n│   └── ...\\n├── routes          -- 路由模块\\n├── config          -- 配置文件\\n├── test            -- 测试模块\\n├── log             -- 日志文件\\n├── Dockerfile\\n└── main.go\\n```\\n\\n## 项目介绍\\n\\n前台：\\n- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁\\n- 实现点赞，统计用户等功能 (Redis)\\n- 评论 + 回复评论功能\\n- 留言采用弹幕墙，效果炫酷\\n- 文章详情页有文章目录、推荐文章等功能，优化用户体验\\n\\n后台：\\n- 鉴权使用 JWT\\n- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理\\n- 支持动态权限修改，前端菜单由后端生成\\n- 文章编辑使用 Markdown 编辑器\\n- 常规后台功能齐全：侧边栏、面包屑、标签栏等\\n\\n其他：\\n- 前后端分离部署，前端使用 Nginx，后端使用 Docker\\n- 代码整洁层次清晰，利于开发者学习\\n\\n## 技术介绍\\n\\n> 这里只写一些主流的通用技术，详细第三方库: 前端参考 `package.json` 文件，后端参考 `go.mod` 文件\\n\\n前台前端：使用 pnpm 包管理工具\\n- 基于 TypeScript\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia\\n- Vue Router \\n- Axios \\n- Naive UI\\n- Vuetify\\n- ...\\n\\n后台前端：使用 pnpm 包管理工具\\n- 基于 JavaSciprt \\n- pnpm: 包管理工具\\n- Vue3\\n- Unocss: 原子化 CSS\\n- Pinia \\n- Vue Router \\n- Axios \\n- Naive UI\\n- ...\\n\\n后端技术栈：\\n- 基于 Golang\\n- Docker\\n- Gin\\n- GORM\\n- Viper: 使用 TOML 作为配置文件\\n- Zap\\n- MySQL\\n- Redis\\n- Nginx: 部署静态资源 + 反向代理\\n- ...\\n\\n其他：\\n- 腾讯云人机验证\\n- 七牛云对象存储\\n- ...\\n\\n## 运行环境\\n\\n服务器：腾讯云 2核 4G Ubuntu 22.04 LTS\\n\\n对象存储：七牛云\\n\\n## 开发环境\\n\\n| 开发工具                      | 说明                    |\\n| ----------------------------- | ----------------------- |\\n| Vscode                        | Golang 后端 +  Vue 前端 |\\n| Navicat                       | MySQL 远程连接工具      |\\n| Another Redis Desktop Manager | Redis 远程连接工具      |\\n| MobaXterm                     | Linux 远程工具          |\\n| Apifox                        | 接口调试 + 文档生成     |\\n\\n\\n| 开发环境 | 版本 |\\n| -------- | ---- |\\n| Golang   | 1.19 |\\n| MySQL    | 8.x  |\\n| Redis    | 7.x  |\\n\\n## 快速开始\\n\\n### 本地运行\\n\\n> 自行安装 Golang、Node、MySQL、Redis 环境\\n\\n拉取项目到本地：\\n\\n```bash\\ngit clone https://github.com/szluyu99/gin-vue-blog.git\\n```\\n\\n后端项目运行：\\n\\n```bash\\n# 1、进入后端项目根目录 \\ncd gin-blog-server\\n\\n# 2、修改项目运行的配置文件，默认加载 config/config.toml \\n\\n# 3、MySQL 导入 ginblog.sql\\n\\n# 4、启动 Redis \\n\\n# 5、运行项目\\ngo mod tidy\\ngo run main.go\\n```\\n\\n前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm\\n\\n```bash\\nnpm install -g pnpm\\n```\\n\\n前台前端：\\n\\n```bash\\n# 1、进入前台前端项目根目录\\ncd gin-blog-front\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n后台前端：\\n\\n```bash\\n# 1、进入后台前端项目根目录\\ncd gin-blog-admin\\n\\n# 2、安装依赖\\npnpm install\\n\\n# 3、运行项目\\npnpm run dev\\n```\\n\\n### 项目部署\\n\\n目前暂时不推荐将本博客部署上生产环境，因为还有太多功能未完善。\\n\\n但是相信本项目对于 Golang 学习者绝对是个合适的项目！\\n\\n等功能开发的差不多了，再专门针对部署写一篇文章。\\n\\n---\\n\\n这里简单介绍一下，有基础的同学可以自行折腾。\\n\\n本项目前端采用 Nginx 部署静态资源，后端使用 Docker 部署。\\n\\n后端 Docker 部署参考 `Dockerfile`，Docker 运行对应的配置文件是 `config/config.docker.toml`\\n\\nDocker 打包成镜像指令：\\n\\n```bash\\ndocker build -t ginblog .\\n```\\n\\n> 以上只是简单说明，等功能大致完成，会从 `安装 Docker`、`Docker 安装运行环境`、`Docker 部署项目` 等多个角度写几篇关于部署的教程。\\n\\n## 项目总结\\n\\n这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。\\n\\n最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。\\n\\n## 后续计划\\n\\n高优先级: \\n\\n- 完善图片上传功能, 目前文件上传还没怎么处理\\n- 后台首页重新设计（目前没放什么内容）\\n- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通\\n- 前台首页搜索文章（ElasticSearch 搜索）\\n- 博客文章导入导出 (.md 文件)\\n- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）\\n- 后端日志切割\\n- 后台修改背景图片，博客配置等\\n- 相册\\n\\n后续有空安排上：\\n- 适配移动端\\n- 黑夜模式\\n- 前台收缩侧边信息功能\\n- 说说\\n- 音乐播放器\\n- 鼠标左击特效\\n- 看板娘\\n- 文章目录锚点跟随\\n- 第三方登录\\n- 评论时支持选择表情，参考 Valine\\n- 若干细节需要完善...\\n\",\"img\":\"https://static.talkxj.com/articles/771941739cbc70fbe40e10cf441e02e5.jpg\",\"type\":1,\"status\":1,\"is_top\":0,\"is_delete\":0,\"original_url\":\"\",\"comment_count\":0,\"read_count\":0,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (22, '2022-12-07 20:53:26.811', '2022-12-07 20:53:26.811', '菜单', '新增或修改', 'gin-blog/api/v1.(*Menu).SaveOrUpdate-fm', '/api/menu', '新增或修改菜单', '{\"id\":33,\"name\":\"首页\",\"path\":\"/home\",\"component\":\"/home\",\"icon\":\"ic:sharp-home\",\"created_at\":\"2022-11-01T01:43:10.142+08:00\",\"order_num\":0,\"children\":[],\"parent_id\":0,\"is_hidden\":1,\"keep_alive\":1,\"redirect\":\"\",\"publishing\":true}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (23, '2022-12-07 20:53:27.481', '2022-12-07 20:53:27.481', '菜单', '新增或修改', 'gin-blog/api/v1.(*Menu).SaveOrUpdate-fm', '/api/menu', '新增或修改菜单', '{\"id\":33,\"name\":\"首页\",\"path\":\"/home\",\"component\":\"/home\",\"icon\":\"ic:sharp-home\",\"created_at\":\"2022-11-01T01:43:10.142+08:00\",\"order_num\":0,\"children\":[],\"parent_id\":0,\"is_hidden\":0,\"keep_alive\":1,\"redirect\":\"\",\"publishing\":true}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (24, '2022-12-07 20:53:31.343', '2022-12-07 20:53:31.343', '菜单', '新增或修改', 'gin-blog/api/v1.(*Menu).SaveOrUpdate-fm', '/api/menu', '新增或修改菜单', '{\"id\":39,\"name\":\"个人中心\",\"path\":\"/profile\",\"component\":\"/profile\",\"icon\":\"mdi:account\",\"created_at\":\"2022-12-07T20:47:08.349+08:00\",\"order_num\":7,\"children\":[],\"parent_id\":0,\"is_hidden\":1,\"keep_alive\":1,\"redirect\":\"\",\"publishing\":true}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (25, '2022-12-07 20:53:33.858', '2022-12-07 20:53:33.858', '菜单', '新增或修改', 'gin-blog/api/v1.(*Menu).SaveOrUpdate-fm', '/api/menu', '新增或修改菜单', '{\"id\":39,\"name\":\"个人中心\",\"path\":\"/profile\",\"component\":\"/profile\",\"icon\":\"mdi:account\",\"created_at\":\"2022-12-07T20:47:08.349+08:00\",\"order_num\":7,\"children\":[],\"parent_id\":0,\"is_hidden\":0,\"keep_alive\":1,\"redirect\":\"\",\"publishing\":true}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (26, '2022-12-07 20:55:08.282', '2022-12-07 20:55:08.282', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":74,\"name\":\"修改用户禁用\",\"url\":\"/user/disable\",\"request_method\":\"PUT\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (27, '2022-12-07 20:55:21.851', '2022-12-07 20:55:21.851', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":1,\"name\":\"管理员\",\"label\":\"admin\",\"created_at\":\"2022-10-20T21:24:28+08:00\",\"is_disable\":0,\"resource_ids\":[3,43,44,45,46,47,48,6,59,60,61,7,38,39,40,41,42,8,65,66,67,68,9,62,63,64,10,23,34,35,36,37,79,80,81,85,49,51,52,53,54,50,55,56,57,58,69,70,71,72,91,92,93,78,82,84,86,98,95,11,99,100,101,74],\"menu_ids\":[2,3,4,5,6,7,8,9,16,17,23,24,25,26,27,28,29,30,31,32,33,36,37,38,34,10,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (28, '2022-12-07 20:55:28.941', '2022-12-07 20:55:28.941', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateDisable-fm', '/api/user/disable', '修改用户', '{\"id\":2,\"user_info_id\":2,\"avatar\":\"https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png\",\"nickname\":\"普通用户\",\"roles\":[{\"id\":2,\"created_at\":\"2022-10-20T21:25:07+08:00\",\"updated_at\":\"2022-12-07T20:47:23.344+08:00\",\"name\":\"用户\",\"label\":\"user\",\"is_disable\":0}],\"login_type\":1,\"ip_address\":\"172.17.0.1:40280\",\"ip_source\":\"未知\",\"created_at\":\"2022-10-19T22:31:26.805+08:00\",\"last_login_time\":\"2022-12-03T12:20:36.539+08:00\",\"is_disable\":1,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (29, '2022-12-07 20:55:30.353', '2022-12-07 20:55:30.353', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateDisable-fm', '/api/user/disable', '修改用户', '{\"id\":2,\"user_info_id\":2,\"avatar\":\"https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png\",\"nickname\":\"普通用户\",\"roles\":[{\"id\":2,\"created_at\":\"2022-10-20T21:25:07+08:00\",\"updated_at\":\"2022-12-07T20:47:23.344+08:00\",\"name\":\"用户\",\"label\":\"user\",\"is_disable\":0}],\"login_type\":1,\"ip_address\":\"172.17.0.1:40280\",\"ip_source\":\"未知\",\"created_at\":\"2022-10-19T22:31:26.805+08:00\",\"last_login_time\":\"2022-12-03T12:20:36.539+08:00\",\"is_disable\":0,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
 
 -- ----------------------------
 -- Table structure for resource
@@ -391,7 +414,7 @@ CREATE TABLE `resource`  (
   `parent_id` bigint NULL DEFAULT NULL COMMENT '父权限id',
   `is_anonymous` tinyint(1) NULL DEFAULT NULL COMMENT '是否匿名访问(0-否 1-是)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 99 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of resource
@@ -457,6 +480,9 @@ INSERT INTO `resource` VALUES (92, '2022-11-03 16:42:49.681', '2022-11-03 16:42:
 INSERT INTO `resource` VALUES (93, '2022-11-03 16:43:04.906', '2022-11-03 16:43:04.906', '/operation/log', 'DELETE', '删除操作日志', 91, 0);
 INSERT INTO `resource` VALUES (95, '2022-11-05 14:22:48.240', '2022-11-05 14:22:48.240', '/home', 'GET', '获取后台首页信息', 11, 0);
 INSERT INTO `resource` VALUES (98, '2022-11-29 23:35:42.865', '2022-11-29 23:35:42.865', '/user/offline', 'DELETE', '强制离线用户', 74, 0);
+INSERT INTO `resource` VALUES (99, '2022-12-07 20:48:05.939', '2022-12-07 20:48:05.939', '/user/current/password', 'PUT', '修改当前用户密码', 74, 0);
+INSERT INTO `resource` VALUES (100, '2022-12-07 20:48:35.511', '2022-12-07 20:48:35.511', '/user/current', 'PUT', '修改当前用户信息', 74, 0);
+INSERT INTO `resource` VALUES (101, '2022-12-07 20:55:08.271', '2022-12-07 20:55:08.271', '/user/disable', 'PUT', '修改用户禁用', 74, 0);
 
 -- ----------------------------
 -- Table structure for role
@@ -475,9 +501,9 @@ CREATE TABLE `role`  (
 -- ----------------------------
 -- Records of role
 -- ----------------------------
-INSERT INTO `role` VALUES (1, '2022-10-20 21:24:28.000', '2022-12-03 21:53:48.623', '管理员', 'admin', 0);
-INSERT INTO `role` VALUES (2, '2022-10-20 21:25:07.000', '2022-12-03 21:40:00.047', '用户', 'user', 0);
-INSERT INTO `role` VALUES (3, '2022-10-20 21:25:09.000', '2022-12-03 21:38:39.232', '测试', 'test', 0);
+INSERT INTO `role` VALUES (1, '2022-10-20 21:24:28.000', '2022-12-07 20:55:21.800', '管理员', 'admin', 0);
+INSERT INTO `role` VALUES (2, '2022-10-20 21:25:07.000', '2022-12-07 20:47:23.344', '用户', 'user', 0);
+INSERT INTO `role` VALUES (3, '2022-10-20 21:25:09.000', '2022-12-07 20:47:25.893', '测试', 'test', 0);
 
 -- ----------------------------
 -- Table structure for role_menu
@@ -491,32 +517,6 @@ CREATE TABLE `role_menu`  (
 -- ----------------------------
 -- Records of role_menu
 -- ----------------------------
-INSERT INTO `role_menu` VALUES (3, 1);
-INSERT INTO `role_menu` VALUES (3, 2);
-INSERT INTO `role_menu` VALUES (3, 3);
-INSERT INTO `role_menu` VALUES (3, 4);
-INSERT INTO `role_menu` VALUES (3, 33);
-INSERT INTO `role_menu` VALUES (3, 6);
-INSERT INTO `role_menu` VALUES (3, 34);
-INSERT INTO `role_menu` VALUES (3, 8);
-INSERT INTO `role_menu` VALUES (3, 9);
-INSERT INTO `role_menu` VALUES (3, 10);
-INSERT INTO `role_menu` VALUES (3, 25);
-INSERT INTO `role_menu` VALUES (3, 26);
-INSERT INTO `role_menu` VALUES (3, 16);
-INSERT INTO `role_menu` VALUES (3, 17);
-INSERT INTO `role_menu` VALUES (3, 23);
-INSERT INTO `role_menu` VALUES (3, 24);
-INSERT INTO `role_menu` VALUES (3, 5);
-INSERT INTO `role_menu` VALUES (3, 29);
-INSERT INTO `role_menu` VALUES (3, 30);
-INSERT INTO `role_menu` VALUES (3, 32);
-INSERT INTO `role_menu` VALUES (3, 31);
-INSERT INTO `role_menu` VALUES (3, 27);
-INSERT INTO `role_menu` VALUES (3, 28);
-INSERT INTO `role_menu` VALUES (3, 36);
-INSERT INTO `role_menu` VALUES (3, 37);
-INSERT INTO `role_menu` VALUES (3, 38);
 INSERT INTO `role_menu` VALUES (2, 1);
 INSERT INTO `role_menu` VALUES (2, 2);
 INSERT INTO `role_menu` VALUES (2, 6);
@@ -543,6 +543,34 @@ INSERT INTO `role_menu` VALUES (2, 34);
 INSERT INTO `role_menu` VALUES (2, 36);
 INSERT INTO `role_menu` VALUES (2, 37);
 INSERT INTO `role_menu` VALUES (2, 38);
+INSERT INTO `role_menu` VALUES (2, 39);
+INSERT INTO `role_menu` VALUES (3, 1);
+INSERT INTO `role_menu` VALUES (3, 2);
+INSERT INTO `role_menu` VALUES (3, 3);
+INSERT INTO `role_menu` VALUES (3, 4);
+INSERT INTO `role_menu` VALUES (3, 33);
+INSERT INTO `role_menu` VALUES (3, 6);
+INSERT INTO `role_menu` VALUES (3, 34);
+INSERT INTO `role_menu` VALUES (3, 8);
+INSERT INTO `role_menu` VALUES (3, 9);
+INSERT INTO `role_menu` VALUES (3, 10);
+INSERT INTO `role_menu` VALUES (3, 25);
+INSERT INTO `role_menu` VALUES (3, 26);
+INSERT INTO `role_menu` VALUES (3, 16);
+INSERT INTO `role_menu` VALUES (3, 17);
+INSERT INTO `role_menu` VALUES (3, 23);
+INSERT INTO `role_menu` VALUES (3, 24);
+INSERT INTO `role_menu` VALUES (3, 5);
+INSERT INTO `role_menu` VALUES (3, 29);
+INSERT INTO `role_menu` VALUES (3, 30);
+INSERT INTO `role_menu` VALUES (3, 32);
+INSERT INTO `role_menu` VALUES (3, 31);
+INSERT INTO `role_menu` VALUES (3, 27);
+INSERT INTO `role_menu` VALUES (3, 28);
+INSERT INTO `role_menu` VALUES (3, 36);
+INSERT INTO `role_menu` VALUES (3, 37);
+INSERT INTO `role_menu` VALUES (3, 38);
+INSERT INTO `role_menu` VALUES (3, 39);
 INSERT INTO `role_menu` VALUES (1, 2);
 INSERT INTO `role_menu` VALUES (1, 3);
 INSERT INTO `role_menu` VALUES (1, 4);
@@ -569,6 +597,7 @@ INSERT INTO `role_menu` VALUES (1, 37);
 INSERT INTO `role_menu` VALUES (1, 38);
 INSERT INTO `role_menu` VALUES (1, 34);
 INSERT INTO `role_menu` VALUES (1, 10);
+INSERT INTO `role_menu` VALUES (1, 39);
 
 -- ----------------------------
 -- Table structure for role_resource
@@ -582,29 +611,6 @@ CREATE TABLE `role_resource`  (
 -- ----------------------------
 -- Records of role_resource
 -- ----------------------------
-INSERT INTO `role_resource` VALUES (3, 43);
-INSERT INTO `role_resource` VALUES (3, 44);
-INSERT INTO `role_resource` VALUES (3, 59);
-INSERT INTO `role_resource` VALUES (3, 38);
-INSERT INTO `role_resource` VALUES (3, 41);
-INSERT INTO `role_resource` VALUES (3, 42);
-INSERT INTO `role_resource` VALUES (3, 65);
-INSERT INTO `role_resource` VALUES (3, 68);
-INSERT INTO `role_resource` VALUES (3, 62);
-INSERT INTO `role_resource` VALUES (3, 35);
-INSERT INTO `role_resource` VALUES (3, 36);
-INSERT INTO `role_resource` VALUES (3, 79);
-INSERT INTO `role_resource` VALUES (3, 80);
-INSERT INTO `role_resource` VALUES (3, 51);
-INSERT INTO `role_resource` VALUES (3, 54);
-INSERT INTO `role_resource` VALUES (3, 55);
-INSERT INTO `role_resource` VALUES (3, 58);
-INSERT INTO `role_resource` VALUES (3, 70);
-INSERT INTO `role_resource` VALUES (3, 78);
-INSERT INTO `role_resource` VALUES (3, 82);
-INSERT INTO `role_resource` VALUES (3, 92);
-INSERT INTO `role_resource` VALUES (3, 95);
-INSERT INTO `role_resource` VALUES (3, 86);
 INSERT INTO `role_resource` VALUES (2, 43);
 INSERT INTO `role_resource` VALUES (2, 44);
 INSERT INTO `role_resource` VALUES (2, 59);
@@ -628,6 +634,29 @@ INSERT INTO `role_resource` VALUES (2, 86);
 INSERT INTO `role_resource` VALUES (2, 92);
 INSERT INTO `role_resource` VALUES (2, 95);
 INSERT INTO `role_resource` VALUES (2, 41);
+INSERT INTO `role_resource` VALUES (3, 43);
+INSERT INTO `role_resource` VALUES (3, 44);
+INSERT INTO `role_resource` VALUES (3, 59);
+INSERT INTO `role_resource` VALUES (3, 38);
+INSERT INTO `role_resource` VALUES (3, 41);
+INSERT INTO `role_resource` VALUES (3, 42);
+INSERT INTO `role_resource` VALUES (3, 65);
+INSERT INTO `role_resource` VALUES (3, 68);
+INSERT INTO `role_resource` VALUES (3, 62);
+INSERT INTO `role_resource` VALUES (3, 35);
+INSERT INTO `role_resource` VALUES (3, 36);
+INSERT INTO `role_resource` VALUES (3, 79);
+INSERT INTO `role_resource` VALUES (3, 80);
+INSERT INTO `role_resource` VALUES (3, 51);
+INSERT INTO `role_resource` VALUES (3, 54);
+INSERT INTO `role_resource` VALUES (3, 55);
+INSERT INTO `role_resource` VALUES (3, 58);
+INSERT INTO `role_resource` VALUES (3, 70);
+INSERT INTO `role_resource` VALUES (3, 78);
+INSERT INTO `role_resource` VALUES (3, 82);
+INSERT INTO `role_resource` VALUES (3, 92);
+INSERT INTO `role_resource` VALUES (3, 95);
+INSERT INTO `role_resource` VALUES (3, 86);
 INSERT INTO `role_resource` VALUES (1, 3);
 INSERT INTO `role_resource` VALUES (1, 43);
 INSERT INTO `role_resource` VALUES (1, 44);
@@ -681,7 +710,6 @@ INSERT INTO `role_resource` VALUES (1, 72);
 INSERT INTO `role_resource` VALUES (1, 91);
 INSERT INTO `role_resource` VALUES (1, 92);
 INSERT INTO `role_resource` VALUES (1, 93);
-INSERT INTO `role_resource` VALUES (1, 74);
 INSERT INTO `role_resource` VALUES (1, 78);
 INSERT INTO `role_resource` VALUES (1, 82);
 INSERT INTO `role_resource` VALUES (1, 84);
@@ -689,6 +717,10 @@ INSERT INTO `role_resource` VALUES (1, 86);
 INSERT INTO `role_resource` VALUES (1, 98);
 INSERT INTO `role_resource` VALUES (1, 95);
 INSERT INTO `role_resource` VALUES (1, 11);
+INSERT INTO `role_resource` VALUES (1, 99);
+INSERT INTO `role_resource` VALUES (1, 100);
+INSERT INTO `role_resource` VALUES (1, 101);
+INSERT INTO `role_resource` VALUES (1, 74);
 
 -- ----------------------------
 -- Table structure for tag
@@ -755,8 +787,8 @@ CREATE TABLE `user_info`  (
 -- ----------------------------
 -- Records of user_info
 -- ----------------------------
-INSERT INTO `user_info` VALUES (1, '2022-10-31 21:54:10.935', '2022-12-03 21:32:46.287', 'admin@qq.com', '管理员', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '我是管理员用户！', 'https://www.baidu.com', 0);
-INSERT INTO `user_info` VALUES (2, '2022-10-19 22:31:26.734', '2022-12-03 21:32:40.393', 'user@qq.com', '普通用户', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '我是个普通用户！', 'https://www.baidu.com', 0);
+INSERT INTO `user_info` VALUES (1, '2022-10-31 21:54:10.935', '2022-12-07 20:49:09.813', '', '管理员', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '我是管理员用户！', 'https://www.baidu.com', 0);
+INSERT INTO `user_info` VALUES (2, '2022-10-19 22:31:26.734', '2022-12-07 20:55:30.347', 'user@qq.com', '普通用户', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '我是个普通用户！', 'https://www.baidu.com', 0);
 INSERT INTO `user_info` VALUES (3, '2022-11-01 10:41:13.234', '2022-11-30 13:51:51.799', 'test@qq.com', '测试用户', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '我是测试用的！', 'https://www.baidu.com', 0);
 
 -- ----------------------------
