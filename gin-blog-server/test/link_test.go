@@ -5,12 +5,12 @@ import (
 )
 
 func TestFriendLinkGetList(t *testing.T) {
-	BaseSuccessTest(t, Get("/api/link/list", router))
+	BaseSuccessTest(t, Get("/api/link/list", backRouter))
 }
 
 func TestFriendLinkDelete(t *testing.T) {
 	ids := []int{11}
-	BaseSuccessTest(t, DeleteJson("/api/link", ids, router))
+	BaseSuccessTest(t, DeleteJson("/api/link", ids, backRouter))
 }
 
 func TestSaveOrUpdateFriendLink(t *testing.T) {
@@ -20,5 +20,5 @@ func TestSaveOrUpdateFriendLink(t *testing.T) {
 		"address": "blog_address",
 		"intro":   "blog_intro",
 	}
-	BaseSuccessTest(t, PostJson("/api/link", param, router))
+	BaseSuccessTest(t, PostJson("/api/link", param, backRouter))
 }

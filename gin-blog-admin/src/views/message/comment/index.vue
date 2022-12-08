@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NPopconfirm, NTag } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
+import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import { commentTypeMap, commentTypeOptions } from '@/constant/data'
 import api from '@/api'
@@ -71,7 +71,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDateTime(row.created_at, 'YYYY-MM-DD'),
+          default: () => formatDate(row.created_at),
           icon: renderIcon('mdi:update', { size: 18 }),
         },
       )

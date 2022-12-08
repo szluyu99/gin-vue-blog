@@ -1,4 +1,4 @@
-import { decrypto, encrypto } from '@/utils/common'
+import { decrypto, encrypto } from '@/utils'
 
 interface StorageData {
   value: unknown

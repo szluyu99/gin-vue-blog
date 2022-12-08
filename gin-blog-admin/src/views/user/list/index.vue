@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NSwitch, NTag } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import { loginTypeMap, loginTypeOptions } from '@/constant/data'
 import api from '@/api'
@@ -33,7 +33,7 @@ const columns = [
       return h(NImage, {
         'height': 50,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': row.avatar,
+        'src': convertImgUrl(row.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -102,7 +102,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDateTime(row.created_at, 'YYYY-MM-DD'),
+          default: () => formatDate(row.created_at),
           icon: renderIcon('mdi:update', { size: 18 }),
         },
       )
@@ -118,7 +118,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDateTime(row.last_login_time, 'YYYY-MM-DD'),
+          default: () => formatDate(row.last_login_time),
           icon: renderIcon('mdi:update', { size: 18 }),
         },
       )

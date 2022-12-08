@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { convertImgUrl } from '@/utils'
+
 interface Props { linkList: any }
 const { linkList = [] } = defineProps<Props>()
 </script>
@@ -31,7 +33,11 @@ const { linkList = [] } = defineProps<Props>()
             flex flex-row p-5 hover:text-white
           >
             <div mr-5 flex items-center z-100>
-              <n-image :src="link.avatar" width="65" class="avatar" rounded-full transition-600 />
+              <n-image
+                :src="convertImgUrl(link.avatar)"
+                width="65" class="avatar"
+                rounded-full transition-600
+              />
             </div>
             <div flex-1 text-center w-290 h-95 flex-col z-100>
               <p text-18 font-bold> {{ link.name }} </p>

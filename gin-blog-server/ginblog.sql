@@ -11,7 +11,7 @@
  Target Server Version : 80031 (8.0.31)
  File Encoding         : 65001
 
- Date: 07/12/2022 20:55:52
+ Date: 08/12/2022 15:52:16
 */
 
 SET NAMES utf8mb4;
@@ -95,7 +95,7 @@ CREATE TABLE `casbin_rule`  (
   `v5` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_casbin_rule`(`ptype` ASC, `v0` ASC, `v1` ASC, `v2` ASC, `v3` ASC, `v4` ASC, `v5` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2280 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2383 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of casbin_rule
@@ -106,105 +106,110 @@ INSERT INTO `casbin_rule` VALUES (1420, 'g', 'test', 'anonymous', NULL, NULL, NU
 INSERT INTO `casbin_rule` VALUES (1421, 'g', 'test', 'logout', NULL, NULL, NULL, NULL);
 INSERT INTO `casbin_rule` VALUES (1417, 'g', 'user', 'anonymous', NULL, NULL, NULL, NULL);
 INSERT INTO `casbin_rule` VALUES (1419, 'g', 'user', 'logout', NULL, NULL, NULL, NULL);
-INSERT INTO `casbin_rule` VALUES (2242, 'p', 'admin', '/article', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2240, 'p', 'admin', '/article', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2239, 'p', 'admin', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2238, 'p', 'admin', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2241, 'p', 'admin', '/article/soft-delete', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2243, 'p', 'admin', '/article/top', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2246, 'p', 'admin', '/category', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2245, 'p', 'admin', '/category', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2244, 'p', 'admin', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2247, 'p', 'admin', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2256, 'p', 'admin', '/comment', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2255, 'p', 'admin', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2257, 'p', 'admin', '/comment/review', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2275, 'p', 'admin', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2264, 'p', 'admin', '/link', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2263, 'p', 'admin', '/link', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2262, 'p', 'admin', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2234, 'p', 'admin', '/menu', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2235, 'p', 'admin', '/menu/:id', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2233, 'p', 'admin', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2236, 'p', 'admin', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2237, 'p', 'admin', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2253, 'p', 'admin', '/message', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2252, 'p', 'admin', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2254, 'p', 'admin', '/message/review', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2274, 'p', 'admin', '/operation/log', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2273, 'p', 'admin', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2229, 'p', 'admin', '/resource', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2232, 'p', 'admin', '/resource/:id', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2228, 'p', 'admin', '/resource/anonymous', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2230, 'p', 'admin', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2231, 'p', 'admin', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2260, 'p', 'admin', '/role', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2259, 'p', 'admin', '/role', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2258, 'p', 'admin', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2261, 'p', 'admin', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2267, 'p', 'admin', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2271, 'p', 'admin', '/setting/about', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2266, 'p', 'admin', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2268, 'p', 'admin', '/setting/blog-config', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2250, 'p', 'admin', '/tag', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2249, 'p', 'admin', '/tag', 'POST', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2248, 'p', 'admin', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2251, 'p', 'admin', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2270, 'p', 'admin', '/user', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2278, 'p', 'admin', '/user/current', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2277, 'p', 'admin', '/user/current/password', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2279, 'p', 'admin', '/user/disable', 'PUT', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2269, 'p', 'admin', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2265, 'p', 'admin', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2276, 'p', 'admin', '/user/offline', 'DELETE', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2272, 'p', 'admin', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2294, 'p', 'admin', '/article', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2292, 'p', 'admin', '/article', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2291, 'p', 'admin', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2290, 'p', 'admin', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2293, 'p', 'admin', '/article/soft-delete', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2295, 'p', 'admin', '/article/top', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2298, 'p', 'admin', '/category', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2297, 'p', 'admin', '/category', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2296, 'p', 'admin', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2299, 'p', 'admin', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2308, 'p', 'admin', '/comment', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2307, 'p', 'admin', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2309, 'p', 'admin', '/comment/review', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2327, 'p', 'admin', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2316, 'p', 'admin', '/link', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2315, 'p', 'admin', '/link', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2314, 'p', 'admin', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2286, 'p', 'admin', '/menu', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2287, 'p', 'admin', '/menu/:id', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2285, 'p', 'admin', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2288, 'p', 'admin', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2289, 'p', 'admin', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2305, 'p', 'admin', '/message', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2304, 'p', 'admin', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2306, 'p', 'admin', '/message/review', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2326, 'p', 'admin', '/operation/log', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2325, 'p', 'admin', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2334, 'p', 'admin', '/page', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2333, 'p', 'admin', '/page', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2332, 'p', 'admin', '/page/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2281, 'p', 'admin', '/resource', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2284, 'p', 'admin', '/resource/:id', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2280, 'p', 'admin', '/resource/anonymous', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2282, 'p', 'admin', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2283, 'p', 'admin', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2312, 'p', 'admin', '/role', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2311, 'p', 'admin', '/role', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2310, 'p', 'admin', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2313, 'p', 'admin', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2319, 'p', 'admin', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2323, 'p', 'admin', '/setting/about', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2318, 'p', 'admin', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2320, 'p', 'admin', '/setting/blog-config', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2302, 'p', 'admin', '/tag', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2301, 'p', 'admin', '/tag', 'POST', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2300, 'p', 'admin', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2303, 'p', 'admin', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2322, 'p', 'admin', '/user', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2330, 'p', 'admin', '/user/current', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2329, 'p', 'admin', '/user/current/password', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2331, 'p', 'admin', '/user/disable', 'PUT', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2321, 'p', 'admin', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2317, 'p', 'admin', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2328, 'p', 'admin', '/user/offline', 'DELETE', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2324, 'p', 'admin', '/user/online', 'GET', '', '', '');
 INSERT INTO `casbin_rule` VALUES (1488, 'p', 'logout', '/logout', 'GET', NULL, NULL, NULL);
-INSERT INTO `casbin_rule` VALUES (2160, 'p', 'test', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2159, 'p', 'test', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2161, 'p', 'test', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2162, 'p', 'test', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2166, 'p', 'test', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2176, 'p', 'test', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2169, 'p', 'test', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2156, 'p', 'test', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2157, 'p', 'test', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2158, 'p', 'test', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2165, 'p', 'test', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2175, 'p', 'test', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2154, 'p', 'test', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2155, 'p', 'test', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2167, 'p', 'test', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2168, 'p', 'test', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2172, 'p', 'test', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2171, 'p', 'test', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2163, 'p', 'test', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2164, 'p', 'test', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2173, 'p', 'test', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2170, 'p', 'test', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2174, 'p', 'test', '/user/online', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2137, 'p', 'user', '/article/:id', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2136, 'p', 'user', '/article/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2138, 'p', 'user', '/category/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2139, 'p', 'user', '/category/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2143, 'p', 'user', '/comment/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2153, 'p', 'user', '/home', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2146, 'p', 'user', '/link/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2133, 'p', 'user', '/menu/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2134, 'p', 'user', '/menu/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2135, 'p', 'user', '/menu/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2142, 'p', 'user', '/message/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2152, 'p', 'user', '/operation/log/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2131, 'p', 'user', '/resource/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2132, 'p', 'user', '/resource/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2144, 'p', 'user', '/role/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2145, 'p', 'user', '/role/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2149, 'p', 'user', '/setting/about', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2148, 'p', 'user', '/setting/blog-config', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2140, 'p', 'user', '/tag/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2141, 'p', 'user', '/tag/option', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2150, 'p', 'user', '/user/info', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2147, 'p', 'user', '/user/list', 'GET', '', '', '');
-INSERT INTO `casbin_rule` VALUES (2151, 'p', 'user', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2365, 'p', 'test', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2364, 'p', 'test', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2366, 'p', 'test', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2367, 'p', 'test', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2371, 'p', 'test', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2381, 'p', 'test', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2374, 'p', 'test', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2361, 'p', 'test', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2362, 'p', 'test', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2363, 'p', 'test', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2370, 'p', 'test', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2380, 'p', 'test', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2382, 'p', 'test', '/page/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2359, 'p', 'test', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2360, 'p', 'test', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2372, 'p', 'test', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2373, 'p', 'test', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2377, 'p', 'test', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2376, 'p', 'test', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2368, 'p', 'test', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2369, 'p', 'test', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2378, 'p', 'test', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2375, 'p', 'test', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2379, 'p', 'test', '/user/online', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2341, 'p', 'user', '/article/:id', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2340, 'p', 'user', '/article/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2342, 'p', 'user', '/category/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2343, 'p', 'user', '/category/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2347, 'p', 'user', '/comment/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2357, 'p', 'user', '/home', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2350, 'p', 'user', '/link/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2337, 'p', 'user', '/menu/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2338, 'p', 'user', '/menu/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2339, 'p', 'user', '/menu/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2346, 'p', 'user', '/message/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2356, 'p', 'user', '/operation/log/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2358, 'p', 'user', '/page/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2335, 'p', 'user', '/resource/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2336, 'p', 'user', '/resource/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2348, 'p', 'user', '/role/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2349, 'p', 'user', '/role/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2353, 'p', 'user', '/setting/about', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2352, 'p', 'user', '/setting/blog-config', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2344, 'p', 'user', '/tag/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2345, 'p', 'user', '/tag/option', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2354, 'p', 'user', '/user/info', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2351, 'p', 'user', '/user/list', 'GET', '', '', '');
+INSERT INTO `casbin_rule` VALUES (2355, 'p', 'user', '/user/online', 'GET', '', '', '');
 
 -- ----------------------------
 -- Table structure for category
@@ -215,16 +220,14 @@ CREATE TABLE `category`  (
   `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '分类名称',
   `created_at` datetime(3) NULL DEFAULT NULL,
   `updated_at` datetime(3) NULL DEFAULT NULL,
-  `deleted_at` datetime(3) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_category_deleted_at`(`deleted_at` ASC) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of category
 -- ----------------------------
-INSERT INTO `category` VALUES (1, '后端', '2022-12-03 22:01:29.106', '2022-12-03 22:01:29.106', NULL);
-INSERT INTO `category` VALUES (2, '前端', '2022-12-03 22:01:33.074', '2022-12-03 22:01:33.074', NULL);
+INSERT INTO `category` VALUES (1, '后端', '2022-12-03 22:01:29.106', '2022-12-03 22:01:29.106');
+INSERT INTO `category` VALUES (2, '前端', '2022-12-03 22:01:33.074', '2022-12-03 22:01:33.074');
 
 -- ----------------------------
 -- Table structure for comment
@@ -327,7 +330,6 @@ CREATE TABLE `message`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `created_at` datetime(3) NULL DEFAULT NULL,
   `updated_at` datetime(3) NULL DEFAULT NULL,
-  `deleted_at` datetime(3) NULL DEFAULT NULL,
   `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '昵称',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '头像地址',
   `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '留言内容',
@@ -335,14 +337,13 @@ CREATE TABLE `message`  (
   `ip_source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'IP 来源',
   `is_review` tinyint(1) NOT NULL DEFAULT 0 COMMENT '审核状态(0-未审核,1-审核通过)',
   `speed` tinyint(1) NULL DEFAULT NULL COMMENT '弹幕速度',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_message_deleted_at`(`deleted_at` ASC) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of message
 -- ----------------------------
-INSERT INTO `message` VALUES (1, '2022-12-03 22:36:43.299', '2022-12-03 22:36:43.299', NULL, '测试用户', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '留言测试！', '[::1]:53442', '未知', 1, 0);
+INSERT INTO `message` VALUES (1, '2022-12-03 22:36:43.299', '2022-12-03 22:36:43.299', '测试用户', 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png', '留言测试！', '[::1]:53442', '未知', 1, 0);
 
 -- ----------------------------
 -- Table structure for operation_log
@@ -365,7 +366,7 @@ CREATE TABLE `operation_log`  (
   `ip_address` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '操作IP',
   `ip_source` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '操作地址',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
@@ -399,6 +400,39 @@ INSERT INTO `operation_log` VALUES (26, '2022-12-07 20:55:08.282', '2022-12-07 2
 INSERT INTO `operation_log` VALUES (27, '2022-12-07 20:55:21.851', '2022-12-07 20:55:21.851', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":1,\"name\":\"管理员\",\"label\":\"admin\",\"created_at\":\"2022-10-20T21:24:28+08:00\",\"is_disable\":0,\"resource_ids\":[3,43,44,45,46,47,48,6,59,60,61,7,38,39,40,41,42,8,65,66,67,68,9,62,63,64,10,23,34,35,36,37,79,80,81,85,49,51,52,53,54,50,55,56,57,58,69,70,71,72,91,92,93,78,82,84,86,98,95,11,99,100,101,74],\"menu_ids\":[2,3,4,5,6,7,8,9,16,17,23,24,25,26,27,28,29,30,31,32,33,36,37,38,34,10,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
 INSERT INTO `operation_log` VALUES (28, '2022-12-07 20:55:28.941', '2022-12-07 20:55:28.941', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateDisable-fm', '/api/user/disable', '修改用户', '{\"id\":2,\"user_info_id\":2,\"avatar\":\"https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png\",\"nickname\":\"普通用户\",\"roles\":[{\"id\":2,\"created_at\":\"2022-10-20T21:25:07+08:00\",\"updated_at\":\"2022-12-07T20:47:23.344+08:00\",\"name\":\"用户\",\"label\":\"user\",\"is_disable\":0}],\"login_type\":1,\"ip_address\":\"172.17.0.1:40280\",\"ip_source\":\"未知\",\"created_at\":\"2022-10-19T22:31:26.805+08:00\",\"last_login_time\":\"2022-12-03T12:20:36.539+08:00\",\"is_disable\":1,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
 INSERT INTO `operation_log` VALUES (29, '2022-12-07 20:55:30.353', '2022-12-07 20:55:30.353', '用户', '修改', 'gin-blog/api/v1.(*User).UpdateDisable-fm', '/api/user/disable', '修改用户', '{\"id\":2,\"user_info_id\":2,\"avatar\":\"https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png\",\"nickname\":\"普通用户\",\"roles\":[{\"id\":2,\"created_at\":\"2022-10-20T21:25:07+08:00\",\"updated_at\":\"2022-12-07T20:47:23.344+08:00\",\"name\":\"用户\",\"label\":\"user\",\"is_disable\":0}],\"login_type\":1,\"ip_address\":\"172.17.0.1:40280\",\"ip_source\":\"未知\",\"created_at\":\"2022-10-19T22:31:26.805+08:00\",\"last_login_time\":\"2022-12-03T12:20:36.539+08:00\",\"is_disable\":0,\"publishing\":true}', 'PUT', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:58630', '未知');
+INSERT INTO `operation_log` VALUES (30, '2022-12-08 15:43:15.429', '2022-12-08 15:43:15.429', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"name\":\"页面模块\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (31, '2022-12-08 15:43:26.018', '2022-12-08 15:43:26.018', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":102,\"name\":\"页面列表\",\"url\":\"/page/list\",\"request_method\":\"GET\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (32, '2022-12-08 15:43:38.579', '2022-12-08 15:43:38.579', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":102,\"name\":\"新增/编辑页面\",\"url\":\"/page\",\"request_method\":\"POST\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (33, '2022-12-08 15:43:50.888', '2022-12-08 15:43:50.888', '资源权限', '新增或修改', 'gin-blog/api/v1.(*Resource).SaveOrUpdate-fm', '/api/resource', '新增或修改资源权限', '{\"parent_id\":102,\"name\":\"删除页面\",\"url\":\"/page\",\"request_method\":\"DELETE\"}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (34, '2022-12-08 15:44:04.384', '2022-12-08 15:44:04.384', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":1,\"name\":\"管理员\",\"label\":\"admin\",\"created_at\":\"2022-10-20T21:24:28+08:00\",\"is_disable\":0,\"resource_ids\":[3,43,44,45,46,47,48,6,59,60,61,7,38,39,40,41,42,8,65,66,67,68,9,62,63,64,10,23,34,35,36,37,79,80,81,85,49,51,52,53,54,50,55,56,57,58,69,70,71,72,91,92,93,78,82,84,86,98,95,11,99,100,101,74,102,103,104,105],\"menu_ids\":[2,3,4,5,6,7,8,9,16,17,23,24,25,26,27,28,29,30,31,32,33,36,37,38,34,10,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (35, '2022-12-08 15:44:09.129', '2022-12-08 15:44:09.129', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":2,\"name\":\"用户\",\"label\":\"user\",\"created_at\":\"2022-10-20T21:25:07+08:00\",\"is_disable\":0,\"resource_ids\":[43,44,59,38,42,65,68,62,35,36,51,54,55,58,70,78,82,79,80,86,92,95,41,103],\"menu_ids\":[1,2,6,8,9,10,3,25,26,16,17,23,24,4,27,28,29,5,30,32,31,33,34,36,37,38,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+INSERT INTO `operation_log` VALUES (36, '2022-12-08 15:44:13.962', '2022-12-08 15:44:13.962', '角色', '新增或修改', 'gin-blog/api/v1.(*Role).SaveOrUpdate-fm', '/api/role', '新增或修改角色', '{\"id\":3,\"name\":\"测试\",\"label\":\"test\",\"created_at\":\"2022-10-20T21:25:09+08:00\",\"is_disable\":0,\"resource_ids\":[43,44,59,38,41,42,65,68,62,35,36,79,80,51,54,55,58,70,78,82,92,95,86,103],\"menu_ids\":[1,2,3,4,33,6,34,8,9,10,25,26,16,17,23,24,5,29,30,32,31,27,28,36,37,38,39]}', 'POST', '{\"code\":0,\"message\":\"OK\",\"data\":null}', 1, '管理员', '127.0.0.1:38804', '未知');
+
+-- ----------------------------
+-- Table structure for page
+-- ----------------------------
+DROP TABLE IF EXISTS `page`;
+CREATE TABLE `page`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `created_at` datetime(3) NULL DEFAULT NULL,
+  `updated_at` datetime(3) NULL DEFAULT NULL,
+  `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '页面名称',
+  `label` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '页面标签',
+  `cover` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '页面封面',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of page
+-- ----------------------------
+INSERT INTO `page` VALUES (1, '2022-12-08 13:09:58.500', '2022-12-08 15:08:38.248', '首页', 'home', 'https://static.talkxj.com/config/0bee7ba5ac70155766648e14ae2a821f.jpg');
+INSERT INTO `page` VALUES (2, '2022-12-08 13:51:49.474', '2022-12-08 13:51:49.474', '归档', 'archive', 'https://static.talkxj.com/config/643f28683e1c59a80ccfc9cb19735a9c.jpg');
+INSERT INTO `page` VALUES (3, '2022-12-08 13:52:18.084', '2022-12-08 13:52:18.084', '分类', 'category', 'https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg');
+INSERT INTO `page` VALUES (4, '2022-12-08 13:52:31.364', '2022-12-08 13:52:31.364', '标签', 'tag', 'https://static.talkxj.com/config/a6f141372509365891081d755da963a1.png');
+INSERT INTO `page` VALUES (5, '2022-12-08 13:52:52.389', '2022-12-08 13:52:52.389', '友链', 'link', 'https://static.talkxj.com/config/9034edddec5b8e8542c2e61b0da1c1da.jpg');
+INSERT INTO `page` VALUES (6, '2022-12-08 13:53:04.159', '2022-12-08 13:53:04.159', '关于', 'about', 'https://static.talkxj.com/config/2a56d15dd742ff8ac238a512d9a472a1.jpg');
+INSERT INTO `page` VALUES (7, '2022-12-08 13:53:17.707', '2022-12-08 13:53:17.707', '留言', 'message', 'https://static.talkxj.com/config/acfeab8379508233fa7e4febf90c2f2e.png');
+INSERT INTO `page` VALUES (8, '2022-12-08 13:53:30.187', '2022-12-08 13:53:30.187', '个人中心', 'profile', 'https://static.talkxj.com/config/ebae4c93de1b286a8d50aa62612caa59.jpeg');
 
 -- ----------------------------
 -- Table structure for resource
@@ -414,7 +448,7 @@ CREATE TABLE `resource`  (
   `parent_id` bigint NULL DEFAULT NULL COMMENT '父权限id',
   `is_anonymous` tinyint(1) NULL DEFAULT NULL COMMENT '是否匿名访问(0-否 1-是)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 106 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of resource
@@ -483,6 +517,10 @@ INSERT INTO `resource` VALUES (98, '2022-11-29 23:35:42.865', '2022-11-29 23:35:
 INSERT INTO `resource` VALUES (99, '2022-12-07 20:48:05.939', '2022-12-07 20:48:05.939', '/user/current/password', 'PUT', '修改当前用户密码', 74, 0);
 INSERT INTO `resource` VALUES (100, '2022-12-07 20:48:35.511', '2022-12-07 20:48:35.511', '/user/current', 'PUT', '修改当前用户信息', 74, 0);
 INSERT INTO `resource` VALUES (101, '2022-12-07 20:55:08.271', '2022-12-07 20:55:08.271', '/user/disable', 'PUT', '修改用户禁用', 74, 0);
+INSERT INTO `resource` VALUES (102, '2022-12-08 15:43:15.421', '2022-12-08 15:43:15.421', '', '', '页面模块', 0, 0);
+INSERT INTO `resource` VALUES (103, '2022-12-08 15:43:26.009', '2022-12-08 15:43:26.009', '/page/list', 'GET', '页面列表', 102, 0);
+INSERT INTO `resource` VALUES (104, '2022-12-08 15:43:38.570', '2022-12-08 15:43:38.570', '/page', 'POST', '新增/编辑页面', 102, 0);
+INSERT INTO `resource` VALUES (105, '2022-12-08 15:43:50.879', '2022-12-08 15:43:50.879', '/page', 'DELETE', '删除页面', 102, 0);
 
 -- ----------------------------
 -- Table structure for role
@@ -501,9 +539,9 @@ CREATE TABLE `role`  (
 -- ----------------------------
 -- Records of role
 -- ----------------------------
-INSERT INTO `role` VALUES (1, '2022-10-20 21:24:28.000', '2022-12-07 20:55:21.800', '管理员', 'admin', 0);
-INSERT INTO `role` VALUES (2, '2022-10-20 21:25:07.000', '2022-12-07 20:47:23.344', '用户', 'user', 0);
-INSERT INTO `role` VALUES (3, '2022-10-20 21:25:09.000', '2022-12-07 20:47:25.893', '测试', 'test', 0);
+INSERT INTO `role` VALUES (1, '2022-10-20 21:24:28.000', '2022-12-08 15:44:04.342', '管理员', 'admin', 0);
+INSERT INTO `role` VALUES (2, '2022-10-20 21:25:07.000', '2022-12-08 15:44:09.091', '用户', 'user', 0);
+INSERT INTO `role` VALUES (3, '2022-10-20 21:25:09.000', '2022-12-08 15:44:13.917', '测试', 'test', 0);
 
 -- ----------------------------
 -- Table structure for role_menu
@@ -517,6 +555,33 @@ CREATE TABLE `role_menu`  (
 -- ----------------------------
 -- Records of role_menu
 -- ----------------------------
+INSERT INTO `role_menu` VALUES (1, 2);
+INSERT INTO `role_menu` VALUES (1, 3);
+INSERT INTO `role_menu` VALUES (1, 4);
+INSERT INTO `role_menu` VALUES (1, 5);
+INSERT INTO `role_menu` VALUES (1, 6);
+INSERT INTO `role_menu` VALUES (1, 7);
+INSERT INTO `role_menu` VALUES (1, 8);
+INSERT INTO `role_menu` VALUES (1, 9);
+INSERT INTO `role_menu` VALUES (1, 16);
+INSERT INTO `role_menu` VALUES (1, 17);
+INSERT INTO `role_menu` VALUES (1, 23);
+INSERT INTO `role_menu` VALUES (1, 24);
+INSERT INTO `role_menu` VALUES (1, 25);
+INSERT INTO `role_menu` VALUES (1, 26);
+INSERT INTO `role_menu` VALUES (1, 27);
+INSERT INTO `role_menu` VALUES (1, 28);
+INSERT INTO `role_menu` VALUES (1, 29);
+INSERT INTO `role_menu` VALUES (1, 30);
+INSERT INTO `role_menu` VALUES (1, 31);
+INSERT INTO `role_menu` VALUES (1, 32);
+INSERT INTO `role_menu` VALUES (1, 33);
+INSERT INTO `role_menu` VALUES (1, 36);
+INSERT INTO `role_menu` VALUES (1, 37);
+INSERT INTO `role_menu` VALUES (1, 38);
+INSERT INTO `role_menu` VALUES (1, 34);
+INSERT INTO `role_menu` VALUES (1, 10);
+INSERT INTO `role_menu` VALUES (1, 39);
 INSERT INTO `role_menu` VALUES (2, 1);
 INSERT INTO `role_menu` VALUES (2, 2);
 INSERT INTO `role_menu` VALUES (2, 6);
@@ -571,33 +636,6 @@ INSERT INTO `role_menu` VALUES (3, 36);
 INSERT INTO `role_menu` VALUES (3, 37);
 INSERT INTO `role_menu` VALUES (3, 38);
 INSERT INTO `role_menu` VALUES (3, 39);
-INSERT INTO `role_menu` VALUES (1, 2);
-INSERT INTO `role_menu` VALUES (1, 3);
-INSERT INTO `role_menu` VALUES (1, 4);
-INSERT INTO `role_menu` VALUES (1, 5);
-INSERT INTO `role_menu` VALUES (1, 6);
-INSERT INTO `role_menu` VALUES (1, 7);
-INSERT INTO `role_menu` VALUES (1, 8);
-INSERT INTO `role_menu` VALUES (1, 9);
-INSERT INTO `role_menu` VALUES (1, 16);
-INSERT INTO `role_menu` VALUES (1, 17);
-INSERT INTO `role_menu` VALUES (1, 23);
-INSERT INTO `role_menu` VALUES (1, 24);
-INSERT INTO `role_menu` VALUES (1, 25);
-INSERT INTO `role_menu` VALUES (1, 26);
-INSERT INTO `role_menu` VALUES (1, 27);
-INSERT INTO `role_menu` VALUES (1, 28);
-INSERT INTO `role_menu` VALUES (1, 29);
-INSERT INTO `role_menu` VALUES (1, 30);
-INSERT INTO `role_menu` VALUES (1, 31);
-INSERT INTO `role_menu` VALUES (1, 32);
-INSERT INTO `role_menu` VALUES (1, 33);
-INSERT INTO `role_menu` VALUES (1, 36);
-INSERT INTO `role_menu` VALUES (1, 37);
-INSERT INTO `role_menu` VALUES (1, 38);
-INSERT INTO `role_menu` VALUES (1, 34);
-INSERT INTO `role_menu` VALUES (1, 10);
-INSERT INTO `role_menu` VALUES (1, 39);
 
 -- ----------------------------
 -- Table structure for role_resource
@@ -611,52 +649,6 @@ CREATE TABLE `role_resource`  (
 -- ----------------------------
 -- Records of role_resource
 -- ----------------------------
-INSERT INTO `role_resource` VALUES (2, 43);
-INSERT INTO `role_resource` VALUES (2, 44);
-INSERT INTO `role_resource` VALUES (2, 59);
-INSERT INTO `role_resource` VALUES (2, 38);
-INSERT INTO `role_resource` VALUES (2, 42);
-INSERT INTO `role_resource` VALUES (2, 65);
-INSERT INTO `role_resource` VALUES (2, 68);
-INSERT INTO `role_resource` VALUES (2, 62);
-INSERT INTO `role_resource` VALUES (2, 35);
-INSERT INTO `role_resource` VALUES (2, 36);
-INSERT INTO `role_resource` VALUES (2, 51);
-INSERT INTO `role_resource` VALUES (2, 54);
-INSERT INTO `role_resource` VALUES (2, 55);
-INSERT INTO `role_resource` VALUES (2, 58);
-INSERT INTO `role_resource` VALUES (2, 70);
-INSERT INTO `role_resource` VALUES (2, 78);
-INSERT INTO `role_resource` VALUES (2, 82);
-INSERT INTO `role_resource` VALUES (2, 79);
-INSERT INTO `role_resource` VALUES (2, 80);
-INSERT INTO `role_resource` VALUES (2, 86);
-INSERT INTO `role_resource` VALUES (2, 92);
-INSERT INTO `role_resource` VALUES (2, 95);
-INSERT INTO `role_resource` VALUES (2, 41);
-INSERT INTO `role_resource` VALUES (3, 43);
-INSERT INTO `role_resource` VALUES (3, 44);
-INSERT INTO `role_resource` VALUES (3, 59);
-INSERT INTO `role_resource` VALUES (3, 38);
-INSERT INTO `role_resource` VALUES (3, 41);
-INSERT INTO `role_resource` VALUES (3, 42);
-INSERT INTO `role_resource` VALUES (3, 65);
-INSERT INTO `role_resource` VALUES (3, 68);
-INSERT INTO `role_resource` VALUES (3, 62);
-INSERT INTO `role_resource` VALUES (3, 35);
-INSERT INTO `role_resource` VALUES (3, 36);
-INSERT INTO `role_resource` VALUES (3, 79);
-INSERT INTO `role_resource` VALUES (3, 80);
-INSERT INTO `role_resource` VALUES (3, 51);
-INSERT INTO `role_resource` VALUES (3, 54);
-INSERT INTO `role_resource` VALUES (3, 55);
-INSERT INTO `role_resource` VALUES (3, 58);
-INSERT INTO `role_resource` VALUES (3, 70);
-INSERT INTO `role_resource` VALUES (3, 78);
-INSERT INTO `role_resource` VALUES (3, 82);
-INSERT INTO `role_resource` VALUES (3, 92);
-INSERT INTO `role_resource` VALUES (3, 95);
-INSERT INTO `role_resource` VALUES (3, 86);
 INSERT INTO `role_resource` VALUES (1, 3);
 INSERT INTO `role_resource` VALUES (1, 43);
 INSERT INTO `role_resource` VALUES (1, 44);
@@ -721,6 +713,58 @@ INSERT INTO `role_resource` VALUES (1, 99);
 INSERT INTO `role_resource` VALUES (1, 100);
 INSERT INTO `role_resource` VALUES (1, 101);
 INSERT INTO `role_resource` VALUES (1, 74);
+INSERT INTO `role_resource` VALUES (1, 102);
+INSERT INTO `role_resource` VALUES (1, 103);
+INSERT INTO `role_resource` VALUES (1, 104);
+INSERT INTO `role_resource` VALUES (1, 105);
+INSERT INTO `role_resource` VALUES (2, 43);
+INSERT INTO `role_resource` VALUES (2, 44);
+INSERT INTO `role_resource` VALUES (2, 59);
+INSERT INTO `role_resource` VALUES (2, 38);
+INSERT INTO `role_resource` VALUES (2, 42);
+INSERT INTO `role_resource` VALUES (2, 65);
+INSERT INTO `role_resource` VALUES (2, 68);
+INSERT INTO `role_resource` VALUES (2, 62);
+INSERT INTO `role_resource` VALUES (2, 35);
+INSERT INTO `role_resource` VALUES (2, 36);
+INSERT INTO `role_resource` VALUES (2, 51);
+INSERT INTO `role_resource` VALUES (2, 54);
+INSERT INTO `role_resource` VALUES (2, 55);
+INSERT INTO `role_resource` VALUES (2, 58);
+INSERT INTO `role_resource` VALUES (2, 70);
+INSERT INTO `role_resource` VALUES (2, 78);
+INSERT INTO `role_resource` VALUES (2, 82);
+INSERT INTO `role_resource` VALUES (2, 79);
+INSERT INTO `role_resource` VALUES (2, 80);
+INSERT INTO `role_resource` VALUES (2, 86);
+INSERT INTO `role_resource` VALUES (2, 92);
+INSERT INTO `role_resource` VALUES (2, 95);
+INSERT INTO `role_resource` VALUES (2, 41);
+INSERT INTO `role_resource` VALUES (2, 103);
+INSERT INTO `role_resource` VALUES (3, 43);
+INSERT INTO `role_resource` VALUES (3, 44);
+INSERT INTO `role_resource` VALUES (3, 59);
+INSERT INTO `role_resource` VALUES (3, 38);
+INSERT INTO `role_resource` VALUES (3, 41);
+INSERT INTO `role_resource` VALUES (3, 42);
+INSERT INTO `role_resource` VALUES (3, 65);
+INSERT INTO `role_resource` VALUES (3, 68);
+INSERT INTO `role_resource` VALUES (3, 62);
+INSERT INTO `role_resource` VALUES (3, 35);
+INSERT INTO `role_resource` VALUES (3, 36);
+INSERT INTO `role_resource` VALUES (3, 79);
+INSERT INTO `role_resource` VALUES (3, 80);
+INSERT INTO `role_resource` VALUES (3, 51);
+INSERT INTO `role_resource` VALUES (3, 54);
+INSERT INTO `role_resource` VALUES (3, 55);
+INSERT INTO `role_resource` VALUES (3, 58);
+INSERT INTO `role_resource` VALUES (3, 70);
+INSERT INTO `role_resource` VALUES (3, 78);
+INSERT INTO `role_resource` VALUES (3, 82);
+INSERT INTO `role_resource` VALUES (3, 92);
+INSERT INTO `role_resource` VALUES (3, 95);
+INSERT INTO `role_resource` VALUES (3, 86);
+INSERT INTO `role_resource` VALUES (3, 103);
 
 -- ----------------------------
 -- Table structure for tag
@@ -730,17 +774,15 @@ CREATE TABLE `tag`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `created_at` datetime(3) NULL DEFAULT NULL,
   `updated_at` datetime(3) NULL DEFAULT NULL,
-  `deleted_at` datetime(3) NULL DEFAULT NULL,
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_tag_deleted_at`(`deleted_at` ASC) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tag
 -- ----------------------------
-INSERT INTO `tag` VALUES (1, '2022-12-03 22:01:51.624', '2022-12-03 22:01:51.624', NULL, 'Golang');
-INSERT INTO `tag` VALUES (2, '2022-12-03 22:01:56.984', '2022-12-03 22:01:56.984', NULL, 'Vue');
+INSERT INTO `tag` VALUES (1, '2022-12-03 22:01:51.624', '2022-12-03 22:01:51.624', 'Golang');
+INSERT INTO `tag` VALUES (2, '2022-12-03 22:01:56.984', '2022-12-03 22:01:56.984', 'Vue');
 
 -- ----------------------------
 -- Table structure for user_auth

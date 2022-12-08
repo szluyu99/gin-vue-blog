@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NPopconfirm, NSwitch, NTag } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
+import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import api from '@/api'
 
@@ -58,7 +58,7 @@ const columns = [
     width: 60,
     align: 'center',
     render(row) {
-      return h('span', formatDateTime(row.created_at, 'YYYY-MM-DD'))
+      return h('span', formatDate(row.created_at))
     },
   },
   {

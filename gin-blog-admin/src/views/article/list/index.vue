@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import { artTypeMap, artTypeOptions } from '@/constant/data'
 import api from '@/api'
@@ -44,10 +44,9 @@ const columns = [
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 90,
-        'imgProps': { style: { 'border-radius': '3px' } },
-        // 特殊处理本地图片, TODO: 更好的做法
-        'src': row.img.startsWith('http') ? row.img : `http://localhost:8765/${row.img}`,
+        'height': 100,
+        'imgProps': { style: { 'border-radius': '2px' } },
+        'src': convertImgUrl(row.img),
         'fallback-src': 'http://dummyimage.com/400x400',
         'show-toolbar-tooltip': true,
       })
@@ -94,7 +93,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDateTime(row.updated_at, 'YYYY-MM-DD'),
+          default: () => formatDate(row.updated_at),
           icon: renderIcon('mdi:update', { size: 18 }),
         },
       )

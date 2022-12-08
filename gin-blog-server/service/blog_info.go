@@ -90,7 +90,7 @@ func (*BlogInfo) UpdateAbout(data model.About) (code int) {
 	return r.OK
 }
 
-/* 前台借口 */
+/* 前台接口 */
 
 // 获取前台首页信息
 func (b *BlogInfo) GetFrontHomeInfo() resp.FrontBlogHomeVO {
@@ -101,6 +101,7 @@ func (b *BlogInfo) GetFrontHomeInfo() resp.FrontBlogHomeVO {
 	tagCount := dao.Count(model.Tag{}, "")
 	blogConfigVO := b.GetBlogConfig()
 	viewCount := utils.Redis.GetInt(KEY_VIEW_COUNT)
+	pageList := dao.List([]model.Page{}, "id, name, label, cover, created_at, updated_at", "", "")
 	return resp.FrontBlogHomeVO{
 		ArticleCount:  articleCount,
 		UserCount:     userCount,
@@ -109,5 +110,6 @@ func (b *BlogInfo) GetFrontHomeInfo() resp.FrontBlogHomeVO {
 		ViewCount:     viewCount,
 		TagCount:      tagCount,
 		BlogConfig:    blogConfigVO,
+		PageList:      pageList,
 	}
 }

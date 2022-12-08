@@ -163,6 +163,13 @@ func BackRouter() http.Handler {
 			operationLog.GET("/list", operationLogAPI.GetList) // 操作日志列表
 			operationLog.DELETE("", operationLogAPI.Delete)    // 删除操作日志
 		}
+		// 页面模块
+		page := auth.Group("/page")
+		{
+			page.GET("/list", pageAPI.GetList)  // 页面列表
+			page.POST("", pageAPI.SaveOrUpdate) // 新增/编辑页面
+			page.DELETE("", pageAPI.Delete)     // 删除页面
+		}
 	}
 	return r
 }

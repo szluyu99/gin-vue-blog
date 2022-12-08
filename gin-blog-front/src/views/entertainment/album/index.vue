@@ -3,7 +3,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <BannerCard banner-img="https://static.talkxj.com/config/e587c4651154e4da49b5a54f865baaed.jpg">
+  <BannerCard label="album">
     <n-result
       status="403"
       title="403 禁止访问"

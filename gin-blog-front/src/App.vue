@@ -5,8 +5,10 @@ import GlobalModel from '@/components/modal/index.vue'
 import { useAppStore, useUserStore } from '@/store'
 const [appStore, userStore] = [useAppStore(), useUserStore()]
 
-appStore.getBlogInfo()
-userStore.getUserInfo() // FIXME: 解决 token 后台过期过快问题
+onMounted(() => {
+  appStore.getBlogInfo()
+  userStore.getUserInfo() // FIXME: 解决 token 后台过期过快问题
+})
 
 // 禁止右键菜单
 document.addEventListener('contextmenu', e => e.preventDefault())

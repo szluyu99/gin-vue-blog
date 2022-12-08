@@ -12,7 +12,7 @@ const { blogConfig } = storeToRefs(useAppStore())
         target="__blank"
         hover="decoration-underline color-primary"
       >
-        gin-blog
+        szluyu99
       </a>
     </p>
     <p>

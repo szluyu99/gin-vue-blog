@@ -22,7 +22,7 @@ export default [
   DefineOptions(),
   // 自动引入 Vue 官方 Api, 只在 .vue 中生效, .js 中不行
   AutoImport({
-    imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
+    imports: ['vue', 'vue-router', 'pinia', '@vueuse/core', 'vue/macros'],
     dts: false,
   }),
   // 自动引入组件: 例如各种 UI 库

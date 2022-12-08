@@ -1,14 +1,10 @@
 <script setup>
 import api from '@/api'
 import { getToken } from '@/utils'
-import { useAppStore } from '@/store'
-const appStore = useAppStore()
 
 onMounted(() => {
-  if (getToken()) {
-    appStore.getBlogInfo() // 获取博客全局设置
+  if (getToken())
     api.report() // 上报用户信息
-  }
 })
 </script>
 

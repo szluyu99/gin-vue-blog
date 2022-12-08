@@ -1,5 +1,5 @@
 <script setup>
-import { renderCustomIcon, renderIcon } from '@/utils/common'
+import { renderCustomIcon, renderIcon } from '@/utils'
 
 const props = defineProps({
   icon: {

@@ -1,4 +1,4 @@
-import { getToken, removeToken } from '@/utils/auth/token'
+import { getToken, removeToken } from '@/utils'
 import api from '@/api'
 
 interface UserInfo {

@@ -3,13 +3,13 @@ import { useStorage } from '@vueuse/core'
 import bgImg from '@/assets/images/login_bg.webp'
 import { lStorage, setToken } from '@/utils'
 import { addDynamicRoutes } from '@/router'
-import { useUserStore } from '@/store'
-import config from '@/assets/js/config'
+import { useAppStore, useUserStore } from '@/store'
+import config from '@/constant/config'
 import api from '@/api'
 
 const title = import.meta.env.VITE_TITLE // 环境变量中读取
 
-const router = useRouter()
+const [userStore, appStore, router] = [useUserStore(), useAppStore(), useRouter()]
 const { query } = useRoute()
 
 const loginInfo = ref({
@@ -48,33 +48,35 @@ async function handleLogin() {
       $message.loading('正在验证...')
 
       // 登录接口
-      const res = await api.login({ username, password })
-      setToken(res.data.token) // 持久化 token
-      $message.success('登录成功')
+      try {
+        const res = await api.login({ username, password })
+        setToken(res.data.token) // 持久化 token
+        $message.success('登录成功')
 
-      // 获取用户详情
-      const userStore = useUserStore()
-      await userStore.getUserInfo()
+        await userStore.getUserInfo() // 获取用户信息
+        await appStore.getBlogInfo() // 获取博客信息
 
-      // "记住我" 功能
-      if (isRemember.value)
-        lStorage.set('loginInfo', { username, password })
-      else lStorage.remove('loginInfo')
+        // "记住我" 功能
+        isRemember.value
+          ? lStorage.set('loginInfo', { username, password })
+          : lStorage.remove('loginInfo')
 
-      // 动态添加路由
-      await addDynamicRoutes()
+        // 动态添加路由
+        await addDynamicRoutes()
 
-      // 页面跳转: 根据 URL 中的 redirect 进行跳转
-      if (query.redirect) {
-        const path = query.redirect
-        Reflect.deleteProperty(query, 'redirect') // 从对象身上删除属性
-        router.push({ path, query })
+        // 页面跳转: 根据 URL 中的 redirect 进行跳转
+        if (query.redirect) {
+          const path = query.redirect
+          Reflect.deleteProperty(query, 'redirect') // 从对象身上删除属性
+          router.push({ path, query })
+        }
+        else {
+          router.push('/')
+        }
       }
-      else {
-        router.push('/')
+      finally {
+        loading.value = false
       }
-
-      loading.value = false
     }
   })
   captcha.show()

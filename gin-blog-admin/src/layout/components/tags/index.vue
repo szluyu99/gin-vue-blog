@@ -46,7 +46,6 @@ function setContextMenu(x, y, currentPath) {
 
 // 右击菜单
 async function handleContextMenu(e, tagItem) {
-  // console.log('右击菜单: ', e, tagItem)
   const { clientX, clientY } = e
   hideContextMenu()
   setContextMenu(clientX, clientY, tagItem.path)

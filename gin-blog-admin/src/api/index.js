@@ -80,4 +80,9 @@ export default {
   saveOrUpdateRole: data => request.post('/role', data),
   deleteRole: (data = []) => request.delete('/role', { data }),
   getRoleOption: () => request.get('/role/option'),
+
+  // 页面相关接口
+  getPages: () => request.get('/page/list'),
+  saveOrUpdatePage: data => request.post('/page', data),
+  deletePage: (data = []) => request.delete('/page', { data }),
 }

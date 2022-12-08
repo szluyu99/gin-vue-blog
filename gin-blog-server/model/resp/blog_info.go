@@ -2,6 +2,7 @@ package resp
 
 import "gin-blog/model"
 
+// 后台首页 VO
 type BlogHomeVO struct {
 	ArticleCount int64 `json:"article_count"` // 文章数量
 	UserCount    int64 `json:"user_count"`    // 用户数量
@@ -13,6 +14,7 @@ type BlogHomeVO struct {
 	// PageList      []Page                 `json:"pageList"`
 }
 
+// 前台首页 VO
 type FrontBlogHomeVO struct {
 	ArticleCount  int64                  `json:"article_count"`  // 文章数量
 	UserCount     int64                  `json:"user_count"`     // 用户数量
@@ -21,5 +23,5 @@ type FrontBlogHomeVO struct {
 	TagCount      int64                  `json:"tag_count"`      // 标签数量
 	BlogConfig    model.BlogConfigDetail `json:"blog_config"`    // 博客信息
 	ViewCount     int                    `json:"view_count"`     // 访问量
-	// PageList      []Page                 `json:"pageList"`
+	PageList      []model.Page           `json:"page_list"`      // 页面列表
 }

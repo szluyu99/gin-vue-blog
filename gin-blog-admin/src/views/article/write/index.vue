@@ -230,7 +230,7 @@ const rules = {
         <n-form-item label="文章缩略图" path="img">
           <UploadOne
             v-model:preview="formModel.img"
-            :width="180"
+            :width="220"
             @finish="val => (formModel.img = val)"
           />
         </n-form-item>

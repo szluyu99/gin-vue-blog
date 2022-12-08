@@ -1,55 +1,62 @@
 <script setup lang="ts">
 import vueDanmaku from 'vue3-danmaku'
+
 import api from '@/api'
-
-import { useUserStore } from '@/store'
+import { convertImgUrl } from '@/utils'
+import { useAppStore, useUserStore } from '@/store'
 const userStore = useUserStore()
+const { pageList } = storeToRefs(useAppStore())
 
-const messageContent = ref('')
-const showBtn = ref(false)
+let content = $ref('')
+const showBtn = $ref(false)
 
-const dmRef = ref<any>(null)
-const isLoop = ref(false) // 循环播放
-const isHide = ref(false) // 隐藏弹幕
+const dmRef = $ref<any>(null) // 弹幕 ref 对象
+const isHide = $ref(false) // 隐藏弹幕
+const isLoop = $ref(false) // 循环播放
 
-const danmus = ref([{
+// 弹幕列表
+let danmus = $ref([{
   avatar: 'https://static.talkxj.com/avatar/15bb3e8d4144163e006f4b2776aa7bac.jpg',
   content: '大家好，我是作者，欢迎给我点一颗 Star!',
   nickname: '阵、雨',
 }])
 
-onMounted(() => {
-  api.getMessages().then(res => danmus.value = [...danmus.value, ...res.data])
+onMounted(async () => {
+  const res = await api.getMessages()
+  danmus = [...danmus, ...res.data]
 })
 
 async function send() {
-  messageContent.value = messageContent.value.trim()
-  if (!messageContent.value) {
+  content = content.trim()
+  if (!content) {
     window?.$message?.info('消息不能为空!')
     return
   }
   const data = {
     avatar: userStore.avatar,
-    content: messageContent.value,
     nickname: userStore.nickname,
+    content,
   }
   await api.saveMessage(data)
-  dmRef.value.push(data)
-  messageContent.value = ''
+  dmRef.push(data)
+  content = ''
 }
 
-watch(isHide, val => val ? dmRef.value.hide() : dmRef.value.show())
+// 注意 watch 第一个参数可以是函数, 由于用了 $ref, 直接写 isHide 不生效
+watch(() => isHide, val => val ? dmRef.hide() : dmRef.show())
 
-// https://w.wallhaven.cc/full/9m/wallhaven-9ml62k.png
-// https://w.wallhaven.cc/full/4y/wallhaven-4yz2vd.jpg
-// https://static.talkxj.com/config/acfeab8379508233fa7e4febf90c2f2e.png
-const bannerImg = 'https://w.wallhaven.cc/full/r2/wallhaven-r2jdq7.jpg'
-const bannerStyle = ref(`background: url('${bannerImg}') center center / cover no-repeat;`)
+// 根据后端配置动态获取封面
+const coverStyle = computed(() => {
+  const page = pageList.value.find(e => e.label === 'message')
+  return page
+    ? `background: url('${page?.cover}') center center / cover no-repeat;`
+    : 'background: url("https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg") center center / cover no-repeat;'
+})
 </script>
 
 <template>
   <div
-    :style="bannerStyle"
+    :style="coverStyle"
     overflow-hidden
     absolute inset-x-0 h-screen
     class="banner-fade-down"
@@ -71,7 +78,7 @@ const bannerStyle = ref(`background: url('${bannerImg}') center center / cover n
       </h1>
       <div flex justify-center mt-32 h-40>
         <input
-          v-model="messageContent"
+          v-model="content"
           text-16 border-1 rounded-20 bg-transparent px-20 w="3/4" text="#eee"
           placeholder="说点什么吧？"
           @click.stop="showBtn = true"
@@ -122,7 +129,7 @@ const bannerStyle = ref(`background: url('${bannerImg}') center center / cover n
       >
         <template #dm="{ danmu }">
           <div bg="#00000080" rounded-20 text-white px-10 py-7 flex items-center>
-            <n-avatar round size="small" :src="danmu.avatar" mr-10 />
+            <n-avatar round size="small" :src="convertImgUrl(danmu.avatar)" mr-10 />
             <span vertical-middle> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
           </div>
         </template>

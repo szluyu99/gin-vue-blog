@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 import { useAppStore, useUserStore } from '@/store'
@@ -79,7 +80,10 @@ defineExpose({ show, data })
 
 <template>
   <div v-if="show" flex p-10 mt-15 border-1px border-solid border-rounded-1rem border-color="#90939950">
-    <n-avatar round :size="36" :src="userStore.avatar" />
+    <n-avatar
+      round :size="36"
+      :src="convertImgUrl(userStore.avatar)"
+    />
     <div w-full my-5 ml-12>
       <textarea
         v-model="data.content"

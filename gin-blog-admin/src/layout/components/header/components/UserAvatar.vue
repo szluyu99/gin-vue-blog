@@ -1,8 +1,7 @@
 <script setup>
 import { renderIcon } from '@/utils'
 import { useUserStore } from '@/store'
-const userStore = useUserStore()
-const router = useRouter()
+const [router, userStore] = [useRouter(), useUserStore()]
 
 const options = [
   {
@@ -37,7 +36,7 @@ function handleSelect(key) {
 <template>
   <n-dropdown :options="options" @select="handleSelect">
     <div flex items-center cursor-pointer>
-      <img :src="userStore.avatar" mr10 w-35 h-35 rounded-full>
+      <img :src="userStore.avatar" mr-10 w-35 h-35 rounded-full>
       <span>{{ userStore.nickname }}</span>
     </div>
   </n-dropdown>

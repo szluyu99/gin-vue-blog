@@ -1,48 +1,8 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
-import { asyncRoutes, basicRoutes } from '@/router/routes'
+import { asyncRoutes, basicRoutes, vueModules } from '@/router/routes'
 import Layout from '@/layout/index.vue'
 import api from '@/api'
-
-// 加载 views 下每个模块的 index.vue 文件
-// const asyncViewMap = new Map()
-// const vueModules = import.meta.glob('@/views/**/index.vue', { eager: true })
-// Object.keys(vueModules).forEach((key) => {
-//   asyncViewMap.set(key, vueModules[key].default)
-// })
-// 加载 views 下每个模块的 index.vue 文件
-const modules = import.meta.glob('@/views/**/index.vue')
-
-// 判断用户角色是否有权限访问路由
-function hasPermission(route, role) {
-  // 路由不需要权限直接返回 true
-  if (!route.meta?.requireAuth)
-    return true
-  // 路由需要的角色
-  const routeRole = route.meta?.role ?? []
-  // 登录用户没有角色 或者 路由没有设置角色判断, 为没有权限
-  if (!role.length || !routeRole.length)
-    return false
-  // 路由指定的角色包含任登录用户角色则判定有权限
-  return role.some(item => routeRole.includes(item))
-}
-
-// 过滤出有权限访问的路由
-function filterAsyncRoutes(routes = [], role) {
-  const res = []
-  routes.forEach((route) => {
-    // FIXME: 需要先判断 route 不为 null, 什么原因会加入 null? 初步估计是 route.js 中的配置...
-    if (route && hasPermission(route, role)) {
-      const curRoute = { ...route, children: [] }
-      if (route.children?.length)
-        curRoute.children = filterAsyncRoutes(route.children, role)
-      else
-        Reflect.deleteProperty(curRoute, 'children')
-      res.push(curRoute)
-    }
-  })
-  return res
-}
 
 export const usePermissionStore = defineStore('permission', {
   state() {
@@ -79,7 +39,7 @@ export const usePermissionStore = defineStore('permission', {
         children: e.children.map(ee => ({
           name: ee.name,
           path: ee.path, // 父路径 + 当前菜单路径
-          component: modules[`/src/views${ee.component}/index.vue`], // ! 读取动态加载的路由模块
+          component: vueModules[`/src/views${ee.component}/index.vue`], // ! 读取动态加载的路由模块
           isHidden: ee.is_hidden,
           meta: {
             title: ee.name,
@@ -93,13 +53,42 @@ export const usePermissionStore = defineStore('permission', {
     },
     // ! 前端控制路由权限: 根据角色过滤路由
     generateRoutes(role = []) {
-      // 从所有路由中过滤出指定角色可以访问的路由
-      this.accessRoutes = filterAsyncRoutes(asyncRoutes, role)
-      // console.log(this.accessRoutes)
-      return this.accessRoutes
+      return filterAsyncRoutes(asyncRoutes, role)
     },
     resetPermission() {
       this.$reset()
     },
   },
 })
+
+// 前端路由相关函数
+// 判断用户角色是否有权限访问路由
+function hasPermission(route, role) {
+  // 路由不需要权限直接返回 true
+  if (!route.meta?.requireAuth)
+    return true
+  // 路由需要的角色
+  const routeRole = route.meta?.role ?? []
+  // 登录用户没有角色 或者 路由没有设置角色判断, 为没有权限
+  if (!role.length || !routeRole.length)
+    return false
+  // 路由指定的角色包含任登录用户角色则判定有权限
+  return role.some(item => routeRole.includes(item))
+}
+
+// 从路由中过滤出有权限访问的路由
+function filterAsyncRoutes(routes = [], role) {
+  const res = []
+  routes.forEach((route) => {
+    // FIXME: 需要先判断 route 不为 null, 什么原因会加入 null? 初步估计是 route.js 中的配置...
+    if (route && hasPermission(route, role)) {
+      const curRoute = { ...route, children: [] }
+      if (route.children?.length)
+        curRoute.children = filterAsyncRoutes(route.children, role)
+      else
+        Reflect.deleteProperty(curRoute, 'children')
+      res.push(curRoute)
+    }
+  })
+  return res
+}

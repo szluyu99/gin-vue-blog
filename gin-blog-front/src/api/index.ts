@@ -1,4 +1,4 @@
-import { request } from '@/utils/http'
+import { request } from '@/utils'
 import type { RequestConfig } from '~/types/axios'
 
 export default {

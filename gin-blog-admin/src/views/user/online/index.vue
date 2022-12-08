@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
-import { formatDateTime, renderIcon } from '@/utils'
+import { formatDate, renderIcon } from '@/utils'
 import api from '@/api'
 
 defineOptions({ name: '在线用户' })
@@ -84,7 +84,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDateTime(row.last_login_time, 'YYYY-MM-DD'),
+          default: () => formatDate(row.last_login_time),
           icon: renderIcon('mdi:update', { size: 18 }),
         },
       )

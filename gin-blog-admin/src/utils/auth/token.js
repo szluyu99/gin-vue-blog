@@ -1,5 +1,4 @@
 import { lStorage } from '@/utils'
-import api from '@/api'
 
 // Token 存储在 LocalStorage 中, 封装其操作
 const TOKEN_CODE = 'access_token'

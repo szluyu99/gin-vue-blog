@@ -58,7 +58,7 @@ func (*_redis) Del(key string) {
 	}
 }
 
-// redis 设置 key value
+// redis 设置 key value 过期时间
 func (*_redis) Set(key string, value interface{}, expiration time.Duration) {
 	err := rdb.Set(ctx, key, value, expiration).Err()
 	if err != nil {

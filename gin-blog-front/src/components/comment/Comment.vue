@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
 // import EmojiList from '@/assets/js/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
+import { convertImgUrl, formatDate } from '@/utils'
 
 import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
@@ -170,7 +169,11 @@ const isLike = computed(() => {
       <!-- 评论列表 -->
       <div v-for="(comment, idx) of commentList" :key="comment.id" my-5 flex>
         <div>
-          <n-image :src="comment.avatar" width="40" duration-600 hover-rotate-360 />
+          <n-image
+            :src="convertImgUrl(comment.avatar)"
+            width="40"
+            duration-600 hover-rotate-360
+          />
         </div>
         <div flex-col flex-1 ml-10>
           <!-- 评论人名称 -->
@@ -198,7 +201,7 @@ const isLike = computed(() => {
           <div flex justify-between text-12>
             <div color="#b3b3b3" py-5 flex items-center>
               <span> {{ commentCount - idx }}楼 </span>
-              <span mx-10> {{ dayjs(comment.created_at).format('YYYY-MM-DD') }} </span>
+              <span mx-10> {{ formatDate(comment.created_at) }} </span>
               <button
                 i-mdi:thumb-up
                 :class="isLike(comment.id) ? 'bg-red' : ''"
@@ -217,7 +220,11 @@ const isLike = computed(() => {
           <!-- 评论回复 start -->
           <div v-for="reply of comment.reply_vo_list" :key="reply.id" mt-10 flex>
             <div>
-              <n-image :src="reply.avatar" width="40" duration-600 hover-rotate-360 />
+              <n-image
+                :src="convertImgUrl(reply.avatar)"
+                width="40"
+                duration-600 hover-rotate-360
+              />
             </div>
             <div flex-col flex-1 ml-10>
               <!-- 回复人名称 -->
@@ -244,7 +251,7 @@ const isLike = computed(() => {
               <!-- 时间 + 点赞 + 回复按钮 -->
               <div flex justify-between text-12>
                 <div color="#b3b3b3" py-5 flex items-center>
-                  <span mr-10> {{ dayjs(reply.created_at).format('YYYY-MM-DD') }} </span>
+                  <span mr-10> {{ formatDate(reply.created_at) }} </span>
                   <button
                     i-mdi:thumb-up
                     :class="isLike(reply.id) ? 'bg-red' : ''"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
+import { convertImgUrl, formatDate } from '@/utils'
 
 interface Props {
   idx?: number
@@ -22,7 +22,7 @@ const isRightClass = computed(() => idx % 2 === 0 ? 'order-0 rounded-l-3xl' : 'o
     <!-- 封面图 -->
     <div :class="isRightClass" overflow-hidden h-full w="45/100">
       <router-link :to="`/article/${article.id}`">
-        <img wh-full transition-600 hover:scale-110 :src="article.img">
+        <img wh-full transition-600 hover:scale-110 :src="convertImgUrl(article.img)">
       </router-link>
     </div>
     <!-- 文章信息 -->
@@ -38,7 +38,7 @@ const isRightClass = computed(() => idx % 2 === 0 ? 'order-0 rounded-l-3xl' : 'o
         <span v-if="article.is_top === 1" mx-7>|</span>
         <!-- 日期 -->
         <span flex items-center>
-          <i-mdi-calendar-month-outline mr-3 /> {{ dayjs(article.created_at).format('YYYY-MM-DD') }}
+          <i-mdi-calendar-month-outline mr-3 /> {{ formatDate(article.created_at) }}
         </span>
         <span mx-7>|</span>
         <!-- 分类 -->

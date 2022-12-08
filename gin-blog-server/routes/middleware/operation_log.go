@@ -28,6 +28,7 @@ var optMap = map[string]string{
 	"Role":         "角色",
 	"Tag":          "标签",
 	"User":         "用户",
+	"Page":         "页面",
 	// "Talk":         "说说",
 	// "Login":        "登录",
 	"POST":   "新增或修改",

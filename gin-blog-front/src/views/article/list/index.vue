@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
+import { convertImgUrl, formatDate } from '@/utils'
 import api from '@/api'
 
 const route = useRoute()
@@ -37,7 +37,7 @@ onMounted(async () => {
           <div overflow-hidden>
             <router-link :to="`/article/${item.id}`">
               <img
-                :src="item.img"
+                :src="convertImgUrl(item.img)"
                 h-220 w-full rounded-t-1rem
                 transition-600 hover:scale-110
               >
@@ -55,7 +55,7 @@ onMounted(async () => {
               <!-- 发布日期 -->
               <span flex items-center>
                 <i-mdi:clock-outline text-20 mr-3 />
-                <span text-16> {{ dayjs(item.created_at).format("YYYY-MM-DD") }} </span>
+                <span text-16> {{ formatDate(item.created_at) }} </span>
               </span>
               <!-- 分类 -->
               <router-link :to="`/categories/${item.category_id}`">

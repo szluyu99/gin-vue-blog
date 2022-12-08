@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
+	"gin-blog/routes"
 	"gin-blog/utils/r"
 	"net/http"
 	"net/http/httptest"
@@ -11,12 +12,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO: 请求需要 token 怎么办? 临时解决方案: 在 router 中去掉 JWT 中间件
-var router http.Handler
+// TODO: 请求需要 token 怎么办? 临时解决方案: 在 backRouter 中去掉 JWT 中间件
+var backRouter http.Handler
+var frontRouter http.Handler
 
+// TODO: 配置文件的位置
 func init() {
-	// routes.InitGlobalVariable()
-	// router = routes.FrontRouter()
+	testing.Init()
+	routes.InitGlobalVariable()
+	backRouter = routes.BackRouter()
+	frontRouter = routes.FrontRouter()
 }
 
 // 基础测试: http 状态码正常 + 反序列化数据正常

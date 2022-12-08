@@ -1,4 +1,4 @@
-import { getLocal, removeLocal, setLocal } from '@/utils/storage'
+import { getLocal, removeLocal, setLocal } from '@/utils'
 
 const TOKEN_CODE = 'blog_access_token'
 /** token过期时间：6小时 */

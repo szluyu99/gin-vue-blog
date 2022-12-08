@@ -73,7 +73,7 @@ func getLogMode(str string) logger.LogLevel {
 // 只支持创建表、增加表中没有的字段和索引
 // 为了保护数据，并不支持改变已有的字段类型或删除未被使用的字段
 func autoMigrate(db *gorm.DB) {
-	_ = db.AutoMigrate(
+	err := db.AutoMigrate(
 		&model.Article{},
 		&model.Category{},
 		&model.Comment{},
@@ -90,7 +90,14 @@ func autoMigrate(db *gorm.DB) {
 		&model.RoleMenu{},     // 角色-菜单 关联
 		&model.RoleResource{}, // 角色-资源 关联
 
+		&model.Page{},         // 页面
 		&model.BlogConfig{},   // 网站设置
 		&model.OperationLog{}, // 操作日志
 	)
+
+	if err != nil {
+		log.Println("gorm 自动迁移失败: ", err)
+	} else {
+		log.Println("gorm 自动迁移成功")
+	}
 }

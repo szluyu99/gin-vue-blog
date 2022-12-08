@@ -2,8 +2,11 @@ import { defineStore } from 'pinia'
 import { nextTick } from 'vue'
 import api from '@/api'
 
-// 存放一些全局应用变量
+// 应用全局变量
 export const useAppStore = defineStore('app', {
+  // TODO: 为什么其他 pinia 模块没有作持久化数据不会丢失???
+  persist: true,
+
   state() {
     return {
       reloadFlag: true,
@@ -13,6 +16,7 @@ export const useAppStore = defineStore('app', {
       blogConfig: {}, // 博客设置信息
     }
   },
+
   actions: {
     // 刷新页面: 效果并非按 F5 刷新整个网页, 而是模拟刷新 (nextTick + 滚动到顶部)
     async reloadPage() {

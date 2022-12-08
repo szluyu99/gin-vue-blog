@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 const [appStore, userStore, router, route] = [useAppStore(), useUserStore(), useRouter(), useRoute()]
 
@@ -131,7 +132,9 @@ const blogTitle = import.meta.env.VITE_APP_TITLE
             </a>
             <template v-else>
               <n-avatar
-                :size="28" :src="userStore.avatar" round
+                :size="28"
+                :src="convertImgUrl(userStore.avatar)"
+                round
                 fallback-src="https://static.talkxj.com/avatar/user.png"
               />
               <ul class="menus-submenu">

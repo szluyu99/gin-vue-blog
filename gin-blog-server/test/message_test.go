@@ -5,7 +5,7 @@ import (
 )
 
 func TestMessageGetList(t *testing.T) {
-	BaseSuccessTest(t, Get("/api/message/list", router))
+	BaseSuccessTest(t, Get("/api/message/list", backRouter))
 }
 
 // func TestMessageGetFrontList(t *testing.T) {
@@ -14,7 +14,7 @@ func TestMessageGetList(t *testing.T) {
 
 func TestMessageDelete(t *testing.T) {
 	ids := []int{4, 5}
-	BaseSuccessTest(t, DeleteJson("/api/message", ids, router))
+	BaseSuccessTest(t, DeleteJson("/api/message", ids, backRouter))
 }
 
 // func TestMessageSave(t *testing.T) {
@@ -24,5 +24,5 @@ func TestMessageDelete(t *testing.T) {
 
 func TestMessageReview(t *testing.T) {
 	param := map[string]any{"ids": []int{1, 2}, "is_review": 1}
-	BaseSuccessTest(t, PutJson("/api/message/review", param, router))
+	BaseSuccessTest(t, PutJson("/api/message/review", param, backRouter))
 }

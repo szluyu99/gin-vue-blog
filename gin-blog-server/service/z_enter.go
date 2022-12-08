@@ -23,6 +23,8 @@ const (
 	KEY_COMMENT_USER_LIKE_SET = "comment_user_like:" // 评论点赞 Set
 	KEY_COMMENT_LIKE_COUNT    = "comment_like_count" // 评论点赞数
 
+	KEY_PAGE = "page" // 页面封面
+
 	// session key
 	// SESSION_ARTICLE_SET = "article_set" //? 文章集合
 )
@@ -39,6 +41,7 @@ var (
 	resourceDao     dao.Resource
 	menuDao         dao.Menu
 	operationLogDao dao.OperationLog
+	pageDao         dao.Page
 )
 
 var (

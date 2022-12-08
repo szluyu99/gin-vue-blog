@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import EasyTyper from 'easy-typer-js'
+import { useAppStore } from '@/store'
+const { pageList, blogConfig } = storeToRefs(useAppStore())
 
 // 打字机特效配置
 const typeObj = reactive({
@@ -21,8 +23,13 @@ onMounted(() => {
     .catch(() => new EasyTyper(typeObj, '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {}))
 })
 
-// TODO:  后端动态配置
-const cover = computed(() => 'background: url("https://static.talkxj.com/config/0bee7ba5ac70155766648e14ae2a821f.jpg") center center /cover no-repeat')
+// 根据后端配置动态获取封面
+const coverStyle = computed(() => {
+  const page = pageList.value.find(e => e.label === 'home')
+  return page
+    ? `background: url('${page?.cover}') center center / cover no-repeat;`
+    : 'background: url("https://static.talkxj.com/config/0bee7ba5ac70155766648e14ae2a821f.jpg") center center / cover no-repeat;'
+})
 
 function scrollDown() {
   window.scrollTo({
@@ -30,18 +37,16 @@ function scrollDown() {
     top: document.documentElement.clientHeight,
   })
 }
-
-const blogTitle = import.meta.env.VITE_APP_TITLE
 </script>
 
 <template>
   <div
     absolute-lrt h-screen text-center text-white
-    :style="cover" class="banner-fade-down"
+    :style="coverStyle" class="banner-fade-down"
   >
     <div absolute mt-43vh inset-x-0 text-center>
       <h1 text-40 font-bold animate-zoom-in>
-        {{ `${blogTitle}的个人博客` }}
+        {{ blogConfig.website_name }}
       </h1>
       <div text-22>
         {{ typeObj.output }}

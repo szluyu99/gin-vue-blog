@@ -59,6 +59,9 @@ const (
 	ERROR_MENU_HAS_CHILDREN     = 6008
 	ERROR_ROLE_NAME_EXIST       = 60010
 	ERROR_ROLE_NOT_EXIST        = 60011
+
+	// code=7000 ... 页面模块的错误
+	ERROR_PAGE_NAME_EXIST = 7001
 )
 
 var codeMsg = map[int]string{
@@ -110,6 +113,8 @@ var codeMsg = map[int]string{
 	ERROR_MENU_HAS_CHILDREN:     "该菜单下存在子菜单，无法删除",
 	ERROR_ROLE_NAME_EXIST:       "该角色名已经存在",
 	ERROR_ROLE_NOT_EXIST:        "该角色不存在",
+
+	ERROR_PAGE_NAME_EXIST: "该页面名称已经存在",
 }
 
 func GetMsg(code int) string {

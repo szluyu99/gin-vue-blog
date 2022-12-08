@@ -1,32 +1,30 @@
 <script setup>
+import UploadOne from '@/components/upload/UploadOne.vue'
 import { useAppStore } from '@/store'
 import api from '@/api'
 
 defineOptions({ name: '网站管理' })
 
-// 表单数据
-const form = ref({})
-const formRef = ref(null)
+const appStore = useAppStore()
+appStore.getBlogInfo()
 
-onMounted(async () => {
-  const res = await api.getBlogConfig()
-  form.value = res.data
-})
+// 表单数据
+const form = ref(appStore.blogConfig)
+const formRef = ref(null)
 
 async function handleSave() {
   formRef.value?.validate(async (err) => {
-    if (err)
-      return
-    try {
-      $loadingBar?.start()
-      await api.updateBlogConfig(form.value)
-      $loadingBar?.finish()
-      $message.success('博客信息更新成功')
-      // 重新加载数据
-      useAppStore().getBlogInfo()
-    }
-    catch (err) {
-      $loadingBar?.error()
+    if (!err) {
+      try {
+        $loadingBar?.start()
+        await api.updateBlogConfig(form.value)
+        $loadingBar?.finish()
+        $message.success('博客信息更新成功')
+        appStore.getBlogInfo() // 重新加载信息
+      }
+      catch (err) {
+        $loadingBar?.error()
+      }
     }
   })
 }
@@ -34,7 +32,7 @@ async function handleSave() {
 
 <template>
   <CommonPage :show-header="false">
-    <n-tabs type="line" animated @update:value="() => {}">
+    <n-tabs type="line" animated>
       <n-tab-pane name="website" tab="网站信息">
         <n-form
           ref="formRef"
@@ -42,12 +40,14 @@ async function handleSave() {
           label-align="left"
           :label-width="120"
           :model="form"
-          w-500
-          mt-15
+          w-500 mt-15
         >
-          <!-- TODO: 头像上传 -->
           <n-form-item label="网站头像" path="website_avatar">
-            <n-image border-dashed border-1 text-gray width="120" :src="form.website_avatar" />
+            <UploadOne
+              v-model:preview="form.website_avatar"
+              :width="120"
+              @finish="val => (form.website_avatar = val)"
+            />
           </n-form-item>
           <n-form-item label="网站名称" path="website_name">
             <n-input v-model:value="form.website_name" placeholder="请输入网站名称" />
@@ -98,8 +98,7 @@ async function handleSave() {
           label-align="left"
           :label-width="120"
           :model="form"
-          w-550
-          mt-15
+          w-500 mt-15
         >
           <n-form-item label="QQ" path="qq">
             <n-input v-model:value="form.qq" placeholder="请输入 QQ" />
@@ -126,10 +125,18 @@ async function handleSave() {
         >
           <n-form ref="formRef" label-align="left" :label-width="120" :model="form" inline>
             <n-form-item label="用户头像" path="user_avatar">
-              <n-image border-dashed border-1 text-gray width="120" :src="form.user_avatar" />
+              <UploadOne
+                v-model:preview="form.user_avatar"
+                :width="120"
+                @finish="val => (form.user_avatar = val)"
+              />
             </n-form-item>
             <n-form-item label="游客头像" path="tourist_avatar">
-              <n-image border-dashed border-1 text-gray width="120" :src="form.tourist_avatar" />
+              <UploadOne
+                v-model:preview="form.tourist_avatar"
+                :width="120"
+                @finish="val => (form.tourist_avatar = val)"
+              />
             </n-form-item>
             <!-- <n-form-item label="微信收款码" path="tourist_avatar">
               <n-image border-dashed border-1 text-gray width="120" :src="form.tourist_avatar" />
@@ -139,13 +146,10 @@ async function handleSave() {
             </n-form-item> -->
           </n-form>
           <n-form-item label-placement="top" label="文章默认封面" path="article_cover">
-            <n-image
-              :object-fit="contain"
-              border-dashed
-              border-1
-              text-gray
-              height="160"
-              :src="form.article_cover"
+            <UploadOne
+              v-model:preview="form.article_cover"
+              :width="300"
+              @finish="val => (form.article_cover = val)"
             />
           </n-form-item>
           <n-form-item label="评论默认审核" path="is_comment_review">

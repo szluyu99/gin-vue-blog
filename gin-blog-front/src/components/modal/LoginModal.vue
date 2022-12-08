@@ -2,7 +2,7 @@
 import config from '@/assets/js/config'
 
 import api from '@/api'
-import { setToken } from '@/utils/auth/token'
+import { setToken } from '@/utils'
 
 import { useAppStore, useUserStore } from '@/store'
 const [appStore, userStore] = [useAppStore(), useUserStore()]

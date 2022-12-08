@@ -13,7 +13,14 @@ import unplugin from './unplugin'
 import { configHtmlPlugin } from './html'
 
 export function createVitePlugins(viteEnv, isBuild) {
-  const plugins = [vue(), ...unplugin, Unocss(), configHtmlPlugin(viteEnv, isBuild)]
+  const plugins = [
+    vue({
+      reactivityTransform: true, // 启用响应式语法糖$ref $computed $toRef
+    }),
+    ...unplugin,
+    Unocss(),
+    configHtmlPlugin(viteEnv, isBuild),
+  ]
   // 读取 .env 中的配置
   // viteEnv?.VITE_USE_MOCK && plugins.push(configMockPlugin(isBuild))
   return plugins

@@ -1,39 +1,51 @@
 <script setup lang="ts">
+import { useAppStore } from '@/store'
+
 interface Props {
+  label?: string
   title?: string
-  bannerImg?: string
   showFooter?: boolean
   loading?: boolean
 }
 
 const {
-  bannerImg = 'https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg',
+  label = 'default',
   showFooter = true,
   loading = false,
+  title = useRoute().meta?.title, // 默认从路由加载 title
 } = defineProps<Props>()
 
-if (loading)
-  window.$loadingBar?.start()
-watch(() => loading, (newVal, oldVal) => {
-  if (!newVal)
-    window.$loadingBar?.finish()
+const { pageList } = storeToRefs(useAppStore())
+
+onMounted(() => {
+  loading && window.$loadingBar?.start()
 })
 
-const styleVal = ref(`background: url('${bannerImg}') center center / cover no-repeat;`)
+watch(() => loading, (newVal) => {
+  newVal
+    ? window.$loadingBar?.start()
+    : window.$loadingBar?.finish()
+})
 
-const route = useRoute()
+// 根据后端配置动态获取封面
+const coverStyle = computed(() => {
+  const page = pageList.value.find(e => e.label === label)
+  return page
+    ? `background: url('${page?.cover}') center center / cover no-repeat;`
+    : 'background: url("https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg") center center / cover no-repeat;'
+})
 </script>
 
 <template>
   <!-- 顶部图片 -->
   <div
-    :style="styleVal"
+    :style="coverStyle"
     absolute inset-x-0 top-0 h-400
     flex items-center justify-center
     class="banner-fade-down"
   >
     <h1 text-40 font-bold text-light>
-      {{ title || route.meta?.title }}
+      {{ title }}
     </h1>
   </div>
   <!-- 主体内容 -->
@@ -47,7 +59,6 @@ const route = useRoute()
         mt-440 mb-40 mx-auto
         class="card-fade-up"
       >
-        <!-- <n-skeleton v-if="loading" :height="100" width="100%" /> -->
         <slot v-if="!loading" />
       </n-card>
     </n-spin>
@@ -57,6 +68,3 @@ const route = useRoute()
     <AppFooter />
   </footer>
 </template>
-
-<style lang="scss" scoped>
-</style>

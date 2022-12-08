@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
+import { convertImgUrl, formatDate } from '@/utils'
 const { recommendList = [] } = defineProps<{ recommendList: any }>()
 </script>
 
@@ -15,14 +14,14 @@ const { recommendList = [] } = defineProps<{ recommendList: any }>()
           <router-link :to="`/article/${item.id}`">
             <div relative f-c-c h-200 bg-black overflow-hidden rounded-2>
               <img
-                :src="item.img"
+                :src="convertImgUrl(item.img)"
                 class="art-img"
                 transition-600 opacity-40 wh-full
               >
               <div absolute text-white text-center>
                 <p>
                   <i-mdi:calendar text-16 />
-                  {{ dayjs(item.created_at).format('YYYY-MM-DD') }}
+                  {{ formatDate(item.created_at) }}
                 </p>
                 <p> {{ item.title }} </p>
               </div>

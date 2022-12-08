@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
+import { formatDate } from '@/utils'
 import api from '@/api'
 
 const router = useRouter()
 
-const loading = ref(true)
-const archiveList = ref<any>([])
-const total = ref(0)
+let loading = $ref(true)
+let total = $ref(0)
+let archiveList = $ref<any>([])
 
 const current = ref(1) // 当前页数
 watch(current, () => getArchives())
 
 function getArchives() {
   api.getArchives({ page_num: current.value, page_size: 10 }).then((res) => {
-    archiveList.value = res.data.pageData
-    total.value = res.data.total
-    loading.value = false
+    archiveList = res.data.pageData
+    total = res.data.total
+    loading = false
   })
 }
 
@@ -26,9 +26,9 @@ onMounted(() => {
 
 <template>
   <BannerCard
-    :loading="loading"
     title="归档"
-    banner-img="https://static.talkxj.com/config/643f28683e1c59a80ccfc9cb19735a9c.jpg"
+    label="archive"
+    :loading="loading"
   >
     <n-timeline :icon-size="20" size="large">
       <n-timeline-item>
@@ -42,7 +42,7 @@ onMounted(() => {
         <n-timeline-item type="info" :content="item.desc">
           <template #header>
             <span color="#666" text-15 mr-15>
-              {{ dayjs(item.created_at).format("YYYY-MM-DD") }}
+              {{ formatDate(item.created_at) }}
             </span>
             <button color="#666" text-18 @click="router.push(`/article/${item.id}`)">
               {{ item.title }}

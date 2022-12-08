@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import api from '@/api'
 
-const loading = ref(true)
-const categoryList = ref<any>([])
+let loading = $ref(true)
+let categoryList = $ref<any>([])
+
 onMounted(() => {
   api.getCategorys().then((res) => {
-    categoryList.value = res.data.list
-    loading.value = false
+    categoryList = res.data.list
+    loading = false
   })
 })
 </script>
 
 <template>
-  <BannerCard
-    :loading="loading"
-    title="分类"
-    banner-img="https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg"
-  >
+  <BannerCard :loading="loading" title="分类" label="category">
     <h2 text-center text-36 leading-20 mb-6rem>
       分类 - {{ categoryList.length }}
     </h2>

@@ -14,7 +14,7 @@ type Tag struct{}
 // 新增 / 修改
 func (*Tag) SaveOrUpdate(req req.AddOrEditTag) int {
 	// 检查标签名称是否已经存在
-	exist := dao.GetOne(model.Tag{}, "name = ?", req.Name)
+	exist := dao.GetOne(model.Tag{}, "name", req.Name)
 	if !exist.IsEmpty() && exist.ID != req.ID {
 		return r.ERROR_TAG_EXIST
 	}

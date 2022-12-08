@@ -1,4 +1,4 @@
-import { decrypto, encrypto } from '@/utils/common'
+import { decrypto, encrypto } from '@/utils'
 
 export function setSession(key: string, value: unknown) {
   const json = encrypto(value)

@@ -1,7 +1,7 @@
 <script setup>
 import { NButton, NPopconfirm, NSwitch } from 'naive-ui'
 import TheIcon from '@/components/icon/TheIcon.vue'
-import { formatDateTime, renderIcon } from '@/utils'
+import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import api from '@/api'
 
@@ -90,7 +90,7 @@ const columns = [
     key: 'created_at',
     width: 70,
     render(row) {
-      return h('span', formatDateTime(row.created_at, 'YYYY-MM-DD'))
+      return h('span', formatDate(row.created_at))
     },
   },
   {

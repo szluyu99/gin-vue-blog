@@ -8,30 +8,30 @@ import '@kangc/v-md-editor/lib/theme/style/github.css'
 // markdown 高亮
 import hljs from 'highlight.js'
 
+import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 import { useAppStore } from '@/store'
-const { blogInfo } = storeToRefs(useAppStore())
+const { blogConfig } = storeToRefs(useAppStore())
 
 VMdPreview.use(githubTheme, { Hljs: hljs })
 
-const aboutContent = ref('')
-onMounted(() => {
-  api.about().then((res) => {
-    aboutContent.value = res.data
-  })
+let content = $ref('')
+onMounted(async () => {
+  const res = await api.about()
+  content = res.data
 })
 </script>
 
 <template>
-  <BannerCard banner-img="https://static.talkxj.com/config/2a56d15dd742ff8ac238a512d9a472a1.jpg">
+  <BannerCard label="about" title="关于我">
     <div text-center>
       <n-image
         width="110"
-        :src="blogInfo.blog_config?.website_avatar"
+        :src="convertImgUrl(blogConfig.website_avatar)"
         duration-600 hover-rotate-360
       />
-      <VMdPreview ref="preview" :text="aboutContent" />
+      <VMdPreview :text="content" />
     </div>
   </BannerCard>
 </template>

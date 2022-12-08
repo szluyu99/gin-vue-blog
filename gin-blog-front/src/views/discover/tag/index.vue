@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import api from '@/api'
 
-const loading = ref(true)
-const tagList = ref<any>({})
+let loading = $ref(true)
+let tagList = $ref<any>({})
+
 onMounted(() => {
   api.getTags().then((res) => {
-    tagList.value = res.data.list
-    loading.value = false
+    tagList = res.data.list
+    loading = false
   })
 })
 
@@ -21,11 +22,7 @@ function randomColorHex() {
 </script>
 
 <template>
-  <BannerCard
-    :loading="loading"
-    title="标签"
-    banner-img="https://static.talkxj.com/config/a6f141372509365891081d755da963a1.png"
-  >
+  <BannerCard :loading="loading" title="标签" label="tag">
     <h2 text-center text-36 leading-20 mb-8rem>
       标签 - {{ tagList.length }}
     </h2>

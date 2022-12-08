@@ -21,6 +21,7 @@ var (
 	menuAPI         v1.Menu         // 菜单
 	blogInfoAPI     v1.BlogInfo     // 博客设置
 	operationLogAPI v1.OperationLog // 操作日志
+	pageAPI         v1.Page
 
 	// store redis.Store // 使用 redis 作为 session 的存储引擎
 )

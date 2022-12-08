@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
+import { formatDate } from '@/utils'
 interface Props { article: any }
 const { article } = defineProps<Props>()
 
@@ -28,9 +28,9 @@ function deleteHTMLTag(str: string) {
       {{ article.title }}
     </h1>
     <p flex items-center justify-center py-8>
-      <i-mdi:calendar text-18 mr-3 /> 发布于 {{ dayjs(article.created_at).format('YYYY-MM-DD') }}
+      <i-mdi:calendar text-18 mr-3 /> 发布于 {{ formatDate(article.created_at) }}
       <span px-6>|</span>
-      <i-mdi:update text-18 mr-3 /> 更新于 {{ dayjs(article.updated_at).format('YYYY-MM-DD') }}
+      <i-mdi:update text-18 mr-3 /> 更新于 {{ formatDate(article.updated_at) }}
       <span px-6>|</span>
       <router-link :to="`/categories/${article.category.id}`" flex items-center>
         <i-material-symbols:menu text-18 mr-3 /> {{ article.category.name }}

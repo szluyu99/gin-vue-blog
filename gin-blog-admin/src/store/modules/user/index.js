@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { resetRouter } from '@/router'
-import { removeToken, toLogin } from '@/utils'
+import { convertImgUrl, removeToken, toLogin } from '@/utils'
 import { usePermissionStore, useTagsStore } from '@/store'
 import api from '@/api'
 
+// 用户全局变量
 export const useUserStore = defineStore('user', {
   state() {
     return {
@@ -11,24 +12,11 @@ export const useUserStore = defineStore('user', {
     }
   },
   getters: {
-    userId() {
-      return this.userInfo.id
-    },
-    nickname() {
-      return this.userInfo.nickname
-    },
-    avatar() {
-      const SERVER_URL = 'http://localhost:8765/'
-      if (this.userInfo.avatar.startsWith('http'))
-        return this.userInfo.avatar
-      return `${SERVER_URL}${this.userInfo.avatar}`
-    },
-    intro() {
-      return this.userInfo.intro
-    },
-    website() {
-      return this.userInfo.website
-    },
+    userId: state => state.userInfo.id,
+    nickname: state => state.userInfo.nickname,
+    intro: state => state.userInfo.intro,
+    website: state => state.userInfo.website,
+    avatar: state => convertImgUrl(state.userInfo.avatar),
   },
   actions: {
     // 获取用户信息
@@ -48,7 +36,7 @@ export const useUserStore = defineStore('user', {
         this.userInfo[key] = user[key]
       })
     },
-    // 退出登录: 主动行为, 需要调用退出登录接口
+    // * 退出登录: 主动行为, 需要调用退出登录接口
     async logout() {
       // * 必须先调用退出登录接口, 再清除本地 Token, 因为退出登录接口需要 Token
       await api.logout()
@@ -62,7 +50,7 @@ export const useUserStore = defineStore('user', {
 
       toLogin()
     },
-    // 被强制退出: 被动行为, 不需要调用退出登录接口
+    // * 被强制退出: 被动行为, 不需要调用退出登录接口
     async forceOffline() {
       window.$message.error('您已经被强制下线!')
       removeToken()
