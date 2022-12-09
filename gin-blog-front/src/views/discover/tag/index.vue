@@ -22,7 +22,7 @@ function randomColorHex() {
 </script>
 
 <template>
-  <BannerCard :loading="loading" title="标签" label="tag">
+  <BannerPage :loading="loading" title="标签" label="tag" card>
     <h2 text-center text-36 leading-20 mb-8rem>
       标签 - {{ tagList.length }}
     </h2>
@@ -40,7 +40,7 @@ function randomColorHex() {
         {{ t.name }}
       </router-link>
     </div>
-  </BannerCard>
+  </BannerPage>
 </template>
 
 <style lang="scss" scoped>

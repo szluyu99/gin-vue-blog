@@ -24,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <BannerCard label="about" title="关于我">
+  <BannerPage label="about" title="关于我" card>
     <div text-center>
       <n-image
         width="110"
@@ -33,5 +33,5 @@ onMounted(async () => {
       />
       <VMdPreview :text="content" />
     </div>
-  </BannerCard>
+  </BannerPage>
 </template>

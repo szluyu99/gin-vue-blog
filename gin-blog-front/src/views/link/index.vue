@@ -17,13 +17,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerCard :loading="loading" label="link" title="友情链接">
+  <BannerPage :loading="loading" label="link" title="友情链接" card>
     <!-- 友链列表 -->
     <LinkList :link-list="linkList" />
     <!-- 添加友链 -->
     <AddLink />
     <!-- 评论 -->
     <Comment mt-30 :type="2" />
-  </BannerCard>
+  </BannerPage>
 </template>
 

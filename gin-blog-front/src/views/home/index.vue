@@ -11,13 +11,13 @@ import TalkingCarousel from './components/TalkingCarousel.vue'
 
 import api from '@/api'
 
-const articleList = ref<any>([])
-const loading = ref(false)
+let articleList = $ref<any>([])
+let loading = $ref(false)
 
 // 无限加载文章
 const params = reactive({ page_size: 5, page_num: 1 }) // 列表加载参数
 const getArticlesInfinite = async ($state: any) => {
-  if (loading.value)
+  if (loading)
     return
 
   try {
@@ -30,7 +30,7 @@ const getArticlesInfinite = async ($state: any) => {
     }
 
     // 非首次加载, 都是往列表中添加数据
-    articleList.value.push(...res.data)
+    articleList.push(...res.data)
     params.page_num++
     $state.loaded()
   }
@@ -40,12 +40,12 @@ const getArticlesInfinite = async ($state: any) => {
 }
 
 onMounted(async () => {
-  loading.value = true
+  loading = true
   // 首次加载
   const res = await api.getArticles(params)
-  articleList.value = res.data
+  articleList = res.data
   params.page_num++
-  loading.value = false
+  loading = false
 })
 </script>
 

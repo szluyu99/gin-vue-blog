@@ -87,6 +87,7 @@ func FrontRouter() http.Handler {
 	// base.Use(middleware.RBAC()) // TODO: 前端不做权限
 	// base.Use(middleware.ListenOnline())
 	{
+		base.POST("/upload", uploadAPI.UploadFile)                  // 文件上传
 		base.GET("/user/info", userAPI.GetInfo)                     // 根据 Token 获取用户信息
 		base.PUT("/user/info", userAPI.UpdateCurrent)               // 根据 Token 更新当前用户信息
 		base.POST("/message", fMessageAPI.Save)                     // 前台新增留言

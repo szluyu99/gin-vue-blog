@@ -1,9 +1,12 @@
-import { createPinia } from 'pinia'
 import type { App } from 'vue'
+// https://github.com/prazdevs/pinia-plugin-persistedstate
+// pinia 数据持久化，解决刷新数据丢失的问题
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-// TODO: pinia 持久化
 export function setupStore(app: App) {
-  app.use(createPinia())
+  const pinia = createPinia()
+  pinia.use(piniaPluginPersistedstate)
+  app.use(pinia)
 }
 
 export * from './modules'

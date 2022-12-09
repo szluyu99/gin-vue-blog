@@ -13,7 +13,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerCard :loading="loading" title="分类" label="category">
+  <BannerPage :loading="loading" title="分类" label="category" card>
     <h2 text-center text-36 leading-20 mb-6rem>
       分类 - {{ categoryList.length }}
     </h2>
@@ -30,7 +30,7 @@ onMounted(() => {
         <span ml-5 text-4xl text-gray> ({{ c.article_count ?? 0 }}) </span>
       </li>
     </ul>
-  </BannerCard>
+  </BannerPage>
 </template>
 
 <style lang="scss" scoped>

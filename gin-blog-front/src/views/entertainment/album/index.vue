@@ -3,7 +3,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <BannerCard label="album">
+  <BannerPage label="album" card>
     <n-result
       status="403"
       title="403 禁止访问"
@@ -15,5 +15,5 @@ const router = useRouter()
         </n-button>
       </template>
     </n-result>
-  </BannerCard>
+  </BannerPage>
 </template>

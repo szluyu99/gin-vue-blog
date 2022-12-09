@@ -18,6 +18,7 @@ specifiers:
   eslint: ^8.28.0
   naive-ui: ^2.34.1
   pinia: ^2.0.25
+  pinia-plugin-persistedstate: ^3.0.1
   pnpm: ^7.17.0
   sass: ^1.56.1
   taze: ^0.8.4
@@ -45,6 +46,7 @@ dependencies:
   crypto-js: registry.npmmirror.com/crypto-js/4.1.1
   dayjs: registry.npmmirror.com/dayjs/1.11.6
   pinia: registry.npmmirror.com/pinia/2.0.25_mgnvym7yiazkylwwogi5r767ue
+  pinia-plugin-persistedstate: registry.npmmirror.com/pinia-plugin-persistedstate/3.0.1_pinia@2.0.25
   v3-infinite-loading: registry.npmmirror.com/v3-infinite-loading/1.2.2
   vue: registry.npmmirror.com/vue/3.2.45
   vue-router: registry.npmmirror.com/vue-router/4.1.6_vue@3.2.45
@@ -6427,6 +6429,17 @@ packages:
     name: pify
     version: 4.0.1
     engines: {node: '>=6'}
+    dev: false
+
+  registry.npmmirror.com/pinia-plugin-persistedstate/3.0.1_pinia@2.0.25:
+    resolution: {integrity: sha512-WRNWtR4v8StJqBQH+Qiz88SGnlr4wvEyh7wtA+fYEVLoIOnpZ0v4FICvUcC8eUkAIvQL3n6/Ew2yryw7okazvA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/pinia-plugin-persistedstate/-/pinia-plugin-persistedstate-3.0.1.tgz}
+    id: registry.npmmirror.com/pinia-plugin-persistedstate/3.0.1
+    name: pinia-plugin-persistedstate
+    version: 3.0.1
+    peerDependencies:
+      pinia: ^2.0.0
+    dependencies:
+      pinia: registry.npmmirror.com/pinia/2.0.25_mgnvym7yiazkylwwogi5r767ue
     dev: false
 
   registry.npmmirror.com/pinia/2.0.25_mgnvym7yiazkylwwogi5r767ue:

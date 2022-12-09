@@ -19,24 +19,12 @@ export const useUserStore = defineStore('user', {
     }
   },
   getters: {
-    userId(): string {
-      return this.userInfo.id || ''
-    },
-    nickname(): string {
-      return this.userInfo.nickname || ''
-    },
-    avatar(): string {
-      return this.userInfo.avatar || 'https://static.talkxj.com/avatar/user.png' // 默认头像
-    },
-    website(): string {
-      return this.userInfo.website || ''
-    },
-    intro(): string {
-      return this.userInfo.intro || ''
-    },
-    email(): string {
-      return this.userInfo.email || ''
-    },
+    userId: state => state.userInfo.id ?? '',
+    nickname: state => state.userInfo.nickname ?? '',
+    avatar: state => state.userInfo.avatar ?? 'https://static.talkxj.com/avatar/user.png',
+    website: state => state.userInfo.website ?? '',
+    intro: state => state.userInfo.intro ?? '',
+    email: state => state.userInfo.email ?? '',
     articleLikeSet(): [number?] {
       return this.userInfo.articleLikeSet || []
     },
@@ -81,9 +69,6 @@ export const useUserStore = defineStore('user', {
     async logout() {
       removeToken() // 删除 token
       this.$reset()
-    },
-    setUserInfo(userInfo = {}) {
-      this.userInfo = { ...this.userInfo, ...userInfo }
     },
     // 维护评论点赞
     // TODO: 如果点赞完每次都 getUserInfo 也可以, 会不会调用后台接口太频繁?

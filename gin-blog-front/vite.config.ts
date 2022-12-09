@@ -1,10 +1,17 @@
 import path from 'path'
-import { defineConfig } from 'vite'
+import type { ConfigEnv } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+import { convertEnv } from './build/utils'
+import { createViteProxy } from './build/config'
 import { setupVitePlugins } from './build/plugins'
 
-export default defineConfig(() => {
+export default defineConfig((configEnv: ConfigEnv) => {
+  // 从环境变量中加载值
+  const viteEnv = convertEnv(loadEnv(configEnv.mode, process.cwd()))
+  const { VITE_PORT, VITE_PUBLIC_PATH, VITE_USE_PROXY, VITE_PROXY_TYPE } = viteEnv
+
   return {
-    base: '/',
+    base: VITE_PUBLIC_PATH,
     resolve: {
       alias: {
         '@': path.resolve(path.resolve(process.cwd()), 'src'),
@@ -14,20 +21,11 @@ export default defineConfig(() => {
     plugins: setupVitePlugins(),
     server: {
       host: '0.0.0.0',
+      port: VITE_PORT,
       open: false,
-      hmr: {
-        overlay: false,
-      },
       // 后端可以解决, 前端就不用设置代理
       // 设置代理后 .env 文件中的 VITE_API 得切换
-      // proxy: {
-      //   '/api/front': {
-      //     target: 'http://47.103.138.81/api/front', // 线上环境
-      //     target: 'http://localhost:5678/api/front', // 本地环境
-      //     changeOrigin: true,
-      //     rewrite: path => path.replace(/^\/api\/front/, ''),
-      //   },
-      // },
+      proxy: createViteProxy(VITE_USE_PROXY, VITE_PROXY_TYPE as ProxyType),
     },
     optimizeDeps: {
       include: ['@kangc/v-md-editor/lib/theme/vuepress.js'],

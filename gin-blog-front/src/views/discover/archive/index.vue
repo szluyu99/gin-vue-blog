@@ -25,10 +25,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerCard
+  <BannerPage
     title="归档"
     label="archive"
     :loading="loading"
+    card
   >
     <n-timeline :icon-size="20" size="large">
       <n-timeline-item>
@@ -63,7 +64,7 @@ onMounted(() => {
         total-visible="6"
       />
     </n-timeline>
-  </BannerCard>
+  </BannerPage>
 </template>
 
 <style lang="scss" scoped>

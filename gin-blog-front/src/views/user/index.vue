@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import api from '@/api'
-import { convertImgUrl } from '@/utils'
+import UploadOne from '@/components/upload/UploadOne.vue'
+
 import { useUserStore } from '@/store'
+import api from '@/api'
+
 const userStore = useUserStore()
 
 const infoForm = $ref<any>({
@@ -11,11 +13,6 @@ const infoForm = $ref<any>({
   website: userStore.website,
   email: userStore.email,
 })
-
-function uploadAvatar() {
-  window.$message?.info('头像上传开发中...')
-}
-
 async function updateUserInfo() {
   try {
     await api.updateUser(infoForm)
@@ -29,18 +26,16 @@ async function updateUserInfo() {
 </script>
 
 <template>
-  <BannerCard label="user" title="个人中心">
+  <BannerPage label="user" title="个人中心" card>
     <p text-24 font-bold>
       基本信息
     </p>
     <n-grid x-gap="15" cols="12">
       <n-gi span="4" f-c-c>
-        <n-image
-          :src="convertImgUrl(infoForm.avatar)"
-          width="140"
-          preview-disabled
-          rounded-full
-          @click="uploadAvatar"
+        <UploadOne
+          v-model:preview="infoForm.avatar"
+          :width="140"
+          @finish="val => (infoForm.avatar = val)"
         />
       </n-gi>
       <n-gi span="7">
@@ -77,5 +72,5 @@ async function updateUserInfo() {
         </v-btn>
       </n-gi>
     </n-grid>
-  </BannerCard>
+  </BannerPage>
 </template>
