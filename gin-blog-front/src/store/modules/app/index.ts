@@ -37,12 +37,15 @@ export const useAppStore = defineStore('app', {
   persist: true, // pinia 持久化插件
   state() {
     return {
+      // mobileFlag: false, // 是否是移动端
       reloadFlag: true,
 
       searchFlag: false, // 搜索
       loginFlag: false, // 登录
       registerFlag: false, // 注册
       forgetFlag: false, // 忘记密码
+
+      collapsed: false, // 侧边栏折叠 (移动端)
 
       // TODO: 将变量拆分开来
       blogInfo: <BlogInfo>{
@@ -55,13 +58,19 @@ export const useAppStore = defineStore('app', {
     }
   },
   getters: {
+    // 是否是移动端
+    isMobile: () => !!navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i),
     articleCount: state => state.blogInfo.article_count ?? 0,
     categoryCount: state => state.blogInfo.category_count ?? 0,
     tagCount: state => state.blogInfo.tag_count ?? 0,
+    viewCount: state => state.blogInfo.view_count ?? 0,
     pageList: state => state.blogInfo.page_list ?? [], // 页面列表
     blogConfig: state => state.blogInfo.blog_config, // 博客信息
   },
   actions: {
+    setCollapsed(flag: boolean) {
+      this.collapsed = flag
+    },
     setLoginFlag(flag: boolean) {
       this.loginFlag = flag
     },
@@ -74,6 +83,10 @@ export const useAppStore = defineStore('app', {
     setSearchFlag(flag: boolean) {
       this.searchFlag = flag
     },
+    // 判断当前是否是移动端
+    // isMobile() {
+    //   return navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+    // },
     async reloadPage() {
       window.$loadingBar?.start()
       this.reloadFlag = false
@@ -92,6 +105,8 @@ export const useAppStore = defineStore('app', {
           this.blogInfo = res.data
           // 处理 page 的 cover 路径
           this.blogInfo.page_list?.map(e => e.cover = convertImgUrl(e.cover))
+          // 处理 website_author
+          this.blogInfo.blog_config.website_avatar = convertImgUrl(this.blogInfo.blog_config.website_avatar)
         }
         else { return Promise.reject(res) }
       }

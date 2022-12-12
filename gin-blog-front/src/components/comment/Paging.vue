@@ -8,29 +8,33 @@ const { pageTotal = 0, index, commentId }
 
 const emit = defineEmits(['changeCurrent'])
 
-const show = ref(false) // 是否显示分页
+let show = $ref(false) // 是否显示分页
 
 // 当前页数
-const current = ref(1)
+let current = $ref(1)
 // 计算属性传参: 判断当前页数是否激活
-const isActive = computed(() => (i: number) => (i === current.value))
+const isActive = computed(() => (i: number) => (i === current))
 // 上一页
 function prePage() {
-  current.value -= 1
-  emit('changeCurrent', current.value, index, commentId)
+  current -= 1
+  emit('changeCurrent', current, index, commentId)
 }
 // 下一页
 function nextPage() {
-  current.value += 1
-  emit('changeCurrent', current.value, index, commentId)
+  current += 1
+  emit('changeCurrent', current, index, commentId)
 }
 // 跳转指定页数
 function changeCurrent(i: number) {
-  current.value = i
-  emit('changeCurrent', current.value, index, commentId)
+  current = i
+  emit('changeCurrent', current, index, commentId)
 }
 
-defineExpose({ show, current })
+function setShow(flag: boolean) {
+  show = flag
+}
+
+defineExpose({ current, setShow })
 </script>
 
 <template>

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store'
-const { blogInfo } = storeToRefs(useAppStore())
+const { blogConfig } = storeToRefs(useAppStore())
 const articleHref = window.location.href
 </script>
 
 <template>
-  <div px-17 py-12 leading-30 text-16 border-1 border-dashed border-lightblue>
+  <div
+    px-17 py-12 leading-30 text-14
+    border-1 border-dashed border-lightblue
+    lg:text-15
+  >
+    <!-- TODO: 点击复制 -->
     <div relative>
       <div
         absolute right-0 top-0 w-16 h-16
@@ -13,7 +18,7 @@ const articleHref = window.location.href
       />
       <span color="#49b1f5" font-bold> 文章作者： </span>
       <router-link to="/" color="#99a9bf" class="!underline">
-        {{ blogInfo.blog_config?.website_author }}
+        {{ blogConfig.website_author }}
       </router-link>
     </div>
     <div>
@@ -28,7 +33,7 @@ const articleHref = window.location.href
         本博客所有文章除特别声明外，均采用
         <a
           href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"
-          color="#99a9bf" class="!underline"
+          color="#99a9bf" i_underline
         >
           CC BY-NC-SA 4.0
         </a>

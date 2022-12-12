@@ -7,14 +7,14 @@ import { setToken } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 const [appStore, userStore] = [useAppStore(), useUserStore()]
 
-const loginFlag = computed({
-  get: () => appStore.loginFlag,
-  set: val => appStore.setLoginFlag(val),
-})
-
 const registerFlag = computed({
   get: () => appStore.registerFlag,
   set: val => appStore.setRegisterFlag(val),
+})
+
+const loginFlag = computed({
+  get: () => appStore.loginFlag,
+  set: val => appStore.setLoginFlag(val),
 })
 
 interface LoginInfo {
@@ -22,7 +22,7 @@ interface LoginInfo {
   password: string
 }
 
-const formModel = ref<LoginInfo>({
+let formModel = $ref<LoginInfo>({
   username: '',
   password: '',
 })
@@ -31,7 +31,7 @@ const rules = {}
 
 // 登录
 async function handleLogin() {
-  const { username, password } = formModel.value
+  const { username, password } = formModel
   if (!username || !password) {
     window.$message?.warning('请输入用户名和密码')
     return
@@ -40,13 +40,13 @@ async function handleLogin() {
   const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
     if (res.ret === 0) {
       // 登录
-      const res: any = await api.login(formModel.value)
+      const res: any = await api.login(formModel)
       window.$notification?.success({ title: '登录成功!', duration: 1500 })
       setToken(res.data.token) // 保存在本地
       // 加载用户信息, 更新 pinia 中信息, 刷新页面
       await userStore.getUserInfo()
       // 清空表单
-      formModel.value = { username: '', password: '' }
+      formModel = { username: '', password: '' }
 
       loginFlag.value = false
     }
@@ -56,8 +56,8 @@ async function handleLogin() {
 
 // 立即注册
 function openRegister() {
-  loginFlag.value = false
   registerFlag.value = true
+  loginFlag.value = false
 }
 
 // TODO:忘记密码
@@ -72,36 +72,25 @@ function openForget() {
     display-directive="show"
     preset="card"
     title="登录"
-    :block-scroll="false"
+    :block-scroll="appStore.isMobile"
     transform-origin="center"
-    w-460 px-10
+    px-10 w-370
+    lg="w-460"
   >
-    <!-- <v-form ref="form">
-      <v-text-field
-        v-model="formModel.username"
-        label="邮箱号"
-        clearable
-        variant="underlined"
-        required
-      />
-      <v-text-field
-        v-model="formModel.password"
-        type="password"
-        label="密码"
-        clearable
-        variant="underlined"
-        required
-      />
-    </v-form> -->
     <n-form
       :model="formModel"
       :rules="rules"
       label-placement="left"
-      label-width="auto"
+      label-width="70"
       require-mark-placement="right-hanging"
     >
       <n-form-item label="用户名" path="username">
-        <n-input v-model:value="formModel.username" placeholder="用户名" clearable />
+        <n-input
+          v-model:value="formModel.username"
+          placeholder="用户名"
+          size="large"
+          clearable
+        />
       </n-form-item>
       <n-form-item label="密码" path="password">
         <n-input
@@ -109,6 +98,7 @@ function openForget() {
           type="password"
           show-password-on="click"
           placeholder="密码"
+          size="large"
           clearable
         />
       </n-form-item>

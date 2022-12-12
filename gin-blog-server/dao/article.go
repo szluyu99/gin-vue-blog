@@ -71,14 +71,15 @@ func (*Article) GetFrontList(req req.GetFrontArts) ([]resp.FrontArticleVO, int64
 
 	db := DB.Table("article").
 		Select("id, title, content, img, type, is_top, created_at, category_id").
-		Where("is_delete = 0 AND status = 1").
-		Count(&total)
+		Where("is_delete = 0 AND status = 1")
 	if req.CategoryId != 0 {
 		db = db.Where("category_id", req.CategoryId)
 	}
 	if req.TagId != 0 {
 		db = db.Where("id IN (SELECT article_id FROM article_tag WHERE tag_id = ?)", req.TagId)
 	}
+
+	db.Count(&total)
 	db.Preload("Tags").
 		Preload("Category").
 		Order("is_top DESC, id DESC").

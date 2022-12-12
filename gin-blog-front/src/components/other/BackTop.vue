@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useWindowScroll } from '@vueuse/core'
 
-const isShowStyle = ref('')
+let isShowStyle = $ref('')
 
-const { y } = useWindowScroll()
-watch(y, () => {
-  isShowStyle.value = (y.value > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
+const { y } = $(useWindowScroll())
+watch($$(y), () => {
+  isShowStyle = (y > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
 })
 
 function switchDark() {

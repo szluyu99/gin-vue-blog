@@ -11,32 +11,32 @@ const { type } = defineProps<{
   type: number // 评论类型: 1-文章, 2-友链
 }>()
 
-const [userStore, appStore, route] = [useUserStore(), useAppStore(), useRoute()]
+const [userStore, appStore] = [useUserStore(), useAppStore()]
 
 onMounted(() => {
   getComments()
 })
 
 // url 中存在 id 参数则为 topic_id, 否则为 0
-const topicId = +(route.params.id ?? 0)
+const topicId = +(useRoute().params.id ?? 0)
 
 // 加载评论
-const commentList = ref<any>([]) // 评论列表 (分页加载)
-const commentCount = ref(0) // 评论总数量
-const listLoading = ref(false) // 列表加载状态
+let commentList = $ref<any>([]) // 评论列表 (分页加载)
+let commentCount = $ref(0) // 评论总数量
+let listLoading = $ref(false) // 列表加载状态
 const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId }) // 加载评论的参数
 async function getComments() {
-  listLoading.value = true
+  listLoading = true
   try {
     const res = await api.getComments(params)
     // * 全局加载更多, 0.8s 延时
     setTimeout(() => {
       params.page_num === 1
-        ? commentList.value = res.data.pageData
-        : commentList.value.push(...res.data.pageData)
-      commentCount.value = res.data.total
+        ? commentList = res.data.pageData
+        : commentList.push(...res.data.pageData)
+      commentCount = res.data.total
       params.page_num++
-      listLoading.value = false
+      listLoading = false
     }, 800)
   }
   catch (err) {
@@ -50,44 +50,44 @@ function reloadComments() {
 }
 
 // * 解决新增评论后刷新数据, 点击回复的顺序错乱问题
-const refresh = ref(true) // 重新刷新整个评论列表
-watch(commentList, () => {
-  refresh.value = false
+let refresh = $ref(true) // 重新刷新整个评论列表
+watch($$(commentList), () => {
+  refresh = false
   nextTick(() => {
-    refresh.value = true
+    refresh = true
   })
 }, { deep: false }) // deep = false 防止 "查看更多" 时刷新整个数据
 
 // 回复相关
 // ! 可以获取 v-for 循环中的 DOM 数组
-const replyFieldRefs = ref<any>([])
+const replyFieldRefs = $ref<any>([])
 // 回复评论
 function replyComment(idx: number, obj: any) {
   // 关闭所有回复框
-  replyFieldRefs.value.forEach((e: any) => e.show = false)
+  replyFieldRefs.forEach((e: any) => e.setReply(false))
   // 打开当前点击的回复框
-  const curRef = replyFieldRefs.value[idx]
-  curRef.show = true
+  const curRef = replyFieldRefs[idx]
+  curRef.setReply(true)
   // * 将值传给回复框
   curRef.data.nickname = obj.nickname // 用户昵称
   curRef.data.reply_user_id = obj.user_id // 回复用户 id
-  curRef.data.parent_id = commentList.value[idx].id // 父评论 id
+  curRef.data.parent_id = commentList[idx].id // 父评论 id
 }
 
 // 提交回复后, 重新加载评论回复
-const pageRefs = ref<any>([]) // 分页
-const checkRefs = ref<any>([]) // 查看
+const pageRefs = $ref<any>([]) // 分页
+const checkRefs = $ref<any>([]) // 查看
 async function reloadReplies(idx: number) {
   const { data } = await api.getCommentReplies(
-    commentList.value[idx].id, { page_size: 5, page_num: pageRefs.value[idx].current },
+    commentList[idx].id, { page_size: 5, page_num: pageRefs[idx].current },
   )
   // * 局部更新某个评论的回复
-  commentList.value[idx].reply_vo_list = data
-  commentList.value[idx].reply_count++ // 数量 + 1
+  commentList[idx].reply_vo_list = data
+  commentList[idx].reply_count++ // 数量 + 1
   // 回复大于 5 条展示评论分页
-  commentList.value[idx].reply_count > 5 && (pageRefs.value[idx].show = true)
+  commentList[idx].reply_count > 5 && (pageRefs[idx].setShow(true))
   // 直接隐藏查看
-  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+  checkRefs[idx].style.display = 'none' // * dom 操作隐藏 "查看"
 }
 
 // "点击查看" 显示更多回复
@@ -98,16 +98,16 @@ async function checkReplies(idx: number, obj: any) {
   // 更新对应楼评论的回复列表
   obj.reply_vo_list = data
   // 超过 5 条数据显示分页
-  obj.reply_count > 5 && (pageRefs.value[idx].show = true)
+  obj.reply_count > 5 && (pageRefs[idx].setShow(true))
   // 隐藏 "点击查看"
-  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+  checkRefs[idx].style.display = 'none' // * dom 操作隐藏 "查看"
 }
 
 // 修改回复分页中当前页数
 async function changeReplyCurrent(pageNum: number, idx: number, commentId: number) {
   const { data } = await api.getCommentReplies(
     commentId, { page_num: pageNum, page_size: 5 })
-  commentList.value[idx].reply_vo_list = data
+  commentList[idx].reply_vo_list = data
 }
 
 // TODO: 点赞
@@ -138,9 +138,7 @@ async function likeComment(comment: any) {
 }
 
 // 判断当前用户是否点赞过该评论
-const isLike = computed(() => {
-  return (commentId: number) => userStore.commentLikeSet.includes(commentId)
-})
+const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(id))
 </script>
 
 <template>
@@ -313,16 +311,15 @@ const isLike = computed(() => {
         </div>
       </div>
       <!-- 加载更多 -->
-      <div f-c-c mt-10>
-        <v-btn
+      <div f-c-c m-15>
+        <n-button
           v-if="commentCount > commentList.length && !listLoading"
-          variant="tonal" color="info"
-          @click="getComments"
+          text @click="getComments"
         >
-          加载更多...
-        </v-btn>
+          点击加载更多...
+        </n-button>
         <div v-if="listLoading" animate-bounce>
-          <v-progress-circular color="green" indeterminate />
+          <n-spin size="small" />
         </div>
       </div>
     </div>

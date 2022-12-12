@@ -66,6 +66,11 @@ func (*Article) GetInfo(id int) resp.ArticleDetailVO {
 
 // TODO: 添加事务
 func (*Article) SaveOrUpdate(req req.SaveOrUpdateArt, userId int) (code int) {
+	// 设置默认图片 (blogConfig 中配置)
+	if req.Img == "" {
+		req.Img = blogInfoService.GetBlogConfig().ArticleCover // 设置默认图片
+	}
+
 	article := utils.CopyProperties[model.Article](req) // po -> vo
 	article.UserId = userId
 
@@ -73,11 +78,6 @@ func (*Article) SaveOrUpdate(req req.SaveOrUpdateArt, userId int) (code int) {
 	category := saveArticleCategory(req)
 	if !category.IsEmpty() {
 		article.CategoryId = category.ID
-	}
-
-	// 设置默认图片 (blogConfig 中配置)
-	if req.Img == "" {
-		req.Img = blogInfoService.GetBlogConfig().ArticleCover // 设置默认图片
 	}
 
 	// 先 添加/更新 文章, 可以获取到 ID
@@ -150,6 +150,8 @@ func (*Article) GetFrontInfo(c *gin.Context, id int) resp.FrontArticleDetailVO {
 	// 点赞量, 浏览量
 	article.ViewCount = utils.Redis.ZScore(KEY_ARTICLE_VIEW_COUNT, strconv.Itoa(id))
 	article.LikeCount = utils.Redis.HGet(KEY_ARTICLE_LIKE_COUNT, strconv.Itoa(id))
+	// 评论数量
+	article.CommentCount = int(commentDao.GetArticleCommentCount(id))
 	return article
 }
 

@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import AppSideBar from './AppSideBar.vue'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
-const [appStore, userStore, router, route] = [useAppStore(), useUserStore(), useRouter(), useRoute()]
+
+const [appStore, userStore] = [useAppStore(), useUserStore()]
+const [router, route] = [useRouter(), useRoute()]
 
 // 菜单项 TODO: 直接从路由中加载? 似乎不可行
 const menuOptions = [
@@ -59,17 +62,17 @@ const menuOptions = [
   },
 ]
 
-const navClass = ref('nav')
-const barShow = ref(true)
+let navClass = $ref('nav')
+let barShow = $ref(true)
 
 // * 监听 y 效果比添加 scroll 监听器效果更好
-const { y } = useWindowScroll()
-const preY = ref(0) // 记录上一次的 y 滚动距离
-watch(y, () => {
-  if (Math.abs(preY.value - y.value) >= 50) { // 小幅度滚动不进行操作
-    barShow.value = (y.value < preY.value)
-    navClass.value = (y.value > 60) ? 'nav-fixed' : 'nav'
-    preY.value = y.value
+const { y } = $(useWindowScroll()) // 通过 $() 解构 ref
+let preY = $ref(0) // 记录上一次的 y 滚动距离
+watch($$(y), () => {
+  if (Math.abs(preY - y) >= 50) { // 小幅度滚动不进行操作
+    barShow = (y < preY)
+    navClass = (y > 60) ? 'nav-fixed' : 'nav'
+    preY = y
   }
 })
 
@@ -80,17 +83,48 @@ function logout() {
   window.$notification?.success({ title: '退出登录成功!', duration: 1500 })
 }
 
-const blogTitle = import.meta.env.VITE_APP_TITLE
+// const blogTitle = import.meta.env.VITE_APP_TITLE
 </script>
 
 <template>
-  <!-- 顶部菜单 -->
+  <!-- 移动端顶部导航栏 -->
   <Transition name="slide-fade" appear>
-    <div v-if="barShow" :class="navClass" fixed z-11 inset-x-0 top-0 h-60>
-      <div h-full px-36 flex items-center justify-between>
+    <div
+      v-if="barShow" :class="navClass"
+      flex items-center justify-between fixed z-11 inset-x-0 top-0 h-60
+      px-16 py-10
+      lg:hidden
+    >
+      <!-- 左上角标题 -->
+      <router-link to="/" text-18 font-bold cursor-pointer>
+        {{ appStore.blogConfig.website_author }}
+      </router-link>
+      <!-- 右上角图标 -->
+      <div flex items-center>
+        <button mr-10 @click="appStore.setSearchFlag(true)">
+          <TheIcon icon="ic:round-search" :size="22" />
+        </button>
+        <button @click="appStore.setCollapsed(true)">
+          <TheIcon icon="ic:sharp-menu" :size="22" />
+        </button>
+      </div>
+    </div>
+  </Transition>
+  <!-- 侧边栏 -->
+  <AppSideBar />
+  <!-- 电脑端顶部导航栏 -->
+  <Transition name="slide-fade" appear>
+    <div
+      v-if="barShow" :class="navClass"
+      fixed z-11 inset-x-0 top-0 h-60
+      hidden lg:block
+    >
+      <div
+        h-full px-36 flex items-center justify-between
+      >
         <!-- 左上角标题 -->
         <router-link to="/" text-18 font-bold cursor-pointer>
-          {{ blogTitle }}
+          {{ appStore.blogConfig.website_author }}
         </router-link>
         <!-- 右上角菜单 -->
         <div flex items-center text-6xl>

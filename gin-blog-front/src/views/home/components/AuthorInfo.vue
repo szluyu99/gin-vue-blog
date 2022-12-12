@@ -10,7 +10,11 @@ function addToFavourites() {
 </script>
 
 <template>
-  <n-card hoverable size="small" text-center rounded-2rem animate-zoom-in>
+  <n-card
+    hoverable size="small"
+    text-center rounded-2rem animate-zoom-in
+    hidden lg:block
+  >
     <n-image
       width="110" :src="convertImgUrl(blogConfig.website_avatar)"
       duration-600 hover:rotate-360 py-15
@@ -55,11 +59,11 @@ function addToFavourites() {
       </button>
     </div>
     <!-- 社交信息 -->
-    <div flex justify-evenly text-24 my-15 px-40>
-      <a :href="blogConfig.qq" target="_blank">
-        <i-mdi:qqchat hover-text-red-500 />
+    <div text-24 my-15 px-40>
+      <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
+        <i-ant-design:qq-circle-filled hover-text-red-500 />
       </a>
-      <a :href="blogConfig.github" target="_blank">
+      <a :href="blogConfig.github" target="_blank" mx-20>
         <i-mdi:github hover:text-red-500 />
       </a>
       <a :href="blogConfig.gitee" target="_blank">

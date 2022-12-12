@@ -36,7 +36,7 @@ function openLogin() {
     display-directive="show"
     preset="card"
     title="忘记密码"
-    :block-scroll="false"
+    :block-scroll="appStore.isMobile"
     transform-origin="center"
     w-460 px-10
   >

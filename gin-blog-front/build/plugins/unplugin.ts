@@ -1,7 +1,7 @@
 // import DefineOptions from 'unplugin-vue-define-options/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-import { NaiveUiResolver, Vuetify3Resolver } from 'unplugin-vue-components/resolvers'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 /**
  * * unplugin-icons 插件，自动引入 iconify 图标
@@ -33,7 +33,7 @@ export default [
   }),
   // https://github.com/antfu/vite-plugin-components
   Components({
-    resolvers: [NaiveUiResolver(), IconsResolver(), Vuetify3Resolver()],
+    resolvers: [NaiveUiResolver(), IconsResolver()],
     dts: 'types/components.d.ts',
   }),
 ]

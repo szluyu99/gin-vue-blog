@@ -2,12 +2,10 @@
 // markdown 相关
 import VMdPreview from '@kangc/v-md-editor/lib/preview'
 import '@kangc/v-md-editor/lib/style/preview.css'
-// markdown 主题
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
 import '@kangc/v-md-editor/lib/theme/style/github.css'
-// markdown 高亮
 import hljs from 'highlight.js'
-// 子组件
+
 import BannerInfo from './components/BannerInfo.vue'
 import Copyright from './components/Copyright.vue'
 import LatestList from './components/LatestList.vue'
@@ -18,23 +16,21 @@ import Recommend from './components/Recommend.vue'
 import Catalogue from './components/Catalogue.vue'
 import Comment from '@/components/comment/Comment.vue'
 
-// api
+import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 VMdPreview.use(githubTheme, { Hljs: hljs })
 
-const route = useRoute()
-
-const styleVal = ref('background: rgba(0,0,0,0.1) center center / cover no-repeat;')
-
-const data = ref<any>({
+let data = $ref<any>({
+  id: 0,
   title: '',
   content: '',
   created_at: '',
   updated_at: '',
   like_count: 0,
   view_count: 0,
-  img: 'https://static.talkxj.com/articles/3dffb2fcbd541886616ab54c92570de3.jpg',
+  comment_count: 0,
+  img: '',
   newest_articles: [],
   tags: [],
   category: {},
@@ -44,62 +40,93 @@ const data = ref<any>({
 })
 
 // 文章内容
-const preview = ref<any>(null)
+const previewRef = $ref<any>(null)
+let loading = $ref(true)
 
-const loading = ref(true)
 onMounted(async () => {
   window.$loadingBar?.start()
-  api.getArticleDetail(+route.params.id).then((res) => {
-    data.value = res.data
-    styleVal.value = `background: url('${data.value.img}') center center / cover no-repeat;`
-  }).finally(() => {
-    loading.value = false
+  try {
+    const res = await api.getArticleDetail(+useRoute().params.id)
+    data = res.data
+  }
+  finally {
+    loading = false
     window.$loadingBar?.finish()
-  })
+  }
 })
+
+const styleVal = $computed(() =>
+  data.img
+    ? `background: url('${convertImgUrl(data.img)}') center center / cover no-repeat;`
+    : 'background: rgba(0,0,0,0.1) center center / cover no-repeat;',
+)
 </script>
 
 <template>
   <!-- 头部 -->
   <div
     :style="styleVal" class="banner-fade-down"
-    absolute inset-x-0 top-0 h-400 f-c-c
+    absolute inset-x-0 top-0 h-360 f-c-c
+    lg:h-400
   >
-    <!-- 头部信息 -->
     <BannerInfo v-if="!loading" :article="data" />
   </div>
   <!-- 主体内容 -->
   <main flex-1>
     <n-grid
       x-gap="15" cols="12"
-      max-w-1200 mt-475 mb-50 mx-auto px-5
+      max-w-1200 mt-380 mb-50 mx-auto px-5
       class="card-fade-up"
+      responsive="screen"
+      item-responsive
+      lg:mt-470
     >
-      <n-grid-item span="9">
+      <n-grid-item span="12 m:9">
         <n-card hoverable rounded-2rem>
           <!-- 文章内容 -->
-          <VMdPreview ref="preview" :text="data.content" />
+          <VMdPreview
+            ref="previewRef"
+            :text="data.content"
+            lg:mx-20
+          />
           <!-- 版权声明 -->
-          <Copyright mx-20 mb-20 />
+          <Copyright mb-20 lg:mx-20 />
           <!-- 标签、转发 -->
-          <Forward :tag-list="data.tags" />
+          <Forward
+            :tag-list="data.tags"
+            mb-50 lg:mx-20
+          />
           <!-- 点赞、打赏 -->
-          <Reward :article-id="data.id" :like-count="data.like_count" />
+          <Reward
+            :article-id="data.id"
+            :like-count="data.like_count"
+            mb-40
+          />
           <!-- 上一篇、下一篇 -->
-          <LastNext :last-article="data.last_article" :next-article="data.next_article" />
+          <LastNext
+            :last-article="data.last_article"
+            :next-article="data.next_article"
+            lg:mx-20
+          />
           <!-- 推荐文章 -->
-          <Recommend :recommend-list="data.recommend_articles" mx-20 mt-30 />
+          <Recommend
+            :recommend-list="data.recommend_articles"
+            mt-30 lg:mx-20
+          />
           <!-- 分隔线 -->
-          <hr mx-20 my-40 border-dashed border-2px border-color="#d2ebfd">
+          <hr
+            my-40 border-dashed border-2px border-color="#d2ebfd"
+            lg:mx-20
+          >
           <!-- 文章评论 -->
-          <Comment :type="1" mx-20 />
+          <Comment :type="1" lg:mx-20 />
         </n-card>
       </n-grid-item>
-      <n-grid-item span="3">
-        <div sticky top-20>
+      <n-grid-item span="0 m:3">
+        <div sticky top-20 hidden lg:block>
           <!-- 目录 -->
           <!-- TODO: v-if 的方法不太好, 想办法解决父组件接口获取数据, 子组件渲染问题 -->
-          <Catalogue v-if="!loading" :preview="preview" />
+          <Catalogue v-if="!loading" :preview="previewRef" />
           <!-- 最新文章 -->
           <LatestList :article-list="data.newest_articles" />
         </div>
@@ -111,3 +138,9 @@ onMounted(async () => {
     <AppFooter />
   </footer>
 </template>
+
+<style lang="scss">
+  .github-markdown-body {
+    padding: 0;
+  }
+</style>

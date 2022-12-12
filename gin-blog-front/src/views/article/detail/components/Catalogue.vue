@@ -8,14 +8,14 @@ onMounted(() => {
 })
 
 // 生成锚点目录
-const titles = ref<any>([])
+let titles = $ref<any>([])
 function buildAnchorTitles() {
   const anchors = preview.$el.querySelectorAll('h1,h2,h3,h4,h5,h6')
   const titleList = Array.from(anchors).filter((t: any) => !!t.innerText.trim())
   if (!titleList.length)
     return
   const hTags = Array.from(new Set(titleList.map((t: any) => t.tagName))).sort()
-  titles.value = titleList.map((el: any) => ({
+  titles = titleList.map((el: any) => ({
     title: el.innerText,
     lineIndex: el.getAttribute('data-v-md-line'),
     indent: hTags.indexOf(el.tagName),

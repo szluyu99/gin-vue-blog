@@ -13,6 +13,7 @@ const infoForm = $ref<any>({
   website: userStore.website,
   email: userStore.email,
 })
+
 async function updateUserInfo() {
   try {
     await api.updateUser(infoForm)
@@ -39,37 +40,28 @@ async function updateUserInfo() {
         />
       </n-gi>
       <n-gi span="7">
-        <v-text-field
-          v-model="infoForm.nickname"
-          label="昵称"
-          placeholder="请输入您的昵称"
-          variant="underlined"
-          mt-7
-        />
-        <v-text-field
-          v-model="infoForm.website"
-          label="个人网站"
-          placeholder="请输入个人网站"
-          variant="underlined"
-          mt-7
-        />
-        <v-text-field
-          v-model="infoForm.intro"
-          label="简介"
-          placeholder="介绍一下自己吧"
-          variant="underlined"
-          mt-7
-        />
-        <v-text-field
-          v-model="infoForm.email"
-          label="邮箱号"
-          disabled
-          variant="underlined"
-          mt-7
-        />
-        <v-btn variant="outlined" mt-15 @click="updateUserInfo">
+        <n-form
+          ref="infoFormRef"
+          label-align="left"
+          :label-width="80"
+          :model="infoForm"
+        >
+          <n-form-item label="昵称" path="nickname">
+            <n-input v-model:value="infoForm.nickname" placeholder="输入您的昵称" />
+          </n-form-item>
+          <n-form-item label="个人网站" path="website">
+            <n-input v-model:value="infoForm.website" placeholder="请输入个人网站" />
+          </n-form-item>
+          <n-form-item label="简介" path="intro">
+            <n-input v-model:value="infoForm.intro" placeholder="介绍一下自己吧" />
+          </n-form-item>
+          <n-form-item label="邮箱" path="email">
+            <n-input v-model:value="infoForm.email" placeholder="请输入邮箱号" disabled />
+          </n-form-item>
+        </n-form>
+        <n-button @click="updateUserInfo">
           修改
-        </v-btn>
+        </n-button>
       </n-gi>
     </n-grid>
   </BannerPage>

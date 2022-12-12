@@ -6,7 +6,7 @@ const route = useRoute()
 
 let loading = $ref(true)
 let articleList = $ref<any>([])
-let name = $ref('') // 标题上显示的 标签/分类 名称
+const name = $ref(route.query.name) // 标题上显示的 标签/分类 名称
 
 onMounted(async () => {
   const res = await api.getArticles({
@@ -14,10 +14,6 @@ onMounted(async () => {
     tag_id: route.params.tagId,
   })
   articleList = res.data
-  // TODO: 优化, 更好的做法?
-  if (route.meta?.title === '标签')
-    name = res.data[0].tags.find((e: any) => e.id === +route.params.tagId).name
-  else name = res.data[0].category.name
   loading = false
 })
 </script>
@@ -28,7 +24,7 @@ onMounted(async () => {
     :title="`${route.meta?.title} - ${name}`"
     label="article_list"
   >
-    <n-grid x-gap="15" y-gap="15" :cols="3">
+    <n-grid x-gap="15" y-gap="15" cols="1 m:3" responsive="screen">
       <n-gi v-for="article of articleList" :key="article.id">
         <!-- 卡片 -->
         <div

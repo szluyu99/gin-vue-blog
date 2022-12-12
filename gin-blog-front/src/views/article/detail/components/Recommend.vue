@@ -8,15 +8,20 @@ const { recommendList = [] } = defineProps<{ recommendList: any }>()
     <p mb-15 text-20 font-bold flex items-center>
       <i-mdi:thumb-up mr-5 text-24 text-orange /> 相关推荐
     </p>
-    <n-grid :cols="12" :x-gap="6" :y-gap="6">
+    <n-grid
+      :cols="12" :x-gap="6" :y-gap="6"
+      item-responsive responsive="screen"
+    >
       <template v-for="item of recommendList" :key="item.id">
-        <n-gi :span="4" class="art-card">
+        <n-gi span="12 m:4" class="art-card">
           <router-link :to="`/article/${item.id}`">
-            <div relative f-c-c h-200 bg-black overflow-hidden rounded-2>
+            <div
+              relative f-c-c bg-black overflow-hidden rounded-2
+              h-150 lg:h-200
+            >
               <img
                 :src="convertImgUrl(item.img)"
-                class="art-img"
-                transition-600 opacity-40 wh-full
+                class="art-img" transition-600 opacity-40 wh-full
               >
               <div absolute text-white text-center>
                 <p>

@@ -1,3 +1,3 @@
 export * from './crypto'
 export * from './icon'
-export * from './common'
+export * from './date'

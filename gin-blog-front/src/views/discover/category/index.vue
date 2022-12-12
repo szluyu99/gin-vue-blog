@@ -4,27 +4,28 @@ import api from '@/api'
 let loading = $ref(true)
 let categoryList = $ref<any>([])
 
-onMounted(() => {
-  api.getCategorys().then((res) => {
-    categoryList = res.data.list
-    loading = false
-  })
+onMounted(async () => {
+  const res = await api.getCategorys()
+  categoryList = res.data.list
+  loading = false
 })
 </script>
 
 <template>
   <BannerPage :loading="loading" title="分类" label="category" card>
-    <h2 text-center text-36 leading-20 mb-6rem>
+    <h2
+      text-center leading-20 mb-6rem text-25 mt-15
+      lg="text-36"
+    >
       分类 - {{ categoryList.length }}
     </h2>
-    <ul class="category-list">
+    <ul class="category-list" px-20>
       <li
-        v-for="c of categoryList"
-        :key="c.id"
+        v-for="c of categoryList" :key="c.id"
         class="category-list-item"
         cursor-pointer hover:text-violet
       >
-        <router-link :to="`categories/${c.id}`">
+        <router-link :to="`categories/${c.id}?name=${c.name}`">
           {{ c.name }}
         </router-link>
         <span ml-5 text-4xl text-gray> ({{ c.article_count ?? 0 }}) </span>

@@ -23,12 +23,15 @@ function randomColorHex() {
 
 <template>
   <BannerPage :loading="loading" title="标签" label="tag" card>
-    <h2 text-center text-36 leading-20 mb-8rem>
+    <h2
+      text-center leading-20 mb-8rem text-25 mt-15
+      lg="text-36"
+    >
       标签 - {{ tagList.length }}
     </h2>
     <div text-center>
       <router-link
-        v-for="t of tagList" :key="t.id" :to="`tags/${t.id}`"
+        v-for="t of tagList" :key="t.id" :to="`tags/${t.id}?name=${t.name}`"
         :style="{
           'font-size': `${randomFontSize()}px`,
           'color': `${randomColorHex()}`,

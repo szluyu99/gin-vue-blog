@@ -25,14 +25,16 @@ function handleSearch() {
     display-directive="show"
     preset="card"
     title="本地搜索"
-    :block-scroll="false"
     transform-origin="center"
-    max-w-600 px-10 h-full
+    :block-scroll="appStore.isMobile"
+    max-w-370 px-10 h-full
+    lg="max-w-600"
   >
     <n-input
       v-model:value="keyword"
       round
       placeholder="输入文章标题或内容..."
+      size="large"
       clearable
     >
       <template #prefix>

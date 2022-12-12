@@ -5,7 +5,7 @@ import api from '@/api'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 const userStore = useUserStore()
-const { pageList } = storeToRefs(useAppStore())
+const { pageList } = $(storeToRefs(useAppStore()))
 
 let content = $ref('')
 const showBtn = $ref(false)
@@ -43,11 +43,12 @@ async function send() {
 }
 
 // 注意 watch 第一个参数可以是函数, 由于用了 $ref, 直接写 isHide 不生效
-watch(() => isHide, val => val ? dmRef.hide() : dmRef.show())
+// 可以传函数 () => isHide, 或者用 $$(isHide) 保留对其 ref 的引用
+watch($$(isHide), val => val ? dmRef.hide() : dmRef.show())
 
 // 根据后端配置动态获取封面
 const coverStyle = computed(() => {
-  const page = pageList.value.find(e => e.label === 'message')
+  const page = pageList.find(e => e.label === 'message')
   return page
     ? `background: url('${page?.cover}') center center / cover no-repeat;`
     : 'background: url("https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg") center center / cover no-repeat;'
@@ -68,10 +69,11 @@ const coverStyle = computed(() => {
       border-1 rounded-10
       shadow-2xl
       absolute inset-x-1
-      w-430
       text-center text-light
       px-5 py-25
       mx-auto z-5
+      w-370
+      lg="w-430"
     >
       <h1 text-32 font-bold>
         留言板

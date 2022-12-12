@@ -4,15 +4,15 @@ import duration from 'dayjs/plugin/duration'
 import { useAppStore } from '@/store'
 
 dayjs.extend(duration)
-const { blogInfo } = storeToRefs(useAppStore())
+const { blogConfig, viewCount } = $(storeToRefs(useAppStore()))
 
 // 每秒刷新时间
-const runTime = ref('')
+let runTime = $ref('')
 
 // 每秒刷新当前时间
 setInterval(() => {
-  const createtime = dayjs(blogInfo.value.blog_config?.website_createtime)
-  runTime.value = dayjs.duration(dayjs().diff(createtime)).format('D 天 H 时 m 分 s 秒')
+  const createtime = dayjs(blogConfig.website_createtime)
+  runTime = dayjs.duration(dayjs().diff(createtime)).format('D 天 H 时 m 分 s 秒')
 }, 1000)
 </script>
 
@@ -20,6 +20,7 @@ setInterval(() => {
   <div
     bg-white p-15 rounded-2rem
     transition-600 hover:shadow-2xl animate-zoom-in
+    hidden lg:block
   >
     <p flex items-center>
       <i-icon-park:analysis mr-5 text-18 class="animate-bang" />
@@ -31,7 +32,7 @@ setInterval(() => {
     </p>
     <p text-14>
       <span> 总访问量： </span>
-      <span float-right> {{ blogInfo.view_count }} </span>
+      <span float-right> {{ viewCount }} </span>
     </p>
   </div>
 </template>

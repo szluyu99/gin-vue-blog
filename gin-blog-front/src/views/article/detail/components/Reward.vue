@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import api from '@/api'
 import { useAppStore, useUserStore } from '@/store'
+import api from '@/api'
 
-// props
 interface Props { articleId: number; likeCount: number }
 const { articleId, likeCount } = defineProps<Props>()
 
@@ -10,9 +9,9 @@ const { articleId, likeCount } = defineProps<Props>()
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
 // 点赞数量
-const count = ref(likeCount)
+let count = $ref(likeCount)
 // * 监听父组件传来的 likeCount, 不能直接用 props 中的值初始化 ref 变量
-watch(() => likeCount, newVal => count.value = newVal)
+watch($$(likeCount), newVal => count = newVal)
 
 async function likeArticle() {
   // 判断是否登录
@@ -24,11 +23,11 @@ async function likeArticle() {
     await api.saveLikeArticle(articleId)
     // 判断是否点赞
     if (userStore.articleLikeSet.includes(articleId)) {
-      count.value--
+      count--
       window.$message?.info('已取消')
     }
     else {
-      count.value++
+      count++
       window.$message?.success('已点赞')
     }
     // 维护全局状态中的点赞 Set
@@ -48,7 +47,7 @@ function rewardArticle() {
 </script>
 
 <template>
-  <div f-c-c mb-40 color="#fff">
+  <div f-c-c color="#fff">
     <button
       f-c-c py-6 mr-10 w-110 rounded-2
       :class="isLike ? 'bg-red' : 'bg-gray'"

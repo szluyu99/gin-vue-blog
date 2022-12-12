@@ -17,7 +17,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerPage :loading="loading" label="link" title="友情链接" card>
+  <BannerPage
+    label="link" title="友情链接" card
+    :loading="loading"
+  >
     <!-- 友链列表 -->
     <LinkList :link-list="linkList" />
     <!-- 添加友链 -->

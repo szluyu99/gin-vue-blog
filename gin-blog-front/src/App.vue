@@ -7,7 +7,7 @@ const [appStore, userStore] = [useAppStore(), useUserStore()]
 
 onMounted(() => {
   appStore.getBlogInfo()
-  userStore.getUserInfo() // FIXME: 解决 token 后台过期过快问题
+  userStore.getUserInfo()
 })
 
 // 禁止右键菜单

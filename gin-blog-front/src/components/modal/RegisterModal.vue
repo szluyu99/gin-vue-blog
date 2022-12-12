@@ -10,7 +10,7 @@ const registerFlag = computed({
   set: val => appStore.setRegisterFlag(val),
 })
 
-const formRef = ref({
+let formRef = $ref({
   username: '',
   password: '',
 })
@@ -19,7 +19,7 @@ const rules = {}
 
 // 注册
 async function handleRegister() {
-  const { username, password } = formRef.value
+  const { username, password } = formRef
   if (!username || !password) {
     window.$message?.warning('请输入用户名和密码')
     return
@@ -29,9 +29,9 @@ async function handleRegister() {
   const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
     if (res.ret === 0) {
       // 注册
-      await api.register(formRef.value)
+      await api.register(formRef)
       window.$notification?.success({ title: '注册成功!', duration: 1500 })
-      formRef.value = { username: '', password: '' }
+      formRef = { username: '', password: '' }
       // 打开登录弹窗
       openLogin()
     }
@@ -51,15 +51,16 @@ function openLogin() {
     display-directive="show"
     preset="card"
     title="注册"
-    :block-scroll="false"
+    :block-scroll="appStore.isMobile"
     transform-origin="center"
-    w-460 px-10
+    px-10 w-370
+    lg="w-460"
   >
     <n-form
       :model="formRef"
       :rules="rules"
       label-placement="left"
-      label-width="auto"
+      label-width="70"
       require-mark-placement="right-hanging"
     >
       <n-form-item label="用户名" path="username">

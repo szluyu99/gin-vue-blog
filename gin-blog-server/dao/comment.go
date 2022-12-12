@@ -121,3 +121,11 @@ func (*Comment) GetReplyListByCommentId(id int, req req.PageQuery) []resp.ReplyV
 		Find(&list)
 	return list
 }
+
+// 查询文章的评论数量
+func (*Comment) GetArticleCommentCount(articleId int) (count int64) {
+	DB.Model(&model.Comment{}).
+		Where("topic_id = ? AND type = 1 AND is_review = 1", articleId).
+		Count(&count)
+	return
+}

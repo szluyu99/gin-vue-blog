@@ -1,4 +1,4 @@
-import { getToken, removeToken } from '@/utils'
+import { convertImgUrl, getToken, removeToken } from '@/utils'
 import api from '@/api'
 
 interface UserInfo {
@@ -56,6 +56,7 @@ export const useUserStore = defineStore('user', {
             articleLikeSet: article_like_set.map((e: string) => +e), // 注意后端给的是字符串数组
             commentLikeSet: comment_like_set.map((e: string) => +e),
           }
+          this.userInfo.avatar = convertImgUrl(this.userInfo.avatar)
           return Promise.resolve(res.data)
         }
         else {

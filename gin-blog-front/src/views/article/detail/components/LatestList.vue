@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { convertImgUrl, formatDate } from '@/utils'
-
-interface Props { articleList: any }
-const { articleList = [] } = defineProps<Props>()
+const { articleList = [] } = defineProps<{ articleList: any }>()
 </script>
 
 <template>
   <n-card hoverable rounded-2rem>
     <div flex items-center>
-      <i-akar-icons:clock text-6xl /> <span text-16 ml-10>最新文章</span>
+      <i-akar-icons:clock text-6xl />
+      <span text-16 ml-10> 最新文章 </span>
     </div>
     <ul>
       <router-link

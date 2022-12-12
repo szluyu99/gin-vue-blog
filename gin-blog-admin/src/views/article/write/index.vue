@@ -34,6 +34,7 @@ const formRef = ref(null)
 const formModel = ref({
   status: 1, // 发布形式: 默认公开
   is_top: 0, // 默认不置顶
+  tag_names: [''],
 })
 const btnLoading = ref(false)
 const modalVisible = ref(false)
@@ -177,8 +178,8 @@ const rules = {
           >
             {{ tag }}
           </n-tag>
+          <!-- TODO: 最多选择三个标签 -->
           <n-popover
-            v-if="(formModel.tag_names.length < 3)"
             trigger="click"
             placement="bottom-start"
           >

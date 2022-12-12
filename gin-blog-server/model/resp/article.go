@@ -73,8 +73,9 @@ type FrontArticleDetailVO struct {
 	Type        int    `json:"type"`
 	OriginalUrl string `json:"original_url"`
 
-	LikeCount int `json:"like_count"` // 点赞
-	ViewCount int `json:"view_count"` // 访问
+	CommentCount int `json:"comment_count"` // 评论数量
+	LikeCount    int `json:"like_count"`    // 点赞数量
+	ViewCount    int `json:"view_count"`    // 访问数量
 
 	CategoryId int            `json:"category_id"`
 	Category   model.Category `gorm:"foreignkey:CategoryId;" json:"category"`

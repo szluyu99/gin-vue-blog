@@ -13,7 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(['afterSubmit']) // 调用父方法
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
-const show = ref(props.show) // 是否显示
+let show = $ref(props.show) // 是否显示
 const data = reactive({
   nickname: '', // * 回复用户, 不为空则说明是回复框
   content: '', // 回复内容
@@ -24,11 +24,11 @@ const data = reactive({
 })
 
 // 判断是回复还是评论: 存在 nickname 则是回复
-const isReply = computed(() => !!data.nickname)
+const isReply = $computed(() => !!data.nickname)
 
 // 取消评论
-function cancelReply() {
-  show.value = false
+function setReply(flag: boolean) {
+  show = flag
 }
 
 // 提交评论
@@ -45,10 +45,6 @@ async function submitComment() {
   }
 
   // TODO: 解析表情
-  // const reg = /\[.+?\]/g
-  // commentConent.value = commentConent.value.replace(reg, str =>
-  //   (`<img src= '${EmojiList[str]}' width='24'height='24' style='margin: 0 1px;vertical-align: text-bottom'/>`),
-  // )
 
   // 调用接口
   try {
@@ -56,7 +52,7 @@ async function submitComment() {
     window.$message?.info('评论成功')
     data.content = ''
 
-    isReply.value && cancelReply()
+    isReply && setReply(false)
     emit('afterSubmit') // 提交后调用刷新方法
   }
   catch (err) {
@@ -75,7 +71,7 @@ const placeholderText = computed(() =>
 )
 
 // 暴露给父组件, 可以在父组件中访问并修改
-defineExpose({ show, data })
+defineExpose({ data, setReply })
 </script>
 
 <template>
@@ -99,7 +95,7 @@ defineExpose({ show, data })
           <span
             v-if="data.nickname"
             btn bg-bluegray hover:bg-bluegray mr-15
-            @click="cancelReply"
+            @click="setReply(false)"
           > 取消 </span>
           <span btn @click="submitComment"> 提交 </span>
         </div>

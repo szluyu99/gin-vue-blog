@@ -20,6 +20,5 @@ export function decrypto(cipherText: string) {
   const originalText = bytes.toString(CryptoJS.enc.Utf8)
   if (originalText)
     return JSON.parse(originalText)
-
   return null
 }

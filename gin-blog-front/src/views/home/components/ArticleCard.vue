@@ -1,36 +1,42 @@
 <script setup lang="ts">
 import { convertImgUrl, formatDate } from '@/utils'
 
-interface Props {
-  idx?: number
-  article: any // TODO: 类型
-}
-
+interface Props { idx?: number; article: any }
 const { idx = 0, article } = defineProps<Props>()
 
 // 判断图片放置位置 (左 or 右)
-const isRightClass = computed(() => idx % 2 === 0 ? 'order-0 rounded-l-3xl' : 'order-1 rounded-r-3xl')
+const isRightClass = computed(() => idx % 2 === 0
+  ? 'rounded-t-3xl md:order-0 md:rounded-l-3xl md:rounded-tr-0'
+  : 'rounded-t-3xl md:order-1 md:rounded-r-3xl md:rounded-tl-0')
 </script>
 
 <template>
   <div
-    flex items-center mt-20
-    w-full h-280 bg-white rounded-2rem shadow-md
+    items-center mt-20
+    w-full bg-white rounded-2rem shadow-md
     transition-600 hover:shadow-2xl
     animate-zoom-in animate-duration-700
+    flex-col md:flex-row
+    h-430 md:h-280
   >
     <!-- 封面图 -->
-    <div :class="isRightClass" overflow-hidden h-full w="45/100">
+    <div
+      :class="isRightClass" overflow-hidden
+      h-230 w-full md:w="45/100" md:h-full
+    >
       <router-link :to="`/article/${article.id}`">
         <img wh-full transition-600 hover:scale-110 :src="convertImgUrl(article.img)">
       </router-link>
     </div>
     <!-- 文章信息 -->
-    <div px-45 w="55/100">
+    <div
+      mt-20 mb-10 w="9/10"
+      md:w="55/100" md:px-45
+    >
       <router-link :to="`/article/${article.id}`" text-8xl cursor-pointer hover:text-violet>
         《{{ article.title }}》
       </router-link>
-      <div flex pt-15 pb-12 color="#858585" text-14>
+      <div flex flex-wrap pt-15 pb-12 color="#858585" text-14>
         <!-- 置顶 -->
         <span v-if="article.is_top === 1" flex items-center color="#ff7242">
           <i-carbon:align-vertical-top mr-3 /> 置顶
@@ -55,7 +61,7 @@ const isRightClass = computed(() => idx % 2 === 0 ? 'order-0 rounded-l-3xl' : 'o
           <i-mdi-tag-multiple mr-2 /> {{ tag.name }}
         </router-link>
       </div>
-      <!-- TODO: 后端? 过滤 Markdown 符号 -->
+      <!-- TODO: 过滤 Markdown 符号 -->
       <div leading-25 class="ell-4">
         {{ article.content }}
       </div>

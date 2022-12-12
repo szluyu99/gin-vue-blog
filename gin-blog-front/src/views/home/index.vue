@@ -50,11 +50,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- 首页轮播图 -->
+  <!-- 首页封面图 -->
   <HomeBanner />
+  <!-- 内容 -->
   <div flex-col justify-center>
-    <div max-w-1200 mx-auto mb-40 style="margin-top: calc(100vh + 30px)">
-      <n-grid :x-gap="12" :y-gap="8" cols="12">
+    <div max-w-1230 mx-auto mb-40 px-15 style="margin-top: calc(100vh + 30px)">
+      <n-grid :x-gap="12" :y-gap="8" cols="9 m:12" responsive="screen">
         <n-grid-item span="9">
           <!-- 说说轮播 -->
           <TalkingCarousel />
@@ -72,7 +73,7 @@ onMounted(async () => {
               </template>
               <template #complete>
                 <span text-gray>
-                  没有更多文章啦!
+                  <!-- 没有更多文章啦! -->
                 </span>
               </template>
             </InfiniteLoading>

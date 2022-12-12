@@ -7,6 +7,7 @@ const { blogInfo } = storeToRefs(useAppStore())
   <div
     bg-white p-15 rounded-2rem
     transition-600 hover:shadow-2xl animate-zoom-in
+    hidden lg:block
   >
     <p mb-10 flex items-center>
       <i-fluent-emoji-flat:bell mr-6 text-20 class="animate-bang" />

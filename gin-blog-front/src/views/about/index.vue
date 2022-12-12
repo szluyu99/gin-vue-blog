@@ -8,7 +8,6 @@ import '@kangc/v-md-editor/lib/theme/style/github.css'
 // markdown 高亮
 import hljs from 'highlight.js'
 
-import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 import { useAppStore } from '@/store'
@@ -27,11 +26,14 @@ onMounted(async () => {
   <BannerPage label="about" title="关于我" card>
     <div text-center>
       <n-image
-        width="110"
-        :src="convertImgUrl(blogConfig.website_avatar)"
+        width="100"
+        :src="blogConfig.website_avatar"
         duration-600 hover-rotate-360
       />
       <VMdPreview :text="content" />
     </div>
   </BannerPage>
 </template>
+
+<style lang="scss">
+</style>
