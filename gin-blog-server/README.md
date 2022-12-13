@@ -62,3 +62,7 @@ PUT:
 ## 项目特色
 
 使用 RESTful API
+
+# Nginx 部署
+
+Nginx 配置 Https 参考: [Nginx 服务器 SSL 证书安装部署](https://cloud.tencent.com/document/product/400/35244)

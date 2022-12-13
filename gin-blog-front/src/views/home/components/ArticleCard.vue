@@ -48,14 +48,14 @@ const isRightClass = computed(() => idx % 2 === 0
         </span>
         <span mx-7>|</span>
         <!-- 分类 -->
-        <router-link :to="`/categories/${article.category_id}`" flex items-center>
+        <router-link :to="`/categories/${article.category_id}?name=${article.category.name}`" flex items-center>
           <i-mdi-inbox-full mr-3 /> {{ article.category.name }}
         </router-link>
         <span mx-7>|</span>
         <!-- 标签 -->
         <router-link
           v-for="tag in article.tags" :key="tag.id"
-          :to="`/tags/${tag.id}`"
+          :to="`/tags/${tag.id}?name=${tag.name}`"
           flex items-center mx-2
         >
           <i-mdi-tag-multiple mr-2 /> {{ tag.name }}

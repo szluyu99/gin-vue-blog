@@ -6,6 +6,7 @@ const route = useRoute()
 
 let loading = $ref(true)
 let articleList = $ref<any>([])
+
 const name = $ref(route.query.name) // 标题上显示的 标签/分类 名称
 
 onMounted(async () => {
@@ -57,7 +58,7 @@ onMounted(async () => {
                 <span text-16> {{ formatDate(article.created_at) }} </span>
               </span>
               <!-- 分类 -->
-              <router-link :to="`/categories/${article.category_id}`">
+              <router-link :to="`/categories/${article.category_id}?name=${article.category.name}`">
                 <div flex items-center text="#4c4948" hover:color-violet>
                   <i-ic:outline-bookmark text-20 mr-3 />
                   <span text-16> {{ article.category.name }} </span>
@@ -67,7 +68,7 @@ onMounted(async () => {
             <div border-1px h-1 my-5 rounded-1rem />
             <!-- 标签 -->
             <p px-15 pt-6 pb-10>
-              <router-link v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}`">
+              <router-link v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
                 <span
                   inline-block px-12 py-3 mr-3rem rounded-3rem text-white text-12 cursor-pointer
                   bg-gradient-to-r from-green-400 to-blue-500

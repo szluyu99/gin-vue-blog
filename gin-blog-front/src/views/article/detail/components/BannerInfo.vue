@@ -36,7 +36,7 @@ function deleteHTMLTag(str: string) {
       <span px-6>|</span>
       <i-mdi:update text-18 mr-3 /> 更新于 {{ formatDate(article.updated_at) }}
       <span px-6>|</span>
-      <router-link :to="`/categories/${article.category.id}`" f-c-c>
+      <router-link :to="`/categories/${article.category.id}?name=${article.category.name}`" f-c-c>
         <i-material-symbols:menu text-18 mr-3 /> {{ article.category.name }}
       </router-link>
     </p>
@@ -64,7 +64,7 @@ function deleteHTMLTag(str: string) {
       <i-mdi:update text-18 mr-3 /> 更新于 {{ formatDate(article.updated_at) }}
     </div>
     <div>
-      <router-link :to="`/categories/${article.category.id}`" mr-8>
+      <router-link :to="`/categories/${article.category.id}?name=${article.category.name}`" mr-8>
         <i-material-symbols:menu text-18 mr-3 /> {{ article.category.name }}
       </router-link>
 

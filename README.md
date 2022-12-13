@@ -24,26 +24,21 @@
 
 您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。
 
-
 Github地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
 
 Gitee地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
 
 ## 在线预览
 
-博客前台链接：[www.hahacode.cn](http://www.hahacode.cn)
+博客前台链接：[hahacode.cn](https://www.hahacode.cn)
 
-博客后台链接：[www.hahacode.cn/blog-admin](http://www.hahacode.cn/blog-admin)
+博客后台链接：[hahacode.cn/blog-admin](https://www.hahacode.cn/blog-admin)
 
-> 因为博客备案还在申请中，可能无法通过域名访问，可尝试 IP 访问：
->
-> 博客前台链接：[http://106.52.70.138/](http://106.52.70.138/)
->
-> 博客后台链接：[http://106.52.70.138/blog-admin](http://106.52.70.138/)
+> 博客已备案通过，且配置 SSL，可通过 https 访问
 
 测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
 
-在线接口文档地址：[https://is68368smh.apifox.cn/](https://is68368smh.apifox.cn/)
+在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)
 
 > 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改
 >
@@ -113,7 +108,7 @@ gin-blog-server
 - 实现记录操作日志功能（GET 不记录）
 - 实现监听在线用户、强制下线功能
 - 文件上传支持七牛云、本地（后续计划支持更多）
-- 对 CRUD 操作封装了通用 Hook，代码质量高
+- 对 CRUD 操作封装了通用 Hook
 
 其他：
 - 采用 Restful 风格的 API
@@ -336,7 +331,6 @@ docker build -t ginblog .
 
 - ~~完善图片上传功能, 目前文件上传还没怎么处理~~ 🆗
 - 后台首页重新设计（目前没放什么内容）
-- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通
 - 前台首页搜索文章（ElasticSearch 搜索）
 - 博客文章导入导出 (.md 文件)
 - 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）
@@ -356,6 +350,9 @@ docker build -t ginblog .
 - 看板娘
 - 第三方登录
 - 评论时支持选择表情，参考 Valine
+- 一键部署：使用 docker compose 单机一键部署整个项目（前后端 + 环境）
+- 单独部署：前后端 + 环境
+- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通
 
 其他：
 - 写一份好的文档
@@ -370,7 +367,13 @@ docker build -t ginblog .
 - `COMPLETE`: 完善
 - `ADD`: 新增
 
-标准描述形式：`[ACTION]`  `[模块]`，`[DETAIL 详情]`
+---
+
+2022-12-13:
+
+项目部署：
+- 新增 Nginx 配置 https 访问域名 (http 自动跳转到 https)
+- 新增 七牛云添加加速域名访问图片资源
 
 ---
 
