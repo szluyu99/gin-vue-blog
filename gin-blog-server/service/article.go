@@ -8,6 +8,7 @@ import (
 	"gin-blog/utils"
 	"gin-blog/utils/r"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +32,7 @@ func (*Article) Delete(ids []int) (code int) {
 	return r.OK
 }
 
-func (*Article) UpdateTop(req req.UpdateArticleTop) (code int) {
+func (*Article) UpdateTop(req req.UpdateArtTop) (code int) {
 	article := model.Article{
 		Universal: model.Universal{ID: req.ID},
 		IsTop:     req.IsTop,
@@ -187,7 +188,63 @@ func (*Article) SaveLike(uid, articleId int) (code int) {
 		utils.Redis.HIncrBy(KEY_ARTICLE_LIKE_COUNT, strconv.Itoa(articleId), 1)
 	}
 	return r.OK
+}
 
+// TODO: 优化字符串的中文问题
+// TODO: 集成 ElasticSearch?
+// 文章搜索: 关键字从标题中搜到则高亮标题中的关键字, 内容中搜到则高亮内容中的关键字
+// 关键字前方文本最多 25, 后方最多 175
+func (*Article) Search(q req.KeywordQuery) []resp.ArticleSearchVO {
+	res := make([]resp.ArticleSearchVO, 0)
+
+	if q.Keyword == "" {
+		return res
+	}
+
+	articleList := dao.List([]model.Article{}, "*", "",
+		"is_delete = 0 AND status = 1 AND (title LIKE ? OR content LIKE ?)",
+		"%"+q.Keyword+"%", "%"+q.Keyword+"%")
+
+	for _, article := range articleList {
+		// 高亮标题中的关键字
+		title := strings.ReplaceAll(article.Title, q.Keyword,
+			"<span style='color:#f47466'>"+q.Keyword+"</span>")
+
+		content := article.Content
+		// 关键字在内容中的起始位置
+		keywordStartIndex := unicodeIndex(content, q.Keyword)
+		if keywordStartIndex != -1 { // 关键字在内容中
+			preIndex, afterIndex := 0, 0
+			if keywordStartIndex > 25 {
+				preIndex = keywordStartIndex - 25
+			}
+			// 防止中文截取出乱码 (中文在 golang 是 3 个字符, 使用 rune 中文占一个数组下标)
+			preText := substring(content, preIndex, keywordStartIndex)
+			// string([]rune(content[preIndex:keywordStartIndex]))
+
+			// 关键字在内容中的结束位置
+			keywordEndIndex := keywordStartIndex + unicodeLen(q.Keyword)
+			afterLength := len(content) - keywordEndIndex
+			if afterLength > 175 {
+				afterIndex = keywordEndIndex + 175
+			} else {
+				afterIndex = keywordEndIndex + afterLength
+			}
+			// afterText := string([]rune(content)[keywordStartIndex:afterIndex])
+			afterText := substring(content, keywordStartIndex, afterIndex)
+			// 高亮内容中的关键字
+			content = strings.ReplaceAll(preText+afterText, q.Keyword,
+				"<span style='color:#f47466'>"+q.Keyword+"</span>")
+		}
+
+		res = append(res, resp.ArticleSearchVO{
+			ID:      article.ID,
+			Title:   title,
+			Content: content,
+		})
+	}
+
+	return res
 }
 
 // ? 更新文章访问数量?? 防止刷新刷访问量?
@@ -209,3 +266,44 @@ func (*Article) SaveLike(uid, articleId int) (code int) {
 // 	}
 // 	session.Save()
 // }
+
+// 获取带中文的字符串中子字符串的实际位置，非字节位置
+func unicodeIndex(str, substr string) int {
+	// 子串在字符串的字节位置
+	result := strings.Index(str, substr)
+	if result > 0 {
+		prefix := []byte(str)[0:result]
+		rs := []rune(string(prefix))
+		result = len(rs)
+	}
+	return result
+}
+
+// 获取带中文的字符串实际长度，非字节长度
+func unicodeLen(str string) int {
+	var r = []rune(str)
+	return len(r)
+}
+
+// 解决中文获取位置不正确问题
+func substring(source string, start int, end int) string {
+	var unicodeStr = []rune(source)
+	length := len(unicodeStr)
+	if start >= end {
+		return ""
+	}
+	if start < 0 {
+		start = 0
+	}
+	if end > length {
+		end = length
+	}
+	if start <= 0 && end >= length {
+		return source
+	}
+	var substring = ""
+	for i := start; i < end; i++ {
+		substring += string(unicodeStr[i])
+	}
+	return substring
+}

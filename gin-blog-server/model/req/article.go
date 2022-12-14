@@ -30,7 +30,7 @@ type GetArts struct {
 }
 
 // 修改文章置顶
-type UpdateArticleTop struct {
+type UpdateArtTop struct {
 	ID    int   `json:"id"`
 	IsTop *int8 `json:"is_top" validate:"required,min=0,max=1" label:"是否置顶(0-否 1-是)"`
 }

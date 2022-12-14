@@ -62,7 +62,7 @@ const coverStyle = computed(() => {
         <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
           <i-ant-design:qq-circle-filled />
         </a>
-        <a :href="blogConfig.github" target="_blank" mx-15>
+        <a :href="blogConfig.github" target="_blank" mx-18>
           <i-mdi:github />
         </a>
         <a :href="blogConfig.gitee" target="_blank">

@@ -74,7 +74,7 @@ function openForget() {
     title="登录"
     :block-scroll="appStore.isMobile"
     transform-origin="center"
-    px-10 w-370
+    px-10 w-360
     lg="w-460"
   >
     <n-form

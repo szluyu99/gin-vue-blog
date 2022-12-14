@@ -53,7 +53,7 @@ function openLogin() {
     title="注册"
     :block-scroll="appStore.isMobile"
     transform-origin="center"
-    px-10 w-370
+    px-10 w-360
     lg="w-460"
   >
     <n-form

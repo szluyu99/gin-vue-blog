@@ -9,7 +9,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card size="small" hoverable rounded-3rem animate-zoom-in cursor-pointer shadow-md>
+  <div card-view animate-zoom-in cursor-pointer>
     <div flex text-center>
       <i-mdi-chat-outline text-20 />
       <div flex-1>
@@ -17,7 +17,7 @@ onMounted(() => {
       </div>
       <i-mdi-chevron-double-right class="arrow" text-20 />
     </div>
-  </n-card>
+  </div>
 </template>
 
 <style lang="scss" scoped>

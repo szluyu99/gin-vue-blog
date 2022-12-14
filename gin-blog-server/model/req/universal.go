@@ -1,7 +1,7 @@
 package req
 
-// 获取树形数据(不需要分页)
-type TreeQuery struct {
+// 关键字查询
+type KeywordQuery struct {
 	Keyword string `form:"keyword"`
 }
 

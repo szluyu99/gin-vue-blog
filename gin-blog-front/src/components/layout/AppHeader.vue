@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppSideBar from './AppSideBar.vue'
+import MobileSideBar from './MobileSideBar.vue'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 
@@ -66,15 +66,16 @@ let navClass = $ref('nav')
 let barShow = $ref(true)
 
 // * 监听 y 效果比添加 scroll 监听器效果更好
+// * 节流操作, 效果很好
 const { y } = $(useWindowScroll()) // 通过 $() 解构 ref
 let preY = $ref(0) // 记录上一次的 y 滚动距离
-watch($$(y), () => {
+watchThrottled($$(y), () => {
   if (Math.abs(preY - y) >= 50) { // 小幅度滚动不进行操作
     barShow = (y < preY)
     navClass = (y > 60) ? 'nav-fixed' : 'nav'
     preY = y
   }
-})
+}, { throttle: 100 })
 
 function logout() {
   userStore.logout()
@@ -111,7 +112,7 @@ function logout() {
     </div>
   </Transition>
   <!-- 侧边栏 -->
-  <AppSideBar />
+  <MobileSideBar />
   <!-- 电脑端顶部导航栏 -->
   <Transition name="slide-fade" appear>
     <div
@@ -277,19 +278,5 @@ function logout() {
     filter: none;
     transform: translateY(0);
   }
-}
-// Transition 的动画
-.slide-fade-enter-active {
-  transition: all 0.5s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(-50px);
-  opacity: 0;
 }
 </style>

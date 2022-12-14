@@ -24,6 +24,7 @@ export default defineConfig({
     ['absolute-lrt', 'absolute left-0 right-0 bottom-0'],
     ['absolute-center', 'absolute-lt f-c-c wh-full'],
     ['text-ellipsis', 'truncate'],
+    ['card-view', 'bg-white p-15 rounded-2rem hover:shadow-2xl transition-500'],
   ],
   rules: [
     [/^bc-(.+)$/, ([, color]) => ({ 'border-color': `#${color}` })],

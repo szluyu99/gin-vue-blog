@@ -15,6 +15,8 @@ export default {
   getArticleDetail: (id: number) => request.get(`/article/${id}`),
   // 文章归档
   getArchives: (params?: any) => request.get('/article/archive', { params }),
+  // 文章搜索
+  searchArticles: (params?: any) => request.get('/article/search', { params }),
 
   // 菜单列表
   getCategorys: () => request.get('/category/list'),

@@ -4,11 +4,7 @@ const { blogInfo } = storeToRefs(useAppStore())
 </script>
 
 <template>
-  <div
-    bg-white p-15 rounded-2rem
-    transition-600 hover:shadow-2xl animate-zoom-in
-    hidden lg:block
-  >
+  <div card-view animate-zoom-in hidden lg:block>
     <p mb-10 flex items-center>
       <i-fluent-emoji-flat:bell mr-6 text-20 class="animate-bang" />
       <span text-16> 公告</span>

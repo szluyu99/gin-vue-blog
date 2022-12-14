@@ -55,20 +55,17 @@ const coverStyle = computed(() => {
   </div>
   <!-- 主体内容 -->
   <main flex-1 mx-5>
-    <!-- 内容在 card 中 -->
+    <!-- 内容在 spin 中 -->
     <n-spin :show="loading" size="large">
       <!-- 卡片视图 -->
       <template v-if="card">
-        <n-card
-          hoverable
-          shadow-xl rounded-2rem
-          pt-10 pb-0 px-0
-          mt-300 mb-40 mx-auto min-h-180
+        <div
+          card-view pt-30 mt-300 mb-40 mx-auto min-h-180
           class="card-fade-up"
-          lg="pt-20 px-15 mt-440 max-w-970"
+          lg="px-55 pt-50 pb-30 mt-440 max-w-970"
         >
           <slot v-if="!loading" />
-        </n-card>
+        </div>
       </template>
       <!-- 常规视图 -->
       <template v-else>
@@ -83,7 +80,7 @@ const coverStyle = computed(() => {
       </template>
     </n-spin>
   </main>
-  <!-- 底部 (可选) -->
+  <!-- 底部 -->
   <footer v-if="showFooter">
     <AppFooter />
   </footer>

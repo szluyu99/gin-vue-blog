@@ -11,7 +11,7 @@ onMounted(() => {
 })
 
 // 禁止右键菜单
-document.addEventListener('contextmenu', e => e.preventDefault())
+// document.addEventListener('contextmenu', e => e.preventDefault())
 </script>
 
 <template>

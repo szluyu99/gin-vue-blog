@@ -33,7 +33,7 @@ const isRightClass = computed(() => idx % 2 === 0
       mt-20 mb-10 w="9/10"
       md:w="55/100" md:px-45
     >
-      <router-link :to="`/article/${article.id}`" text-8xl cursor-pointer hover:text-violet>
+      <router-link :to="`/article/${article.id}`" text-8xl hover:text-violet>
         《{{ article.title }}》
       </router-link>
       <div flex flex-wrap pt-15 pb-12 color="#858585" text-14>
@@ -61,7 +61,6 @@ const isRightClass = computed(() => idx % 2 === 0
           <i-mdi-tag-multiple mr-2 /> {{ tag.name }}
         </router-link>
       </div>
-      <!-- TODO: 过滤 Markdown 符号 -->
       <div leading-25 class="ell-4">
         {{ article.content }}
       </div>

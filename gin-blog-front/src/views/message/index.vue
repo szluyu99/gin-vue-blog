@@ -70,25 +70,28 @@ const coverStyle = computed(() => {
       shadow-2xl
       absolute inset-x-1
       text-center text-light
-      px-5 py-25
+      px-5 py-15
       mx-auto z-5
-      w-370
-      lg="w-430"
+      w-350
+      lg="w-420 py-20"
     >
-      <h1 text-32 font-bold>
+      <h1 font-bold text-25 lg:text-30>
         留言板
       </h1>
-      <div flex justify-center mt-32 h-40>
+      <div
+        flex justify-center
+        mt-20 h-36 lg="mt-25 h-40"
+      >
         <input
           v-model="content"
-          text-16 border-1 rounded-20 bg-transparent px-20 w="3/4" text="#eee"
+          border-1 rounded-20 bg-transparent px-20 w="3/4" text="#eee"
           placeholder="说点什么吧？"
           @click.stop="showBtn = true"
           @keyup.enter="send"
         >
         <button
           v-if="showBtn"
-          ml-12 text-16 rounded-20 px-18 border-1 animate-back-in-right
+          ml-12 rounded-20 px-18 border-1 animate-back-in-right
           @click="send"
         >
           发送
@@ -130,9 +133,13 @@ const coverStyle = computed(() => {
         :is-suspend="true"
       >
         <template #dm="{ danmu }">
-          <div bg="#00000080" rounded-20 text-white px-10 py-7 flex items-center>
+          <div
+            bg="#00000060" rounded-20 text-white flex items-center
+            text-15 px-6 py-4
+            lg="text-16 px-8 py-5"
+          >
             <n-avatar round size="small" :src="convertImgUrl(danmu.avatar)" mr-10 />
-            <span vertical-middle> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
+            <span> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
           </div>
         </template>
       </vue-danmaku>

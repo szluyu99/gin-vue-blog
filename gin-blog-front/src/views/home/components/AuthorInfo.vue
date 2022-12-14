@@ -10,11 +10,7 @@ function addToFavourites() {
 </script>
 
 <template>
-  <n-card
-    hoverable size="small"
-    text-center rounded-2rem animate-zoom-in
-    hidden lg:block
-  >
+  <div card-view animate-zoom-in text-center hidden lg:block>
     <n-image
       width="110" :src="convertImgUrl(blogConfig.website_avatar)"
       duration-600 hover:rotate-360 py-15
@@ -70,5 +66,5 @@ function addToFavourites() {
         <i-simple-icons:gitee hover:text-red-500 />
       </a>
     </div>
-  </n-card>
+  </div>
 </template>

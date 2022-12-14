@@ -38,7 +38,8 @@ function openLogin() {
     title="忘记密码"
     :block-scroll="appStore.isMobile"
     transform-origin="center"
-    w-460 px-10
+    w-360 px-10
+    lg:w-460
   >
     <n-form
       ref="formRef"

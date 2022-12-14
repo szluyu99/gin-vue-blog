@@ -10,7 +10,6 @@ import (
 
 type Article struct{}
 
-// TODO: 前台相关: 文章归档, 点赞, 文章列表, 根据 id 获取文章具体内容...
 // 获取前台文章列表
 func (*Article) GetFrontList(c *gin.Context) {
 	r.SuccessData(c, articleService.GetFrontList(utils.BindQuery[req.GetFrontArts](c)))
@@ -31,4 +30,9 @@ func (*Article) SaveLike(c *gin.Context) {
 	uid := utils.GetFromContext[int](c, "user_info_id")
 	articleId := utils.GetIntParam(c, "article_id")
 	r.SendCode(c, articleService.SaveLike(uid, articleId))
+}
+
+// 文章搜索
+func (*Article) Search(c *gin.Context) {
+	r.SuccessData(c, articleService.Search(utils.BindQuery[req.KeywordQuery](c)))
 }

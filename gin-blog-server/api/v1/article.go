@@ -40,7 +40,7 @@ func (*Article) GetInfo(c *gin.Context) {
 
 // 修改置顶信息
 func (*Article) UpdateTop(c *gin.Context) {
-	r.SendCode(c, articleService.UpdateTop(utils.BindValidJson[req.UpdateArticleTop](c)))
+	r.SendCode(c, articleService.UpdateTop(utils.BindValidJson[req.UpdateArtTop](c)))
 }
 
 // TODO: 导入导出文章

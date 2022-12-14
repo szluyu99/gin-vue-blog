@@ -17,11 +17,7 @@ setInterval(() => {
 </script>
 
 <template>
-  <div
-    bg-white p-15 rounded-2rem
-    transition-600 hover:shadow-2xl animate-zoom-in
-    hidden lg:block
-  >
+  <div card-view animate-zoom-in hidden lg:block>
     <p flex items-center>
       <i-icon-park:analysis mr-5 text-18 class="animate-bang" />
       <span text-16> 网站咨询 </span>

@@ -42,12 +42,12 @@ onMounted(() => {
             <span color="#666" mr-15 lg="text-15">
               {{ formatDate(item.created_at) }}
             </span>
-            <button
+            <a
               color="#666" lg="text-16"
               @click="router.push(`/article/${item.id}`)"
             >
               {{ item.title }}
-            </button>
+            </a>
           </template>
           <template #icon>
             <i-mdi:circle />
@@ -55,7 +55,7 @@ onMounted(() => {
           <template #footer>
             <hr
               v-if="idx !== archiveList.length - 1"
-              my-20 border-dashed border-1px border-color="#d2ebfd"
+              mt-15 mb-15 border-dashed border-1px border-color="#d2ebfd"
             >
           </template>
         </n-timeline-item>

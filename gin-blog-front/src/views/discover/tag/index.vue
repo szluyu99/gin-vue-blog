@@ -24,7 +24,7 @@ function randomColorHex() {
 <template>
   <BannerPage :loading="loading" title="标签" label="tag" card>
     <h2
-      text-center leading-20 mb-8rem text-25 mt-15
+      text-center leading-20 mb-8rem text-25 mt-10
       lg="text-36"
     >
       标签 - {{ tagList.length }}

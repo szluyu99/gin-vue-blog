@@ -1,19 +1,18 @@
 @charset "UTF-8";
 
-/* router view transition fade-slide */
-.fade-slide-leave-active,
-.fade-slide-enter-active {
-  transition: all 0.3s;
+// Transition 动画
+.slide-fade-enter-active {
+  transition: all 0.5s ease-out;
 }
 
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
+.slide-fade-leave-active {
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
-.fade-slide-leave-to {
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-50px);
   opacity: 0;
-  transform: translateX(30px);
 }
 
 // 光标闪烁动画 (目前使用 animate-ping 替代)

@@ -14,7 +14,7 @@ onMounted(async () => {
 <template>
   <BannerPage :loading="loading" title="分类" label="category" card>
     <h2
-      text-center leading-20 mb-6rem text-25 mt-15
+      text-center leading-20 mb-6rem text-25 mt-10
       lg="text-36"
     >
       分类 - {{ categoryList.length }}

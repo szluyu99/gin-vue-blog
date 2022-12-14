@@ -7,6 +7,7 @@ import { setupVitePlugins } from './build/plugins'
 
 export default defineConfig((configEnv: ConfigEnv) => {
   // 从环境变量中加载值
+  const isBuild = configEnv.command === 'build' // 判断是否是打包
   const viteEnv = convertEnv(loadEnv(configEnv.mode, process.cwd()))
   const { VITE_PORT, VITE_PUBLIC_PATH, VITE_USE_PROXY, VITE_PROXY_TYPE } = viteEnv
 
@@ -18,7 +19,7 @@ export default defineConfig((configEnv: ConfigEnv) => {
         '~': path.resolve(process.cwd()),
       },
     },
-    plugins: setupVitePlugins(),
+    plugins: setupVitePlugins(viteEnv, isBuild),
     server: {
       host: '0.0.0.0',
       port: VITE_PORT,
@@ -36,6 +37,13 @@ export default defineConfig((configEnv: ConfigEnv) => {
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制 (单位 kb)
       commonjsOptions: {
         ignoreTryCatch: false,
+      },
+      terserOptions: {
+        // 打包后移除 console 和 注释
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
       },
     },
   }
