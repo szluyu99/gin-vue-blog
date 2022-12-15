@@ -25,6 +25,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:visible', 'onSave'])
+
+// 实现和父组件传来的数据双向绑定
 const show = computed({
   get() {
     return props.visible
@@ -51,7 +53,12 @@ const show = computed({
           <n-button @click="show = false">
             取消
           </n-button>
-          <n-button :loading="loading" ml-20 type="primary" @click="emit('onSave')">
+          <n-button
+            :loading="loading"
+            ml-20
+            type="primary"
+            @click="emit('onSave')"
+          >
             保存
           </n-button>
         </slot>

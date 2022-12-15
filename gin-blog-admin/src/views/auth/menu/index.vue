@@ -7,8 +7,8 @@ import api from '@/api'
 
 defineOptions({ name: '菜单管理' })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 // 表单初始化内容
 const initForm = ref({
@@ -33,11 +33,11 @@ const {
   doCreate: api.saveOrUpdateMenu,
   doDelete: api.deleteMenu,
   doUpdate: api.saveOrUpdateMenu,
-  refresh: () => $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 // 是否展示 "菜单类型"

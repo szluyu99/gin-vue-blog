@@ -22,17 +22,17 @@ const tagType = computed(() => (type) => {
   }
 })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
   name: '日志',
   doDelete: api.deleteOperationLogs,
-  refresh: $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 const columns = [
@@ -96,7 +96,7 @@ const columns = [
         ),
         h(
           NPopconfirm,
-          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
+          { onPositiveClick: () => handleDelete([row.id], false) },
           {
             trigger: () =>
               h(
@@ -135,7 +135,7 @@ function copyFormatCode(code) {
         ml-20
         type="error"
         :disabled="!$table?.selections.length"
-        @click="handleDelete(JSON.stringify($table?.selections))"
+        @click="handleDelete($table?.selections)"
       >
         <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>

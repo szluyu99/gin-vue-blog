@@ -49,7 +49,7 @@ function handleSelect(key, page) {
   if (key === 'edit')
     handleEdit(page)
   else if (key === 'delete')
-    handleDelete(JSON.stringify([page.id]))
+    handleDelete([page.id])
 }
 
 const options = [

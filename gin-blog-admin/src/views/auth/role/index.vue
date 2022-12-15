@@ -6,8 +6,8 @@ import api from '@/api'
 
 defineOptions({ name: '角色管理' })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 const {
   modalVisible,
@@ -26,7 +26,7 @@ const {
   doCreate: api.saveOrUpdateRole,
   doDelete: api.deleteRole,
   doUpdate: api.saveOrUpdateRole,
-  refresh: $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 // 菜单, 资源 跳出菜单的选项不同
@@ -35,7 +35,7 @@ const resourceOption = ref([]) // 资源选项
 const menuOption = ref([]) // 菜单选项
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
   api.getResourceOption().then(res => (resourceOption.value = res.data))
   api.getMenuOption().then(res => (menuOption.value = res.data))
 })
@@ -122,7 +122,7 @@ const columns = [
         h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false),
+            onPositiveClick: () => handleDelete([row.id], false),
             onNegativeClick: () => {},
           },
           {
@@ -159,7 +159,7 @@ const columns = [
         ml-20
         type="error"
         :disabled="!$table?.selections.length"
-        @click="handleDelete(JSON.stringify($table?.selections))"
+        @click="handleDelete($table?.selections)"
       >
         <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>

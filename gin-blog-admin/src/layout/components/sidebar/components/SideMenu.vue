@@ -7,20 +7,26 @@ const curRoute = useRoute() // 进行路由跳转
 const permissionStore = usePermissionStore()
 const appStore = useAppStore()
 
-// 菜单选项
+const activeKey = computed(() => curRoute.meta?.activeMenu || curRoute.name)
+
 const menuOptions = computed(() => {
-  const res = permissionStore.menus
+  return permissionStore.menus
     .map(item => getMenuItem(item))
     .sort((a, b) => a.order - b.order)
-  return res
+})
+
+// 点击标签, 自动展开菜单栏, 选中对应菜单
+const menuRef = $ref(null)
+watch(curRoute, async () => {
+  await nextTick()
+  menuRef.showOption()
 })
 
 function resolvePath(basePath, path) {
   if (isExternal(path))
     return path
   return (
-    `/${
-    [basePath, path]
+    `/${[basePath, path]
       .filter(path => !!path && path !== '/')
       .map(path => path.replace(/(^\/)|(\/$)/g, ''))
       .join('/')}`
@@ -38,7 +44,8 @@ function getMenuItem(route, basePath = '') {
     order: route.meta?.order || 0,
   }
 
-  const visibleChildren = route.children?.filter(item => item.name && !item.isHidden) ?? []
+  const visibleChildren = route.children
+    ?.filter(item => item.name && !item.isHidden) ?? []
 
   if (!visibleChildren.length)
     return menuItem
@@ -53,7 +60,8 @@ function getMenuItem(route, basePath = '') {
       icon: getIcon(singleRoute.meta),
       order: menuItem.order,
     }
-    const visibleItems = singleRoute.children?.filter(item => item.name && !item.isHidden) ?? []
+    const visibleItems = singleRoute.children
+      ?.filter(item => item.name && !item.isHidden) ?? []
     if (visibleItems.length === 1) {
       menuItem = getMenuItem(visibleItems[0], menuItem.path)
     }
@@ -85,21 +93,22 @@ function handleMenuSelect(key, item) {
     window.open(item.path)
   }
   else {
-    if (item.path === curRoute.path)
-      appStore.reloadPage()
-    else router.push(item.path)
+    (item.path === curRoute.path)
+      ? appStore.reloadPage()
+      : router.push(item.path)
   }
 }
 </script>
 
 <template>
   <n-menu
+    ref="menuRef"
     class="side-menu"
     :indent="18"
     :collapsed-icon-size="22"
     :collapsed-width="64"
     :options="menuOptions"
-    :value="curRoute.meta?.activeMenu || curRoute.name"
+    :value="activeKey"
     @update:value="handleMenuSelect"
   />
 </template>

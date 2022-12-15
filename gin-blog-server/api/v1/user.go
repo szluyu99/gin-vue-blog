@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"gin-blog/model/req"
 	"gin-blog/utils"
 	"gin-blog/utils/r"
@@ -15,7 +14,6 @@ type User struct{}
 func (*User) UpdateCurrent(c *gin.Context) {
 	currentUser := utils.BindValidJson[req.UpdateCurrentUser](c)
 	currentUser.ID = utils.GetFromContext[int](c, "user_info_id")
-	fmt.Println(currentUser.ID)
 	r.SendCode(c, userService.UpdateCurrent(currentUser))
 }
 

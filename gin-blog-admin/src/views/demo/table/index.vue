@@ -6,11 +6,11 @@ import { useCRUD } from '@/hooks'
 
 defineOptions({ name: 'CrudTable' })
 
-const $table = ref(null)
+const $table = $ref(null)
 /** QueryBar筛选参数（可选） */
-const queryItems = ref({})
+const queryItems = $ref({})
 /** 补充参数（可选） */
-const extraParams = ref({})
+const extraParams = $ref({})
 
 const {
   modalVisible,
@@ -30,12 +30,12 @@ const {
   doCreate: api.addPost,
   doDelete: api.deletePost,
   doUpdate: api.updatePost,
-  refresh: () => $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
   // 调用子组件中的方法
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 const columns = [

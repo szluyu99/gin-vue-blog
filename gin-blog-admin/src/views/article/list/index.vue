@@ -2,7 +2,7 @@
 import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
-import { artTypeMap, artTypeOptions } from '@/constant/data'
+import { articleTypeMap, articleTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
@@ -10,29 +10,29 @@ defineOptions({ name: '文章列表' })
 
 const [route, router] = [useRoute(), useRouter()]
 
-const categoryOptions = ref([])
-const tagOptions = ref([])
+let categoryOptions = $ref([])
+let tagOptions = $ref([])
 
-const $table = ref(null)
-const queryItems = ref({}) // 条件搜索
-const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
+const $table = $ref(null)
+const queryItems = $ref({}) // 条件搜索
+const extraParams = $ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
 
 const { handleDelete } = useCRUD({
   name: '文章',
   doDelete: updateOrDeleteArticles, // 软删除
-  refresh: () => $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
-  api.getCategoryOption().then(res => (categoryOptions.value = res.data))
-  api.getTagOption().then(res => (tagOptions.value = res.data))
+  api.getCategoryOption().then(res => (categoryOptions = res.data))
+  api.getTagOption().then(res => (tagOptions = res.data))
   handleChangeTab('all') // 默认查看全部
 })
 
 // ! 切换页面时, 如果是 [写文章] 页面跳转过来, 会携带 needRefresh 参数
 onActivated(() => {
   const { needRefresh } = route.query
-  needRefresh && ($table.value?.handleSearch())
+  needRefresh && ($table?.handleSearch())
 })
 
 const columns = [
@@ -78,8 +78,8 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: artTypeMap[row.type].tag },
-        { default: () => artTypeMap[row.type].name },
+        { type: articleTypeMap[row.type].tag },
+        { default: () => articleTypeMap[row.type].name },
       )
     },
   },
@@ -135,7 +135,7 @@ const columns = [
               onClick: async () => {
                 // 软删除恢复
                 await api.softDeleteArticle({ ids: [row.id], is_delete: 0 })
-                await $table?.value.handleSearch()
+                await $table?.handleSearch()
               },
             },
             { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
@@ -152,7 +152,7 @@ const columns = [
           ),
         h(
           NPopconfirm,
-          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
+          { onPositiveClick: () => handleDelete([row.id], false) },
           {
             trigger: () =>
               h(
@@ -170,7 +170,7 @@ const columns = [
 
 // extraParams 中的 is_delete 为 0 则软删除, is_delete 为 1 则物理删除
 function updateOrDeleteArticles(ids) {
-  extraParams.value.is_delete === 0
+  extraParams.is_delete === 0
     ? api.softDeleteArticle({ ids: JSON.parse(ids), is_delete: 1 })
     : api.deleteArticle(ids)
 }
@@ -184,34 +184,34 @@ async function handleUpdateTop(row) {
   await api.updateArticleTop(row)
   row.publishing = false
   $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 }
 
 // 切换标签页: [全部, 公开, 私密, 草稿箱, 回收站]
 function handleChangeTab(value) {
   switch (value) {
     case 'all':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = null
+      extraParams.is_delete = 0
+      extraParams.status = null
       break
     case 'public':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 1
+      extraParams.is_delete = 0
+      extraParams.status = 1
       break
     case 'secret':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 2
+      extraParams.is_delete = 0
+      extraParams.status = 2
       break
     case 'draft':
-      extraParams.value.is_delete = 0
-      extraParams.value.status = 3
+      extraParams.is_delete = 0
+      extraParams.status = 3
       break
     case 'delete':
-      extraParams.value.is_delete = 1
-      extraParams.value.status = null
+      extraParams.is_delete = 1
+      extraParams.status = null
       break
   }
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 }
 </script>
 
@@ -227,7 +227,7 @@ function handleChangeTab(value) {
         ml-20
         type="error"
         :disabled="!$table?.selections.length"
-        @click="handleDelete(JSON.stringify($table?.selections))"
+        @click="handleDelete($table?.selections)"
       >
         <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
       </NButton>
@@ -276,7 +276,7 @@ function handleChangeTab(value) {
             v-model:value="queryItems.type"
             clearable
             placeholder="请选择文章类型"
-            :options="artTypeOptions"
+            :options="articleTypeOptions"
             @update:value="$table?.handleSearch()"
           />
         </QueryBarItem>

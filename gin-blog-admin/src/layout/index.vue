@@ -3,10 +3,11 @@ import AppHeader from './components/header/index.vue'
 import AppMain from './components/AppMain.vue'
 import Sidebar from './components/sidebar/index.vue'
 import AppTags from './components/tags/index.vue'
+
 import { useAppStore } from '@/store'
 import { header, tags } from '~/setting'
 
-const appStore = useAppStore()
+const { collapsed } = storeToRefs(useAppStore())
 </script>
 
 <template>
@@ -18,7 +19,7 @@ const appStore = useAppStore()
       :collapsed-width="64"
       :width="220"
       :native-scrollbar="false"
-      :collapsed="appStore.collapsed"
+      :collapsed="collapsed"
     >
       <Sidebar />
     </n-layout-sider>
@@ -27,7 +28,7 @@ const appStore = useAppStore()
       <!-- 头部 -->
       <header
         :style="`height: ${header.height}px`"
-        bg-white px-15 border-b bc-eee flex items-center
+        flex items-center bg-white px-15 border-b bc-eee
       >
         <AppHeader />
       </header>

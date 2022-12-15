@@ -14,7 +14,7 @@ const props = defineProps({
 
 const emit = defineEmits(['finish'])
 
-const token = getToken() // 图片上传需要 token
+const token = getToken() // 图片上传需要 Token
 let previewImg = $ref(props.preview)
 
 // 上传图片

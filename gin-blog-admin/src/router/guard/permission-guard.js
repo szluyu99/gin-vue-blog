@@ -3,9 +3,9 @@ import { getToken } from '@/utils'
 // 没有 Token 也可访问的白名单页面
 const WHITE_LIST = ['/login', '/404']
 
-// 根据有无 Token 判断能否页面
+// 根据有无 Token 判断能否访问页面
 export function createPermissionGuard(router) {
-  // 路由前置守卫: 根据有没有 token 判断前往哪个页面
+  // 路由前置守卫: 根据有没有 Token 判断前往哪个页面
   router.beforeEach(async (to) => {
     const token = getToken()
     // 没有 Token 的情况

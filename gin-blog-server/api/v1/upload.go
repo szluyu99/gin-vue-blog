@@ -17,6 +17,7 @@ func (*Upload) UploadFile(c *gin.Context) {
 		code := r.EEROR_FILE_RECEIVE
 		utils.Logger.Error(r.GetMsg(code), zap.Error(err))
 		r.SendCode(c, code)
+		return
 	}
 	// 上传文件, 获取文件路径
 	url, code := fileService.UploadFile(fileHeader)

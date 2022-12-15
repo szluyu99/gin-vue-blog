@@ -6,13 +6,11 @@ import { createVitePlugins } from './build/plugin'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-  // TODO 其他配置
-  const isBuild = command === 'build' // pnpm run build
+  const isBuild = command === 'build' // pnpm build
 
   // 加载 .env 中的环境变量
   // 设置第三个参数为 '' 可以加载所有环境变量(包括本机的), 默认只会加载 'VITE_' 前缀的变量
-  const env = loadEnv(mode, process.cwd()) // loadEnv(mode, process.cwd(), '')
-  const viteEnv = convertEnv(env)
+  const viteEnv = convertEnv(loadEnv(mode, process.cwd())) // loadEnv(mode, process.cwd(), '')
   const { VITE_PUBLIC_PATH, VITE_PORT, VITE_USE_PROXY, VITE_PROXY_TYPE } = viteEnv
 
   return {
@@ -38,6 +36,12 @@ export default defineConfig(({ command, mode }) => {
       outDir: 'dist',
       reportCompressedSize: false, // 禁用 gzip 压缩大小报告
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+      },
     },
   }
 })

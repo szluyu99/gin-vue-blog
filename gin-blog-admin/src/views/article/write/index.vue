@@ -1,43 +1,45 @@
 <script setup>
-// markdown 编辑器
 import MdEditor from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 
-// 单文件上传组件
 import UploadOne from '@/components/upload/UploadOne.vue'
 
-import { artTypeOptions } from '@/constant/data'
-import { useTagsStore } from '@/store'
+import { articleTypeOptions } from '@/constant/data'
+import { useAppStore, useTagsStore } from '@/store'
 import api from '@/api'
 
 defineOptions({ name: '发布文章' })
 
 const [router, route] = [useRouter(), useRoute()]
+const [appStore, tagsStore] = [useAppStore(), useTagsStore()]
 
-const categoryOptions = ref([])
-const tagOptions = ref([])
+let categoryOptions = $ref([]) // 分类选项
+let tagOptions = $ref([]) // 标签选项
+
+// 解决同时查看多篇文章, 切换标签不刷新的问题
+watch(route, async () => {
+  appStore.reloadPage()
+})
 
 onActivated(async () => {
-  api.getCategoryOption().then(
-    res => (categoryOptions.value = res.data.map(e => ({ value: e.label, label: e.label }))),
-  )
-  api.getTagOption().then(
-    res => (tagOptions.value = res.data.map(e => ({ value: e.label, label: e.label }))),
-  )
+  api.getCategoryOption()
+    .then(res => categoryOptions = res.data.map(e => ({ value: e.label, label: e.label })))
+  api.getTagOption()
+    .then(res => tagOptions = res.data.map(e => ({ value: e.label, label: e.label })))
   // 根据路由中的 id 参数获取文章信息
   await getArticleInfo()
   // TODO: 优化文章显示白屏加载效果
   await nextTick(() => {})
 })
 
-const formRef = ref(null)
-const formModel = ref({
+const formRef = $ref(null)
+let formModel = $ref({
   status: 1, // 发布形式: 默认公开
   is_top: 0, // 默认不置顶
   tag_names: [''],
 })
-const btnLoading = ref(false)
-const modalVisible = ref(false)
+let btnLoading = $ref(false)
+let modalVisible = $ref(false)
 
 // 根据路由中的 id 参数获取文章信息
 async function getArticleInfo() {
@@ -45,7 +47,7 @@ async function getArticleInfo() {
 
   // 没有 id, 表示是新增文章
   if (!id) {
-    formModel.value = { status: 1, is_top: 0, title: '' }
+    formModel = { status: 1, is_top: 0, title: '' }
     return
   }
 
@@ -54,7 +56,7 @@ async function getArticleInfo() {
   $message.loading('加载中...')
   try {
     const res = await api.getArticleById(id)
-    formModel.value = res.data
+    formModel = res.data
 
     window.$loadingBar?.finish()
     $message?.success('加载成功')
@@ -67,7 +69,7 @@ async function getArticleInfo() {
 
 // 删除标签
 function removeTag(name) {
-  formModel.value.tag_names = formModel.value.tag_names.filter(e => e !== name)
+  formModel.tag_names = formModel.tag_names.filter(e => e !== name)
 }
 
 // TODO: 保存草稿
@@ -77,34 +79,34 @@ function handleDraft() {
 
 // 发布文章
 function handlePublish() {
-  if (!formModel.value.title || !formModel.value.title?.trim()) {
-    formModel.value.title = formModel.value.title?.trim()
+  if (!formModel.title || !formModel.title?.trim()) {
+    formModel.title = formModel.title?.trim()
     $message.info('请输入标题')
     return
   }
-  modalVisible.value = true
+  modalVisible = true
 }
 
 // 保存
 async function handleSave() {
-  formRef.value?.validate(async (err) => {
-    if (err)
-      return
-    btnLoading.value = true
-    $message.loading('正在保存...')
-    try {
-      await api.saveOrUpdateArticle(formModel.value)
-      modalVisible.value = false
-      $message.success('操作成功!')
-      // 关闭当前标签, 并跳转回文章列表
-      useTagsStore().removeTag(route.path)
-      await router.replace({ path: '/article/list', query: { needRefresh: true } })
-    }
-    catch (err) {
-      console.error(err)
-    }
-    finally {
-      btnLoading.value = false
+  formRef?.validate(async (err) => {
+    if (!err) {
+      btnLoading = true
+      $message.loading('正在保存...')
+      try {
+        await api.saveOrUpdateArticle(formModel)
+        modalVisible = false
+        $message.success('操作成功!')
+        // 关闭当前标签, 并跳转回文章列表
+        tagsStore.removeTag(route.path)
+        await router.replace({ path: '/article/list', query: { needRefresh: true } })
+      }
+      catch (err) {
+        console.error(err)
+      }
+      finally {
+        btnLoading = false
+      }
     }
   })
 }
@@ -207,7 +209,7 @@ const rules = {
             v-model:value="formModel.type"
             style="width: 50%"
             placeholder="请选择文章分类"
-            :options="artTypeOptions"
+            :options="articleTypeOptions"
           />
         </n-form-item>
         <!-- <n-form-item label="文章描述" path="desc">

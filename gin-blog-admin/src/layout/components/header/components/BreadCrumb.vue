@@ -5,9 +5,8 @@ const router = useRouter()
 const route = useRoute()
 
 function handleBreadClick(path) {
-  if (path === route.path)
-    return
-  router.push(path) // 会根据 router.js 中设置的 redirect 进行跳转
+  if (path !== route.path)
+    router.push(path) // 根据 router.js 中设置的 redirect 进行跳转
 }
 
 function getIcon(meta) {
@@ -15,6 +14,7 @@ function getIcon(meta) {
     return renderCustomIcon(meta.customIcon, { size: 18 })
   if (meta?.icon)
     return renderIcon(meta.icon, { size: 18 })
+  return null
 }
 </script>
 

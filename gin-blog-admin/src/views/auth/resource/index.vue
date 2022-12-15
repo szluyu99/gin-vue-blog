@@ -6,8 +6,8 @@ import api from '@/api'
 
 defineOptions({ name: '接口管理' })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 const {
   modalVisible,
@@ -26,11 +26,11 @@ const {
   doCreate: api.saveOrUpdateResource,
   doDelete: api.deleteResource,
   doUpdate: api.saveOrUpdateResource,
-  refresh: () => $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 // 请求方法

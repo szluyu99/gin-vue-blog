@@ -3,8 +3,7 @@ import api from '@/api'
 import { getToken } from '@/utils'
 
 onMounted(() => {
-  if (getToken())
-    api.report() // 上报用户信息
+  getToken() && api.report() // 上报用户信息
 })
 </script>
 

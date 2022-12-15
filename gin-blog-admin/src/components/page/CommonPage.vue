@@ -13,21 +13,23 @@ defineProps({
     default: undefined,
   },
 })
+
 const route = useRoute()
 </script>
 
 <template>
   <AppPage :show-footer="showFooter">
-    <header v-if="showHeader" px-15 mb-15 min-h-45 flex justify-between items-center>
+    <header
+      v-if="showHeader"
+      flex justify-between items-center
+      px-15 mb-15 min-h-45
+    >
       <slot v-if="$slots.header" name="header" />
       <template v-else>
         <h2 color="#333" text-22 font-normal>
           {{ title || route.meta?.title }}
         </h2>
         <div>
-          <!-- <n-icon mr-20 size="18" cursor-pointer @click="handleRefresh">
-            <icon-mdi:refresh />
-          </n-icon> -->
           <slot name="action" />
         </div>
       </template>

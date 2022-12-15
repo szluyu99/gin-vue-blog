@@ -6,8 +6,8 @@ import api from '@/api'
 
 defineOptions({ name: '标签管理' })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 const {
   modalVisible,
@@ -25,11 +25,11 @@ const {
   doCreate: api.saveOrUpdateTag,
   doDelete: api.deleteTag,
   doUpdate: api.saveOrUpdateTag,
-  refresh: $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 const columns = [
@@ -96,7 +96,7 @@ const columns = [
         ),
         h(
           NPopconfirm,
-          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
+          { onPositiveClick: () => handleDelete([row.id], false) },
           {
             trigger: () => h(
               NButton,
@@ -123,7 +123,7 @@ const columns = [
         ml-20
         type="error"
         :disabled="!$table?.selections.length"
-        @click="handleDelete(JSON.stringify($table.selections))"
+        @click="handleDelete($table?.selections)"
       >
         <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
       </NButton>

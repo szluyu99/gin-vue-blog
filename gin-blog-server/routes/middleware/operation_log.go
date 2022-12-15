@@ -59,8 +59,9 @@ func (w CustomResponseWriter) WriteString(s string) (int, error) {
 // 记录操作日志中间件
 func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 不记录 GET 请求操作记录 (太多了)
-		if c.Request.Method != "GET" {
+		// TODO: 优化记录文件上传
+		// 不记录 GET 请求操作记录 (太多了) 和 文件上传操作记录 (请求体太长)
+		if c.Request.Method != "GET" && !strings.Contains(c.Request.RequestURI, "upload") {
 			blw := &CustomResponseWriter{
 				body:           bytes.NewBufferString(""),
 				ResponseWriter: c.Writer,

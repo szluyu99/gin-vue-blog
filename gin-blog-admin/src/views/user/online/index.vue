@@ -1,14 +1,14 @@
 <script setup>
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
-import { formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import api from '@/api'
 
 defineOptions({ name: '在线用户' })
 
-const $table = ref(null)
+const $table = $ref(null)
 
 onMounted(() => {
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 const columns = [
@@ -21,7 +21,7 @@ const columns = [
       return h(NImage, {
         'height': 50,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': row.avatar,
+        'src': convertImgUrl(row.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -122,7 +122,7 @@ async function handleForceOffline(row) {
   try {
     await api.forceOfflineUser(row)
     $message.success('该用户已被强制下线!')
-    $table.value?.handleSearch()
+    $table?.handleSearch()
   }
   catch (err) {
     $message.error('强制下线失败!')

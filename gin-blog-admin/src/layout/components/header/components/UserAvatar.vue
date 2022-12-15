@@ -1,7 +1,9 @@
 <script setup>
 import { renderIcon } from '@/utils'
 import { useUserStore } from '@/store'
-const [router, userStore] = [useRouter(), useUserStore()]
+
+const userStore = useUserStore()
+const router = useRouter()
 
 const options = [
   {

@@ -7,20 +7,20 @@ import api from '@/api'
 
 defineOptions({ name: '用户列表' })
 
-const $table = ref(null)
-const queryItems = ref({})
+const $table = $ref(null)
+const queryItems = $ref({})
 
 const { modalVisible, modalLoading, handleSave, modalForm, modalFormRef, handleEdit } = useCRUD({
   name: '用户',
   doUpdate: api.updateUser,
-  refresh: () => $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 const roleOption = ref([])
 
 onMounted(() => {
   api.getRoleOption().then(res => roleOption.value = res.data)
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 })
 
 const columns = [
@@ -180,7 +180,7 @@ async function handleUpdateDisable(row) {
   try {
     await api.updateUserDisable(row)
     $message?.success(row.is_disable ? '已禁用该用户' : '已取消禁用该用户')
-    $table.value?.handleSearch()
+    $table?.handleSearch()
   }
   catch (err) {
     // 有异常恢复原来的状态

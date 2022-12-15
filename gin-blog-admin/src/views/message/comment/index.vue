@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NPopconfirm, NTag } from 'naive-ui'
-import { formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import { commentTypeMap, commentTypeOptions } from '@/constant/data'
 import api from '@/api'
@@ -11,14 +11,14 @@ onMounted(() => {
   handleChangeTab('all') // 默认查看全部
 })
 
-const $table = ref(null)
-const queryItems = ref({}) // 条件查询参数
-const extraParams = ref({}) // 额外参数
+const $table = $ref(null)
+const queryItems = $ref({}) // 条件查询参数
+const extraParams = $ref({}) // 额外参数
 
 const { handleDelete } = useCRUD({
   name: '评论',
   doDelete: api.deleteComments,
-  refresh: $table.value?.handleSearch(),
+  refresh: () => $table?.handleSearch(),
 })
 
 const columns = [
@@ -32,7 +32,7 @@ const columns = [
       return h(NImage, {
         'height': 50,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': row.avatar,
+        'src': convertImgUrl(row.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -140,7 +140,7 @@ const columns = [
           ),
         h(
           NPopconfirm,
-          { onPositiveClick: () => handleDelete(JSON.stringify([row.id]), false) },
+          { onPositiveClick: () => handleDelete([row.id], false) },
           {
             trigger: () =>
               h(
@@ -164,23 +164,23 @@ async function handleUpdateReview(ids, is_review) {
   }
   await api.updateCommentReview({ ids, is_review })
   $message?.success(is_review ? '审核成功' : '撤下成功')
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 }
 
 // 切换标签页: [全部, 通过, 审核中]
 function handleChangeTab(value) {
   switch (value) {
     case 'all':
-      extraParams.value.is_review = null
+      extraParams.is_review = null
       break
     case 'has_review': // 通过
-      extraParams.value.is_review = 1
+      extraParams.is_review = 1
       break
     case 'not_review': // 审核中
-      extraParams.value.is_review = 0
+      extraParams.is_review = 0
       break
   }
-  $table.value?.handleSearch()
+  $table?.handleSearch()
 }
 </script>
 
@@ -193,7 +193,7 @@ function handleChangeTab(value) {
         ml-20
         type="error"
         :disabled="!$table?.selections.length"
-        @click="handleDelete(JSON.stringify($table.selections))"
+        @click="handleDelete($table?.selections)"
       >
         <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
       </NButton>

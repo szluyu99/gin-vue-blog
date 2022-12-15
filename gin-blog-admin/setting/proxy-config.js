@@ -9,6 +9,10 @@ const proxyConfigMappings = {
     prefix: '/api',
     target: 'http://www.hahacode.cn/api/',
   },
+  test: {
+    prefix: '/api',
+    target: 'http://localhost:8765/api/',
+  },
 }
 
 export function getProxyConfig(envType = 'dev') {

@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { $$, $computed, $ref } from 'vue/macros'
 
 const ACTIONS = {
   view: '查看',
@@ -15,117 +15,106 @@ const ACTIONS = {
  * @param {*} refresh 查找(刷新)操作
  */
 export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, refresh }) {
-  const modalVisible = ref(false)
+  let modalVisible = $ref(false) // 弹框显示
   /** 操作: add - 新增, edit - 删除, view - 查看 */
-  const modalAction = ref('')
-  const modalTitle = computed(() => ACTIONS[modalAction.value] + name)
-  const modalLoading = ref(false)
-  const modalFormRef = ref(null)
-  const modalForm = ref({ ...initForm })
+  let modalAction = $ref('')
+  let modalLoading = $ref(false)
+  const modalTitle = $computed(() => ACTIONS[modalAction] + name) // 弹窗标题
+
+  let modalForm = $ref({ ...initForm })
+  const modalFormRef = $ref(null)
 
   /** 新增 */
   function handleAdd() {
-    modalAction.value = 'add'
-    modalVisible.value = true
-    modalForm.value = { ...initForm } // 使用初始表单
+    modalAction = 'add'
+    modalVisible = true
+    modalForm = { ...initForm } // 使用初始表单
   }
 
   /** 修改 */
   function handleEdit(row) {
-    modalAction.value = 'edit'
-    modalVisible.value = true
-    modalForm.value = { ...row }
+    modalAction = 'edit'
+    modalVisible = true
+    modalForm = { ...row }
   }
 
   /** 查看 */
   function handleView(row) {
-    modalAction.value = 'view'
-    modalVisible.value = true
-    modalForm.value = { ...row }
+    modalAction = 'view'
+    modalVisible = true
+    modalForm = { ...row }
   }
 
   /** 保存 */
   function handleSave() {
-    if (!['edit', 'add'].includes(modalAction.value)) {
-      modalVisible.value = false
+    if (!['edit', 'add'].includes(modalAction)) {
+      modalVisible = false
       return
     }
-    modalFormRef.value?.validate(async (err) => {
-      if (err)
-        return
-      const actions = {
-        add: {
-          api: () => doCreate(modalForm.value),
-          cb: () => window.$message.success('新增成功'),
-        },
-        edit: {
-          api: () => doUpdate(modalForm.value),
-          cb: () => window.$message.success('编辑成功'),
-        },
-      }
-      const action = actions[modalAction.value]
+    modalFormRef?.validate(async (err) => {
+      if (!err) {
+        const actions = {
+          add: {
+            api: () => doCreate(modalForm),
+            cb: () => window.$message.success('新增成功'),
+          },
+          edit: {
+            api: () => doUpdate(modalForm),
+            cb: () => window.$message.success('编辑成功'),
+          },
+        }
+        const action = actions[modalAction]
 
-      try {
-        modalLoading.value = true
-        const data = await action.api()
-        action.cb()
-        modalLoading.value = modalVisible.value = false
-        data && refresh(data)
-      }
-      catch (error) {
-        modalLoading.value = false
+        try {
+          modalLoading = true
+          const data = await action.api()
+          action.cb()
+          modalLoading = modalVisible = false
+          data && refresh(data)
+        }
+        catch (error) {
+          modalLoading = false
+        }
       }
     })
   }
 
   /**
-   * 删除
-   **/
-  async function handleDelete(id, needConfirm = true) {
-    if (!id || id === '[]') {
+   * 批量删除, 数组只有一个元素即为普通删除
+   * @param {[]} ids 主键数组
+   * @param {boolean} needConfirm 是否需要确认窗口
+   */
+  async function handleDelete(ids, needConfirm = true) {
+    if (!ids || !ids.length) {
       window.$message.info('请选择要删除的数据')
       return
     }
 
-    if (needConfirm) {
-      // 需要弹窗确认
-      window.$dialog.confirm({
-        content: '确定删除？',
-        async confirm() {
-          try {
-            modalLoading.value = true
-            const data = await doDelete(id)
-            // 针对软删除的情况做判断
-            if (data?.code === 0)
-              window.$message.success('删除成功')
-            modalLoading.value = false
-            refresh(data)
-          }
-          catch (error) {
-            modalLoading.value = false
-          }
-        },
-        // ...confirmOptions,
-      })
-    }
-    else {
-      // 无需弹窗确认
+    // 调用删除接口
+    const callDeleteAPI = async () => {
       try {
-        modalLoading.value = true
-        const data = await doDelete(id)
+        modalLoading = true
+        const data = await doDelete(JSON.stringify(ids))
         // 针对软删除的情况做判断
         if (data?.code === 0)
           window.$message.success('删除成功')
-        modalLoading.value = false
+        modalLoading = false
         refresh(data)
       }
       catch (error) {
-        modalLoading.value = false
+        modalLoading = false
       }
     }
+
+    needConfirm
+      ? window.$dialog.confirm({
+        content: '确定删除？',
+        confirm: () => callDeleteAPI(),
+      })
+      : callDeleteAPI()
   }
 
-  return {
+  return $$({
     modalVisible,
     modalAction,
     modalTitle,
@@ -137,5 +126,5 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
     handleSave,
     modalForm,
     modalFormRef,
-  }
+  })
 }

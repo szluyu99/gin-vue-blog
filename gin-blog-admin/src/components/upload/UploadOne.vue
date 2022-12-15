@@ -1,5 +1,5 @@
 <script setup>
-import { convertImgUrl } from '@/utils'
+import { convertImgUrl, getToken } from '@/utils'
 
 const props = defineProps({
   preview: {
@@ -14,25 +14,24 @@ const props = defineProps({
 
 const emit = defineEmits(['finish'])
 
-const previewImg = ref(props.preview)
+const token = getToken() // 图片上传需要 Token
+let previewImg = $ref(props.preview)
 
 // 上传图片
 function handleImgUpload({ event }) {
   const respStr = (event?.target).response
   const res = JSON.parse(respStr)
   if (res.code !== 0) {
-    $message.error('文件上传失败')
+    $message?.error(res.message)
     return
   }
-  previewImg.value = res.data
-  emit('finish', previewImg.value)
+  previewImg = res.data
+  emit('finish', previewImg)
 }
 
 // 判断是本地上传的图片或网络资源
 // 开发环境可以使用本地文件上传, 生产环境建议使用云存储
-const imgUrl = computed(() => {
-  return convertImgUrl(previewImg.value)
-})
+const imgUrl = computed(() => convertImgUrl(previewImg))
 
 defineExpose({ previewImg })
 </script>
@@ -41,6 +40,7 @@ defineExpose({ previewImg })
   <div>
     <n-upload
       action="/api/upload"
+      :headers="{ Authorization: `Bearer ${token}` }"
       @finish="handleImgUpload"
     >
       <template v-if="previewImg">

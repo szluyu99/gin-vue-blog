@@ -22,11 +22,11 @@
 
 因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。
 
-您的 star 是我坚持的动力，感谢大家的支持，欢迎提交 pr 共同改进项目。
+您的 Star 是我坚持的动力，感谢大家的支持，欢迎提交 Pr 共同改进项目。
 
-Github地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
+Github 地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
 
-Gitee地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
+Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
 
 ## 在线预览
 
@@ -323,6 +323,7 @@ docker build -t ginblog .
 - [https://github.com/qifengzhang007/GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
 - [https://github.com/X1192176811/blog](https://github.com/X1192176811/blog)
 - [https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin)
+- [https://github.com/antfu/vitesse](https://github.com/antfu/vitesse)
 - ...
 
 > 需要感谢的绝不止以上这些开源项目，但是一时难以全部列出，后面会慢慢补上。
@@ -372,6 +373,15 @@ docker build -t ginblog .
 
 ---
 
+2022-12-15:
+
+博客后台：
+- 优化 菜单栏和标签栏，点击标签自动展开对应菜单，点击菜单自动滚动到显示对应标签 ⭐
+- 优化 使用响应式语法糖重构代码
+- 优化 代码结构 + 注释
+
+---
+
 2022-12-14:
 
 博客前台：
@@ -388,7 +398,7 @@ docker build -t ginblog .
 - 新增 Nginx 配置 https 访问域名 (http 自动跳转到 https) ⭐
 - 新增 七牛云添加加速域名访问图片资源
 
-博客后端:
+博客后端：
 - 新增 文章搜索接口（数据库模糊查询）
 
 博客前台：

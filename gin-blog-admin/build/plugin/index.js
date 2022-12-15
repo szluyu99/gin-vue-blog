@@ -1,13 +1,13 @@
 import vue from '@vitejs/plugin-vue'
 
-/**
- * * unocss插件，原子css
- * https://github.com/antfu/unocss
- */
+// https://github.com/antfu/unocss
 import Unocss from 'unocss/vite'
 
-// TODO 打包分析插件 rollup-plugin-visualizer
-// TODO 压缩插件 vite-plugin-compression
+// 压缩
+import viteCompression from 'vite-plugin-compression'
+
+// rollup打包分析插件
+import visualizer from 'rollup-plugin-visualizer'
 
 import unplugin from './unplugin'
 import { configHtmlPlugin } from './html'
@@ -15,13 +15,21 @@ import { configHtmlPlugin } from './html'
 export function createVitePlugins(viteEnv, isBuild) {
   const plugins = [
     vue({
-      reactivityTransform: true, // 启用响应式语法糖$ref $computed $toRef
+      reactivityTransform: true, // 启用响应式语法糖
     }),
     ...unplugin,
     Unocss(),
     configHtmlPlugin(viteEnv, isBuild),
   ]
-  // 读取 .env 中的配置
-  // viteEnv?.VITE_USE_MOCK && plugins.push(configMockPlugin(isBuild))
+
+  viteEnv?.VITE_USE_COMPRESS && plugins.push(viteCompression({ algorithm: 'gzip' }))
+
+  isBuild && plugins.push(
+    visualizer({
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+    }))
+
   return plugins
 }

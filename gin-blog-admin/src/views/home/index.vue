@@ -1,14 +1,24 @@
 <script setup>
 import { useUserStore } from '@/store'
 import api from '@/api'
-const userStore = useUserStore()
+const { nickname, avatar } = useUserStore()
 
-const homeInfo = ref({})
-onMounted(() => {
-  api.getHomeInfo().then((res) => {
-    homeInfo.value = res.data
-  })
+let homeInfo = $ref({})
+onMounted(async () => {
+  getOneSentence()
+  const res = await api.getHomeInfo()
+  homeInfo = res.data
 })
+
+// 一言
+let sentence = $ref('')
+function getOneSentence() {
+  // 一言 + 打字机特效
+  fetch('https://v1.hitokoto.cn?c=i')
+    .then(res => res.json())
+    .then(data => sentence = data.hitokoto)
+    .catch(() => sentence = '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。')
+}
 </script>
 
 <template>
@@ -16,29 +26,37 @@ onMounted(() => {
     <div flex-1>
       <n-card rounded-10>
         <div flex items-center>
-          <n-avatar round :size="60" :src="userStore.avatar" />
+          <n-avatar round :size="60" :src="avatar" />
           <div ml-20>
             <p text-16>
-              Hello, {{ userStore.nickname }}
+              Hello, {{ nickname }}
             </p>
             <p text-12 mt-5 op-60>
-              今天又是元气满满的一天
+              {{ sentence }}
             </p>
           </div>
           <div ml-auto flex items-center>
             <!-- <n-statistic label="待办" :value="4">
-              <template #suffix> / 10 </template>
+              <template #suffix>
+                / 10
+              </template>
             </n-statistic> -->
-            <!-- <n-statistic label="Stars" w-100 ml-80>
-              <a href="https://github.com/szluyu99/gin-vue-blog">
-                <img alt="stars" src="https://badgen.net/github/stars/szluyu99/gin-vue-blog" />
+            <n-statistic label="Stars" w-80 ml-80>
+              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
+                <img
+                  alt="stars"
+                  src="https://badgen.net/github/stars/szluyu99/gin-vue-blog"
+                >
               </a>
             </n-statistic>
             <n-statistic label="Forks" w-100 ml-80>
-              <a href="https://github.com/szluyu99/gin-vue-blog">
-                <img alt="forks" src="https://badgen.net/github/forks/szluyu99/gin-vue-blog" />
+              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
+                <img
+                  alt="forks"
+                  src="https://badgen.net/github/forks/szluyu99/gin-vue-blog"
+                >
               </a>
-            </n-statistic> -->
+            </n-statistic>
           </div>
         </div>
       </n-card>
@@ -78,7 +96,8 @@ onMounted(() => {
         </n-gi>
       </n-grid>
 
-      <n-card title="项目" size="small" segment mt-15 rounded-10>
+      <!-- TODO: 完善首页设计 -->
+      <n-card title="项目" size="small" mt-15 rounded-10>
         <template #header-extra>
           <n-button text type="primary">
             更多

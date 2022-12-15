@@ -14,13 +14,13 @@ export const loginTypeMap = {
 }
 
 // 文章类型选项
-export const artTypeOptions = [
+export const articleTypeOptions = [
   { label: '原创', value: 1 },
   { label: '转载', value: 2 },
   { label: '翻译', value: 3 },
 ]
 
-export const artTypeMap = {
+export const articleTypeMap = {
   1: { name: '原创', tag: 'error' },
   2: { name: '转载', tag: 'success' },
   3: { name: '翻译', tag: 'warning' },

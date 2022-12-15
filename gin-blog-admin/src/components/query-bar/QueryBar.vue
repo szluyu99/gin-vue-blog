@@ -4,7 +4,11 @@ const emit = defineEmits(['search', 'reset'])
 </script>
 
 <template>
-  <div min-h-60 p-15 flex items-start justify-between b-1 bc-ccc rounded-8 bg="#fafafc">
+  <div
+    flex items-start justify-between
+    min-h-60 p-15
+    b-1 bc-ccc rounded-8 bg="#fafafc"
+  >
     <n-space wrap :size="[35, 15]">
       <slot />
     </n-space>

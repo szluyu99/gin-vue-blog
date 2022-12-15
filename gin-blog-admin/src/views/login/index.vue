@@ -41,45 +41,53 @@ async function handleLogin() {
     return
   }
 
-  // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-  const captcha = new TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
-    if (res.ret === 0) {
-      loading.value = true
-      $message.loading('正在验证...')
+  const doLogin = async (username, password) => {
+    loading.value = true
+    $message.loading('正在验证...')
 
-      // 登录接口
-      try {
-        const res = await api.login({ username, password })
-        setToken(res.data.token) // 持久化 token
-        $message.success('登录成功')
+    // 登录接口
+    try {
+      const res = await api.login({ username, password })
+      setToken(res.data.token) // 持久化 token
+      $message.success('登录成功')
 
-        await userStore.getUserInfo() // 获取用户信息
-        await appStore.getBlogInfo() // 获取博客信息
+      await userStore.getUserInfo() // 获取用户信息
+      await appStore.getBlogInfo() // 获取博客信息
 
-        // "记住我" 功能
-        isRemember.value
-          ? lStorage.set('loginInfo', { username, password })
-          : lStorage.remove('loginInfo')
+      // "记住我" 功能
+      isRemember.value
+        ? lStorage.set('loginInfo', { username, password })
+        : lStorage.remove('loginInfo')
 
-        // 动态添加路由
-        await addDynamicRoutes()
+      // 动态添加路由
+      await addDynamicRoutes()
 
-        // 页面跳转: 根据 URL 中的 redirect 进行跳转
-        if (query.redirect) {
-          const path = query.redirect
-          Reflect.deleteProperty(query, 'redirect') // 从对象身上删除属性
-          router.push({ path, query })
-        }
-        else {
-          router.push('/')
-        }
+      // 页面跳转: 根据 URL 中的 redirect 进行跳转
+      if (query.redirect) {
+        const path = query.redirect
+        Reflect.deleteProperty(query, 'redirect') // 从对象身上删除属性
+        router.push({ path, query })
       }
-      finally {
-        loading.value = false
+      else {
+        router.push('/')
       }
     }
-  })
-  captcha.show()
+    finally {
+      loading.value = false
+    }
+  }
+
+  // 判断是否需要验证码
+  if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
+    // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
+    const captcha = new TencentCaptcha(config.TENCENT_CAPTCHA,
+      async res => res.ret === 0 && doLogin(username, password),
+    )
+    captcha.show()
+  }
+  else {
+    doLogin(username, password)
+  }
 }
 </script>
 

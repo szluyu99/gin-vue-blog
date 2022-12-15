@@ -29,13 +29,6 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  /** 选中的列 **/
-  // selections: {
-  //   type: Array,
-  //   default() {
-  //     return []
-  //   },
-  // },
   /** queryBar 中的参数 */
   queryItems: {
     type: Object,
@@ -53,8 +46,8 @@ const props = defineProps({
   /**
    * ! 约定接口入参出参
    * * 分页模式需约定分页接口入参
-   *    @param {number} pageSize 分页参数：一页展示多少条，默认 10
-   *    @param {number} pageNum   分页参数：页码，默认 1
+   *    @param {number} pageSize 分页参数: 一页展示多少条，默认 10
+   *    @param {number} pageNum   分页参数: 页码，默认 1
    * * 需约定接口出参
    *    @param {number} pageData 分页模式必须, 非分页模式如果没有 pageData 则取上一层 data
    *    @param {number} total    分页模式必须，非分页模式如果没有 total 则取上一层 data.length
@@ -67,11 +60,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:queryItems', 'onChecked'])
 
-const selections = ref([]) // 多选
-
-const loading = ref(false)
+let loading = $ref(false) // 加载
+let selections = $ref([]) // 多选
+let tableData = $ref([]) // 表格数据
 const initQuery = { ...props.queryItems }
-const tableData = ref([])
+
 // 分页配置
 const pagination = reactive({
   page: 1,
@@ -93,12 +86,12 @@ const pagination = reactive({
 })
 
 async function handleQuery() {
-  selections.value = [] // 重置选中
+  selections = [] // 重置选中
 
   try {
-    loading.value = true
+    loading = true
     let paginationParams = {}
-    // 如果非分页模式或者使用前端分页,则无需传分页参数
+    // 如果非分页模式或者使用前端分页, 则无需传分页参数
     if (props.isPagination && props.remote) {
       paginationParams = {
         page_num: pagination.page,
@@ -110,15 +103,15 @@ async function handleQuery() {
       ...props.extraParams,
       ...paginationParams,
     })
-    tableData.value = data?.pageData || data
+    tableData = data?.pageData || data
     pagination.itemCount = data?.total ?? data.length
   }
   catch (error) {
-    tableData.value = []
+    tableData = []
     pagination.itemCount = 0
   }
   finally {
-    loading.value = false
+    loading = false
   }
 }
 
@@ -131,7 +124,6 @@ async function handleReset() {
   const queryItems = { ...props.queryItems }
   for (const key in queryItems)
     queryItems[key] = null // 注意类型
-
   emit('update:queryItems', { ...queryItems, ...initQuery })
   await nextTick()
   pagination.page = 1
@@ -140,23 +132,21 @@ async function handleReset() {
 
 function onPageChange(currentPage) {
   pagination.page = currentPage
-  // 后端分页
-  if (props.remote)
-    handleQuery()
+  props.remote && handleQuery() // 后端分页
 }
 
 function onChecked(rowKeys) {
-  selections.value = rowKeys
+  selections = rowKeys
   // 包含 selection
   if (props.columns.some(item => item.type === 'selection'))
     emit('onChecked', rowKeys)
 }
 
-defineExpose({
+defineExpose($$({
   handleSearch,
   handleReset,
   selections,
-})
+}))
 </script>
 
 <template>

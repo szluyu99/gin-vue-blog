@@ -6,7 +6,7 @@ import { usePermissionStore, useUserStore } from '@/store'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/blog-admin'
-  routes: basicRoutes, // FIXME: 刷新时有时候加载不到?
+  routes: basicRoutes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })
 
@@ -26,7 +26,7 @@ export async function resetRouter() {
   })
 }
 
-// 添加动态路由
+// ! 添加动态路由: 可以由前端生成或后端生成路由
 export async function addDynamicRoutes() {
   const token = getToken()
 
@@ -43,9 +43,12 @@ export async function addDynamicRoutes() {
     const permissionStore = usePermissionStore()
     // userId 不存在, 则调用接口根据 token 获取用户信息
     !userStore.userId && (await userStore.getUserInfo())
-    // 根据用户角色生成路由, 并添加到当前路由实例中
-    // const accessRoutes = permissionStore.generateRoutes(['admin']) // ! 前端控制路由
-    const accessRoutes = await permissionStore.generateRoutesFromBack() // ! 后端生成路由
+
+    // 根据环境变量中的值决定前端生成路由还是后端路由
+    const accessRoutes = (JSON.parse(import.meta.env.VITE_BACK_ROUTER))
+      ? await permissionStore.generateRoutesBack() // ! 后端生成路由
+      : permissionStore.generateRoutesFront(['admin']) // ! 前端生成路由 (根据角色)
+
     // 将当前没有的路由添加进去
     accessRoutes.forEach(route => !router.hasRoute(route.name) && router.addRoute(route))
     // 移除 EMPTY_ROUTE 页面
@@ -54,7 +57,8 @@ export async function addDynamicRoutes() {
     router.addRoute(NOT_FOUND_ROUTE)
   }
   catch (err) {
-    window.$message.error('addDynamicRoutes Error')
+    // window.$message.error('addDynamicRoutes Error')
+    console.error(err)
   }
 }
 

@@ -46,9 +46,8 @@ func BackRouter() http.Handler {
 	base := r.Group("/api")
 	{
 		// TODO: 用户注册 和 后台登录 应该记录到 日志
-		base.POST("/upload", uploadAPI.UploadFile) // 文件上传 TODO: 重构
-		base.POST("/login", userAuthAPI.Login)     // 后台登录
-		base.POST("/report", blogInfoAPI.Report)   // 上报信息
+		base.POST("/login", userAuthAPI.Login)   // 后台登录
+		base.POST("/report", blogInfoAPI.Report) // 上报信息
 	}
 
 	// 需要鉴权的接口
@@ -61,6 +60,7 @@ func BackRouter() http.Handler {
 	{
 		auth.GET("/home", blogInfoAPI.GetHomeInfo) // 后台首页信息
 		auth.GET("/logout", userAuthAPI.Logout)    // 退出登录
+		auth.POST("/upload", uploadAPI.UploadFile) // 文件上传
 
 		// 博客设置
 		setting := auth.Group("/setting")
