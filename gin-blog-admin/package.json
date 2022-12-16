@@ -17,7 +17,6 @@
     "axios": "^0.27.2",
     "dayjs": "^1.11.7",
     "highlight.js": "^11.7.0",
-    "lodash-es": "^4.17.21",
     "md-editor-v3": "^2.5.0",
     "pinia": "^2.0.27",
     "pinia-plugin-persistedstate": "^3.0.1",

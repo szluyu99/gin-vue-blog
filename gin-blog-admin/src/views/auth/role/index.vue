@@ -30,19 +30,29 @@ const {
 })
 
 // 菜单, 资源 跳出菜单的选项不同
-const showMenu = ref(true)
-const resourceOption = ref([]) // 资源选项
-const menuOption = ref([]) // 菜单选项
+let showMenu = $ref(true)
+let resourceOption = $ref([]) // 资源选项
+let menuOption = $ref([]) // 菜单选项
 
 onMounted(() => {
   $table?.handleSearch()
-  api.getResourceOption().then(res => (resourceOption.value = res.data))
-  api.getMenuOption().then(res => (menuOption.value = res.data))
+  api.getResourceOption().then(res => (resourceOption = res.data))
+  api.getMenuOption().then(res => (menuOption = res.data))
 })
 
 const columns = [
-  { type: 'selection', width: 15, fixed: 'left' },
-  { title: '角色名', key: 'name', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  {
+    type: 'selection',
+    width: 15,
+    fixed: 'left',
+  },
+  {
+    title: '角色名',
+    key: 'name',
+    width: 80,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
   {
     title: '角色标签',
     key: 'label',
@@ -94,7 +104,7 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenu.value = true
+              showMenu = true
               handleEdit(row)
             },
           },
@@ -110,7 +120,7 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenu.value = false
+              showMenu = false
               handleEdit(row)
             },
           },

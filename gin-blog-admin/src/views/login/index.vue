@@ -12,7 +12,7 @@ const title = import.meta.env.VITE_TITLE // 环境变量中读取
 const [userStore, appStore, router] = [useUserStore(), useAppStore(), useRouter()]
 const { query } = useRoute()
 
-const loginInfo = ref({
+let loginInfo = $ref({
   username: 'test@qq.com',
   password: '11111',
 })
@@ -23,7 +23,7 @@ initLoginInfo()
 function initLoginInfo() {
   const localLoginInfo = lStorage.get('loginInfo')
   if (localLoginInfo) {
-    loginInfo.value = {
+    loginInfo = {
       username: localLoginInfo.username || 'test@qq.com',
       password: localLoginInfo.password || '11111',
     }
@@ -32,17 +32,17 @@ function initLoginInfo() {
 
 // Reactive LocalStorage/SessionStorage - vueuse
 const isRemember = useStorage('isRemember', false)
-const loading = ref(false)
+let loading = $ref(false)
 
 async function handleLogin() {
-  const { username, password } = loginInfo.value
+  const { username, password } = loginInfo
   if (!username || !password) {
     $message.warning('请输入用户名和密码')
     return
   }
 
   const doLogin = async (username, password) => {
-    loading.value = true
+    loading = true
     $message.loading('正在验证...')
 
     // 登录接口
@@ -73,7 +73,7 @@ async function handleLogin() {
       }
     }
     finally {
-      loading.value = false
+      loading = false
     }
   }
 
@@ -149,3 +149,4 @@ async function handleLogin() {
     </div>
   </AppPage>
 </template>
+

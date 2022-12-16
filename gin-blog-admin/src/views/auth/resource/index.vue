@@ -22,7 +22,6 @@ const {
   modalFormRef,
 } = useCRUD({
   name: '接口',
-  initForm: {},
   doCreate: api.saveOrUpdateResource,
   doDelete: api.deleteResource,
   doUpdate: api.saveOrUpdateResource,
@@ -37,7 +36,7 @@ onMounted(() => {
 const requestMethods = ['GET', 'POST', 'DELETE', 'PUT']
 
 // 请求方法对应不同类型的标签 (计算属性传参)
-const tagType = computed(() => (type) => {
+const tagType = $computed(() => (type) => {
   switch (type) {
     case 'GET':
       return 'info'
@@ -65,7 +64,7 @@ const columns = [
         ? ''
         : h(
           NTag,
-          { type: tagType.value(row.request_method) }, // 注意这里使用计算属性
+          { type: tagType(row.request_method) }, // 注意这里使用计算属性
           { default: () => row.request_method },
         )
     },
@@ -115,7 +114,7 @@ const columns = [
             style: `display: ${row.children ? '' : 'none'};`,
             onClick: () => {
               handleAdd()
-              modalForm.value.parent_id = row.id // 父资源id
+              modalForm.parent_id = row.id // 父资源id
             },
           },
           { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 14 }) },
@@ -160,20 +159,20 @@ async function handleUpdateAnonymous(row) {
 }
 
 // 模块相关
-const moduleModalVisible = ref(false)
+let moduleModalVisible = $ref(false)
 function handleAddModule() {
   modalAction.value = 'add'
   modalForm.value = {}
-  moduleModalVisible.value = true
+  moduleModalVisible = true
 }
 function handleEditModule(row) {
   modalAction.value = 'edit'
   modalForm.value = { ...row }
-  moduleModalVisible.value = true
+  moduleModalVisible = true
 }
 async function handleModuleSave() {
   handleSave()
-  moduleModalVisible.value = false
+  moduleModalVisible = false
 }
 </script>
 

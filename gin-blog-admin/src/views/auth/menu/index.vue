@@ -11,14 +11,13 @@ const $table = $ref(null)
 const queryItems = $ref({})
 
 // 表单初始化内容
-const initForm = ref({
+const initForm = $ref({
   order_num: 1,
   is_hidden: 0,
 })
 
 const {
   modalVisible,
-  modalAction,
   modalTitle,
   modalLoading,
   handleAdd,
@@ -29,7 +28,7 @@ const {
   modalFormRef,
 } = useCRUD({
   name: '菜单',
-  initForm: initForm.value,
+  initForm,
   doCreate: api.saveOrUpdateMenu,
   doDelete: api.deleteMenu,
   doUpdate: api.saveOrUpdateMenu,
@@ -41,7 +40,7 @@ onMounted(() => {
 })
 
 // 是否展示 "菜单类型"
-const showMenuType = ref(false)
+let showMenuType = $ref(false)
 
 const columns = [
   { title: '菜单名称', key: 'name', width: 80, ellipsis: { tooltip: true } },
@@ -109,10 +108,10 @@ const columns = [
             type: 'primary',
             style: `display: ${row.children ? '' : 'none'};`,
             onClick: () => {
-              initForm.value.is_catelogue = false // 设置非目录(显示组件路径)
-              initForm.value.component = '' // 手动清空组件路径
-              initForm.value.parent_id = row.id // 设置父菜单id
-              showMenuType.value = false
+              initForm.is_catelogue = false // 设置非目录(显示组件路径)
+              initForm.component = '' // 手动清空组件路径
+              initForm.parent_id = row.id // 设置父菜单id
+              showMenuType = false
               handleAdd()
             },
           },
@@ -125,7 +124,7 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenuType.value = false
+              showMenuType = false
               handleEdit(row)
             },
           },
@@ -172,10 +171,10 @@ async function handleUpdateHidden(row) {
 
 // 新增菜单(可选目录)
 function handleClickAddMenu() {
-  showMenuType.value = true
-  initForm.value.is_catelogue = true // 默认选中"目录"
-  initForm.value.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
-  initForm.value.parent_id = 0 // 目录和一级菜单的父id是 0
+  showMenuType = true
+  initForm.is_catelogue = true // 默认选中"目录"
+  initForm.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
+  initForm.parent_id = 0 // 目录和一级菜单的父id是 0
   handleAdd()
 }
 </script>

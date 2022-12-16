@@ -4,20 +4,19 @@ import api from '@/api'
 
 // 应用全局变量
 export const useAppStore = defineStore('app', {
-  // TODO: 为什么其他 pinia 模块没有作持久化数据不会丢失???
   persist: true,
 
   state() {
     return {
       reloadFlag: true,
-      collapsed: false,
-      // keepAlive 路由的 key, 重新赋值可重置 keepAlive
-      aliveKeys: {},
+      aliveKeys: {}, // keepAlive 路由的 key, 重新赋值可重置 keepAlive
       blogConfig: {}, // 博客设置信息
     }
   },
-
   actions: {
+    setAliveKeys(key, val) {
+      this.aliveKeys[key] = val
+    },
     // 刷新页面: 效果并非按 F5 刷新整个网页, 而是模拟刷新 (nextTick + 滚动到顶部)
     async reloadPage() {
       window.$loadingBar.start()
@@ -33,16 +32,6 @@ export const useAppStore = defineStore('app', {
         document.documentElement.scrollTo({ left: 0, top: 0 })
         window.$loadingBar.finish()
       }, 100)
-    },
-    // 切换页面展开
-    switchCollapsed() {
-      this.collapsed = !this.collapsed
-    },
-    setCollapsed(collapsed) {
-      this.collapsed = collapsed
-    },
-    setAliveKeys(key, val) {
-      this.aliveKeys[key] = val
     },
     // 加载博客设置信息
     async getBlogInfo() {

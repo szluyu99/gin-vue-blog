@@ -4,13 +4,13 @@ import '@wangeditor/editor/dist/css/style.css'
 
 defineOptions({ name: 'RichTextEditor' })
 
-const editorRef = shallowRef()
+let editorRef = $shallowRef()
 const toolbarConfig = { excludeKeys: 'fullScreen' }
 const editorConfig = { placeholder: '请输入内容...', MENU_CONF: {} }
 const valueHtml = ref('')
 
 const handleCreated = (editor) => {
-  editorRef.value = editor
+  editorRef = editor
 }
 </script>
 

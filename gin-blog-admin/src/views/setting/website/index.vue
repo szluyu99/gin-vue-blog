@@ -9,15 +9,15 @@ const appStore = useAppStore()
 appStore.getBlogInfo()
 
 // 表单数据
-const form = ref(appStore.blogConfig)
-const formRef = ref(null)
+const form = $ref(appStore.blogConfig)
+const formRef = $ref(null)
 
 async function handleSave() {
-  formRef.value?.validate(async (err) => {
+  formRef?.validate(async (err) => {
     if (!err) {
       try {
         $loadingBar?.start()
-        await api.updateBlogConfig(form.value)
+        await api.updateBlogConfig(form)
         $loadingBar?.finish()
         $message.success('博客信息更新成功')
         appStore.getBlogInfo() // 重新加载信息

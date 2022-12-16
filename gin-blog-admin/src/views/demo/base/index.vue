@@ -11,16 +11,16 @@ const handleDelete = function () {
   })
 }
 
-const loading = ref(false)
+let loading = $ref(false)
 function handleLogin() {
-  loading.value = true
+  loading = true
   $message.loading('登陆中...')
   setTimeout(() => {
     $message.error('登陆失败')
     $message.loading('正在尝试重新登陆...')
     setTimeout(() => {
       $message.success('登陆成功')
-      loading.value = false
+      loading = false
     }, 2000)
   }, 2000)
 }

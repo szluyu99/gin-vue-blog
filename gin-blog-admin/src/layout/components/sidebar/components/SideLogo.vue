@@ -1,6 +1,6 @@
 <script setup>
-import { useAppStore } from '@/store'
-const { collapsed } = storeToRefs(useAppStore())
+import { useThemeStore } from '@/store'
+const { collapsed } = storeToRefs(useThemeStore())
 const title = import.meta.env.VITE_TITLE
 </script>
 

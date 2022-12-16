@@ -4,10 +4,10 @@ import AppMain from './components/AppMain.vue'
 import Sidebar from './components/sidebar/index.vue'
 import AppTags from './components/tags/index.vue'
 
-import { useAppStore } from '@/store'
+import { useThemeStore } from '@/store'
 import { header, tags } from '~/setting'
 
-const { collapsed } = storeToRefs(useAppStore())
+const { collapsed } = storeToRefs(useThemeStore())
 </script>
 
 <template>

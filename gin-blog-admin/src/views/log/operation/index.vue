@@ -7,7 +7,7 @@ import api from '@/api'
 defineOptions({ name: '操作日志' })
 
 // 请求方法对应不同类型的标签 (计算属性传参)
-const tagType = computed(() => (type) => {
+const tagType = $computed(() => (type) => {
   switch (type) {
     case 'GET':
       return 'info'
@@ -39,9 +39,9 @@ const columns = [
   { type: 'selection', width: 20, fixed: 'left' },
   { title: '系统模块', key: 'opt_module', width: 70, align: 'center', ellipsis: { tooltip: true } },
   { title: '操作类型', key: 'opt_type', width: 70, align: 'center', ellipsis: { tooltip: true } },
-  { title: '操作描述', key: 'opt_desc', width: 80, align: 'center', ellipsis: { tooltip: true } },
+  // { title: '操作描述', key: 'opt_desc', width: 80, align: 'center', ellipsis: { tooltip: true } },
   {
-    title: '请求方式',
+    title: '请求方法',
     key: 'request_method',
     width: 80,
     align: 'center',
@@ -49,7 +49,7 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: tagType.value(row.request_method) }, // 注意这里使用计算属性
+        { type: tagType(row.request_method) }, // 注意这里使用计算属性
         { default: () => row.request_method },
       )
     },
@@ -182,14 +182,19 @@ function copyFormatCode(code) {
         <n-form-item label="请求地址: " path="opt_url">
           {{ modalForm.opt_url }}
         </n-form-item>
-        <n-form-item label="请求方式: " path="opt_type">
+        <n-form-item label="请求方法: " path="request_method">
+          <NTag :type="tagType(modalForm.request_method)">
+            {{ modalForm.request_method }}
+          </NTag>
+        </n-form-item>
+        <n-form-item label="操作类型: " path="opt_type">
           {{ modalForm.opt_type }}
         </n-form-item>
         <n-form-item label="操作方法: " path="opt_method">
           <n-code
             :code="modalForm.opt_method"
             code-wrap
-            language="javascript"
+            language="json"
           />
         </n-form-item>
         <n-form-item label="操作人员: " path="nickname">
@@ -200,7 +205,7 @@ function copyFormatCode(code) {
             p-7 cursor-pointer
             word-wrap
             :code="modalForm.request_param"
-            language="javascript"
+            language="json"
             @click="copyFormatCode(modalForm.request_param)"
           />
         </n-form-item>
@@ -208,7 +213,7 @@ function copyFormatCode(code) {
           <n-code
             p-7 cursor-pointer
             :code="JSON.stringify(JSON.parse(modalForm.response_data), null, 2)"
-            language="javascript"
+            language="json"
             @click="copyFormatCode(modalForm.response_data)"
           />
         </n-form-item>

@@ -5,22 +5,22 @@ import api from '@/api'
 
 defineOptions({ name: '关于我' })
 
-const aboutContent = ref('')
-const btnLoading = ref(false)
+let aboutContent = $ref('')
+let btnLoading = $ref(false)
 
 onMounted(async () => {
   const res = await api.getAbout()
-  aboutContent.value = res.data
+  aboutContent = res.data
 })
 
 async function handleSave() {
   try {
-    btnLoading.value = true
-    await api.updateAbout({ content: aboutContent.value })
+    btnLoading = true
+    await api.updateAbout({ content: aboutContent })
     $message.success('更新成功')
   }
   finally {
-    btnLoading.value = false
+    btnLoading = false
   }
 }
 </script>

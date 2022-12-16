@@ -9,6 +9,10 @@ defineOptions({ name: '分类管理' })
 const $table = $ref(null)
 const queryItems = $ref({})
 
+onMounted(() => {
+  $table?.handleSearch()
+})
+
 const {
   modalVisible,
   modalTitle,
@@ -26,10 +30,6 @@ const {
   doDelete: api.deleteCategory,
   doUpdate: api.saveOrUpdateCategory,
   refresh: () => $table?.handleSearch(),
-})
-
-onMounted(() => {
-  $table?.handleSearch()
 })
 
 const columns = [

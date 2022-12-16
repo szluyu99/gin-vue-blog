@@ -16,10 +16,10 @@ const { modalVisible, modalLoading, handleSave, modalForm, modalFormRef, handleE
   refresh: () => $table?.handleSearch(),
 })
 
-const roleOption = ref([])
+let roleOption = $ref([])
 
 onMounted(() => {
-  api.getRoleOption().then(res => roleOption.value = res.data)
+  api.getRoleOption().then(res => roleOption = res.data)
   $table?.handleSearch()
 })
 

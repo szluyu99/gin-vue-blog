@@ -33,7 +33,7 @@ function handleImgUpload({ event }) {
 // 开发环境可以使用本地文件上传, 生产环境建议使用云存储
 const imgUrl = computed(() => convertImgUrl(previewImg))
 
-defineExpose({ previewImg })
+defineExpose($$({ previewImg }))
 </script>
 
 <template>

@@ -5,15 +5,15 @@ import 'md-editor-v3/lib/style.css'
 defineOptions({ name: 'MDEditor' })
 
 // refs
-const post = ref({})
-const btnLoading = ref(false)
+const post = $ref({})
+let btnLoading = $ref(false)
 
 function handleSavePost() {
-  btnLoading.value = true
+  btnLoading = true
   $message.loading('正在保存...')
   setTimeout(() => {
     $message.success('保存成功')
-    btnLoading.value = false
+    btnLoading = false
   }, 2000)
 }
 </script>

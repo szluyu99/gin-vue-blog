@@ -5,19 +5,19 @@ import { useUserStore } from '@/store'
 const userStore = useUserStore()
 
 // 用户信息的表单
-const infoFormRef = ref(null)
-const infoForm = ref({
+const infoFormRef = $ref(null)
+const infoForm = $ref({
   avatar: userStore.avatar,
   nickname: userStore.nickname,
   intro: userStore.intro,
   website: userStore.website,
 })
 async function updateProfile() {
-  infoFormRef.value?.validate(async (err) => {
+  infoFormRef?.validate(async (err) => {
     if (!err) {
-      await api.updateCurrent(infoForm.value)
+      await api.updateCurrent(infoForm)
       $message.success('更新成功!')
-      userStore.setUserInfo(infoForm.value)
+      userStore.setUserInfo(infoForm)
     }
   })
 }
@@ -32,16 +32,16 @@ const infoFormRules = {
 }
 
 // 修改密码的表单
-const passwordFormRef = ref(null)
-const passwordForm = ref({
+const passwordFormRef = $ref(null)
+const passwordForm = $ref({
   old_password: '',
   new_password: '',
   confirm_password: '',
 })
 async function updatePassword() {
-  passwordFormRef.value?.validate(async (err) => {
+  passwordFormRef?.validate(async (err) => {
     if (!err) {
-      await api.updateCurrentPassword(passwordForm.value)
+      await api.updateCurrentPassword(passwordForm)
       $message.success('修改成功!')
     }
   })
@@ -80,10 +80,10 @@ const passwordFormRules = {
   ],
 }
 function validatePasswordStartWith(rule, value) {
-  return !!passwordForm.value.new_password && passwordForm.value.new_password.startsWith(value) && passwordForm.value.new_password.length >= value.length
+  return !!passwordForm.new_password && passwordForm.new_password.startsWith(value) && passwordForm.new_password.length >= value.length
 }
 function validatePasswordSame(rule, value) {
-  return value === passwordForm.value.new_password
+  return value === passwordForm.new_password
 }
 </script>
 

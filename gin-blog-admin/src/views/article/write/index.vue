@@ -1,9 +1,8 @@
 <script setup>
 import MdEditor from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-
+import { NTag } from 'naive-ui'
 import UploadOne from '@/components/upload/UploadOne.vue'
-
 import { articleTypeOptions } from '@/constant/data'
 import { useAppStore, useTagsStore } from '@/store'
 import api from '@/api'
@@ -15,17 +14,19 @@ const [appStore, tagsStore] = [useAppStore(), useTagsStore()]
 
 let categoryOptions = $ref([]) // 分类选项
 let tagOptions = $ref([]) // 标签选项
+let backTagOptions = [] // 备份标签选项
 
 // 解决同时查看多篇文章, 切换标签不刷新的问题
-watch(route, async () => {
-  appStore.reloadPage()
-})
+watch(route, async () => appStore.reloadPage())
 
 onActivated(async () => {
   api.getCategoryOption()
     .then(res => categoryOptions = res.data.map(e => ({ value: e.label, label: e.label })))
   api.getTagOption()
-    .then(res => tagOptions = res.data.map(e => ({ value: e.label, label: e.label })))
+    .then((res) => {
+      tagOptions = res.data.map(e => ({ value: e.label, label: e.label }))
+      backTagOptions = tagOptions
+    })
   // 根据路由中的 id 参数获取文章信息
   await getArticleInfo()
   // TODO: 优化文章显示白屏加载效果
@@ -40,6 +41,12 @@ let formModel = $ref({
 })
 let btnLoading = $ref(false)
 let modalVisible = $ref(false)
+const newTag = $ref(null) // 新增标签
+
+// 监听已选标签, 实时更新可选择的标签
+watch(() => formModel.tag_names, (newVal) => {
+  tagOptions = backTagOptions.filter(e => !newVal.includes(e.label))
+}, { deep: true })
 
 // 根据路由中的 id 参数获取文章信息
 async function getArticleInfo() {
@@ -65,11 +72,6 @@ async function getArticleInfo() {
     window.$loadingBar?.error()
     $message?.error('加载失败')
   }
-}
-
-// 删除标签
-function removeTag(name) {
-  formModel.tag_names = formModel.tag_names.filter(e => e !== name)
 }
 
 // TODO: 保存草稿
@@ -122,6 +124,20 @@ const rules = {
     message: '请选择文章标签',
   },
 }
+
+// 渲染标签
+function renderTag(tag, index) {
+  return h(
+    NTag,
+    {
+      type: 'info',
+      disabled: index > 3,
+      closable: true,
+      onClose: () => formModel.tag_names.splice(index, 1),
+    },
+    { default: () => tag },
+  )
+}
 </script>
 
 <template>
@@ -173,36 +189,29 @@ const rules = {
           />
         </n-form-item>
         <n-form-item label="文章标签" path="tag_names">
-          <n-tag
-            v-for="tag of formModel.tag_names" :key="tag"
-            mr-8 closable type="info"
-            @close="removeTag(tag)"
+          <n-dynamic-tags
+            v-model:value="formModel.tag_names"
+            :render-tag="renderTag"
+            :max="3"
           >
-            {{ tag }}
-          </n-tag>
-          <!-- TODO: 最多选择三个标签 -->
-          <n-popover
-            trigger="click"
-            placement="bottom-start"
-          >
-            <template #trigger>
-              <n-button secondary type="success" size="small">
-                添加标签
-              </n-button>
-            </template>
-            <div w-340>
+            <template #input="{ submit, deactivate }">
               <n-select
-                v-model:value="formModel.tag_names"
-                filterable multiple tag
+                v-model:value="newTag"
+                size="small" filterable tag clearable
                 :options="tagOptions"
-                placeholder="输入标签名搜索，enter 添加自定义标签"
+                placeholder="标签名称"
+                @update:value="{
+                  submit($event);
+                  newTag = null;
+                }"
+                @blur="deactivate"
               >
                 <template #action>
-                  请输入标签名搜索，enter 可添加自定义标签
+                  输入标签名搜索，enter 添加自定义标签
                 </template>
               </n-select>
-            </div>
-          </n-popover>
+            </template>
+          </n-dynamic-tags>
         </n-form-item>
         <n-form-item label="文章类型" path="type">
           <n-select

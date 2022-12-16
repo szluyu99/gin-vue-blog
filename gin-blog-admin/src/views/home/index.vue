@@ -12,8 +12,7 @@ onMounted(async () => {
 
 // 一言
 let sentence = $ref('')
-function getOneSentence() {
-  // 一言 + 打字机特效
+async function getOneSentence() {
   fetch('https://v1.hitokoto.cn?c=i')
     .then(res => res.json())
     .then(data => sentence = data.hitokoto)
@@ -31,9 +30,12 @@ function getOneSentence() {
             <p text-16>
               Hello, {{ nickname }}
             </p>
-            <p text-12 mt-5 op-60>
+            <n-gradient-text
+              mt-5 text-12 op-60
+              gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)"
+            >
               {{ sentence }}
-            </p>
+            </n-gradient-text>
           </div>
           <div ml-auto flex items-center>
             <!-- <n-statistic label="待办" :value="4">
