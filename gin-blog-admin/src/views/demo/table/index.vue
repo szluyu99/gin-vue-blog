@@ -110,7 +110,7 @@ const columns = [
             size: 'small',
             type: 'error',
             style: 'margin-left: 15px;',
-            onClick: () => handleDelete(row.id),
+            onClick: () => handleDelete([row.id]),
           },
           {
             default: () => '删除',

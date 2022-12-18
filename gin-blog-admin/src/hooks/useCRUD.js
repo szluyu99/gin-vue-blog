@@ -80,12 +80,12 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
   }
 
   /**
-   * 批量删除, 数组只有一个元素即为普通删除
-   * @param {[]} ids 主键数组
+   * 删除 (传入数组为批量删除, 传入单个 id 为普通删除)
+   * @param {*} ids 主键数组
    * @param {boolean} needConfirm 是否需要确认窗口
    */
   async function handleDelete(ids, needConfirm = true) {
-    if (!ids || !ids.length) {
+    if (!ids || (Array.isArray(ids) && !ids.length)) {
       window.$message.info('请选择要删除的数据')
       return
     }

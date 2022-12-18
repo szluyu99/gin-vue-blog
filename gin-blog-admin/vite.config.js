@@ -42,6 +42,7 @@ export default defineConfig(({ command, mode }) => {
           drop_debugger: true,
         },
       },
+      minify: 'terser',
     },
   }
 })

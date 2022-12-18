@@ -41,7 +41,6 @@ var (
 	resourceDao     dao.Resource
 	menuDao         dao.Menu
 	operationLogDao dao.OperationLog
-	pageDao         dao.Page
 )
 
 var (

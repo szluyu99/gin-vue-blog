@@ -15,7 +15,7 @@ func Cors() gin.HandlerFunc {
 		// 允许使用的请求方式
 		AllowMethods: []string{"PUT", "POST", "GET", "DELETE", "OPTIONS", "PATCH"},
 		// 允许使用的请求头
-		AllowHeaders: []string{"Origin", "Authorization", "Content-Type"},
+		AllowHeaders: []string{"Origin", "Authorization", "Content-Type", "X-Requested-With"},
 		// 暴露的请求头
 		ExposeHeaders: []string{"Content-Type"},
 		// 凭证共享

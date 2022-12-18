@@ -26,8 +26,9 @@ type ArticleVO struct {
 	IsDelete    *int8  `json:"is_delete"`
 	OriginalUrl string `json:"original_url"`
 
-	CommentCount int `json:"comment_count"`
-	ReadCount    int `json:"read_count"`
+	LikeCount int `json:"like_count"`
+	ViewCount int `json:"view_count"`
+	// CommentCount int `json:"comment_count"`
 }
 
 // 文章详情 VO
@@ -37,7 +38,7 @@ type ArticleDetailVO struct {
 	Desc         string   `json:"desc"`
 	Content      string   `json:"content"`
 	Img          string   `json:"img"`
-	CategoryName string   `json:"category_name"`
+	CategoryName *string  `json:"category_name"`
 	TagNames     []string `json:"tag_names"`
 	Type         int      `json:"type"`
 	OriginalUrl  string   `json:"original_url"`

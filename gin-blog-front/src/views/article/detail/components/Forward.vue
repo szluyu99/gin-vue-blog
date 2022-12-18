@@ -11,7 +11,7 @@ function share() {
     <div>
       <router-link
         v-for="tag of tagList" :key="tag.id"
-        :to="`/tags/${tag.id}`"
+        :to="`/tags/${tag.id}?name=${tag.name}`"
       >
         <span
           px-7 py-3 mr-3 text-12

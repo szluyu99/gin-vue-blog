@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
-import { convertImgUrl, formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, downloadFile, formatDate, getToken, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
 import { articleTypeMap, articleTypeOptions } from '@/constant/data'
 import api from '@/api'
@@ -9,6 +9,7 @@ import api from '@/api'
 defineOptions({ name: '文章列表' })
 
 const [route, router] = [useRoute(), useRouter()]
+const token = getToken()
 
 let categoryOptions = $ref([])
 let tagOptions = $ref([])
@@ -36,16 +37,14 @@ onActivated(() => {
 })
 
 const columns = [
-  { type: 'selection', width: 15, fixed: 'left' },
+  { type: 'selection', width: 20, fixed: 'left' },
   {
     title: '文章封面',
     key: 'img',
-    width: 80,
+    width: 55,
     align: 'center',
     render(row) {
       return h(NImage, {
-        height: 100,
-        width: 160,
         imgProps: { style: { 'border-radius': '2px', 'height': '100%', 'width': '100%' } },
         src: convertImgUrl(row.img),
         fallbackSrc: 'http://dummyimage.com/400x400',
@@ -53,12 +52,27 @@ const columns = [
       })
     },
   },
-  { title: '文章标题', key: 'title', width: 120, align: 'center', ellipsis: { tooltip: true } },
-  { title: '分类', key: 'category.name', width: 60, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '文章标题',
+    key: 'title',
+    width: 120,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: '分类',
+    key: 'category.name',
+    width: 60,
+    align: 'center',
+    ellipsis: { tooltip: true },
+    render(row) {
+      return h('div', row.category.name || '无')
+    },
+  },
   {
     title: '标签',
     key: 'tags',
-    width: 120,
+    width: 100,
     align: 'center',
     render(row) {
       const tags = row.tags ?? []
@@ -68,8 +82,22 @@ const columns = [
           h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => tags[i].name }),
         )
       }
-      return h('div', group)
+      return h('div', group.length ? group : '无')
     },
+  },
+  {
+    title: '浏览量',
+    key: 'view_count',
+    width: 40,
+    align: 'center',
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: '点赞量',
+    key: 'like_count',
+    width: 40,
+    align: 'center',
+    ellipsis: { tooltip: true },
   },
   {
     title: '类型',
@@ -188,6 +216,19 @@ async function handleUpdateTop(row) {
   $table?.handleSearch()
 }
 
+// 导出文章
+async function exportArticles(ids) {
+  // 方式一: 前端根据文章内容和标题进行导出
+  const list = $table?.tableData.filter(e => ids.includes(e.id))
+  for (const item of list)
+    downloadFile(item.content, `${item.title}.md`)
+
+  // 方式二: 后端导出返回链接, 前端根据链接下载
+  // const res = await api.exportArticles(ids)
+  // for (const url of res.data)
+  // downloadFile(url)
+}
+
 // 切换标签页: [全部, 公开, 私密, 草稿箱, 回收站]
 function handleChangeTab(value) {
   switch (value) {
@@ -214,6 +255,28 @@ function handleChangeTab(value) {
   }
   $table?.handleSearch()
 }
+
+// 文件上传前检查类型
+function beforeUpload(data) {
+  if (!data.file.name.endsWith('.md')) {
+    $message.error('只能上传 .md 格式的文件，请重新上传')
+    return false
+  }
+  return true
+}
+
+// 文件上传后的操作
+function afterUpload({ event }) {
+  const respStr = (event?.target).response
+  const res = JSON.parse(respStr)
+  if (res.code === 0) {
+    $table?.handleSearch()
+    $message.success('文章导入成功！')
+  }
+  else {
+    $message.error('文章导入失败！')
+  }
+}
 </script>
 
 <template>
@@ -235,13 +298,24 @@ function handleChangeTab(value) {
       <NButton
         ml-20 type="info"
         :disabled="!$table?.selections.length"
-        @click="() => {}"
+        @click="exportArticles($table?.selections)"
       >
         <TheIcon icon="mdi:export" :size="18" mr-5 /> 批量导出
       </NButton>
-      <NButton ml-20 type="success" @click="() => {}">
-        <TheIcon icon="mdi:import" :size="18" mr-5 /> 批量导入
-      </NButton>
+      <div inline-block>
+        <n-upload
+          action="/api/article/import"
+          :headers="{ Authorization: `Bearer ${token}` }"
+          :show-file-list="false"
+          multiple
+          @before-upload="beforeUpload"
+          @finish="afterUpload"
+        >
+          <NButton ml-20 type="success" @click="importArticles">
+            <TheIcon icon="mdi:import" :size="18" mr-5 /> 批量导入
+          </NButton>
+        </n-upload>
+      </div>
     </template>
     <!-- 导航栏 -->
     <n-tabs type="line" animated @update:value="handleChangeTab">

@@ -146,6 +146,7 @@ defineExpose($$({
   handleSearch,
   handleReset,
   selections,
+  tableData,
 }))
 </script>
 

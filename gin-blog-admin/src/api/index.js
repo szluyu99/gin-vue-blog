@@ -14,6 +14,8 @@ export default {
   deleteArticle: (data = []) => request.delete('/article', { data }), // 物理删除
   softDeleteArticle: data => request.put('/article/soft-delete', data), // 软删除
   updateArticleTop: data => request.put('/article/top', data), // 修改文章置顶
+  exportArticles: (data = []) => request.post('/article/export', data), // 导出文章
+  importArticles: data => request.post('/article/import', data), // 导入文章
 
   // 分类相关接口
   getCategorys: (params = {}) => request.get('/category/list', { params }),

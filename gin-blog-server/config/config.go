@@ -52,9 +52,11 @@ type Session struct {
 
 type Upload struct {
 	// Size int    // 文件上传的最大值
-	OssType   string // 存储类型
-	Path      string // 本地文件访问路径
-	StorePath string // 本地文件存储路径
+	OssType     string // 存储类型
+	Path        string // 本地文件访问路径
+	StorePath   string // 本地文件存储路径
+	MdPath      string // Markdown 访问路径
+	MdStorePath string // Markdown 存储路径
 }
 
 type Zap struct {

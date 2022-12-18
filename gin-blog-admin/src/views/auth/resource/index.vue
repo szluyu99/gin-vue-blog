@@ -113,8 +113,8 @@ const columns = [
             type: 'primary',
             style: `display: ${row.children ? '' : 'none'};`,
             onClick: () => {
-              handleAdd()
-              modalForm.parent_id = row.id // 父资源id
+              handleAdd() // 新增弹窗
+              modalForm.value.parent_id = row.id // 父资源id
             },
           },
           { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 14 }) },
@@ -131,7 +131,11 @@ const columns = [
         ),
         h(
           NPopconfirm,
-          { onPositiveClick: () => handleDelete(row.id, false) },
+          {
+            onPositiveClick: () => {
+              handleDelete(row.id, false)
+            },
+          },
           {
             trigger: () =>
               h(

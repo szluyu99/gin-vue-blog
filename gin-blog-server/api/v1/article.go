@@ -43,4 +43,23 @@ func (*Article) UpdateTop(c *gin.Context) {
 	r.SendCode(c, articleService.UpdateTop(utils.BindValidJson[req.UpdateArtTop](c)))
 }
 
-// TODO: 导入导出文章
+// 导出文章: 获取导出后的资源链接列表
+func (*Article) Export(c *gin.Context) {
+	r.SuccessData(c, articleService.Export(utils.BindJson[[]int](c)))
+}
+
+// 导入文章: 题目 + 内容
+func (*Article) Import(c *gin.Context) {
+	_, fileHeader, err := c.Request.FormFile("file")
+	if err != nil {
+		r.SendCode(c, r.EEROR_FILE_RECEIVE)
+		return
+	}
+	fileName := fileHeader.Filename
+	articleService.Import(
+		fileName[:len(fileName)-3],
+		utils.File.ReadFromFileHeader(fileHeader),
+		utils.GetFromContext[int](c, "user_info_id"),
+	)
+	r.Success(c)
+}

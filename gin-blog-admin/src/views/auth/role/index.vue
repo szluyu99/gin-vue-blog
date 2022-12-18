@@ -105,6 +105,7 @@ const columns = [
             type: 'info',
             onClick: () => {
               showMenu = true
+              api.getMenuOption().then(res => (menuOption = res.data))
               handleEdit(row)
             },
           },
@@ -121,6 +122,7 @@ const columns = [
             type: 'info',
             onClick: () => {
               showMenu = false
+              api.getResourceOption().then(res => (resourceOption = res.data))
               handleEdit(row)
             },
           },

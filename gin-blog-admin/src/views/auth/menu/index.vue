@@ -133,8 +133,7 @@ const columns = [
         h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete(row.id, false),
-            onNegativeClick: () => {},
+            onPositiveClick: () => handleDelete([row.id], false),
           },
           {
             trigger: () =>

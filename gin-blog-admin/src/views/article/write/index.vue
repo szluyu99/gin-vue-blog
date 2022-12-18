@@ -37,7 +37,6 @@ const formRef = $ref(null)
 let formModel = $ref({
   status: 1, // 发布形式: 默认公开
   is_top: 0, // 默认不置顶
-  tag_names: [''],
 })
 let btnLoading = $ref(false)
 let modalVisible = $ref(false)
@@ -181,9 +180,7 @@ function renderTag(tag, index) {
           <n-select
             v-model:value="formModel.category_name"
             style="width: 50%"
-            clearable
-            tag
-            filterable
+            clearable tag filterable
             placeholder="关键字搜索，enter 添加"
             :options="categoryOptions"
           />

@@ -108,7 +108,8 @@ func BackRouter() http.Handler {
 			articles.GET("/:id", articleAPI.GetInfo)            // 文章详情
 			articles.PUT("/soft-delete", articleAPI.SoftDelete) // 软删除文章
 			articles.DELETE("", articleAPI.Delete)              // 物理删除文章
-			// TODO: import, export
+			articles.POST("/export", articleAPI.Export)         // 导出文章
+			articles.POST("/import", articleAPI.Import)         // 导入文章
 		}
 		// 评论模块
 		comment := auth.Group("/comment")

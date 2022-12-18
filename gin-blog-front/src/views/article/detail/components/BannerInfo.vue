@@ -70,7 +70,7 @@ function deleteHTMLTag(str: string) {
 
       <router-link
         v-for="tag of article.tags" :key="tag.id"
-        :to="`/tags/${tag.id}`"
+        :to="`/tags/${tag.id}?name=${tag.name}`"
       >
         <span
           px-8 py-1 mr-8

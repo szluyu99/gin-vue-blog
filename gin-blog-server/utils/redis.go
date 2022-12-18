@@ -148,6 +148,10 @@ func (*_redis) HGetAll(key string) map[string]string {
 // rdb.ZAdd()
 // }
 
+func (*_redis) ZRangeWithScores(key string, start, stop int64) []redis.Z {
+	return rdb.ZRangeWithScores(ctx, key, start, stop).Val()
+}
+
 // 获取[有序集合]中, 成员的分数值
 func (*_redis) ZScore(key, member string) int {
 	return int(rdb.ZScore(ctx, key, member).Val())

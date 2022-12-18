@@ -25,6 +25,11 @@ func (*Article) GetList(req req.GetArts) ([]resp.ArticleVO, int64) {
 	var total int64
 
 	db := DB.Model(model.Article{})
+
+	// 评论数量
+	// Select("article.id, article.title, article.content, article.created_at, article.updated_at, user_id, img, article.type, status, is_top, article.is_delete, original_url," +
+	// 	"(SELECT COUNT(*) FROM `comment` WHERE comment.type = 1 AND comment.is_delete = 0 AND is_review = 1 AND comment.topic_id = article.id) AS comment_count")
+
 	// 文章标题
 	if req.Title != "" {
 		db = db.Where("title LIKE ?", "%"+req.Title+"%")
@@ -56,6 +61,7 @@ func (*Article) GetList(req req.GetArts) ([]resp.ArticleVO, int64) {
 	if req.TagId != 0 {
 		db = db.Where("tag_id", req.TagId)
 	}
+
 	db.Count(&total).
 		Limit(req.PageSize).Offset(req.PageSize * (req.PageNum - 1)).
 		Order("is_top DESC, article.id DESC").

@@ -20,7 +20,7 @@
 
 [在线预览](#在线预览) | [目录结构](#目录结构) | [技术介绍](#技术介绍) | [运行环境](#运行环境) | [开发环境](#开发环境) | [快速开始](#快速开始) | [项目总结](#项目总结)  | [鸣谢项目](#鸣谢项目) | [后续计划](#后续计划) | [更新日志](#更新日志)
 
-因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。
+> 因最近忙于学业，本项目开发周期不是很长且断断续续，可能会存在不少 BUG，但是我会逐步修复的。
 
 您的 Star 是我坚持的动力，感谢大家的支持，欢迎提交 Pr 共同改进项目。
 
@@ -28,13 +28,15 @@ Github 地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/sz
 
 Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
 
+其实博客并不是本项目的核心主题，本项目志在提供一个 **代码整洁、质量优秀、轻量级、注释完善、适合初学者学习、适用为模板** 的这么一个完整的全栈前后端项目，只是恰好选择了博客这样一个简单易懂的主题作为核心业务。实际上本项目包含的业务需求并不止博客（例如基于 RBAC 的权限管理、动态菜单等）。
+
 ## 在线预览
 
-博客前台链接：[hahacode.cn](https://www.hahacode.cn)
+博客前台链接：[hahacode.cn](https://www.hahacode.cn)（已适配移动端）
 
-博客后台链接：[hahacode.cn/blog-admin](https://www.hahacode.cn/blog-admin)
+博客后台链接：[hahacode.cn/blog-admin](https://www.hahacode.cn/blog-admin)（暂未专门适配移动端）
 
-> 博客已备案通过，且配置 SSL，可通过 https 访问
+> 博客已备案通过，且配置 SSL，通过 https 访问
 
 测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
 
@@ -42,7 +44,16 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 
 > 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改
 >
-> 并且由于一开始不会用 Apifox，接口文档生成的信息不全（如返回响应、响应示例），抽空完善一下
+> 由于一开始不会用，接口文档生成的信息不全（如返回响应、响应示例），后续完善
+
+以下放几张简单的预览图，强烈建议点击上面的[预览链接](#在线预览)进去体验下：
+
+![前台首页图片](https://img-blog.csdnimg.cn/fd25f0e52cdc467893925a48d0d66662.png)
+
+![前台首页文章列表](https://img-blog.csdnimg.cn/005cee463d3c4e729a1dd7bbee41e963.png)
+
+![后台文章列表](https://img-blog.csdnimg.cn/18c39f63b7b64f7bbd2a4ab764552d13.png)
+
 
 ## 目录结构
 
@@ -120,7 +131,7 @@ gin-blog-server
 
 > 这里只写一些主流的通用技术，详细第三方库：前端参考 `package.json` 文件，后端参考 `go.mod` 文件
 
-前台前端：使用 pnpm 包管理工具
+前端技术栈: 使用 pnpm 包管理工具
 - 基于 TypeScript
 - Vue3
 - VueUse: 服务于 Vue Composition API 的工具集
@@ -131,18 +142,7 @@ gin-blog-server
 - Naive UI
 - ...
 
-后台前端：使用 pnpm 包管理工具
-- 基于 JavaSciprt 
-- Vue3
-- VueUse: 服务于 Vue Composition API 的工具集
-- Unocss: 原子化 CSS
-- Pinia 
-- Vue Router 
-- Axios 
-- Naive UI
-- ...
-
-后端技术栈：
+后端技术栈:
 - 基于 Golang
 - Docker
 - Gin
@@ -155,7 +155,7 @@ gin-blog-server
 - Nginx: 部署静态资源 + 反向代理
 - ...
 
-其他：
+其他:
 - 腾讯云人机验证
 - 七牛云对象存储
 - ...
@@ -334,8 +334,8 @@ docker build -t ginblog .
 
 - ~~完善图片上传功能, 目前文件上传还没怎么处理~~ 🆗
 - 后台首页重新设计（目前没放什么内容）
-- ~~前台首页搜索文章（目前使用数据库模糊搜索）~~
-- 博客文章导入导出 (.md 文件)
+- ~~前台首页搜索文章（目前使用数据库模糊搜索）~~ 🆗
+- ~~博客文章导入导出 (.md 文件)~~ 🆗
 - 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）
 - 后端日志切割
 - ~~后台修改背景图片，博客配置等~~ 🆗
@@ -370,6 +370,13 @@ docker build -t ginblog .
 - `REFINE`: 优化
 - `COMPLETE`: 完善
 - `ADD`: 新增
+
+---
+
+2022-12-17:
+
+博客后台:
+- 新增 文章导入、导出 ⭐
 
 ---
 

@@ -17,5 +17,3 @@ func (*File) UploadFile(header *multipart.FileHeader) (url string, code int) {
 	}
 	return filePath, r.OK
 }
-
-// TODO: 读取、写入文章

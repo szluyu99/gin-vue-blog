@@ -33,8 +33,6 @@ type Article struct {
 	IsTop       *int8  `gorm:"type:tinyint;not null;default:0;comment:是否置顶(0-否 1-是)" json:"is_top"`
 	IsDelete    *int8  `gorm:"type:tinyint;not null;default:0;comment:是否放到回收站(0-否 1-是)" json:"is_delete"`
 	OriginalUrl string `gorm:"type:varchar(100);comment:源链接" json:"original_url"`
-	// CommentCount int    `gorm:"type:int;not null;default:0;comment:评论数量" json:"comment_count"`
-	// ReadCount    int    `gorm:"type:int;not null;default:0;comment:阅读数量" json:"read_count"`
 }
 
 func (a *Article) IsEmpty() bool {

@@ -41,3 +41,7 @@ type GetFrontArts struct {
 	CategoryId int `form:"category_id"`
 	TagId      int `form:"tag_id"`
 }
+
+// 导入文章
+type ImportArt struct {
+}

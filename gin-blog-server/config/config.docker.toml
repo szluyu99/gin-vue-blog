@@ -43,6 +43,9 @@ LogInConsole = false   # 是否输出到控制台
 OssType = "qiniu"              # 控制存储: local、qiniu
 Path = "public/uploaded/"      # 本地文件访问路径
 StorePath = "public/uploaded/" # 本地文件上传路径
+# Markdown 目前只支持本地上传
+MdPath = "public/markdown/"      # Markdown 访问路径
+MdStorePath = "public/markdown/" # Markdown 上传路径
 
 [Qiniu]
 ImgPath = ""          # 外链

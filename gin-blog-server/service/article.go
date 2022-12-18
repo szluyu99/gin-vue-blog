@@ -1,6 +1,7 @@
 package service
 
 import (
+	"gin-blog/config"
 	"gin-blog/dao"
 	"gin-blog/model"
 	"gin-blog/model/req"
@@ -11,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 )
 
 type Article struct{}
@@ -42,13 +44,22 @@ func (*Article) UpdateTop(req req.UpdateArtTop) (code int) {
 }
 
 func (*Article) GetList(req req.GetArts) resp.PageResult[[]resp.ArticleVO] {
-	data, total := articleDao.GetList(req)
-	// TODO: 浏览量, 点赞量
+	articleList, total := articleDao.GetList(req)
+
+	likeCountMap := utils.Redis.HGetAll(KEY_ARTICLE_LIKE_COUNT) // 点赞数量 map
+	viewCountZ := utils.Redis.ZRangeWithScores(KEY_ARTICLE_VIEW_COUNT, 0, -1)
+	viewCountMap := getViewCountMap(viewCountZ) // 访问数量 map
+
+	for i, article := range articleList {
+		articleList[i].ViewCount = viewCountMap[article.ID]
+		articleList[i].LikeCount, _ = strconv.Atoi(likeCountMap[strconv.Itoa(article.ID)])
+	}
+
 	return resp.PageResult[[]resp.ArticleVO]{
 		PageSize: req.PageSize,
 		PageNum:  req.PageNum,
 		Total:    total,
-		List:     data,
+		List:     articleList,
 	}
 }
 
@@ -59,9 +70,11 @@ func (*Article) GetInfo(id int) resp.ArticleDetailVO {
 	tagNames := tagDao.GetTagNamesByArtId(id)
 
 	articleVo := utils.CopyProperties[resp.ArticleDetailVO](article)
-	articleVo.CategoryName = category.Name
+	// 前端 category 为 '' 不显示 placeholder, 为 null 显示 placeholder
+	if category.ID != 0 {
+		articleVo.CategoryName = &category.Name
+	}
 	articleVo.TagNames = tagNames
-
 	return articleVo
 }
 
@@ -124,6 +137,30 @@ func saveArticleTag(req req.SaveOrUpdateArt, articleId int) {
 		})
 	}
 	dao.Create(&articleTags)
+}
+
+// 导出文章:
+func (*Article) Export(ids []int) []string {
+	urls := make([]string, 0)
+	articles := dao.List([]model.Article{}, "title, content", "", "id in ?", ids)
+	for _, article := range articles {
+		utils.File.WriteFile(article.Title+".md", config.Cfg.Upload.MdStorePath, article.Content)
+		urls = append(urls, config.Cfg.Upload.MdPath+article.Title+".md")
+	}
+	return urls
+}
+
+// 导入文章: 标题 + 内容
+func (*Article) Import(title, content string, userId int) {
+	article := model.Article{
+		Title:   title,
+		Content: content,
+		Status:  model.DRAFT,
+		Type:    1,                                            // 默认为原创
+		Img:     blogInfoService.GetBlogConfig().ArticleCover, // 默认图片
+		UserId:  userId,
+	}
+	dao.Create(&article)
 }
 
 /* 前台接口 */
@@ -306,4 +343,14 @@ func substring(source string, start int, end int) string {
 		substring += string(unicodeStr[i])
 	}
 	return substring
+}
+
+// 获取点赞数量 map
+func getViewCountMap(rz []redis.Z) map[int]int {
+	m := make(map[int]int)
+	for _, article := range rz {
+		id, _ := strconv.Atoi(article.Member.(string))
+		m[id] = int(article.Score)
+	}
+	return m
 }
