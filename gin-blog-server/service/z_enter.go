@@ -4,9 +4,9 @@ import (
 	"gin-blog/dao"
 )
 
-const (
-	// redis key
+// redis key
 
+const (
 	KEY_USER         = "user:"        // 记录用户
 	KEY_DELETE       = "delete:"      //? 记录强制下线用户?
 	KEY_ABOUT        = "about"        // 关于我信息
@@ -24,9 +24,6 @@ const (
 	KEY_COMMENT_LIKE_COUNT    = "comment_like_count" // 评论点赞数
 
 	KEY_PAGE = "page" // 页面封面
-
-	// session key
-	// SESSION_ARTICLE_SET = "article_set" //? 文章集合
 )
 
 var (

@@ -311,7 +311,7 @@ function afterUpload({ event }) {
           @before-upload="beforeUpload"
           @finish="afterUpload"
         >
-          <NButton ml-20 type="success" @click="importArticles">
+          <NButton ml-20 type="success">
             <TheIcon icon="mdi:import" :size="18" mr-5 /> 批量导入
           </NButton>
         </n-upload>

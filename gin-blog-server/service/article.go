@@ -139,7 +139,7 @@ func saveArticleTag(req req.SaveOrUpdateArt, articleId int) {
 	dao.Create(&articleTags)
 }
 
-// 导出文章:
+// 导出文章: (目前是前端导出)
 func (*Article) Export(ids []int) []string {
 	urls := make([]string, 0)
 	articles := dao.List([]model.Article{}, "title, content", "", "id in ?", ids)
@@ -180,7 +180,7 @@ func (*Article) GetFrontInfo(c *gin.Context, id int) resp.FrontArticleDetailVO {
 	article.NewestArticles = articleDao.GetNewestList(5)
 	// 更新文章浏览量 TODO: 删除文章时删除其浏览量
 	// updateArticleViewCount(c, id)
-	// * 请求一次就会增加访问量, 即刷新可以刷访问量
+	// * 目前请求一次就会增加访问量, 即刷新可以刷访问量
 	utils.Redis.ZincrBy(KEY_ARTICLE_VIEW_COUNT, strconv.Itoa(id), 1)
 	// 获取上一篇文章, 下一篇文章
 	article.LastArticle = articleDao.GetLast(id)

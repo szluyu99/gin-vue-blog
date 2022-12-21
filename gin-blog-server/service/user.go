@@ -242,10 +242,12 @@ func convertUserDetailDTO(userAuth model.UserAuth, c *gin.Context) dto.UserDetai
 	ipAddress := utils.IP.GetIpAddress(c)
 	ipSource := utils.IP.GetIpSourceSimpleIdle(ipAddress)
 	browser, os := "unknown", "unknown"
+
 	if userAgent := utils.IP.GetUserAgent(c); userAgent != nil {
 		browser = userAgent.Name + " " + userAgent.Version.String()
 		os = userAgent.OS + " " + userAgent.OSVersion.String()
 	}
+
 	// 获取用户详细信息
 	userInfo := dao.GetOne(&model.UserInfo{}, "id", userAuth.ID)
 	// FIXME: 获取该用户对应的角色, 没有角色默认是 "test"
@@ -259,19 +261,18 @@ func convertUserDetailDTO(userAuth model.UserAuth, c *gin.Context) dto.UserDetai
 
 	return dto.UserDetailDTO{
 		LoginVO: resp.LoginVO{
-			ID:            userAuth.ID,
-			UserInfoId:    userInfo.ID,
-			Email:         userInfo.Email,
-			LoginType:     userAuth.LoginType,
-			Username:      userAuth.Username,
-			Nickname:      userInfo.Nickname,
-			Avatar:        userInfo.Avatar,
-			Intro:         userInfo.Intro,
-			Website:       userInfo.Website,
-			IpAddress:     ipAddress,
-			IpSource:      ipSource,
-			LastLoginTime: time.Now(),
-
+			ID:             userAuth.ID,
+			UserInfoId:     userInfo.ID,
+			Email:          userInfo.Email,
+			LoginType:      userAuth.LoginType,
+			Username:       userAuth.Username,
+			Nickname:       userInfo.Nickname,
+			Avatar:         userInfo.Avatar,
+			Intro:          userInfo.Intro,
+			Website:        userInfo.Website,
+			IpAddress:      ipAddress,
+			IpSource:       ipSource,
+			LastLoginTime:  time.Now(),
 			ArticleLikeSet: articleLikeSet,
 			CommentLikeSet: commentLikeSet,
 		},

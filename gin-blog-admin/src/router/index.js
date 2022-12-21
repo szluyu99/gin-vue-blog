@@ -11,7 +11,7 @@ export const router = createRouter({
 })
 
 export async function setupRouter(app) {
-  await addDynamicRoutes()
+  await addDynamicRoutes() // 每次刷新时都添加动态路由
   setupRouterGuard(router) // 路由守卫
   app.use(router)
 }
@@ -57,8 +57,7 @@ export async function addDynamicRoutes() {
     router.addRoute(NOT_FOUND_ROUTE)
   }
   catch (err) {
-    // window.$message.error('addDynamicRoutes Error')
-    console.error(err)
+    console.error('addDynamicRoutes Error: ', err)
   }
 }
 

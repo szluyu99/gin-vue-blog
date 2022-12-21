@@ -21,7 +21,6 @@ func InitGlobalVariable() {
 	utils.InitRedis()
 	// 初始化 Casbin
 	utils.InitCasbin(dao.DB)
-
 }
 
 // 后台服务

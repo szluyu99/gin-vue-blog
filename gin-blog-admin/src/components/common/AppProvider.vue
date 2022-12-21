@@ -5,9 +5,12 @@ import { dateZhCN, useDialog, useLoadingBar, useMessage, useNotification, zhCN }
 // 代码高亮插件
 import hljs from 'highlight.js/lib/core'
 import json from 'highlight.js/lib/languages/json'
+import { useThemeStore } from '@/store'
 import { naiveThemeOverrides } from '~/setting'
 import { setupDialog, setupMessage } from '@/utils'
 hljs.registerLanguage('json', json)
+
+const themeStore = useThemeStore()
 
 // function kebabCase(str) {
 //   return str.replace(/([A-Z])/g, '-$1').toLowerCase()
@@ -38,6 +41,20 @@ const NaiveProviderContent = defineComponent({
   render() {
     return h('div')
   },
+})
+
+// 监听黑暗模式
+watch(() => themeStore.darkMode, (v) => {
+  v
+    ? document.documentElement.classList.add('dark')
+    : document.documentElement.classList.remove('dark')
+})
+
+// 默认是否加载黑夜模式
+onMounted(() => {
+  themeStore.darkMode
+    ? document.documentElement.classList.add('dark')
+    : document.documentElement.classList.remove('dark')
 })
 </script>
 

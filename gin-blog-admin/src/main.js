@@ -16,4 +16,5 @@ async function setupApp() {
   app.mount('#app')
 }
 
+// 每次刷新页面都会执行 main.js 中的内容
 setupApp()

@@ -2,8 +2,10 @@
 import api from '@/api'
 import { getToken } from '@/utils'
 
+const token = getToken()
+
 onMounted(() => {
-  getToken() && api.report() // 上报用户信息
+  token && api.report() // token 不为空, 上报用户信息
 })
 </script>
 

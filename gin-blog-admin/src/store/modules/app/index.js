@@ -5,7 +5,6 @@ import api from '@/api'
 // 应用全局变量
 export const useAppStore = defineStore('app', {
   persist: true,
-
   state() {
     return {
       reloadFlag: true,

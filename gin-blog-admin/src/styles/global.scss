@@ -7,6 +7,19 @@ body {
 
 html {
   font-size: 4px; // * 1rem = 4px  方便unocss计算：在unocss中 1字体单位 = 0.25rem，相当于 1等份 = 1px
+
+  &.dark {
+    filter: invert(1);
+
+    // 通过再次反转图像, 来让图片颜色保持正常
+    img {
+      filter: invert(1);
+    }
+  }
+
+  // 切换黑夜模式时添加过渡动画
+  // transition: color .6s, background-color .6s; // 无效?
+  transition: all .6s; // 有效
 }
 
 body {
@@ -37,25 +50,31 @@ body {
 /* 自定义滚动条样式 */
 .cus-scroll {
   overflow: auto;
+
   &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 }
+
 .cus-scroll-x {
   overflow-x: auto;
+
   &::-webkit-scrollbar {
     width: 0;
     height: 8px;
   }
 }
+
 .cus-scroll-y {
   overflow-y: auto;
+
   &::-webkit-scrollbar {
     width: 8px;
     height: 0;
   }
 }
+
 .cus-scroll,
 .cus-scroll-x,
 .cus-scroll-y {
@@ -63,10 +82,12 @@ body {
     background-color: transparent;
     border-radius: 4px;
   }
+
   &:hover {
     &::-webkit-scrollbar-thumb {
       background: #bfbfbf;
     }
+
     &::-webkit-scrollbar-thumb:hover {
       background: var(--primary-color);
     }

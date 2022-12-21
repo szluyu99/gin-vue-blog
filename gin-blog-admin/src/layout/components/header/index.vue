@@ -1,6 +1,7 @@
 <script setup>
 import MenuCollapse from './components/MenuCollapse.vue'
 import BreadCrumb from './components/BreadCrumb.vue'
+import ThemeMode from './components/ThemeMode.vue'
 import Watermark from './components/Watermark.vue'
 import GithubSite from './components/GithubSite.vue'
 import FullScreen from './components/FullScreen.vue'
@@ -17,6 +18,8 @@ import UserAvatar from './components/UserAvatar.vue'
   <div flex ml-auto items-center>
     <!-- Github 网址图标 -->
     <GithubSite />
+    <!-- 切换模式 -->
+    <ThemeMode />
     <!-- 水印 -->
     <Watermark />
     <!-- 全屏按钮 -->

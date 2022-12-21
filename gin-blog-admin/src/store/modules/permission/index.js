@@ -5,6 +5,7 @@ import Layout from '@/layout/index.vue'
 import api from '@/api'
 
 export const usePermissionStore = defineStore('permission', {
+  persist: true,
   state() {
     return {
       accessRoutes: [], // 可访问的路由

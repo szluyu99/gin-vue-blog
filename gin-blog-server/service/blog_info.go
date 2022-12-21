@@ -17,17 +17,24 @@ type BlogInfo struct{}
 
 // 用户上报信息: 统计地域信息, 访问数量
 func (*BlogInfo) Report(c *gin.Context) (code int) {
-	ipAddress, browser, os := utils.IP.GetInfo(c)
+	ipAddress := utils.IP.GetIpAddress(c)
+	userAgent := utils.IP.GetUserAgent(c)
+	browser := userAgent.Name + " " + userAgent.Version.String()
+	os := userAgent.OS + " " + userAgent.OSVersion.String()
+
 	uuid := utils.Encryptor.MD5(ipAddress + browser + os)
+	// fmt.Println(uuid)
 	// 当前用户没有统计过访问人数 (不在 用户set 中)
 	if !utils.Redis.SIsMember(KEY_UNIQUE_VISITOR_SET, uuid) {
 		// 统计地域信息
 		ipSource := utils.IP.GetIpSource(ipAddress)
-		if ipSource != "未知" { // 获取到具体的位置, 提取出其中的 省份
+		if ipSource != "" { // 获取到具体的位置, 提取出其中的 省份
 			address := strings.Split(ipSource, "|")
-			ipSource = strings.ReplaceAll(address[2], "省", "")
+			province := strings.ReplaceAll(address[2], "省", "")
+			utils.Redis.HIncrBy(KEY_VISITOR_AREA, province, 1)
+		} else {
+			utils.Redis.HIncrBy(KEY_VISITOR_AREA, "未知", 1)
 		}
-		utils.Redis.HIncrBy(KEY_VISITOR_AREA, ipSource, 1)
 		// 访问数量 + 1
 		utils.Redis.Incr(KEY_VIEW_COUNT)
 		// 将当前用户记录到 用户set
@@ -37,7 +44,7 @@ func (*BlogInfo) Report(c *gin.Context) (code int) {
 	return r.OK
 }
 
-// 获取博客首页信息
+// 博客后台首页信息 TODO: 完善首页显示
 func (b *BlogInfo) GetHomeInfo() resp.BlogHomeVO {
 	articleCount := dao.Count(model.Article{}, "status = ? AND is_delete = ?", 1, 0)
 	userCount := dao.Count(model.UserInfo{}, "")
@@ -61,11 +68,12 @@ func (b *BlogInfo) GetHomeInfo() resp.BlogHomeVO {
 func (*BlogInfo) GetBlogConfig() (respVO model.BlogConfigDetail) {
 	// 尝试从 Redis 中取值
 	blogConfig := utils.Redis.GetVal(KEY_BLOG_CONFIG)
+	// Redis 中没有值, 再查数据库, 查到后设置到 Redis 中
 	if blogConfig == "" {
 		blogConfig = dao.GetOne(model.BlogConfig{}, "id", 1).Config
 		utils.Redis.Set(KEY_BLOG_CONFIG, blogConfig, 0)
 	}
-	// 存储到 Redis
+	// 反序列化字符串为 golang 对象
 	utils.Json.Unmarshal(blogConfig, &respVO)
 	return respVO
 }
@@ -74,7 +82,7 @@ func (*BlogInfo) GetBlogConfig() (respVO model.BlogConfigDetail) {
 func (*BlogInfo) UpdateBlogConfig(reqVO model.BlogConfigDetail) (code int) {
 	blogConfig := model.BlogConfig{
 		Universal: model.Universal{ID: 1},
-		Config:    utils.Json.Marshal(reqVO),
+		Config:    utils.Json.Marshal(reqVO), // 序列化 golang 对象
 	}
 	dao.Update(&blogConfig, "config")
 	utils.Redis.Del(KEY_BLOG_CONFIG) // 从 Redis 中清除旧值
