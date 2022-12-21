@@ -195,7 +195,6 @@ gin-blog-server
 | -------- | ---- |
 | Volar   | Vue 官方插件 |
 | UnoCSS | Unocss 官方插件 |
-| Tailwind CSS IntelliSense | Tailwind 官方插件 |
 | Iconify IntelliSense | Iconify 提示插件 |
 
 后端开发插件：
@@ -269,7 +268,7 @@ cd gin-blog-front
 pnpm install
 
 # 3、运行项目
-pnpm run dev
+pnpm dev
 ```
 
 后台前端：
@@ -282,7 +281,7 @@ cd gin-blog-admin
 pnpm install
 
 # 3、运行项目
-pnpm run dev
+pnpm dev
 ```
 
 
@@ -336,12 +335,13 @@ docker build -t ginblog .
 - 后台首页重新设计（目前没放什么内容）
 - ~~前台首页搜索文章（目前使用数据库模糊搜索）~~ 🆗
 - ~~博客文章导入导出 (.md 文件)~~ 🆗
-- 权限管理中菜单编辑时选择图标（现在只能输入图标字符串）
+- ~~权限管理中菜单编辑时选择图标（现在只能输入图标字符串）~~ 🆗
 - 后端日志切割
 - ~~后台修改背景图片，博客配置等~~ 🆗
 - ~~后端的 IP 地址检测 BUG 待修复~~ 🆗
 - ~~博客前台适配移动端~~ 🆗
 - ~~文章详情, 目录锚点跟随~~ 🆗
+- 邮箱注册 + 邮件发送验证码
 
 后续有空安排上：
 - 黑夜模式
@@ -373,7 +373,14 @@ docker build -t ginblog .
 
 ---
 
-2022-12-20::
+2022-12-21:
+
+博客后台:
+- 新增 图标选择组件, 选择范围为自定义图标数组 ⭐
+
+---
+
+2022-12-20:
 
 博客后台: 
 - 完善 IP 检测工具 ⭐

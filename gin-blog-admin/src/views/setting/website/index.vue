@@ -46,7 +46,6 @@ async function handleSave() {
             <UploadOne
               v-model:preview="form.website_avatar"
               :width="120"
-              @finish="val => (form.website_avatar = val)"
             />
           </n-form-item>
           <n-form-item label="网站名称" path="website_name">
@@ -128,14 +127,12 @@ async function handleSave() {
               <UploadOne
                 v-model:preview="form.user_avatar"
                 :width="120"
-                @finish="val => (form.user_avatar = val)"
               />
             </n-form-item>
             <n-form-item label="游客头像" path="tourist_avatar">
               <UploadOne
                 v-model:preview="form.tourist_avatar"
                 :width="120"
-                @finish="val => (form.tourist_avatar = val)"
               />
             </n-form-item>
             <!-- <n-form-item label="微信收款码" path="tourist_avatar">
@@ -149,7 +146,6 @@ async function handleSave() {
             <UploadOne
               v-model:preview="form.article_cover"
               :width="300"
-              @finish="val => (form.article_cover = val)"
             />
           </n-form-item>
           <n-form-item label="评论默认审核" path="is_comment_review">

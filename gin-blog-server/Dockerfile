@@ -13,6 +13,7 @@ FROM alpine:latest
 WORKDIR /app
 COPY --from=0 /app/server .
 COPY --from=0 /app/config/config.docker.toml .
+COPY --from=0 /app/config/ip2region.xdb ./config/ip2region.xdb
 
 # 后台接口
 EXPOSE 8765 

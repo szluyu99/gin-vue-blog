@@ -52,7 +52,7 @@ func (*ipUtil) GetIpAddress(c *gin.Context) (ipAddress string) {
 	}
 
 	// 检测到是本机 IP, 读取其局域网 IP 地址
-	if ipAddress == "127.0.0.1" || strings.HasPrefix(ipAddress, "[::1]") {
+	if strings.HasPrefix(ipAddress, "127.0.0.1") || strings.HasPrefix(ipAddress, "[::1]") {
 		ip, err := externalIP()
 		if err != nil {
 			Logger.Error("GetIpAddress, externalIP, err: ", zap.Error(err))

@@ -21,9 +21,7 @@ func (*BlogInfo) Report(c *gin.Context) (code int) {
 	userAgent := utils.IP.GetUserAgent(c)
 	browser := userAgent.Name + " " + userAgent.Version.String()
 	os := userAgent.OS + " " + userAgent.OSVersion.String()
-
 	uuid := utils.Encryptor.MD5(ipAddress + browser + os)
-	// fmt.Println(uuid)
 	// 当前用户没有统计过访问人数 (不在 用户set 中)
 	if !utils.Redis.SIsMember(KEY_UNIQUE_VISITOR_SET, uuid) {
 		// 统计地域信息
@@ -40,7 +38,6 @@ func (*BlogInfo) Report(c *gin.Context) (code int) {
 		// 将当前用户记录到 用户set
 		utils.Redis.SAdd(KEY_UNIQUE_VISITOR_SET, uuid)
 	}
-
 	return r.OK
 }
 

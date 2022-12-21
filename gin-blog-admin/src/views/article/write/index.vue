@@ -240,7 +240,6 @@ function renderTag(tag, index) {
           <UploadOne
             v-model:preview="formModel.img"
             :width="220"
-            @finish="val => (formModel.img = val)"
           />
         </n-form-item>
         <n-form-item label="置顶" path="is_top">

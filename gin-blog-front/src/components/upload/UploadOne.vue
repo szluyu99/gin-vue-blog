@@ -12,7 +12,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['finish'])
+const emit = defineEmits(['update:preview'])
 
 const token = getToken() // 图片上传需要 Token
 let previewImg = $ref(props.preview)
@@ -26,7 +26,7 @@ function handleImgUpload({ event }: { event?: ProgressEvent }) {
     return
   }
   previewImg = res.data
-  emit('finish', previewImg)
+  emit('update:preview', previewImg)
 }
 
 // 判断是本地上传的图片或网络资源

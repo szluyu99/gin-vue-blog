@@ -1,5 +1,6 @@
 <script setup>
 import { NButton, NPopconfirm, NSwitch } from 'naive-ui'
+import IconPicker from '@/components/icon/IconPicker.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
 import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/hooks'
@@ -49,9 +50,7 @@ const columns = [
     key: 'icon',
     width: 30,
     render(row) {
-      return row.icon
-        ? h(TheIcon, { icon: row.icon, size: 20 })
-        : h(TheIcon, { icon: 'material-symbols:disabled-by-default', size: 20 })
+      return h(TheIcon, { icon: row.icon, size: 20 })
     },
   },
   { title: '排序', key: 'order_num', width: 30, ellipsis: { tooltip: true } },
@@ -169,7 +168,7 @@ async function handleUpdateHidden(row) {
 }
 
 // 新增菜单(可选目录)
-function handleClickAddMenu() {
+function handleClickAdd() {
   showMenuType = true
   initForm.is_catelogue = true // 默认选中"目录"
   initForm.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
@@ -182,7 +181,7 @@ function handleClickAddMenu() {
   <!-- 业务页面 -->
   <CommonPage show-footer title="菜单管理">
     <template #action>
-      <NButton type="primary" @click="handleClickAddMenu">
+      <NButton type="primary" @click="handleClickAdd">
         <TheIcon icon="material-symbols:add" :size="18" /> 新建菜单
       </NButton>
     </template>
@@ -240,7 +239,7 @@ function handleClickAddMenu() {
           <n-input v-model:value="modalForm.name" placeholder="请输入菜单名称" />
         </n-form-item>
         <n-form-item label="菜单图标" path="icon">
-          <n-input v-model:value="modalForm.icon" placeholder="请输入菜单图标" />
+          <IconPicker v-model:value="modalForm.icon" w-full />
         </n-form-item>
         <n-form-item v-if="!modalForm.is_catelogue" label="组件路径" path="component">
           <n-input v-model:value="modalForm.component" placeholder="请输入组件路径" />

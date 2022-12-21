@@ -96,7 +96,6 @@ function validatePasswordSame(rule, value) {
             <UploadOne
               v-model:preview="infoForm.avatar"
               :width="130"
-              @finish="val => (infoForm.avatar = val)"
             />
           </div>
           <n-form

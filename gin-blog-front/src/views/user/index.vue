@@ -36,7 +36,6 @@ async function updateUserInfo() {
         <UploadOne
           v-model:preview="infoForm.avatar"
           :width="140"
-          @finish="val => (infoForm.avatar = val)"
         />
       </n-gi>
       <n-gi span="7">

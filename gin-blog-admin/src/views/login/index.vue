@@ -31,7 +31,7 @@ function initLoginInfo() {
 }
 
 // Reactive LocalStorage/SessionStorage - vueuse
-const isRemember = useStorage('isRemember', false)
+const isRemember = $(useStorage('isRemember', false))
 let loading = $ref(false)
 
 async function handleLogin() {
@@ -55,7 +55,7 @@ async function handleLogin() {
       await appStore.getBlogInfo() // 获取博客信息
 
       // "记住我" 功能
-      isRemember.value
+      isRemember
         ? lStorage.set('loginInfo', { username, password })
         : lStorage.remove('loginInfo')
 
