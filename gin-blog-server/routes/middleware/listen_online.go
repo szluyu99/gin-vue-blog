@@ -32,11 +32,11 @@ func ListenOnline() gin.HandlerFunc {
 		} else { // * session 中还是取不到, 就返回 401 让前端退回登录界面
 			// ! 考虑一下
 			val := session.Get(userKey)
-			// if val == nil {
-			// 	r.Send(c, http.StatusUnauthorized, r.ERROR_TOKEN_RUNTIME, nil)
-			// 	c.Abort()
-			// 	return
-			// }
+			if val == nil {
+				r.Send(c, http.StatusUnauthorized, r.ERROR_TOKEN_RUNTIME, nil)
+				c.Abort()
+				return
+			}
 			utils.Json.Unmarshal(val.(string), &sessionInfo)
 		}
 

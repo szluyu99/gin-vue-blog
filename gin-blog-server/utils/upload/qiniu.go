@@ -7,6 +7,7 @@ import (
 	"gin-blog/config"
 	"gin-blog/utils"
 	"mime/multipart"
+	"path"
 	"time"
 
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
@@ -21,8 +22,7 @@ func (*Qiniu) UploadFile(file *multipart.FileHeader) (filePath, fileName string,
 	putPolicy := storage.PutPolicy{Scope: config.Cfg.Qiniu.Bucket}
 	mac := qbox.NewMac(config.Cfg.Qiniu.AccessKey, config.Cfg.Qiniu.SecretKey)
 	upToken := putPolicy.UploadToken(mac)
-	cfg := qiniuConfig()
-	formUploader := storage.NewFormUploader(cfg)
+	formUploader := storage.NewFormUploader(qiniuConfig())
 	ret := storage.PutRet{}
 	putExtra := storage.PutExtra{Params: map[string]string{"x:name": "github logo"}}
 
@@ -34,7 +34,7 @@ func (*Qiniu) UploadFile(file *multipart.FileHeader) (filePath, fileName string,
 	defer f.Close()
 
 	// 文件名格式 建议保证唯一性
-	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), utils.Encryptor.MD5(file.Filename))
+	fileKey := fmt.Sprintf("%d%s%s", time.Now().Unix(), utils.Encryptor.MD5(file.Filename), path.Ext(file.Filename))
 	putErr := formUploader.Put(context.Background(), &ret, upToken, fileKey, f, file.Size, &putExtra)
 	if putErr != nil {
 		utils.Logger.Error("function formUploader.Put() Filed", zap.Any("err", putErr.Error()))

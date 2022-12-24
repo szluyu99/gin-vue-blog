@@ -7,7 +7,8 @@ const proxyConfigMappings: Record<ProxyType, ProxyConfig> = {
   // 生产环境调用的接口
   prod: {
     prefix: '/api/front',
-    target: 'http://hahacode.cn/api/front',
+    target: 'http://localhost:5678/api/front',
+    // target: 'https://hahacode.cn/api/front',
   },
   test: {
     prefix: '/api/front',

@@ -30,7 +30,7 @@ type MyJWT struct {
 
 // JWT 工具类
 func GetJWT() *MyJWT {
-	return &MyJWT{[]byte(config.Cfg.JWT.SigningKey)}
+	return &MyJWT{[]byte(config.Cfg.JWT.Secret)}
 }
 
 // 生成 JWT
@@ -41,7 +41,7 @@ func (j *MyJWT) GenToken(userId int, role string, uuid string) (string, error) {
 		UUID:   uuid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    config.Cfg.JWT.Issuer,
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(config.Cfg.JWT.ExpiresTime) * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(config.Cfg.JWT.Expire) * time.Hour)),
 		},
 	}
 	// 使用指定的签名方法创建签名对象

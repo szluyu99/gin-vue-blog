@@ -4,10 +4,9 @@ import (
 	"gin-blog/config"
 	"gin-blog/routes/middleware"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +17,11 @@ func BackRouter() http.Handler {
 	r := gin.New()
 	r.SetTrustedProxies([]string{"*"})
 
-	// 静态文件服务
-	r.Static("/public", "./public")
-	r.StaticFS("/dir", http.Dir("./public")) // 将 public 目录内的文件列举展示
+	// 使用本地文件上传, 需要静态文件服务, 使用七牛云不需要
+	if config.Cfg.Upload.OssType == "local" {
+		r.Static("/public", "./public")
+		r.StaticFS("/dir", http.Dir("./public")) // 将 public 目录内的文件列举展示
+	}
 
 	r.Use(middleware.Logger())             // 自定义的 zap 日志中间件
 	r.Use(middleware.ErrorRecovery(false)) // 自定义错误处理中间件
@@ -28,18 +29,18 @@ func BackRouter() http.Handler {
 
 	// 初始化 session store, session 中用来传递用户的详细信息
 	// ! Session 如果使用 Redis 存, 可以存进去, 但是获取不到值?
-	store, _ := redis.NewStoreWithDB(10,
-		"tcp",
-		config.Cfg.Redis.Addr,
-		config.Cfg.Redis.Password,
-		strconv.Itoa(config.Cfg.Redis.DB),
-		[]byte(config.Cfg.Session.Salt))
+	// store, _ := redis.NewStoreWithDB(10,
+	// 	"tcp",
+	// 	config.Cfg.Redis.Addr,
+	// 	config.Cfg.Redis.Password,
+	// 	strconv.Itoa(config.Cfg.Redis.DB),
+	// 	[]byte(config.Cfg.Session.Salt))
 
 	// 基于 cookie 存储 session
-	// store := cookie.NewStore([]byte(config.Cfg.Session.Salt))
+	store := cookie.NewStore([]byte(config.Cfg.Session.Salt))
 
 	// session 存储时间跟 JWT 过期时间一致
-	store.Options(sessions.Options{MaxAge: int(config.Cfg.JWT.ExpiresTime) * 3600})
+	store.Options(sessions.Options{MaxAge: int(config.Cfg.JWT.Expire) * 3600})
 	r.Use(sessions.Sessions(config.Cfg.Session.Name, store)) // Session 中间件
 
 	// 无需鉴权的接口

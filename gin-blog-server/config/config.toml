@@ -1,23 +1,21 @@
 # 本地运行的配置文件
 [Server]
 AppMode = "debug"   # debug 开发环境, release 生产环境
-BackPort = ":8765"  # 前台服务端口
-FrontPort = ":5678" # 后台服务端口
+BackPort = ":8765"  # 后台服务端口
+FrontPort = ":5678" # 前台服务端口
 
 [JWT]
-SigningKey = "abc123321"
-ExpiresTime = 24         # 过期时间 (小时)
+Secret = "abc123321"
+Expire = 24             # 过期时间 (小时)
 Issuer = "gin-vue-blog"
 
 [Mysql]
-Path = "127.0.0.1"
+Host = "127.0.0.1"
 Port = "3306"
 Config = ""         # 其他配置, 例如时区
-Dbname = "ginblog"  # 数据库名称
+Dbname = "gvb"      # 数据库名称
 Username = "root"
 Password = "123456" # 数据库密码
-MaxIdleConns = 10
-MaxOpenConns = 100
 # 日志级别 silent, error, warn, info, 默认 info
 LogMode = "error" # silent 相当于关闭日志
 
@@ -41,9 +39,9 @@ LogInConsole = true        # 是否输出到控制台
 
 [Upload]
 OssType = "local"             # 控制存储: local、qiniu
-Path = "public/uploaded"      # 本地文件访问路径
-StorePath = "public/uploaded" # 本地文件上传路径
-# Markdown 目前只支持本地上传
+Path = "public/uploaded"      # 本地文件访问路径 (OssType="local" 才生效)
+StorePath = "public/uploaded" # 本地文件上传路径 (OssType="local" 才生效)
+# Markdown 目前只支持本地上传 (目前使用前端导出, 该配置无效)
 MdPath = "public/markdown/"      # Markdown 访问路径
 MdStorePath = "public/markdown/" # Markdown 上传路径
 

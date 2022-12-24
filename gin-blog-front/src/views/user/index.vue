@@ -5,6 +5,7 @@ import { useUserStore } from '@/store'
 import api from '@/api'
 
 const userStore = useUserStore()
+const router = useRouter()
 
 const infoForm = $ref<any>({
   avatar: userStore.avatar,
@@ -12,6 +13,12 @@ const infoForm = $ref<any>({
   intro: userStore.intro,
   website: userStore.website,
   email: userStore.email,
+})
+
+onMounted(() => {
+  // 如果未登录, 退回首页
+  if (!userStore.userId)
+    router.push('/')
 })
 
 async function updateUserInfo() {

@@ -74,7 +74,7 @@ var vIndex []byte // 缓存 VetorIndex 索引, 减少一次固定的 IO 操作
 
 // 获取地域信息: 中国|0|江苏省|苏州市|电信
 func (*ipUtil) GetIpSource(ipAddress string) string {
-	var dbPath = "./config/ip2region.xdb" // IP 数据库文件
+	var dbPath = "./assets/ip2region.xdb" // IP 数据库文件
 	// 完全基于文件查询, 每次都读取文件
 	// searcher, err := xdb.NewWithFileOnly(dbPath)
 

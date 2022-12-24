@@ -147,7 +147,7 @@ func (*User) ForceOffline(req req.ForceOfflineUser) (code int) {
 	sessionInfo.IsOffline = 1 // *
 	utils.Redis.Del(KEY_USER + uuid)
 	// ? 这里设置强制离线后 redis 中存储的 delete:xxx 时间和 Token 过期时间一致
-	utils.Redis.Set(KEY_DELETE+uuid, utils.Json.Marshal(sessionInfo), time.Duration(config.Cfg.JWT.ExpiresTime)*time.Hour)
+	utils.Redis.Set(KEY_DELETE+uuid, utils.Json.Marshal(sessionInfo), time.Duration(config.Cfg.JWT.Expire)*time.Hour)
 	return r.OK
 }
 

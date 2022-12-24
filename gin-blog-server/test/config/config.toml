@@ -13,11 +13,9 @@ Issuer = "gin-vue-blog"
 Path = "127.0.0.1"
 Port = "3306"
 Config = ""         # 其他配置, 例如时区
-Dbname = "ginblog"  # 数据库名称
+Dbname = "gvb"  # 数据库名称
 Username = "root"
 Password = "123456" # 数据库密码
-MaxIdleConns = 10
-MaxOpenConns = 100
 # 日志级别 silent, error, warn, info, 默认 info
 LogMode = "error" # silent 相当于关闭日志
 

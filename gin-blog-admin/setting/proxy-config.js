@@ -7,7 +7,8 @@ const proxyConfigMappings = {
   // 这里写线上接口, 打包后调用线上 API
   prod: {
     prefix: '/api',
-    target: 'http://www.hahacode.cn/api/',
+    // target: 'https://hahacode.cn/api/',
+    target: 'http://localhost:8765/api/',
   },
   test: {
     prefix: '/api',

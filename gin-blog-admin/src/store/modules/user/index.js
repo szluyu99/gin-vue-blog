@@ -41,7 +41,6 @@ export const useUserStore = defineStore('user', {
       // * 必须先调用退出登录接口, 再清除本地 Token, 因为退出登录接口需要 Token
       await api.logout()
 
-      window.$message.success('您已经退出登录!')
       removeToken()
       useTagsStore().resetTags()
       usePermissionStore().resetPermission()
@@ -49,10 +48,10 @@ export const useUserStore = defineStore('user', {
       this.$reset()
 
       toLogin()
+      window.$message.success('您已经退出登录!')
     },
     // * 被强制退出: 被动行为, 不需要调用退出登录接口
     async forceOffline() {
-      window.$message.error('您已经被强制下线!')
       removeToken()
       useTagsStore().resetTags()
       usePermissionStore().resetPermission()
@@ -60,6 +59,7 @@ export const useUserStore = defineStore('user', {
       this.$reset()
 
       toLogin()
+      window.$message.error('您已经被强制下线!')
     },
   },
 })

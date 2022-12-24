@@ -1,0 +1,48 @@
+# 本地运行的配置文件
+Server:
+  AppMode: debug # debug 开发环境, release 生产环境
+  BackPort: :8765 # 后台服务端口
+  FrontPort: :5678 # 前台服务端口
+JWT:
+  Secret: abc123321
+  Expire: 24 # 过期时间 (小时)
+  Issuer: gin-vue-blog
+Mysql:
+  Host: 127.0.0.1
+  Port: "3306"
+  Config: "" # 其他配置, 例如时区
+  Dbname: ginblog
+  Username: root
+  Password: "123456"
+  # 日志级别 silent, error, warn, info, 默认 info
+  LogMode: error # silent 相当于关闭日志
+Redis:
+  DB: 7
+  Addr: 127.0.0.1:6379
+  Password: ""
+Session:
+  Name: mysession
+  Salt: salt
+  MaxAge: 600 # 秒
+Zap:
+  Level: error # 日志级别: debug, info, warn, error, dpanic, panic, fatal, 默认 info
+  Format: console # 输出格式: console, json
+  Prefix: "[GIN-VUE-BLOG] " # 日志前缀
+  Directory: log # 存放日志的文件夹
+  ShowLine: true # 是否显示哪行调用
+  LogInConsole: true # 是否输出到控制台
+Upload:
+  OssType: local # 控制存储: local、qiniu
+  Path: public/uploaded # 本地文件访问路径 (OssType="local" 才生效)
+  StorePath: public/uploaded # 本地文件上传路径 (OssType="local" 才生效)
+  # Markdown 目前只支持本地上传 (目前使用前端导出, 该配置无效)
+  MdPath: public/markdown/ # Markdown 访问路径
+  MdStorePath: public/markdown/ # Markdown 上传路径
+Qiniu:
+  ImgPath: http://cdn.hahacode.cn # 外链
+  Zone: ZoneHuaDong
+  Bucket: yusael-ginblog
+  AccessKey: EB0heiSomzwk7-Em_5M5PzY-5w1xvD1XOMvMdblW
+  SecretKey: OjXt9g4XGZUKEKiaEfTOvgYdCXbPZFspdSIULxUY
+  UseHttps: true # 是否使用 https 加速
+  UseCdnDomains: true # 上传是否使用 CDN 上传加速

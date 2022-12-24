@@ -42,6 +42,7 @@ defineExpose({ previewImg })
     <n-upload
       action="/api/front/upload"
       :headers="{ Authorization: `Bearer ${token}` }"
+      :show-file-list="false"
       @finish="handleImgUpload"
     >
       <template v-if="previewImg">

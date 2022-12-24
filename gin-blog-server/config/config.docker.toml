@@ -1,52 +1,62 @@
-# Docker 部署时读取的配置文件
+# Docker 运行时读取的配置文件, 有些参数会被 docker-compose 中的环境变量覆盖
+# 具体参考 deploy/start 下 docker-compose 和 .env 文件
+# 例如: MYSQL_PORT 会覆盖 [Mysql] 下的 Port
+
 [Server]
 AppMode = "release" # debug, release
 BackPort = ":8765"  # 前台服务端口
 FrontPort = ":5678" # 后台服务端口
 
+# 线上部署建议将 Secret 和 Issuer 修改成其他随机值
 [JWT]
-SigningKey = "abc123321"
-ExpiresTime = 24         # 过期时间 (小时)
+Secret = "abc123321"
+Expire = 24             # 过期时间 (小时)
 Issuer = "gin-vue-blog"
 
+# 优先会读取 docker-compose 中的环境变量，这里基本不用动
 [Mysql]
-Path = "127.0.0.1"
+Host = "172.12.0.3"
 Port = "3306"
 Config = ""         # 其他配置, 例如时区
-Dbname = "ginblog"  # 数据库名称
+Dbname = "gvb"
 Username = "root"
-Password = "123456" # 数据库密码
-MaxIdleConns = 10
-MaxOpenConns = 100
+Password = "123456"
 # 日志级别 silent, error, warn, info, 默认 info
-LogMode = "silent" # silent 相当于关闭日志
+LogMode = "error" # silent 相当于关闭日志
 
+# 优先会读取 docker-compose 中的环境变量，这里基本不用动
 [Redis]
 DB = 7
-Addr = '127.0.0.1:6379'
-Password = ''
+Addr = "172.12.0.2:6379"
+Password = "123456"
 
+# 线上部署建议将 Name 和 Salt 修改成其他随机值
 [Session]
 Name = "mysession"
 Salt = "salt"
 MaxAge = 600       # 秒
 
+# 根据需求调整
 [Zap]
-Level = "info"         # 日志级别: debug, info, warn, error, dpanic, panic, fatal, 默认 info
+Level = "error"         # 日志级别: debug, info, warn, error, dpanic, panic, fatal, 默认 info
 Format = "console"     # 输出格式: console, json
 Prefix = "[GIN-BLOG] " # 日志前缀
 Directory = "log"      # 存放日志的文件夹
 ShowLine = false       # 是否显示哪行调用
 LogInConsole = false   # 是否输出到控制台
 
+# 线上部署建议使用七牛云存储, 自行去七牛云创建对象存储服务
+# https://developer.qiniu.com/kodo/1233/console-quickstart
+# 不使用七牛云可以选择本地存储, 上传文件会存储在你的服务器上
 [Upload]
-OssType = "qiniu"              # 控制存储: local、qiniu
-Path = "public/uploaded/"      # 本地文件访问路径
-StorePath = "public/uploaded/" # 本地文件上传路径
-# Markdown 目前只支持本地上传
+OssType = "local"             # 控制存储: local、qiniu
+Path = "public/uploaded"      # 本地文件访问路径 (OssType="local" 才生效)
+StorePath = "public/uploaded" # 本地文件上传路径 (OssType="local" 才生效)
+# Markdown 目前只支持本地上传 (目前使用前端导出, 该配置无效)
 MdPath = "public/markdown/"      # Markdown 访问路径
 MdStorePath = "public/markdown/" # Markdown 上传路径
 
+# OssType = "Qiniu" 需要完善以下信息
 [Qiniu]
 ImgPath = ""          # 外链
 Zone = ""

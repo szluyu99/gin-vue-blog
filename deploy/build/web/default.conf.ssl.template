@@ -1,0 +1,70 @@
+server {
+    listen 80;
+    # 填写绑定证书的域名
+    server_name ${SERVER_NAME};
+    # http 域名转化成 https
+    return 301 https://$host$request_uri;
+}
+
+server {
+    # SSL 默认访问端口号为 443
+    listen 443 ssl;
+    # 绑定证书的域名
+    server_name ${SERVER_NAME};
+    # 证书文件的相对路径或绝对路径
+    ssl_certificate /etc/nginx/crt/server.crt;
+    # 私钥文件的相对路径或绝对路径
+    ssl_certificate_key /etc/nginx/crt/server.key;
+    ssl_session_timeout 5m;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE; 
+    ssl_prefer_server_ciphers on;
+
+    root /usr/share/nginx/html;
+
+    ######### 反向代理 start ########
+    # 后台接口
+    location /api {
+        proxy_pass http://${BACKEND_HOST}:${BACK_SERVER_PORT};
+        # 获取真实 IP 
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $remote_addr;
+
+        client_max_body_size 40M;
+    }
+    # 前台接口
+    location /api/front {
+        proxy_pass http://${BACKEND_HOST}:${FRONT_SERVER_PORT};
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $remote_addr;
+
+        client_max_body_size 40M;
+    }
+    # Gin 服务器处理静态资源, Nginx 反向代理 Gin 服务器 (本地文件上传才需要)
+    # location /public/uploaded {
+        # proxy_pass http://${BACKEND_HOST}:${BACK_SERVER_PORT}/public/uploaded;
+    # }
+    ######### 反向代理 end ########
+
+    ######### 静态资源 start ########
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    location /admin {
+        try_files $uri $uri/ /admin/index.html;
+    }
+    location ~ .*\.(js|json|css)$ {
+        gzip on;
+        gzip_static on; 
+        gzip_min_length 1k;
+        gzip_http_version 1.1;
+        gzip_comp_level 9;
+        gzip_types text/css application/javascript application/json;
+        root /usr/share/nginx/html;
+    }
+    ######### 静态资源 end ########
+}

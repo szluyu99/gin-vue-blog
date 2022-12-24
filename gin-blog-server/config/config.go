@@ -21,21 +21,19 @@ type Server struct {
 }
 
 type JWT struct {
-	SigningKey  string // JWT 签名
-	ExpiresTime int64  // 过期时间
-	Issuer      string // 签发者
+	Secret string // JWT 签名
+	Expire int64  // 过期时间
+	Issuer string // 签发者
 }
 
 type Mysql struct {
-	Path         string // 服务器地址
-	Port         string // 端口
-	Config       string // 高级配置
-	Dbname       string // 数据库名
-	Username     string // 数据库用户名
-	Password     string // 数据库密码
-	MaxIdleConns int    // 空闲中的最大连接数
-	MaxOpenConns int    // 打开到数据库的最大连接数
-	LogMode      string // 日志级别
+	Host     string // 服务器地址
+	Port     string // 端口
+	Config   string // 高级配置
+	Dbname   string // 数据库名
+	Username string // 数据库用户名
+	Password string // 数据库密码
+	LogMode  string // 日志级别
 }
 
 type Redis struct {

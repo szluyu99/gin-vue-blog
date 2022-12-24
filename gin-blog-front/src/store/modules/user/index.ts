@@ -13,6 +13,7 @@ interface UserInfo {
 }
 
 export const useUserStore = defineStore('user', {
+  persist: true,
   state() {
     return {
       userInfo: <UserInfo>{},
@@ -68,7 +69,7 @@ export const useUserStore = defineStore('user', {
       }
     },
     async logout() {
-      removeToken() // 删除 token
+      removeToken()
       this.$reset()
     },
     // 维护评论点赞

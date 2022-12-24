@@ -36,22 +36,33 @@ async function handleLogin() {
     window.$message?.warning('请输入用户名和密码')
     return
   }
-  // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-  const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
-    if (res.ret === 0) {
-      // 登录
-      const res: any = await api.login(formModel)
+
+  const doLogin = async (username: string, password: string) => {
+    try {
+      const res: any = await api.login({ username, password })
       window.$notification?.success({ title: '登录成功!', duration: 1500 })
       setToken(res.data.token) // 保存在本地
       // 加载用户信息, 更新 pinia 中信息, 刷新页面
       await userStore.getUserInfo()
       // 清空表单
       formModel = { username: '', password: '' }
-
+    }
+    finally {
       loginFlag.value = false
     }
-  })
-  captcha.show()
+  }
+
+  if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
+  // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
+    const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA,
+      async (res: any) => {
+        res.ret === 0 && doLogin(username, password)
+      })
+    captcha.show()
+  }
+  else {
+    doLogin(username, password)
+  }
 }
 
 // 立即注册

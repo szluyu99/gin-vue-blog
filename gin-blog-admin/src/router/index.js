@@ -5,7 +5,7 @@ import { getToken } from '@/utils'
 import { usePermissionStore, useUserStore } from '@/store'
 
 export const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/blog-admin'
+  history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/admin'
   routes: basicRoutes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })

@@ -1,0 +1,92 @@
+version: "3"
+
+networks:
+  gvb-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+
+services:
+  gvb-redis:
+    image: redis:alpine
+    container_name: gvb-redis
+    restart: always
+    volumes:
+      - ${GVB_DATA_DIRECTORY}/data/redis/:/data
+    ports:
+      - ${REDIS_PORT}:6379 # 自定义的是暴露出去的端口, Redis 容器内运行固定为 6379
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    networks:
+      gvb-network:
+        ipv4_address: ${REDIS_HOST}
+
+  gvb-mysql:
+    build: ../build/mysql
+    container_name: gvb-mysql
+    restart: always
+    volumes:
+      - ${GVB_DATA_DIRECTORY}/data/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} # root 账号的密码
+      - TZ=Asia/Shanghai
+    ports:
+      - ${MYSQL_PORT}:3306 # 自定义的是暴露出去的端口, MySQL 容器内运行固定为 3306
+    networks:
+      gvb-network:
+        ipv4_address: ${MYSQL_HOST}
+
+  gvb-server:
+    build: ../../gin-blog-server
+    container_name: gvb-server
+    restart: always
+    depends_on:
+      gvb-redis:
+        condition: service_started
+      gvb-mysql:
+        condition: service_started
+    volumes:
+      - ${GVB_DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
+      # - ${GVB_DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
+    environment:
+      # 以下环境变量会覆盖后端源码中 config.docker.toml 中的配置
+      - TZ=Asia/Shanghai
+      # SERVER
+      - SERVER_BACKPORT=:${BACK_SERVER_PORT} # 后台服务端口
+      - SERVER_FRONTPORT=:${FRONT_SERVER_PORT} # 前台服务端口
+      # MySQL
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=3306
+      - MYSQL_DBNAME=gvb # 默认 gvb, 改动需要修改 gvb-mysql 镜像
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      # Redis
+      - REDIS_ADDR=${REDIS_HOST}:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - ${BACK_SERVER_PORT}:${BACK_SERVER_PORT}
+      - ${FRONT_SERVER_PORT}:${FRONT_SERVER_PORT}
+    networks:
+      gvb-network:
+        ipv4_address: ${BACKEND_HOST}
+
+  gvb-web:
+    build: ../build/web
+    container_name: gvb-web
+    restart: always
+    # 需要开启 https, 请提供证书, 并设置 USE_HTTPS=true
+    volumes:
+      - ./server.crt:/etc/nginx/crt/server.crt
+      - ./server.key:/etc/nginx/crt/server.key
+    environment:
+      - USE_HTTPS=${USE_HTTPS} # 使用 https 设置为 true
+      - SERVER_NAME=${SERVER_NAME} # 域名 或 localhost
+      - BACKEND_HOST=${BACKEND_HOST} # 后端服务地址
+      - BACK_SERVER_PORT=${BACK_SERVER_PORT} # 后台服务端口
+      - FRONT_SERVER_PORT=${FRONT_SERVER_PORT} # 前台服务端口
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      gvb-network:
+        ipv4_address: ${FRONTEND_HOST}

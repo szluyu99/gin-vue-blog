@@ -3,7 +3,6 @@ package utils
 import (
 	"fmt"
 	"gin-blog/config"
-	"gin-blog/model"
 	"log"
 	"time"
 
@@ -18,7 +17,7 @@ func InitMySQLDB() *gorm.DB {
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlCfg.Username,
 		mysqlCfg.Password,
-		mysqlCfg.Path,
+		mysqlCfg.Host,
 		mysqlCfg.Port,
 		mysqlCfg.Dbname,
 	)
@@ -46,9 +45,9 @@ func InitMySQLDB() *gorm.DB {
 	// autoMigrate(DB)
 
 	sqlDB, _ := DB.DB()
-	sqlDB.SetMaxIdleConns(mysqlCfg.MaxIdleConns) // 设置连接池中的最大闲置连接
-	sqlDB.SetMaxOpenConns(mysqlCfg.MaxOpenConns) // 设置数据库的最大连接数量
-	sqlDB.SetConnMaxLifetime(10 * time.Second)   // 设置连接的最大可复用时间
+	sqlDB.SetMaxIdleConns(10)                  // 设置连接池中的最大闲置连接
+	sqlDB.SetMaxOpenConns(100)                 // 设置数据库的最大连接数量
+	sqlDB.SetConnMaxLifetime(10 * time.Second) // 设置连接的最大可复用时间
 
 	return DB
 }
@@ -72,32 +71,32 @@ func getLogMode(str string) logger.LogLevel {
 // 迁移数据表，在没有数据表结构变更时候，建议注释不执行
 // 只支持创建表、增加表中没有的字段和索引
 // 为了保护数据，并不支持改变已有的字段类型或删除未被使用的字段
-func autoMigrate(db *gorm.DB) {
-	err := db.AutoMigrate(
-		&model.Article{},
-		&model.Category{},
-		&model.Comment{},
-		&model.Tag{},
-		&model.Message{},
-		&model.UserInfo{},
-		&model.FriendLink{},
-		// 权限相关
-		&model.UserAuth{},     // 用户
-		&model.Role{},         // 角色
-		&model.Menu{},         // 菜单
-		&model.Resource{},     // 资源(接口)
-		&model.UserRole{},     // 用户-角色 关联
-		&model.RoleMenu{},     // 角色-菜单 关联
-		&model.RoleResource{}, // 角色-资源 关联
+// func autoMigrate(db *gorm.DB) {
+// 	err := db.AutoMigrate(
+// 		&model.Article{},
+// 		&model.Category{},
+// 		&model.Comment{},
+// 		&model.Tag{},
+// 		&model.Message{},
+// 		&model.UserInfo{},
+// 		&model.FriendLink{},
+// 		// 权限相关
+// 		&model.UserAuth{},     // 用户
+// 		&model.Role{},         // 角色
+// 		&model.Menu{},         // 菜单
+// 		&model.Resource{},     // 资源(接口)
+// 		&model.UserRole{},     // 用户-角色 关联
+// 		&model.RoleMenu{},     // 角色-菜单 关联
+// 		&model.RoleResource{}, // 角色-资源 关联
 
-		&model.Page{},         // 页面
-		&model.BlogConfig{},   // 网站设置
-		&model.OperationLog{}, // 操作日志
-	)
+// 		&model.Page{},         // 页面
+// 		&model.BlogConfig{},   // 网站设置
+// 		&model.OperationLog{}, // 操作日志
+// 	)
 
-	if err != nil {
-		log.Println("gorm 自动迁移失败: ", err)
-	} else {
-		log.Println("gorm 自动迁移成功")
-	}
-}
+// 	if err != nil {
+// 		log.Println("gorm 自动迁移失败: ", err)
+// 	} else {
+// 		log.Println("gorm 自动迁移成功")
+// 	}
+// }

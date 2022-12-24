@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>阵、雨的博客</title>
+  <meta name="description" content="Opinionated Vite Starter Template">
+  <!-- 允许加载 http 资源 -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <!-- 腾讯验证码 -->
+  <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+  <script type="module" crossorigin src="/assets/index.8c13a795.js"></script>
+  <link rel="stylesheet" href="/assets/index.31ae1e1d.css">
+</head>
+
+<body class="font-sans dark:text-white dark:bg-hex-121212">
+  <div id="app"> </div>
+  <script>
+    (function () {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      const setting = localStorage.getItem('color-schema') || 'auto'
+      if (setting === 'dark' || (prefersDark && setting !== 'light'))
+        document.documentElement.classList.toggle('dark', true)
+    })()
+  </script>
+  
+</body>
+
+</html>

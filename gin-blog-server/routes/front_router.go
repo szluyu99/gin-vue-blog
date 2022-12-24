@@ -4,10 +4,9 @@ import (
 	"gin-blog/config"
 	"gin-blog/routes/middleware"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +17,11 @@ func FrontRouter() http.Handler {
 	r := gin.New()
 	r.SetTrustedProxies([]string{"*"})
 
-	// 静态文件服务
-	r.Static("/public", "./public")
-	r.StaticFS("/dir", http.Dir("./public")) // 将 public 目录内的文件列举展示
+	// 使用本地文件上传, 需要静态文件服务, 使用七牛云不需要
+	// if config.Cfg.Upload.OssType == "local" {
+	// 	r.Static("/public", "./public")
+	// 	r.StaticFS("/dir", http.Dir("./public")) // 将 public 目录内的文件列举展示
+	// }
 
 	// 开发模式同时把日志写到控制台
 	// if config.Cfg.Server.AppMode == "debug" {
@@ -31,17 +32,17 @@ func FrontRouter() http.Handler {
 	r.Use(middleware.Cors())               // 跨域中间件
 
 	// ! Session 如果使用 Redis 存, 可以存进去, 但是获取不到值?
-	store, _ := redis.NewStoreWithDB(10,
-		"tcp",
-		config.Cfg.Redis.Addr,
-		config.Cfg.Redis.Password,
-		strconv.Itoa(config.Cfg.Redis.DB),
-		[]byte(config.Cfg.Session.Salt))
+	// store, _ := redis.NewStoreWithDB(10,
+	// 	"tcp",
+	// 	config.Cfg.Redis.Addr,
+	// 	config.Cfg.Redis.Password,
+	// 	strconv.Itoa(config.Cfg.Redis.DB),
+	// 	[]byte(config.Cfg.Session.Salt))
 
 	// 基于 cookies 存储 session
-	// store := cookie.NewStore([]byte(config.Cfg.Session.Salt))
-	// store.Options(sessions.Options{MaxAge: config.Cfg.Session.MaxAge})
+	store := cookie.NewStore([]byte(config.Cfg.Session.Salt))
 
+	store.Options(sessions.Options{MaxAge: config.Cfg.Session.MaxAge})
 	r.Use(sessions.Sessions(config.Cfg.Session.Name, store)) // Session 中间件 (使用 Redis 存储引擎)
 
 	// 无需监权的接口
