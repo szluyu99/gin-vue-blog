@@ -270,6 +270,21 @@ TODO: 直接写到 .vscode 文件中, 用 VsCode 打开后自动推荐安装
 
 需要修改源码的话，参考常规运行，前后端分开运行。
 
+### 拉取项目前的准备 (Windows)
+
+如果是 Windows 系统，需要先执行以下指令，否则 Docker 构建过程会出 BUG。
+
+或者直接下载 ZIP 而不是通过 git clone 克隆项目。
+
+Linux 和 Mac 不需要进行该操作。
+
+> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 ctlf，经过测试，构建过程会产生 BUG。
+
+```bash
+# 防止 git 自动将换行符转换为 crlf
+git config --global core.autocrlf false
+```
+
 ### 方式一：Docker Compose 一键运行
 
 需要有 Docker 和 Docker Compose 的环境
@@ -277,8 +292,9 @@ TODO: 直接写到 .vscode 文件中, 用 VsCode 打开后自动推荐安装
 > 详细运行文档（包含环境搭建）参考：[deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
 
 ```bash
-# 拉取项目
-git clone https://github.com/szluyu99/gin-vue-blog
+# 拉取项目, 进入根目录
+git clone https://github.com/szluyu99/gin-vue-blog 
+cd gin-vue-blog
 
 # 进入 docker-compose 目录
 cd deploy/start

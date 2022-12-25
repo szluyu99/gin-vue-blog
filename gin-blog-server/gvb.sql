@@ -473,7 +473,7 @@ INSERT INTO `page` VALUES (4, '2022-12-08 13:52:31.364', '2022-12-08 13:52:31.36
 INSERT INTO `page` VALUES (5, '2022-12-08 13:52:52.389', '2022-12-08 13:52:52.389', '友链', 'link', 'https://static.talkxj.com/config/9034edddec5b8e8542c2e61b0da1c1da.jpg');
 INSERT INTO `page` VALUES (6, '2022-12-08 13:53:04.159', '2022-12-08 13:53:04.159', '关于', 'about', 'https://static.talkxj.com/config/2a56d15dd742ff8ac238a512d9a472a1.jpg');
 INSERT INTO `page` VALUES (7, '2022-12-08 13:53:17.707', '2022-12-16 23:46:51.066', '留言', 'message', 'https://img-blog.csdnimg.cn/50e0ec7fde824633b2cd7870028670b2.jpeg');
-INSERT INTO `page` VALUES (8, '2022-12-08 13:53:30.187', '2022-12-08 13:53:30.187', '个人中心', 'profile', 'https://static.talkxj.com/config/ebae4c93de1b286a8d50aa62612caa59.jpeg');
+INSERT INTO `page` VALUES (8, '2022-12-08 13:53:30.187', '2022-12-08 13:53:30.187', '个人中心', 'user', 'https://static.talkxj.com/config/ebae4c93de1b286a8d50aa62612caa59.jpeg');
 INSERT INTO `page` VALUES (9, '2022-12-16 23:54:52.650', '2022-12-16 23:54:52.650', '相册', 'album', 'https://static.talkxj.com/config/e587c4651154e4da49b5a54f865baaed.jpg');
 INSERT INTO `page` VALUES (10, '2022-12-16 23:55:36.059', '2022-12-16 23:55:36.059', '错误页面', '404', 'https://img-blog.csdnimg.cn/2c0e923329974daabb91373d0834359f.jpeg');
 INSERT INTO `page` VALUES (11, '2022-12-16 23:56:17.917', '2022-12-16 23:56:17.917', '文章列表', 'article_list', 'https://static.talkxj.com/config/924d65cc8312e6cdad2160eb8fce6831.jpg');

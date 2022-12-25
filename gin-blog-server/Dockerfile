@@ -15,10 +15,15 @@ WORKDIR ${WORK_PATH}
 COPY --from=0 ${WORK_PATH}/server .
 COPY --from=0 ${WORK_PATH}/config/config.docker.toml .
 COPY --from=0 ${WORK_PATH}/assets/ip2region.xdb ./assets/ip2region.xdb
+COPY --from=0 ${WORK_PATH}/assets/wait-for .
+
+RUN chmod a+x ./wait-for
 
 # 后台接口
 EXPOSE 8765
 # 前台接口
 EXPOSE 5678
 
-ENTRYPOINT ./server -c config.docker.toml
+# 在 docker-compose 中使用 wait-for 依赖 mysql 再启动
+# ENTRYPOINT ./server -c config.docker.toml
+# CMD sleep 5 && ./server -c config.docker.toml

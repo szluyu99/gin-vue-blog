@@ -5,7 +5,9 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL
 export function convertImgUrl(imgUrl: string | undefined) {
   if (!imgUrl)
     return 'http://dummyimage.com/400x400'
-  return imgUrl.startsWith('http') ? imgUrl : `${SERVER_URL}/${imgUrl}`
+  if (imgUrl.startsWith('http'))
+    return imgUrl
+  return `${SERVER_URL}/${imgUrl}`
 }
 
 export * from './common'

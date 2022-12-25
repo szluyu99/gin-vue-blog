@@ -153,3 +153,25 @@ gvb-mysql 服务 和 gvb-server 服务运行不起来，很有可能是因为你
 - 解决方案二：修改 .env 文件中的 `MYSQL_PORT` 为其他端口
 
 > 解决方案二中修改了 MySQL 的端口是 Docker 容器对外暴露的端口，即我如果修改为 33069，则我本机通过 Navicat 连接的应该是 127.0.0.1:33069 的 mysql 服务。但是 MySQL 容器内是固定运行在 3306 端口的。但是容器和主机，以及容器之前是互相隔离的，所以不会有影响。
+
+
+## gvb-web 和 gvb-server 无法启动
+
+gvb-web 的日志中报错如下：
+
+```
+'：No such file or directory
+```
+
+如果是 Windows 系统，需要先执行以下指令，否则 Docker 过程会出 BUG。
+
+或者直接下载 ZIP 而不是通过 git clone 克隆项目。
+
+Linux 和 Mac 不需要进行该操作。
+
+> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 ctlf，经过测试，构建过程会产生 BUG。
+
+```bash
+# 防止 git 自动将换行符转换为 crlf
+git config --global core.autocrlf false
+```

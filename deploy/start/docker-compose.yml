@@ -45,6 +45,8 @@ services:
         condition: service_started
       gvb-mysql:
         condition: service_started
+    # 依赖 mysql 启动后再开启后端服务
+    command: ./wait-for ${MYSQL_HOST}:3306 -t 5 -- ./server -c config.docker.toml
     volumes:
       - ${GVB_DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
       # - ${GVB_DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
