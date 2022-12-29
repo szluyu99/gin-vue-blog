@@ -6,7 +6,7 @@ dist
 dist-ssr
 node_modules
 .idea/
-.vscode/
+# .vscode/
 *.log
 
 # Binaries for programs and plugins

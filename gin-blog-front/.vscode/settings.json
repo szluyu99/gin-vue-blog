@@ -1,0 +1,12 @@
+{
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "fileNestingUpdater.autoUpdate": true,
+  "fileNestingUpdater.autoUpdateInterval": 720,
+  "fileNestingUpdater.promptOnAutoUpdate": true,
+  "fileNestingUpdater.upstreamRepo": "antfu/vscode-file-nesting-config",
+  "fileNestingUpdater.upstreamBranch": "main"
+}

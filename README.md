@@ -237,9 +237,9 @@ deploy
 
 ### VsCode 插件
 
-TODO: 直接写到 .vscode 文件中, 用 VsCode 打开后自动推荐安装
+目前推荐安装插件已经写到 `.vscode/extensions.json` 中，使用 VsCode 打开项目会推荐安装。
 
-如果使用 Vscode 开发，推荐安装以下插件。
+> 注意，一定要用 VsCode 打开 gin-blog-admin 和 gin-blog-front 这两个前端项目，而不是打开 gin-vue-blog 这个目录！
 
 前端开发插件：（必备）
 
@@ -278,7 +278,7 @@ TODO: 直接写到 .vscode 文件中, 用 VsCode 打开后自动推荐安装
 
 Linux 和 Mac 不需要进行该操作。
 
-> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 ctlf，经过测试，构建过程会产生 BUG。
+> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 crlf，经过测试，构建过程会产生 BUG。
 
 ```bash
 # 防止 git 自动将换行符转换为 crlf
