@@ -51,6 +51,7 @@ func FrontRouter() http.Handler {
 		base.POST("/login", userAuthAPI.Login)           // 登录
 		base.GET("/logout", userAuthAPI.Logout)          // 退出登录
 		base.POST("/register", userAuthAPI.Register)     // 注册
+		base.GET("/code", userAuthAPI.SendCode)          // 验证码
 		base.GET("/home", fBlogInfoAPI.GetFrontHomeInfo) // 前台首页
 		base.GET("/about", blogInfoAPI.GetAbout)         // 获取关于我
 

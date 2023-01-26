@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"gin-blog/config"
 	"gin-blog/dao"
 	"gin-blog/model"
@@ -75,7 +76,12 @@ func (*User) Logtout(c *gin.Context) {
 }
 
 // 用户注册
-func (*User) Register(req req.Register) int {
+func (*User) Register(req req.Register) (code int) {
+	// 检查验证码是否正确
+	if req.Code != utils.Redis.GetVal(KEY_CODE+req.Username) {
+		return r.ERROR_VERIFICATION_CODE
+	}
+
 	// 检查用户名已存在, 则该账号已经注册过
 	if exist := checkUserExistByName(req.Username); exist {
 		return r.ERROR_USER_NAME_USED
@@ -103,7 +109,17 @@ func (*User) Register(req req.Register) int {
 	return r.OK
 }
 
-// TODO: SendCode, SaveEmail 发送验证码 和 邮件
+// 更新用户邮箱信息
+func (*User) UpdateEmail(userInfoId int, req req.UpdateEmail) (code int) {
+	// 检查验证码是否正确
+	if req.Code != utils.Redis.GetVal(KEY_CODE+req.Email) {
+		return r.ERROR_VERIFICATION_CODE
+	}
+
+	// TODO: 更新 user表 和 user_auth表 的邮箱信息
+
+	return r.OK
+}
 
 // 查询当前在线用户
 // TODO: 分页 + 条件搜索
@@ -228,6 +244,40 @@ func (*User) UpdateCurrentPassword(req req.UpdateAdminPassword, id int) int {
 // 更新用户禁用
 func (*User) UpdateDisable(id, isDisable int) {
 	dao.UpdatesMap(&model.UserInfo{}, map[string]any{"is_disable": isDisable}, "id", id)
+}
+
+// 发送验证码
+func (*User) SendCode(email string) (code int) {
+	// 已经发送验证码且未过期
+	if utils.Redis.GetVal(KEY_CODE+email) != "" {
+		return r.ERROR_EMAIL_HAS_SEND
+	}
+
+	expireTime := config.Cfg.Captcha.ExpireTime
+	validateCode := utils.Encryptor.ValidateCode()
+	content := fmt.Sprintf(`
+		<div style="text-align:center">
+			<div>你好！欢迎访问阵、雨的个人博客！</div>
+			<div style="padding: 8px 40px 8px 50px;">
+            	<p>
+					您本次的验证码为
+					<p style="font-size:75px;font-weight:blod;"> %s </p>
+					为了保证账号安全，验证码有效期为 %d 分钟。请确认为本人操作，切勿向他人泄露，感谢您的理解与使用~
+				</p>
+       	 	</div>
+			<div>
+            	<p>发送邮件专用邮箱，请勿回复。</p>
+        	</div>
+		</div>
+	`, validateCode, expireTime)
+
+	if err := utils.Email(email, "博客注册验证码", content); err != nil {
+		return r.ERROR_EMAIL_SEND
+	}
+
+	// 将验证码存储到 Redis 中
+	utils.Redis.Set(KEY_CODE+email, validateCode, time.Duration(expireTime)*time.Minute)
+	return r.OK
 }
 
 // 检查用户名是否存在

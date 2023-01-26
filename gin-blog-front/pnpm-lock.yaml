@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@antfu/eslint-config': ^0.27.0
-  '@iconify/json': ^2.1.158
+  '@iconify/json': ^2.1.159
   '@iconify/vue': ^4.0.2
   '@kangc/v-md-editor': ^2.3.15
   '@types/marked': ^4.0.8
@@ -22,7 +22,7 @@ specifiers:
   pinia: ^2.0.28
   pinia-plugin-persistedstate: ^3.0.2
   pnpm: ^7.21.0
-  rollup-plugin-visualizer: ^5.8.3
+  rollup-plugin-visualizer: ^5.9.0
   sass: ^1.57.1
   taze: ^0.8.5
   typescript: ^4.9.4
@@ -57,7 +57,7 @@ dependencies:
 
 devDependencies:
   '@antfu/eslint-config': registry.npmmirror.com/@antfu/eslint-config/0.27.0_lzzuuodtsqwxnvqeq4g4likcqa
-  '@iconify/json': registry.npmmirror.com/@iconify/json/2.1.158
+  '@iconify/json': registry.npmmirror.com/@iconify/json/2.1.159
   '@iconify/vue': registry.npmmirror.com/@iconify/vue/4.0.2_vue@3.2.45
   '@types/marked': registry.npmmirror.com/@types/marked/4.0.8
   '@types/node': registry.npmmirror.com/@types/node/18.7.18
@@ -67,7 +67,7 @@ devDependencies:
   eslint: registry.npmmirror.com/eslint/8.30.0
   naive-ui: registry.npmmirror.com/naive-ui/2.34.3_vue@3.2.45
   pnpm: registry.npmmirror.com/pnpm/7.21.0
-  rollup-plugin-visualizer: registry.npmmirror.com/rollup-plugin-visualizer/5.8.3
+  rollup-plugin-visualizer: registry.npmmirror.com/rollup-plugin-visualizer/5.9.0
   sass: registry.npmmirror.com/sass/1.57.1
   taze: registry.npmmirror.com/taze/0.8.5
   typescript: registry.npmmirror.com/typescript/4.9.4
@@ -385,10 +385,10 @@ packages:
     version: 1.2.1
     dev: true
 
-  registry.npmmirror.com/@iconify/json/2.1.158:
-    resolution: {integrity: sha512-7rw3LTk6Y9aLyVESGoFADBJiYpsLdNRV7GCEarh3HpbR4jdDH29s8kF6yJybgYoBfb01J6h6PzDgjujSxlNUaQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@iconify/json/-/json-2.1.158.tgz}
+  registry.npmmirror.com/@iconify/json/2.1.159:
+    resolution: {integrity: sha512-LBJDXNsHMBhBZ2BfN2Es/cB8GmI9+2305biJz/C2riYyUWNIU1BnrM5EzDL4i0FwKq6s7I2C+j2wtBJ3pCeQjA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@iconify/json/-/json-2.1.159.tgz}
     name: '@iconify/json'
-    version: 2.1.158
+    version: 2.1.159
     dependencies:
       '@iconify/types': registry.npmmirror.com/@iconify/types/2.0.0
       pathe: registry.npmmirror.com/pathe/0.3.9
@@ -6894,10 +6894,10 @@ packages:
     version: 3.0.1
     dev: false
 
-  registry.npmmirror.com/rollup-plugin-visualizer/5.8.3:
-    resolution: {integrity: sha512-QGJk4Bqe4AOat5AjipOh8esZH1nck5X2KFpf4VytUdSUuuuSwvIQZjMGgjcxe/zXexltqaXp5Vx1V3LmnQH15Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-5.8.3.tgz}
+  registry.npmmirror.com/rollup-plugin-visualizer/5.9.0:
+    resolution: {integrity: sha512-bbDOv47+Bw4C/cgs0czZqfm8L82xOZssk4ayZjG40y9zbXclNk7YikrZTDao6p7+HDiGxrN0b65SgZiVm9k1Cg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-5.9.0.tgz}
     name: rollup-plugin-visualizer
-    version: 5.8.3
+    version: 5.9.0
     engines: {node: '>=14'}
     hasBin: true
     peerDependencies:
@@ -6907,6 +6907,7 @@ packages:
         optional: true
     dependencies:
       open: registry.npmmirror.com/open/8.4.0
+      picomatch: registry.npmmirror.com/picomatch/2.3.1
       source-map: registry.npmmirror.com/source-map/0.7.4
       yargs: registry.npmmirror.com/yargs/17.6.2
     dev: true
@@ -7985,7 +7986,7 @@ packages:
       local-pkg: registry.npmmirror.com/local-pkg/0.4.2
       picocolors: registry.npmmirror.com/picocolors/1.0.0
       vite: registry.npmmirror.com/vite/3.2.5_cdvgcc4n5tqr6ynhut5vstflsm
-      yaml: registry.npmmirror.com/yaml/2.2.0
+      yaml: registry.npmmirror.com/yaml/2.2.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8298,13 +8299,13 @@ packages:
     dependencies:
       eslint-visitor-keys: registry.npmmirror.com/eslint-visitor-keys/3.3.0
       lodash: registry.npmmirror.com/lodash/4.17.21
-      yaml: registry.npmmirror.com/yaml/2.2.0
+      yaml: registry.npmmirror.com/yaml/2.2.1
     dev: true
 
-  registry.npmmirror.com/yaml/2.2.0:
-    resolution: {integrity: sha512-auf7Gi6QwO7HW//GA9seGvTXVGWl1CM/ADWh1+RxtXr6XOxnT65ovDl9fTi4e0monEyJxCHqDpF6QnFDXmJE4g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/yaml/-/yaml-2.2.0.tgz}
+  registry.npmmirror.com/yaml/2.2.1:
+    resolution: {integrity: sha512-e0WHiYql7+9wr4cWMx3TVQrNwejKaEe7/rHNmQmqRjazfOP5W8PB6Jpebb5o6fIapbz9o9+2ipcaTM2ZwDI6lw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/yaml/-/yaml-2.2.1.tgz}
     name: yaml
-    version: 2.2.0
+    version: 2.2.1
     engines: {node: '>= 14'}
     dev: true
 

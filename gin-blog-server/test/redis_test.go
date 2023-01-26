@@ -1,12 +1,11 @@
 package test
 
 import (
-	"context"
 	"fmt"
 	"gin-blog/utils"
 )
 
-var ctx = context.Background()
+// var ctx = context.Background()
 
 func ExampleClient() {
 	// rdb := redis.NewClient(&redis.Options{

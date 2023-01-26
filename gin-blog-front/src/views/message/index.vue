@@ -16,7 +16,7 @@ const isLoop = $ref(false) // 循环播放
 
 // 弹幕列表
 let danmus = $ref([{
-  avatar: 'https://static.talkxj.com/avatar/15bb3e8d4144163e006f4b2776aa7bac.jpg',
+  avatar: 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
   content: '大家好，我是作者，欢迎给我点一颗 Star!',
   nickname: '阵、雨',
 }])

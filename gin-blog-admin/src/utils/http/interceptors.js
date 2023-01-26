@@ -35,7 +35,7 @@ export function resResolve(resp) {
     // 根据 code 处理对应操作, 返回处理后的 msg
     const msg = resolveResError(code, data?.message ?? statusText)
     // 需要错误提醒
-    !config?.noNeedTip && $message.error(msg)
+    !config?.noNeedTip && window.$message.error(msg)
     return Promise.reject({ code, msg, error: data || resp })
   }
   // 请求正常
@@ -50,7 +50,7 @@ export function resReject(err) {
     // 根据 code 处理对应操作, 返回处理后的 msg
     const msg = resolveResError(code, err.message)
     // 全局弹窗提示错误
-    $message?.error(msg)
+    window.$message?.error(msg)
     return Promise.reject({ code, msg, err })
   }
   const { data, status, config } = err.response

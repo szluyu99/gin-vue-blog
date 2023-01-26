@@ -31,26 +31,32 @@ type UpdateUserDisable struct {
 }
 
 type Register struct {
-	Username string `json:"username" validate:"required,min=4,max=12" label:"用户名"`
+	Username string `json:"username" validate:"required" label:"用户名"`
 	Password string `json:"password" validate:"required,min=4,max=20" label:"密码"`
-	// Code     string `json:"code"` // TODO: 验证码
+	Code     string `json:"code" validate:"required" label:"邮箱验证码"`
 }
 
 type Login struct {
-	Username string `json:"username" validate:"required,min=4,max=12" label:"用户名"`
-	Password string `json:"password" validate:"required,min=4,max=20" label:"密码"`
+	Username string `json:"username" validate:"required" label:"用户名"`
+	Password string `json:"password" validate:"required" label:"密码"`
 }
 
 // 修改普通用户密码
 type UpdatePassword struct {
-	Username string `json:"username" validate:"required,min=4,max=12" label:"用户名"`
-	Password string `json:"password" validate:"required,min=4,max=20" label:"密码"`
+	Username string `json:"username" validate:"required" label:"用户名"`
+	Password string `json:"password" validate:"required" label:"密码"`
 }
 
 // 修改管理员密码: 需要旧密码验证
 type UpdateAdminPassword struct {
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
+}
+
+// 更新邮箱信息
+type UpdateEmail struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
 }
 
 // 强制下线需要用户信息计算其 uuid

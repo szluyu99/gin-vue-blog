@@ -7,6 +7,7 @@ import (
 // redis key
 
 const (
+	KEY_CODE         = "code:"        // 验证码
 	KEY_USER         = "user:"        // 记录用户
 	KEY_DELETE       = "delete:"      //? 记录强制下线用户?
 	KEY_ABOUT        = "about"        // 关于我信息

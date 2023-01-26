@@ -36,6 +36,19 @@ Name = "mysession"
 Salt = "salt"
 MaxAge = 600       # 秒
 
+# 配置发送验证码账号信息
+[Email]
+Host = "smtp.163.com"       # 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
+Port = 465                  # 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
+From = ""     # 发件人 (邮箱)
+IsSSL = true                # 是否开启 SSL
+Secret = "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
+Nickname = ""           # 发件人昵称, 通常为自己的邮箱名
+
+[Captcha]
+SendEmail = true # 通过邮箱发送验证码
+ExpireTime = 15  # 过期时间 (分钟)
+
 # 根据需求调整
 [Zap]
 Level = "error"         # 日志级别: debug, info, warn, error, dpanic, panic, fatal, 默认 info

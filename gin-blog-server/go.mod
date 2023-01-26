@@ -11,6 +11,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/qiniu/go-sdk/v7 v7.13.0
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0

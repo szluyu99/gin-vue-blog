@@ -10,34 +10,59 @@ const registerFlag = computed({
   set: val => appStore.setRegisterFlag(val),
 })
 
-let formRef = $ref({
+let form = $ref({
   username: '',
   password: '',
+  code: '',
 })
 
 const rules = {}
 
 // 注册
 async function handleRegister() {
-  const { username, password } = formRef
+  const { username, password, code } = form
+  if (!code) {
+    window.$message?.warning('请输入发送到邮箱的验证码')
+    return
+  }
+
   if (!username || !password) {
-    window.$message?.warning('请输入用户名和密码')
+    window.$message?.warning('请输入邮箱号和密码')
     return
   }
 
   // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-  const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
-    if (res.ret === 0) {
-      // 注册
-      await api.register(formRef)
-      window.$notification?.success({ title: '注册成功!', duration: 1500 })
-      formRef = { username: '', password: '' }
-      // 打开登录弹窗
-      openLogin()
-    }
-  })
-  captcha.show()
+  const doRegister = async () => {
+    // 注册
+    await api.register(form)
+    window.$notification?.success({ title: '注册成功!', duration: 1500 })
+    form = { username: '', password: '', code: '' }
+    // 打开登录弹窗
+    openLogin()
+  }
+
+  if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
+    const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
+      res.ret === 0 && doRegister()
+    })
+    captcha.show()
+  }
+  else {
+    doRegister()
+  }
 }
+
+// 发送验证码
+async function sendCode() {
+  const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+  if (!reg.test(form.username)) {
+    window.$message?.warning('请输入正确的邮箱格式')
+    return
+  }
+  await api.sendCode({ email: form.username })
+  window.$message?.success('邮件发送成功')
+}
+
 // 登录
 function openLogin() {
   appStore.setRegisterFlag(false)
@@ -57,22 +82,32 @@ function openLogin() {
     lg="w-460"
   >
     <n-form
-      :model="formRef"
+      :model="form"
       :rules="rules"
       label-placement="left"
       label-width="70"
       require-mark-placement="right-hanging"
     >
-      <n-form-item label="用户名" path="username">
+      <n-form-item label="邮箱号" path="username">
         <n-input
-          v-model:value="formRef.username"
-          placeholder="用户名"
+          v-model:value="form.username"
+          placeholder="邮箱号，也是用户名"
           clearable
         />
       </n-form-item>
+      <n-form-item label="验证码" path="code">
+        <n-input
+          v-model:value="form.code"
+          placeholder="请输入 6 位验证码"
+          clearable
+        />
+        <n-button w-50 text @click="sendCode">
+          发送
+        </n-button>
+      </n-form-item>
       <n-form-item label="密码" path="password">
         <n-input
-          v-model:value="formRef.password"
+          v-model:value="form.password"
           type="password"
           show-password-on="click"
           placeholder="密码"
@@ -90,9 +125,9 @@ function openLogin() {
         </button>
         <div mt-25 mb-10 text-left>
           已有账号？
-          <button @click="openLogin">
+          <n-button text @click="openLogin">
             登录
-          </button>
+          </n-button>
         </div>
       <!-- TODO: 第三方登录 -->
       <!-- <div text-center text-10 color="#aaa">

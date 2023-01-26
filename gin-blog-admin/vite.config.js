@@ -8,7 +8,7 @@ import { createVitePlugins } from './build/plugin'
 export default defineConfig(({ command, mode }) => {
   const isBuild = command === 'build' // pnpm build
 
-  // 加载 .env 中的环境变量
+  // 加载 .env 中的环境变量 (vite.config.js 中无法通过 import.meta.env 获取环境变量, 需要使用 process.env 获取)
   // 设置第三个参数为 '' 可以加载所有环境变量(包括本机的), 默认只会加载 'VITE_' 前缀的变量
   const viteEnv = convertEnv(loadEnv(mode, process.cwd())) // loadEnv(mode, process.cwd(), '')
   const { VITE_PUBLIC_PATH, VITE_PORT, VITE_USE_PROXY, VITE_PROXY_TYPE } = viteEnv

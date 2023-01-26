@@ -56,7 +56,3 @@ func (*User) ForceOffline(c *gin.Context) {
 	// userInfoId := utils.GetFromContext[int](c, "user_info_id")
 	r.SendCode(c, userService.ForceOffline(utils.BindJson[req.ForceOfflineUser](c)))
 }
-
-// TODO: SendCode, SaveEmail
-
-// TODO: UpdateAvatar

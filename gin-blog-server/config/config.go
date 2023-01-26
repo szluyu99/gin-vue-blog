@@ -9,6 +9,8 @@ type Config struct {
 	Mysql   Mysql
 	Redis   Redis
 	Session Session
+	Email   Email
+	Captcha Captcha
 	Upload  Upload
 	Zap     Zap
 	Qiniu   Qiniu
@@ -46,6 +48,21 @@ type Session struct {
 	Name   string
 	Salt   string
 	MaxAge int
+}
+
+type Email struct {
+	To       string // 收件人 多个以英文逗号分隔 例：a@qq.com,b@qq.com
+	From     string // 发件人 要发邮件的邮箱
+	Host     string // 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
+	Secret   string // 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
+	Nickname string // 发件人昵称, 通常为自己的邮箱名
+	Port     int    // 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
+	IsSSL    bool   // 是否开启 SSL
+}
+
+type Captcha struct {
+	SendEmail  bool // 是否通过邮箱发送验证码
+	ExpireTime int  // 过期时间
 }
 
 type Upload struct {

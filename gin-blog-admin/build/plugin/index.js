@@ -6,7 +6,7 @@ import Unocss from 'unocss/vite'
 // 压缩
 import viteCompression from 'vite-plugin-compression'
 
-// rollup打包分析插件
+// rollup 打包分析插件
 import visualizer from 'rollup-plugin-visualizer'
 
 import unplugin from './unplugin'

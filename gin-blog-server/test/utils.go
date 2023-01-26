@@ -20,8 +20,26 @@ var frontRouter http.Handler
 func init() {
 	testing.Init()
 	routes.InitGlobalVariable()
-	backRouter = routes.BackRouter()
-	frontRouter = routes.FrontRouter()
+	// backRouter = routes.BackRouter()
+	// frontRouter = routes.FrontRouter()
+}
+
+func BackRouter() http.Handler {
+	if backRouter != nil {
+		return backRouter
+	} else {
+		backRouter = routes.BackRouter()
+		return backRouter
+	}
+}
+
+func FrontRouter() http.Handler {
+	if frontRouter != nil {
+		return frontRouter
+	} else {
+		frontRouter = routes.FrontRouter()
+		return frontRouter
+	}
 }
 
 // 基础测试: http 状态码正常 + 反序列化数据正常

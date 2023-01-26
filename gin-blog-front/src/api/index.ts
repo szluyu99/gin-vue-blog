@@ -7,6 +7,9 @@ export default {
   logout: () => request.get('/logout'),
   about: () => request.get('/about'),
 
+  // 发送验证码
+  sendCode: (params?: { email: string }) => request.get('/code', { params }),
+
   // 首页数据
   getHomeData: () => request.get('/home'),
   // 首页文章列表

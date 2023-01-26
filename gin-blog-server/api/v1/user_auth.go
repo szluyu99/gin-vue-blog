@@ -33,4 +33,9 @@ func (*UserAuth) Logout(c *gin.Context) {
 	r.Success(c)
 }
 
+// 发送邮件验证码
+func (*UserAuth) SendCode(c *gin.Context) {
+	r.SendCode(c, userService.SendCode(c.Query("email")))
+}
+
 // TODO: refresh token
