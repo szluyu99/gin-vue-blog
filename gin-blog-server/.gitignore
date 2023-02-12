@@ -18,3 +18,5 @@
 
 public/uploaded/
 public/markdown/
+
+*.db
