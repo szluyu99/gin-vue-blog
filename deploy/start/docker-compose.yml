@@ -46,6 +46,7 @@ services:
       gvb-mysql:
         condition: service_started
     # 依赖 mysql 启动后再开启后端服务
+    # 注意如果注释掉下面这行需要在 gin-blog-server 的 Dockerfile 打开 ENTRYPOINT 那行注释
     command: ./wait-for ${MYSQL_HOST}:3306 -t 5 -- ./server -c config.docker.toml
     volumes:
       - ${GVB_DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded

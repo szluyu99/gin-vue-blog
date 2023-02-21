@@ -25,5 +25,8 @@ EXPOSE 8765
 EXPOSE 5678
 
 # 在 docker-compose 中使用 wait-for 依赖 mysql 再启动
+# 如果不使用上面的方式需要打开下面这行注释
 # ENTRYPOINT ./server -c config.docker.toml
+
+###############################################
 # CMD sleep 5 && ./server -c config.docker.toml
