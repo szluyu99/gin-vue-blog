@@ -1,3 +1,12 @@
+## 博客交流群
+
+作者目前忙于实习，项目剩余功能目前还在筹划中，预计还会有大规模重构... 欢迎各种 PR，建一个交流群欢迎大家进群交流。
+
+<p align=center>
+<img width="300" src="https://img-blog.csdnimg.cn/91cafc8f02fc4f96be3a60a9179aaf5b.png" />
+</p>
+
+
 ## 博客介绍
 
 <p align=center>
