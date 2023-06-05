@@ -122,7 +122,7 @@ func saveArticleTag(req req.SaveOrUpdateArt, articleId int) {
 	if req.ID != 0 {
 		dao.Delete(model.ArticleTag{}, "article_id = ?", req.ID)
 	}
-	// 遍历 req.TagNams 中传来的标签, 不存在则新建
+	// 遍历 req.TagNames 中传来的标签, 不存在则新建
 	var articleTags []model.ArticleTag // 文章-标签 关系
 	for _, tagName := range req.TagNames {
 		tag := dao.GetOne(model.Tag{}, "name = ?", tagName)

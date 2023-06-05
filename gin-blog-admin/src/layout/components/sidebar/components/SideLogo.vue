@@ -6,7 +6,9 @@ const title = import.meta.env.VITE_TITLE
 
 <template>
   <router-link f-c-c h-60 to="/">
-    <icon-custom-logo text-36 color-primary />
+    <div f-c-c w-36 h-full>
+      <icon-custom-logo color-primary />
+    </div>
     <h2
       v-show="!collapsed"
       flex-shrink-0 max-w-140 ml-10 text-16 color-primary font-bold

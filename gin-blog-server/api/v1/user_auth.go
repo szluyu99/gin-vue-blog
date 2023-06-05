@@ -29,7 +29,7 @@ func (*UserAuth) Login(c *gin.Context) {
 
 // 退出登录
 func (*UserAuth) Logout(c *gin.Context) {
-	userService.Logtout(c)
+	userService.Logout(c)
 	r.Success(c)
 }
 

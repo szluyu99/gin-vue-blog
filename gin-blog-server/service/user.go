@@ -67,7 +67,7 @@ func (*User) Login(c *gin.Context, username, password string) (loginVo resp.Logi
 }
 
 // 退出登录
-func (*User) Logtout(c *gin.Context) {
+func (*User) Logout(c *gin.Context) {
 	uuid := utils.GetFromContext[string](c, "uuid")
 	session := sessions.Default(c)
 	session.Delete(KEY_USER + uuid) //? FIXME: 删除后 redis 还会有一条记录?
