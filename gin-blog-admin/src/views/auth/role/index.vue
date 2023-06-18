@@ -1,13 +1,20 @@
 <script setup>
-import { NButton, NPopconfirm, NSwitch, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NForm, NFormItem, NInput, NPopconfirm, NSwitch, NTag, NTree } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '角色管理' })
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 const {
   modalVisible,
@@ -26,18 +33,18 @@ const {
   doCreate: api.saveOrUpdateRole,
   doDelete: api.deleteRole,
   doUpdate: api.saveOrUpdateRole,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 // 菜单, 资源 跳出菜单的选项不同
-let showMenu = $ref(true)
-let resourceOption = $ref([]) // 资源选项
-let menuOption = $ref([]) // 菜单选项
+const showMenu = ref(true)
+const resourceOption = ref([]) // 资源选项
+const menuOption = ref([]) // 菜单选项
 
 onMounted(() => {
-  $table?.handleSearch()
-  api.getResourceOption().then(res => (resourceOption = res.data))
-  api.getMenuOption().then(res => (menuOption = res.data))
+  $table.value?.handleSearch()
+  api.getResourceOption().then(res => (resourceOption.value = res.data))
+  api.getMenuOption().then(res => (menuOption.value = res.data))
 })
 
 const columns = [
@@ -104,14 +111,14 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenu = true
-              api.getMenuOption().then(res => (menuOption = res.data))
+              showMenu.value = true
+              api.getMenuOption().then(res => (menuOption.value = res.data))
               handleEdit(row)
             },
           },
           {
             default: () => '菜单权限',
-            icon: renderIcon('material-symbols:edit-outline', { size: 14 }),
+            icon: renderIcon('material-symbols:edit-outline', { size: 16 }),
           },
         ),
         h(
@@ -121,14 +128,14 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenu = false
-              api.getResourceOption().then(res => (resourceOption = res.data))
+              showMenu.value = false
+              api.getResourceOption().then(res => (resourceOption.value = res.data))
               handleEdit(row)
             },
           },
           {
             default: () => '资源权限',
-            icon: renderIcon('ic:baseline-folder-open', { size: 14 }),
+            icon: renderIcon('ic:baseline-folder-open', { size: 16 }),
           },
         ),
         h(
@@ -148,7 +155,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
                 },
               ),
             default: () => h('div', {}, '确定删除该角色吗?'),
@@ -161,23 +168,20 @@ const columns = [
 </script>
 
 <template>
-  <!-- 业务页面 -->
   <CommonPage show-footer title="角色管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <TheIcon icon="material-symbols:add" :size="18" /> 新建角色
+        <span class="i-material-symbols:add mr-5 text-18" /> 新建角色
       </NButton>
       <NButton
-        ml-20
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
+        <span class="i-material-symbols:add mr-5 text-18" /> 批量删除
       </NButton>
     </template>
 
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -186,7 +190,7 @@ const columns = [
     >
       <template #queryBar>
         <QueryBarItem label="角色名" :label-width="50">
-          <n-input
+          <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
@@ -197,15 +201,13 @@ const columns = [
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
-      @on-save="handleSave"
+      @save="handleSave"
     >
-      <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
@@ -213,35 +215,31 @@ const columns = [
         :model="modalForm"
         :disabled="modalAction === 'view'"
       >
-        <n-form-item label="角色名" path="name">
-          <n-input v-model:value="modalForm.name" placeholder="请输入角色名称" />
-        </n-form-item>
-        <n-form-item label="角色标签" path="name">
-          <n-input v-model:value="modalForm.label" placeholder="请输入角色标签" />
-        </n-form-item>
-        <n-form-item v-if="showMenu" label="菜单权限" path="menu_ids">
-          <n-tree
+        <NFormItem label="角色名" path="name">
+          <NInput v-model:value="modalForm.name" placeholder="请输入角色名称" />
+        </NFormItem>
+        <NFormItem label="角色标签" path="name">
+          <NInput v-model:value="modalForm.label" placeholder="请输入角色标签" />
+        </NFormItem>
+        <NFormItem v-if="showMenu" label="菜单权限" path="menu_ids">
+          <NTree
             :data="menuOption"
             :checked-keys="modalForm.menu_ids"
-            block-line
-            checkable
-            expand-on-click
+
+            checkable expand-on-click block-line
             @update:checked-keys="(v) => (modalForm.menu_ids = v)"
           />
-        </n-form-item>
-        <n-form-item v-else label="资源权限" path="resource_ids">
-          <n-tree
+        </NFormItem>
+        <NFormItem v-else label="资源权限" path="resource_ids">
+          <NTree
             :data="resourceOption"
             :checked-keys="modalForm.resource_ids"
-            block-line
-            checkable
-            cascade
-            accordion
-            expand-on-click
+
+            block-line checkable expand-on-click cascade accordion
             @update:checked-keys="(v) => (modalForm.resource_ids = v)"
           />
-        </n-form-item>
-      </n-form>
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

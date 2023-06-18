@@ -1,52 +1,60 @@
 <script setup>
+import { ref } from 'vue'
 import { watchDebounced } from '@vueuse/core'
+import { NInput, NPopover } from 'naive-ui'
+
+import TheIcon from './TheIcon.vue'
 import iconData from '@/assets/js/icons'
 
 const props = defineProps({ value: String })
 const emit = defineEmits(['update:value'])
 
-let choosed = $ref(props.value) // 选中值
-let icons = $ref(iconData.filter(icon => icon.includes(choosed))) // 可选图标列表
+const choosed = ref(props.value) // 选中值
+const icons = ref(iconData.filter(icon => icon.includes(choosed.value))) // 可选图标列表
 
 function filterIcons() {
-  icons = iconData.filter(item => item.includes(choosed))
+  icons.value = iconData.filter(item => item.includes(choosed.value))
 }
 
 function selectIcon(icon) {
-  choosed = icon
-  emit('update:value', choosed)
+  choosed.value = icon
+  emit('update:value', choosed.value)
 }
 
-watchDebounced($$(choosed), () => {
+watchDebounced(choosed, () => {
   filterIcons()
-  emit('update:value', choosed)
+  emit('update:value', choosed.value)
 }, { debounce: 500 })
 </script>
 
 <template>
-  <div>
-    <n-popover trigger="click" placement="bottom-start">
+  <div class="w-full">
+    <NPopover trigger="click" placement="bottom-start">
       <template #trigger>
-        <n-input
+        <NInput
           v-model:value="choosed"
           placeholder="请输入图标名称"
           @update:value="filterIcons"
         >
           <template #prefix>
-            <icon-mdi:magnify />
+            <span class="i-mdi:magnify text-18" />
           </template>
           <template #suffix>
             <TheIcon :icon="choosed" :size="18" />
           </template>
-        </n-input>
+        </NInput>
       </template>
       <template #footer>
-        更多图标去 <a color-blue target="_blank" href="https://icones.js.org/collection/all">Icones</a> 查看
+        更多图标去
+        <a class="text-blue" target="_blank" href="https://icones.js.org/collection/all">
+          Icones
+        </a>
+        查看
       </template>
-      <ul v-if="icons.length" w-300 h-150 overflow-y-scroll>
+      <ul v-if="icons.length" class="h-150 w-300 overflow-y-scroll">
         <li
           v-for="(icon, index) in icons" :key="index"
-          mx-5 cursor-pointer hover:text-cyan inline-block
+          class="mx-5 inline-block cursor-pointer hover:text-cyan"
           @click="selectIcon(icon)"
         >
           <TheIcon :icon="icon" :size="18" />
@@ -55,6 +63,6 @@ watchDebounced($$(choosed), () => {
       <div v-else>
         <TheIcon :icon="choosed" :size="18" />
       </div>
-    </n-popover>
+    </NPopover>
   </div>
 </template>

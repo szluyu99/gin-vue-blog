@@ -1,18 +1,25 @@
 <script setup>
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useStorage } from '@vueuse/core'
-import bgImg from '@/assets/images/login_bg.webp'
+import { NButton, NCheckbox, NInput } from 'naive-ui'
+
+import AppPage from '@/components/page/AppPage.vue'
 import { lStorage, setToken } from '@/utils'
 import { addDynamicRoutes } from '@/router'
 import { useAppStore, useUserStore } from '@/store'
+import bgImg from '@/assets/images/login_bg.webp'
 import config from '@/constant/config'
 import api from '@/api'
 
 const title = import.meta.env.VITE_TITLE // 环境变量中读取
 
-const [userStore, appStore, router] = [useUserStore(), useAppStore(), useRouter()]
+const userStore = useUserStore()
+const appStore = useAppStore()
+const router = useRouter()
 const { query } = useRoute()
 
-let loginInfo = $ref({
+const loginInfo = ref({
   username: 'test@qq.com',
   password: '11111',
 })
@@ -23,7 +30,7 @@ initLoginInfo()
 function initLoginInfo() {
   const localLoginInfo = lStorage.get('loginInfo')
   if (localLoginInfo) {
-    loginInfo = {
+    loginInfo.value = {
       username: localLoginInfo.username || 'test@qq.com',
       password: localLoginInfo.password || '11111',
     }
@@ -31,18 +38,18 @@ function initLoginInfo() {
 }
 
 // Reactive LocalStorage/SessionStorage - vueuse
-const isRemember = $(useStorage('isRemember', false))
-let loading = $ref(false)
+const isRemember = useStorage('isRemember', false)
+const loading = ref(false)
 
 async function handleLogin() {
-  const { username, password } = loginInfo
+  const { username, password } = loginInfo.value
   if (!username || !password) {
     $message.warning('请输入用户名和密码')
     return
   }
 
   const doLogin = async (username, password) => {
-    loading = true
+    loading.value = true
     $message.loading('正在验证...')
 
     // 登录接口
@@ -73,7 +80,7 @@ async function handleLogin() {
       }
     }
     finally {
-      loading = false
+      loading.value = false
     }
   }
 
@@ -95,30 +102,29 @@ async function handleLogin() {
   <AppPage show-footer bg-cover :style="{ backgroundImage: `url(${bgImg})` }">
     <div
       style="transform: translateY(25px)"
-      f-c-c min-w-345 max-w-700 m-auto p-15 rounded-10 card-shadow bg-white bg-opacity-60
+      class="m-auto max-w-700 min-w-345 flex items-center justify-center rounded-10 bg-white bg-opacity-60 p-15 shadow"
     >
-      <div w-380 hidden md:block px-20 py-35>
-        <img src="@/assets/images/login_banner.webp" w-full alt="login_banner">
+      <div class="hidden w-380 px-20 py-35 md:block">
+        <img src="@/assets/images/login_banner.webp" class="w-full" alt="login_banner">
       </div>
 
-      <div w-320 flex-col px-20 py-35>
-        <h5 f-c-c text-24 font-normal color="#6a6a6a">
-          <icon-custom-logo mr-10 text-50 color-primary />
+      <div class="w-320 flex flex-col px-20 py-35">
+        <h5 class="flex items-center justify-center text-24 font-normal text-gray">
+          <img src="@/assets/svg/logo.svg" alt="logo" class="mr-10 h-50 w-50">
           {{ title }}
         </h5>
-        <div mt-30>
-          <n-input
+        <div class="mt-30">
+          <NInput
             v-model:value="loginInfo.username"
-            text-16 items-center h-50 pl-10
-            autofocus
+            class="autofocus h-50 items-center pl-10 text-16"
             placeholder="test@qq.com"
             :maxlength="20"
           />
         </div>
-        <div mt-30>
-          <n-input
+        <div class="mt-30">
+          <NInput
             v-model:value="loginInfo.password"
-            text-16 items-center h-50 pl-10
+            class="h-50 items-center pl-10 text-16"
             type="password"
             show-password-on="mousedown"
             placeholder="11111"
@@ -127,26 +133,25 @@ async function handleLogin() {
           />
         </div>
 
-        <div mt-20>
-          <n-checkbox
+        <div class="mt-20">
+          <NCheckbox
             :checked="isRemember"
             label="记住我"
             :on-update:checked="(val) => (isRemember = val)"
           />
         </div>
 
-        <div mt-20>
-          <n-button
-            w-full h-50 rounded-5 text-16
+        <div class="mt-20">
+          <NButton
+            class="h-50 w-full rounded-5 text-16"
             type="primary"
             :loading="loading"
             @click="handleLogin"
           >
             登录
-          </n-button>
+          </NButton>
         </div>
       </div>
     </div>
   </AppPage>
 </template>
-

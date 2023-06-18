@@ -1,7 +1,13 @@
 <script setup>
-import { NButton, NImage, NPopconfirm, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NImage, NInput, NPopconfirm, NTabPane, NTabs, NTag } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '留言管理' })
@@ -10,14 +16,14 @@ onMounted(() => {
   handleChangeTab('all') // 默认查看全部
 })
 
-const $table = $ref(null)
-const queryItems = $ref({}) // 条件查询参数
-const extraParams = $ref({}) // 额外参数
+const $table = ref(null)
+const queryItems = ref({}) // 条件查询参数
+const extraParams = ref({}) // 额外参数
 
 const { handleDelete } = useCRUD({
   name: '留言',
   doDelete: api.deleteMessages,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 const columns = [
@@ -115,7 +121,7 @@ const columns = [
             },
             {
               default: () => '撤下',
-              icon: renderIcon('mi:circle-error', { size: 14 }),
+              icon: renderIcon('mi:circle-error', { size: 16 }),
             },
           )
           : h(
@@ -128,7 +134,7 @@ const columns = [
             },
             {
               default: () => '通过',
-              icon: renderIcon('mi:circle-check', { size: 14 }),
+              icon: renderIcon('mi:circle-check', { size: 16 }),
             },
           ),
         h(
@@ -139,7 +145,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
               ),
             default: () => h('div', {}, '确定删除该条留言吗?'),
           },
@@ -157,23 +163,23 @@ async function handleUpdateReview(ids, is_review) {
   }
   await api.updateMessageReview({ ids, is_review })
   $message?.success(is_review ? '审核成功' : '撤下成功')
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 }
 
 // 切换标签页: [全部, 通过, 审核中]
 function handleChangeTab(value) {
   switch (value) {
     case 'all':
-      extraParams.is_review = null
+      extraParams.value.is_review = null
       break
     case 'has_review': // 通过
-      extraParams.is_review = 1
+      extraParams.value.is_review = 1
       break
     case 'not_review': // 审核中
-      extraParams.is_review = 0
+      extraParams.value.is_review = 0
       break
   }
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 }
 </script>
 
@@ -183,24 +189,22 @@ function handleChangeTab(value) {
     <!-- 操作栏 -->
     <template #action>
       <NButton
-        ml-20
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <TheIcon icon="material-symbols:recycling-rounded" :size="18" /> 批量删除
+        <span class="i-material-symbols:recycling-rounded mr-5 text-18" /> 批量删除
       </NButton>
       <NButton
-        ml-20
         type="success"
         :disabled="!$table?.selections.length"
         @click="handleUpdateReview($table.selections, 1)"
       >
-        <TheIcon icon="ic:outline-approval" :size="18" /> 批量通过
+        <span class="i-ic:outline-approval mr-5 text-18" /> 批量通过
       </NButton>
     </template>
     <!-- 标签栏 -->
-    <n-tabs
+    <NTabs
       type="line"
       animated
       @update:value="handleChangeTab"
@@ -208,10 +212,10 @@ function handleChangeTab(value) {
       <template #prefix>
         状态
       </template>
-      <n-tab-pane name="all" tab="全部" />
-      <n-tab-pane name="has_review" tab="通过" />
-      <n-tab-pane name="not_review" tab="审核中" />
-    </n-tabs>
+      <NTabPane name="all" tab="全部" />
+      <NTabPane name="has_review" tab="通过" />
+      <NTabPane name="not_review" tab="审核中" />
+    </NTabs>
     <!-- 表格 -->
     <CrudTable
       ref="$table"
@@ -222,7 +226,7 @@ function handleChangeTab(value) {
     >
       <template #queryBar>
         <QueryBarItem label="用户" :label-width="40" :content-width="180">
-          <n-input
+          <NInput
             v-model:value="queryItems.nickname"
             clearable
             type="text"

@@ -1,14 +1,19 @@
 <script setup>
+import { h, onMounted, ref } from 'vue'
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import api from '@/api'
 
 defineOptions({ name: '在线用户' })
 
-const $table = $ref(null)
+const $table = ref(null)
 
 onMounted(() => {
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -107,7 +112,7 @@ const columns = [
               { size: 'small', type: 'primary' },
               {
                 default: () => '下线',
-                icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+                icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
               },
             ),
           default: () => h('div', {}, '确定强制该用户下线吗?'),
@@ -122,7 +127,7 @@ async function handleForceOffline(row) {
   try {
     await api.forceOfflineUser(row)
     $message.success('该用户已被强制下线!')
-    $table?.handleSearch()
+    $table.value?.handleSearch()
   }
   catch (err) {
     $message.error('强制下线失败!')
@@ -131,7 +136,7 @@ async function handleForceOffline(row) {
 </script>
 
 <template>
-  <CommonPage show-footer title="在线用户">
+  <CommonPage title="在线用户">
     <CrudTable
       ref="$table"
       :columns="columns"

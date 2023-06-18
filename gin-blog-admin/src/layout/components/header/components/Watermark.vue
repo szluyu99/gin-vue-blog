@@ -1,5 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
+import { NIcon, NWatermark } from 'naive-ui'
 import { useThemeStore, useUserStore } from '@/store'
 
 const { nickname } = storeToRefs(useUserStore())
@@ -7,12 +8,12 @@ const themeStore = useThemeStore()
 </script>
 
 <template>
-  <n-icon size="18" mr-20 cursor-pointer @click="themeStore.switchWatermark">
-    <icon-ic:baseline-branding-watermark v-if="themeStore.watermarkFlag" />
-    <icon-ic:outline-branding-watermark v-else />
-  </n-icon>
+  <NIcon size="18" class="mr-20 cursor-pointer" @click="themeStore.switchWatermark">
+    <div v-if="themeStore.watermarkFlag" class="i-ic:baseline-branding-watermark" />
+    <div v-else class="i-ic:outline-branding-watermark" />
+  </NIcon>
 
-  <n-watermark
+  <NWatermark
     v-if="themeStore.watermarkFlag"
     :content="nickname"
     cross

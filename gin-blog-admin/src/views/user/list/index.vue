@@ -1,26 +1,33 @@
 <script setup>
-import { NButton, NImage, NSwitch, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NCheckbox, NCheckboxGroup, NForm, NFormItem, NImage, NInput, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import { loginTypeMap, loginTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 defineOptions({ name: '用户列表' })
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 const { modalVisible, modalLoading, handleSave, modalForm, modalFormRef, handleEdit } = useCRUD({
   name: '用户',
   doUpdate: api.updateUser,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
-let roleOption = $ref([])
+const roleOption = ref([])
 
 onMounted(() => {
-  api.getRoleOption().then(res => roleOption = res.data)
-  $table?.handleSearch()
+  api.getRoleOption().then(res => roleOption.value = res.data)
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -163,7 +170,7 @@ const columns = [
           },
           {
             default: () => '编辑',
-            icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+            icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
           },
         ),
       ]
@@ -180,7 +187,7 @@ async function handleUpdateDisable(row) {
   try {
     await api.updateUserDisable(row)
     $message?.success(row.is_disable ? '已禁用该用户' : '已取消禁用该用户')
-    $table?.handleSearch()
+    $table.value?.handleSearch()
   }
   catch (err) {
     // 有异常恢复原来的状态
@@ -204,7 +211,7 @@ async function handleUpdateDisable(row) {
     >
       <template #queryBar>
         <QueryBarItem label="昵称" :label-width="40">
-          <n-input
+          <NInput
             v-model:value="queryItems.nickname"
             clearable
             type="text"
@@ -213,7 +220,7 @@ async function handleUpdateDisable(row) {
           />
         </QueryBarItem>
         <QueryBarItem label="登录方式" :label-width="70" :content-width="180">
-          <n-select
+          <NSelect
             v-model:value="queryItems.login_type"
             clearable
             filterable
@@ -230,35 +237,35 @@ async function handleUpdateDisable(row) {
       v-model:visible="modalVisible"
       title="修改用户"
       :loading="modalLoading"
-      @on-save="handleSave"
+      @save="handleSave"
     >
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="80"
         :model="modalForm"
       >
-        <n-form-item label="用户昵称" path="name">
-          <n-input
+        <NFormItem label="用户昵称" path="name">
+          <NInput
             v-model:value="modalForm.nickname"
             clearable
             placeholder="请输入用户昵称"
           />
-        </n-form-item>
-        <n-form-item label="角色" path="role_ids">
-          <n-checkbox-group v-model:value="modalForm.role_ids">
-            <n-space item-style="display: flex;">
-              <n-checkbox
+        </NFormItem>
+        <NFormItem label="角色" path="role_ids">
+          <NCheckboxGroup v-model:value="modalForm.role_ids">
+            <NSpace item-style="display: flex;">
+              <NCheckbox
                 v-for="item in roleOption"
                 :key="item.value"
                 :value="item.value"
                 :label="item.label"
               />
-            </n-space>
-          </n-checkbox-group>
-        </n-form-item>
-      </n-form>
+            </NSpace>
+          </NCheckboxGroup>
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

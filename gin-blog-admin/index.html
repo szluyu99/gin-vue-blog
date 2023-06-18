@@ -12,14 +12,13 @@
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/resource/loading.css" />
-  <!-- title 的值从 .env 中读取, vite-plugin-html 插件注入 -->
-  <title> <%= title %> </title>
+  <title> Gin Vue Blog </title>
   <!-- 腾讯验证码 -->
   <!-- <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script> -->
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" class="w-full h-full">
     <!-- 白屏时的 loading 效果 -->
     <div class="loading-container">
       <div id="loadingLogo" class="loading-svg"></div>
@@ -31,11 +30,11 @@
           <div class="right-0 bottom-0 loading-spin-item loading-delay-1500"></div>
         </div>
       </div>
-      <div class="loading-title"> <%= title %> </div>
+      <div class="loading-title"> Gin Vue Blog </div>
     </div>
     <script src="/resource/loading.js"></script>
   </div>
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

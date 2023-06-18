@@ -1,4 +1,6 @@
 <script setup>
+import { computed, ref } from 'vue'
+import { NIcon, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { convertImgUrl, getToken } from '@/utils'
 
 const props = defineProps({
@@ -15,7 +17,7 @@ const props = defineProps({
 const emit = defineEmits(['update:preview'])
 
 const token = getToken() // 图片上传需要 Token
-let previewImg = $ref(props.preview)
+const previewImg = ref(props.preview)
 
 // 上传图片
 function handleImgUpload({ event }) {
@@ -25,20 +27,20 @@ function handleImgUpload({ event }) {
     $message?.error(res.message)
     return
   }
-  previewImg = res.data
-  emit('update:preview', previewImg)
+  previewImg.value = res.data
+  emit('update:preview', previewImg.value)
 }
 
 // 判断是本地上传的图片或网络资源
 // 开发环境可以使用本地文件上传, 生产环境建议使用云存储
-const imgUrl = computed(() => convertImgUrl(previewImg))
+const imgUrl = computed(() => convertImgUrl(previewImg.value))
 
-defineExpose($$({ previewImg }))
+defineExpose({ previewImg })
 </script>
 
 <template>
   <div>
-    <n-upload
+    <NUpload
       action="/api/upload"
       :headers="{ Authorization: `Bearer ${token}` }"
       :show-file-list="false"
@@ -46,24 +48,25 @@ defineExpose($$({ previewImg }))
     >
       <template v-if="previewImg">
         <img
-          border-dashed border-2 border-color="#d9d9d9" rounded-2rem
-          cursor-pointer hover:border-color-lightblue
+          border-color="#d9d9d9"
+          class="cursor-pointer border-2 rounded-2rem border-dashed hover:border-color-lightblue"
           :style="{ width: `${props.width}px` }"
-          :src="imgUrl" alt="文章封面"
+          :src="imgUrl"
+          alt="文章封面"
         >
       </template>
       <template v-else>
-        <n-upload-dragger>
-          <div mb-12>
-            <n-icon size="58" :depth="3">
-              <icon-mdi:upload />
-            </n-icon>
+        <NUploadDragger>
+          <div class="mb-12">
+            <NIcon size="58" :depth="3">
+              <span class="i-mdi:upload" />
+            </NIcon>
           </div>
-          <n-text text-14>
+          <NText class="text-14">
             点击或者拖动文件到该区域来上传
-          </n-text>
-        </n-upload-dragger>
+          </NText>
+        </NUploadDragger>
       </template>
-    </n-upload>
+    </NUpload>
   </div>
 </template>

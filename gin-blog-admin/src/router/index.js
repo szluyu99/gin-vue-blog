@@ -41,11 +41,12 @@ export async function addDynamicRoutes() {
     // 根据权限生成动态路由
     const userStore = useUserStore()
     const permissionStore = usePermissionStore()
+
     // userId 不存在, 则调用接口根据 token 获取用户信息
     !userStore.userId && (await userStore.getUserInfo())
 
     // 根据环境变量中的值决定前端生成路由还是后端路由
-    const accessRoutes = (JSON.parse(import.meta.env.VITE_BACK_ROUTER))
+    const accessRoutes = JSON.parse(import.meta.env.VITE_BACK_ROUTER)
       ? await permissionStore.generateRoutesBack() // ! 后端生成路由
       : permissionStore.generateRoutesFront(['admin']) // ! 前端生成路由 (根据角色), 待完善
 

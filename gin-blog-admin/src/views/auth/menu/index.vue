@@ -1,18 +1,25 @@
 <script setup>
-import { NButton, NPopconfirm, NSwitch } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NForm, NFormItem, NInput, NInputNumber, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
 import IconPicker from '@/components/icon/IconPicker.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
+
 import { formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '菜单管理' })
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 // 表单初始化内容
-const initForm = $ref({
+const initForm = ref({
   order_num: 1,
   is_hidden: 0,
 })
@@ -33,15 +40,15 @@ const {
   doCreate: api.saveOrUpdateMenu,
   doDelete: api.deleteMenu,
   doUpdate: api.saveOrUpdateMenu,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 })
 
 // 是否展示 "菜单类型"
-let showMenuType = $ref(false)
+const showMenuType = ref(false)
 
 const columns = [
   { title: '菜单名称', key: 'name', width: 80, ellipsis: { tooltip: true } },
@@ -107,14 +114,14 @@ const columns = [
             type: 'primary',
             style: `display: ${row.children ? '' : 'none'};`,
             onClick: () => {
-              initForm.is_catelogue = false // 设置非目录(显示组件路径)
-              initForm.component = '' // 手动清空组件路径
-              initForm.parent_id = row.id // 设置父菜单id
-              showMenuType = false
+              initForm.value.is_catalogue = false // 设置非目录(显示组件路径)
+              initForm.value.component = '' // 手动清空组件路径
+              initForm.value.parent_id = row.id // 设置父菜单id
+              showMenuType.value = false
               handleAdd()
             },
           },
-          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 14 }) },
+          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 16 }) },
         ),
         h(
           NButton,
@@ -123,11 +130,11 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenuType = false
+              showMenuType.value = false
               handleEdit(row)
             },
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
+          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
         ),
         h(
           NPopconfirm,
@@ -145,7 +152,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 14 }),
+                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
                 },
               ),
             default: () => h('div', {}, '确定删除该菜单吗?'),
@@ -169,10 +176,10 @@ async function handleUpdateHidden(row) {
 
 // 新增菜单(可选目录)
 function handleClickAdd() {
-  showMenuType = true
-  initForm.is_catelogue = true // 默认选中"目录"
-  initForm.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
-  initForm.parent_id = 0 // 目录和一级菜单的父id是 0
+  showMenuType.value = true
+  initForm.value.is_catalogue = true // 默认选中"目录"
+  initForm.value.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
+  initForm.value.parent_id = 0 // 目录和一级菜单的父id是 0
   handleAdd()
 }
 </script>
@@ -182,7 +189,7 @@ function handleClickAdd() {
   <CommonPage show-footer title="菜单管理">
     <template #action>
       <NButton type="primary" @click="handleClickAdd">
-        <TheIcon icon="material-symbols:add" :size="18" /> 新建菜单
+        <span class="i-material-symbols:add mr-5 text-18" /> 新建菜单
       </NButton>
     </template>
 
@@ -197,7 +204,7 @@ function handleClickAdd() {
     >
       <template #queryBar>
         <QueryBarItem label="菜单名" :label-width="50">
-          <n-input
+          <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
@@ -213,57 +220,57 @@ function handleClickAdd() {
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
-      @on-save="handleSave"
+      @save="handleSave"
     >
       <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="80"
         :model="modalForm"
       >
-        <n-form-item v-if="showMenuType" label="菜单类型" path="type">
-          <n-radio-group v-model:value="modalForm.is_catelogue" name="radiogroup">
-            <n-space>
-              <n-radio :value="true">
+        <NFormItem v-if="showMenuType" label="菜单类型" path="type">
+          <NRadioGroup v-model:value="modalForm.is_catalogue" name="radiogroup">
+            <NSpace>
+              <NRadio :value="true">
                 目录
-              </n-radio>
-              <n-radio :value="false">
+              </NRadio>
+              <NRadio :value="false">
                 一级菜单
-              </n-radio>
-            </n-space>
-          </n-radio-group>
-        </n-form-item>
-        <n-form-item label="菜单名称" path="name">
-          <n-input v-model:value="modalForm.name" placeholder="请输入菜单名称" />
-        </n-form-item>
-        <n-form-item label="菜单图标" path="icon">
-          <IconPicker v-model:value="modalForm.icon" w-full />
-        </n-form-item>
-        <n-form-item v-if="!modalForm.is_catelogue" label="组件路径" path="component">
-          <n-input v-model:value="modalForm.component" placeholder="请输入组件路径" />
-        </n-form-item>
-        <n-form-item label="访问路径" path="path">
-          <n-input v-model:value="modalForm.path" placeholder="请输入访问路径" />
-        </n-form-item>
-        <n-form-item label="跳转路径" path="redirect">
-          <n-input
+              </NRadio>
+            </NSpace>
+          </NRadioGroup>
+        </NFormItem>
+        <NFormItem label="菜单名称" path="name">
+          <NInput v-model:value="modalForm.name" placeholder="请输入菜单名称" />
+        </NFormItem>
+        <NFormItem label="菜单图标" path="icon">
+          <IconPicker v-model:value="modalForm.icon" />
+        </NFormItem>
+        <NFormItem v-if="!modalForm.is_catalogue" label="组件路径" path="component">
+          <NInput v-model:value="modalForm.component" placeholder="请输入组件路径" />
+        </NFormItem>
+        <NFormItem label="访问路径" path="path">
+          <NInput v-model:value="modalForm.path" placeholder="请输入访问路径" />
+        </NFormItem>
+        <NFormItem label="跳转路径" path="redirect">
+          <NInput
             v-model:value="modalForm.redirect"
             :disabled="modalForm.parent_id !== 0"
             placeholder="只有一级菜单可以设置跳转路径"
           />
-        </n-form-item>
-        <n-form-item label="显示排序" path="order_num">
-          <n-input-number v-model:value="modalForm.order_num" />
-        </n-form-item>
-        <n-form-item label="是否隐藏" path="is_hidden">
+        </NFormItem>
+        <NFormItem label="显示排序" path="order_num">
+          <NInputNumber v-model:value="modalForm.order_num" />
+        </NFormItem>
+        <NFormItem label="是否隐藏" path="is_hidden">
           <NSwitch v-model:value="modalForm.is_hidden" :checked-value="1" :unchecked-value="0" />
-        </n-form-item>
-        <n-form-item label="KeepAlive" path="keep_alive">
+        </NFormItem>
+        <NFormItem label="KeepAlive" path="keep_alive">
           <NSwitch v-model:value="modalForm.keep_alive" :checked-value="1" :unchecked-value="0" />
-        </n-form-item>
-      </n-form>
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

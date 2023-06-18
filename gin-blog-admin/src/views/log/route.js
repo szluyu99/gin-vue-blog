@@ -12,7 +12,7 @@ export default {
   },
   children: [
     {
-      name: 'OperatilnLog',
+      name: 'OperatingLog',
       path: 'operation',
       component: () => import('./operation/index.vue'),
       meta: {

@@ -7,20 +7,33 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build
 dist
 dist-ssr
 *.local
 
-stats.html
+# MacOS
+.DS_Store
+
+# Vim swap files
+*.swp
 
 # Editor directories and files
-# .vscode/*
-# !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# rollup-plugin-visualizer
+stats.html
+
+# Dotenv
+.env*
+*.local
+!.env.sample

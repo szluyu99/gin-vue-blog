@@ -1,11 +1,13 @@
 <script setup>
+import { NIcon } from 'naive-ui'
+
 function handleLinkClick() {
   window.open('https://github.com/szluyu99/gin-vue-blog')
 }
 </script>
 
 <template>
-  <n-icon mr-20 size="18" cursor-pointer @click="handleLinkClick">
-    <icon-mdi:github />
-  </n-icon>
+  <NIcon class="mr-20 cursor-pointer" size="18" @click="handleLinkClick">
+    <span class="i-mdi:github" />
+  </NIcon>
 </template>

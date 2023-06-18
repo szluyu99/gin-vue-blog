@@ -6,7 +6,6 @@ export function addBaseParams(params) {
 }
 
 export function resolveResError(code, message) {
-  // console.log(code, message)
   switch (code) {
     case 400:
       message = message ?? '请求参数错误'

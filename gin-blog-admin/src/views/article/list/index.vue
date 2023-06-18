@@ -1,39 +1,47 @@
 <script setup>
-import { NButton, NImage, NPopconfirm, NSwitch, NTag } from 'naive-ui'
+import { defineOptions, h, onActivated, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { NButton, NImage, NInput, NPopconfirm, NSelect, NSwitch, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { convertImgUrl, downloadFile, formatDate, getToken, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import { articleTypeMap, articleTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
 
-const [route, router] = [useRoute(), useRouter()]
+const route = useRoute()
+const router = useRouter()
 const token = getToken()
 
-let categoryOptions = $ref([])
-let tagOptions = $ref([])
+const categoryOptions = ref([])
+const tagOptions = ref([])
 
-const $table = $ref(null)
-const queryItems = $ref({}) // 条件搜索
-const extraParams = $ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
+const $table = ref(null)
+const queryItems = ref({}) // 条件搜索
+const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
 
 const { handleDelete } = useCRUD({
   name: '文章',
   doDelete: updateOrDeleteArticles, // 软删除
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  api.getCategoryOption().then(res => (categoryOptions = res.data))
-  api.getTagOption().then(res => (tagOptions = res.data))
+  api.getCategoryOption().then(res => (categoryOptions.value = res.data))
+  api.getTagOption().then(res => (tagOptions.value = res.data))
   handleChangeTab('all') // 默认查看全部
 })
 
 // ! 切换页面时, 如果是 [写文章] 页面跳转过来, 会携带 needRefresh 参数
 onActivated(() => {
   const { needRefresh } = route.query
-  needRefresh && ($table?.handleSearch())
+  needRefresh && ($table.value?.handleSearch())
 })
 
 const columns = [
@@ -79,7 +87,10 @@ const columns = [
       const group = []
       for (let i = 0; i < tags.length; i++) {
         group.push(
-          h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => tags[i].name }),
+          h(NTag,
+            { type: 'info', style: { margin: '2px 3px' } },
+            { default: () => tags[i].name },
+          ),
         )
       }
       return h('div', group.length ? group : '无')
@@ -164,10 +175,10 @@ const columns = [
               onClick: async () => {
                 // 软删除恢复
                 await api.softDeleteArticle({ ids: [row.id], is_delete: 0 })
-                await $table?.handleSearch()
+                await $table.value?.handleSearch()
               },
             },
-            { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
+            { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 16 }) },
           )
           : h(
             NButton,
@@ -177,7 +188,7 @@ const columns = [
               secondary: true,
               onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
             },
-            { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 14 }) },
+            { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 16 }) },
           ),
         h(
           NPopconfirm,
@@ -187,7 +198,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
               ),
             default: () => h('div', {}, '确定删除该文章吗?'),
           },
@@ -199,7 +210,7 @@ const columns = [
 
 // extraParams 中的 is_delete 为 0 则软删除, is_delete 为 1 则物理删除
 function updateOrDeleteArticles(ids) {
-  extraParams.is_delete === 0
+  extraParams.value.is_delete === 0
     ? api.softDeleteArticle({ ids: JSON.parse(ids), is_delete: 1 })
     : api.deleteArticle(ids)
 }
@@ -213,13 +224,13 @@ async function handleUpdateTop(row) {
   await api.updateArticleTop(row)
   row.publishing = false
   $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 }
 
 // 导出文章
 async function exportArticles(ids) {
   // 方式一: 前端根据文章内容和标题进行导出
-  const list = $table?.tableData.filter(e => ids.includes(e.id))
+  const list = $table.value?.tableData.filter(e => ids.includes(e.id))
   for (const item of list)
     downloadFile(item.content, `${item.title}.md`)
 
@@ -233,27 +244,27 @@ async function exportArticles(ids) {
 function handleChangeTab(value) {
   switch (value) {
     case 'all':
-      extraParams.is_delete = 0
-      extraParams.status = null
+      extraParams.value.is_delete = 0
+      extraParams.value.status = null
       break
     case 'public':
-      extraParams.is_delete = 0
-      extraParams.status = 1
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 1
       break
     case 'secret':
-      extraParams.is_delete = 0
-      extraParams.status = 2
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 2
       break
     case 'draft':
-      extraParams.is_delete = 0
-      extraParams.status = 3
+      extraParams.value.is_delete = 0
+      extraParams.value.status = 3
       break
     case 'delete':
-      extraParams.is_delete = 1
-      extraParams.status = null
+      extraParams.value.is_delete = 1
+      extraParams.value.status = null
       break
   }
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 }
 
 // 文件上传前检查类型
@@ -270,7 +281,7 @@ function afterUpload({ event }) {
   const respStr = (event?.target).response
   const res = JSON.parse(respStr)
   if (res.code === 0) {
-    $table?.handleSearch()
+    $table.value?.handleSearch()
     $message.success('文章导入成功！')
   }
   else {
@@ -284,26 +295,25 @@ function afterUpload({ event }) {
   <CommonPage show-footer title="文章列表">
     <!-- 操作栏 -->
     <template #action>
-      <NButton type="primary" @click="router.replace('/article/write')">
-        <TheIcon icon="material-symbols:add" :size="18" mr-5 /> 新建文章
+      <NButton type="primary" @click="$router.replace('/article/write')">
+        <span class="i-material-symbols:add mr-5 text-18" /> 新建文章
       </NButton>
       <NButton
-        ml-20
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <TheIcon icon="material-symbols:recycling-rounded" :size="18" mr-5 /> 批量删除
+        <span class="i-material-symbols:recycling-rounded mr-5 text-18" /> 批量删除
       </NButton>
       <NButton
-        ml-20 type="info"
+        type="info"
         :disabled="!$table?.selections.length"
         @click="exportArticles($table?.selections)"
       >
-        <TheIcon icon="mdi:export" :size="18" mr-5 /> 批量导出
+        <span class="i-mdi:export mr-5 text-18" /> 批量导出
       </NButton>
-      <div inline-block>
-        <n-upload
+      <div class="inline-block">
+        <NUpload
           action="/api/article/import"
           :headers="{ Authorization: `Bearer ${token}` }"
           :show-file-list="false"
@@ -311,23 +321,23 @@ function afterUpload({ event }) {
           @before-upload="beforeUpload"
           @finish="afterUpload"
         >
-          <NButton ml-20 type="success">
-            <TheIcon icon="mdi:import" :size="18" mr-5 /> 批量导入
+          <NButton type="success">
+            <span class="i-mdi:import mr-5 text-18" /> 批量导入
           </NButton>
-        </n-upload>
+        </NUpload>
       </div>
     </template>
     <!-- 导航栏 -->
-    <n-tabs type="line" animated @update:value="handleChangeTab">
+    <NTabs type="line" animated @update:value="handleChangeTab">
       <template #prefix>
         状态
       </template>
-      <n-tab-pane name="all" tab="全部" />
-      <n-tab-pane name="public" tab="公开" />
-      <n-tab-pane name="secret" tab="私密" />
-      <n-tab-pane name="draft" tab="草稿箱" />
-      <n-tab-pane name="delete" tab="回收站" />
-    </n-tabs>
+      <NTabPane name="all" tab="全部" />
+      <NTabPane name="public" tab="公开" />
+      <NTabPane name="secret" tab="私密" />
+      <NTabPane name="draft" tab="草稿箱" />
+      <NTabPane name="delete" tab="回收站" />
+    </NTabs>
     <!-- 表格 -->
     <CrudTable
       ref="$table"
@@ -338,7 +348,7 @@ function afterUpload({ event }) {
     >
       <template #queryBar>
         <QueryBarItem label="标题" :label-width="40" :content-width="180">
-          <n-input
+          <NInput
             v-model:value="queryItems.title"
             clearable
             type="text"
@@ -347,7 +357,7 @@ function afterUpload({ event }) {
           />
         </QueryBarItem>
         <QueryBarItem label="类型" :label-width="40" :content-width="160">
-          <n-select
+          <NSelect
             v-model:value="queryItems.type"
             clearable
             placeholder="请选择文章类型"
@@ -356,7 +366,7 @@ function afterUpload({ event }) {
           />
         </QueryBarItem>
         <QueryBarItem label="分类" :label-width="40" :content-width="160">
-          <n-select
+          <NSelect
             v-model:value="queryItems.category_id"
             clearable
             filterable
@@ -366,7 +376,7 @@ function afterUpload({ event }) {
           />
         </QueryBarItem>
         <QueryBarItem label="标签" :label-width="40" :content-width="160">
-          <n-select
+          <NSelect
             v-model:value="queryItems.tag_id"
             clearable
             filterable

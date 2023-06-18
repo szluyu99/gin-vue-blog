@@ -1,4 +1,8 @@
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { NDropdown } from 'naive-ui'
+
 import { useAppStore, useTagsStore } from '@/store'
 import { renderIcon } from '@/utils'
 
@@ -23,8 +27,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:show'])
 
-const tagsStore = useTagsStore()
+const route = useRoute()
 const appStore = useAppStore()
+const tagsStore = useTagsStore()
 
 // 右键菜单选项
 const options = computed(() => [
@@ -37,26 +42,26 @@ const options = computed(() => [
   {
     label: '关闭',
     key: 'close',
-    disabled: tagsStore.tags.length <= 1, // 只有一个标签
+    disabled: tagsStore.tags.length <= 1, // 只有一个标签不能关闭
     icon: renderIcon('mdi:close', { size: '14px' }),
   },
   {
     label: '关闭其他',
     key: 'close-other',
-    disabled: tagsStore.tags.length <= 1, // 只有一个标签
+    disabled: tagsStore.tags.length <= 1, // 只有一个标签不能关闭其他
     icon: renderIcon('mdi:arrow-expand-horizontal', { size: '14px' }),
   },
   {
     label: '关闭左侧',
     key: 'close-left',
-    // 只有一个标签 或者 当前选中的是第一个标签
+    // 只有一个标签 或者 当前选中的是第一个标签, 不能关闭左侧
     disabled: tagsStore.tags.length <= 1 || props.currentPath === tagsStore.tags[0].path,
     icon: renderIcon('mdi:arrow-expand-left', { size: '14px' }),
   },
   {
     label: '关闭右侧',
     key: 'close-right',
-    // 只有一个标签 或者 当前选中的是最后一个标签
+    // 只有一个标签 或者 当前选中的是最后一个标签, 不能关闭右侧
     disabled:
       tagsStore.tags.length <= 1
       || props.currentPath === tagsStore.tags[tagsStore.tags.length - 1].path,
@@ -64,12 +69,12 @@ const options = computed(() => [
   },
 ])
 
-const route = useRoute()
 // 重置 KeepAlive
 function resetKeepAlive() {
   if (route.meta?.keepAlive)
     appStore.setAliveKeys(route.name, +new Date())
 }
+
 // TODO: 标签关闭时会重置 KeepAlive
 const actionMap = new Map([
   [
@@ -88,31 +93,23 @@ const actionMap = new Map([
   ],
   [
     'close-other',
-    () => {
-      tagsStore.removeOther(props.currentPath)
-    },
+    () => tagsStore.removeOther(props.currentPath),
   ],
   [
     'close-left',
-    () => {
-      tagsStore.removeLeft(props.currentPath)
-    },
+    () => tagsStore.removeLeft(props.currentPath),
   ],
   [
     'close-right',
-    () => {
-      tagsStore.removeRight(props.currentPath)
-    },
+    () => tagsStore.removeRight(props.currentPath),
   ],
 ])
 
 function handleHideDropdown() {
-  // 配合父组件中使用 v-model:show="show" 来使用
-  emit('update:show', false) // 通知父组件更新了 show 的值为 false
+  emit('update:show', false)
 }
 
 function handleSelect(key) {
-  // console.log('右键菜单选择: ', key)
   const actionFn = actionMap.get(key)
   actionFn && actionFn()
   handleHideDropdown()
@@ -120,7 +117,7 @@ function handleSelect(key) {
 </script>
 
 <template>
-  <n-dropdown
+  <NDropdown
     :show="show"
     :options="options"
     :x="x"

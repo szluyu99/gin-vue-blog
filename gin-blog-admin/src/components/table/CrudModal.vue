@@ -1,44 +1,25 @@
 <script setup>
+import { computed } from 'vue'
+import { NButton, NModal } from 'naive-ui'
+
 const props = defineProps({
-  width: {
-    type: String,
-    default: '600px',
-  },
-  title: {
-    type: String,
-    default: '',
-  },
-  /** 是否显示操作按钮 */
-  showFooter: {
-    type: Boolean,
-    default: true,
-  },
-  visible: {
-    type: Boolean,
-    required: true,
-  },
-  /** 按钮的加载效果 */
-  loading: {
-    type: Boolean,
-    default: false,
-  },
+  visible: { type: Boolean, required: true },
+  width: { type: String, default: '600px' },
+  title: { type: String, default: '' },
+  showFooter: { type: Boolean, default: true },
+  loading: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:visible', 'onSave'])
+const emit = defineEmits(['update:visible', 'save'])
 
-// 实现和父组件传来的数据双向绑定
 const show = computed({
-  get() {
-    return props.visible
-  },
-  set(v) {
-    emit('update:visible', v)
-  },
+  get: () => props.visible,
+  set: v => emit('update:visible', v),
 })
 </script>
 
 <template>
-  <n-modal
+  <NModal
     v-model:show="show"
     :style="{ width }"
     preset="card"
@@ -48,21 +29,20 @@ const show = computed({
   >
     <slot />
     <template v-if="showFooter" #footer>
-      <footer flex justify-end>
+      <footer class="flex justify-end space-x-20">
         <slot name="footer">
-          <n-button @click="show = false">
+          <NButton @click="show = false">
             取消
-          </n-button>
-          <n-button
+          </NButton>
+          <NButton
             :loading="loading"
-            ml-20
             type="primary"
-            @click="emit('onSave')"
+            @click="emit('save')"
           >
             保存
-          </n-button>
+          </NButton>
         </slot>
       </footer>
     </template>
-  </n-modal>
+  </NModal>
 </template>

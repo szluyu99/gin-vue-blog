@@ -1,13 +1,20 @@
 <script setup>
-import { NButton, NImage, NPopconfirm } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NForm, NFormItem, NImage, NInput, NPopconfirm } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '友链管理' })
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 const {
   modalVisible,
@@ -25,11 +32,11 @@ const {
   doCreate: api.saveOrUpdateLink,
   doDelete: api.deleteLinks,
   doUpdate: api.saveOrUpdateLink,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -117,7 +124,7 @@ const columns = [
             type: 'primary',
             onClick: () => handleEdit(row),
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
+          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
         ),
         h(
           NPopconfirm,
@@ -126,7 +133,7 @@ const columns = [
             trigger: () => h(
               NButton,
               { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
             ),
             default: () => h('div', {}, '确定删除该分类吗?'),
           },
@@ -142,7 +149,7 @@ const columns = [
   <CommonPage show-footer title="友链管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <TheIcon icon="material-symbols:add" :size="18" /> 新建友链
+        <span class="i-material-symbols:add mr-5 text-18" /> 新建友链
       </NButton>
       <NButton
         ml-20
@@ -150,7 +157,7 @@ const columns = [
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
+        <span class="i-material-symbols:playlist-remove mr-5 text-18" /> 批量删除
       </NButton>
     </template>
 
@@ -163,7 +170,7 @@ const columns = [
     >
       <template #queryBar>
         <QueryBarItem label="友链名" :label-width="50">
-          <n-input
+          <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
@@ -179,45 +186,45 @@ const columns = [
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
-      @on-save="handleSave"
+      @save="handleSave"
     >
       <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="80"
         :model="modalForm"
       >
-        <n-form-item
+        <NFormItem
           label="链接名"
           path="name"
           :rule="{ required: true, message: '请输入友链名称', trigger: ['input', 'blur'] }"
         >
-          <n-input v-model:value="modalForm.name" placeholder="请输入友链名称" />
-        </n-form-item>
-        <n-form-item
+          <NInput v-model:value="modalForm.name" placeholder="请输入友链名称" />
+        </NFormItem>
+        <NFormItem
           label="链接头像"
           path="avatar"
           :rule="{ required: true, message: '请输入友链头像', trigger: ['input', 'blur'] }"
         >
-          <n-input v-model:value="modalForm.avatar" placeholder="请输入链接头像" />
-        </n-form-item>
-        <n-form-item
+          <NInput v-model:value="modalForm.avatar" placeholder="请输入链接头像" />
+        </NFormItem>
+        <NFormItem
           label="链接地址"
           path="address"
           :rule="{ required: true, message: '请输入友链地址', trigger: ['input', 'blur'] }"
         >
-          <n-input v-model:value="modalForm.address" placeholder="请输入链接地址" />
-        </n-form-item>
-        <n-form-item
+          <NInput v-model:value="modalForm.address" placeholder="请输入链接地址" />
+        </NFormItem>
+        <NFormItem
           label="链接介绍"
           path="intro"
           :rule="{ required: true, message: '请输入友链介绍', trigger: ['input', 'blur'] }"
         >
-          <n-input v-model:value="modalForm.intro" placeholder="请输入友链地址" />
-        </n-form-item>
-      </n-form>
+          <NInput v-model:value="modalForm.intro" placeholder="请输入友链地址" />
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

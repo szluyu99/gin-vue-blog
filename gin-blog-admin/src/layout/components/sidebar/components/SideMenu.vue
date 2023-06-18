@@ -1,6 +1,9 @@
 <script setup>
+import { computed, nextTick, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { NMenu } from 'naive-ui'
 import { useAppStore, usePermissionStore } from '@/store'
-import { isExternal, renderCustomIcon, renderIcon } from '@/utils'
+import { isExternal, renderIcon } from '@/utils'
 
 const router = useRouter() // 获取路由信息
 const curRoute = useRoute() // 进行路由跳转
@@ -16,10 +19,10 @@ const menuOptions = computed(() => {
 })
 
 // 点击标签, 自动展开菜单栏, 选中对应菜单
-const menuRef = $ref(null)
+const menuRef = ref(null)
 watch(curRoute, async () => {
   await nextTick()
-  menuRef.showOption()
+  menuRef.value.showOption()
 })
 
 function resolvePath(basePath, path) {
@@ -33,7 +36,6 @@ function resolvePath(basePath, path) {
   )
 }
 
-// ! TODO 需要理解
 // 根据路由获取菜单项
 function getMenuItem(route, basePath = '') {
   let menuItem = {
@@ -81,8 +83,6 @@ function getMenuItem(route, basePath = '') {
 }
 
 function getIcon(meta) {
-  if (meta?.customIcon)
-    return renderCustomIcon(meta.customIcon, { size: 18 })
   if (meta?.icon)
     return renderIcon(meta.icon, { size: 18 })
   return null
@@ -101,7 +101,7 @@ function handleMenuSelect(key, item) {
 </script>
 
 <template>
-  <n-menu
+  <NMenu
     ref="menuRef"
     class="side-menu"
     :indent="18"

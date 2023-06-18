@@ -1,4 +1,4 @@
-import { $$, $computed, $ref } from 'vue/macros'
+import { computed, ref } from 'vue'
 
 const ACTIONS = {
   view: '查看',
@@ -15,65 +15,65 @@ const ACTIONS = {
  * @param {*} refresh 查找(刷新)操作
  */
 export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, refresh }) {
-  let modalVisible = $ref(false) // 弹框显示
+  const modalVisible = ref(false) // 弹框显示
   /** 操作: add - 新增, edit - 删除, view - 查看 */
-  let modalAction = $ref('')
-  let modalLoading = $ref(false)
-  const modalTitle = $computed(() => ACTIONS[modalAction] + name) // 弹窗标题
+  const modalAction = ref('')
+  const modalLoading = ref(false)
+  const modalTitle = computed(() => ACTIONS[modalAction.value] + name) // 弹窗标题
 
-  let modalForm = $ref({ ...initForm })
-  const modalFormRef = $ref(null)
+  const modalForm = ref({ ...initForm })
+  const modalFormRef = ref(null)
 
   /** 新增 */
   function handleAdd() {
-    modalAction = 'add'
-    modalVisible = true
-    modalForm = { ...initForm } // 使用初始表单
+    modalAction.value = 'add'
+    modalVisible.value = true
+    modalForm.value = { ...initForm } // 使用初始表单
   }
 
   /** 修改 */
   function handleEdit(row) {
-    modalAction = 'edit'
-    modalVisible = true
-    modalForm = { ...row }
+    modalAction.value = 'edit'
+    modalVisible.value = true
+    modalForm.value = { ...row }
   }
 
   /** 查看 */
   function handleView(row) {
-    modalAction = 'view'
-    modalVisible = true
-    modalForm = { ...row }
+    modalAction.value = 'view'
+    modalVisible.value = true
+    modalForm.value = { ...row }
   }
 
   /** 保存 */
   function handleSave() {
-    if (!['edit', 'add'].includes(modalAction)) {
-      modalVisible = false
+    if (!['edit', 'add'].includes(modalAction.value)) {
+      modalVisible.value = false
       return
     }
-    modalFormRef?.validate(async (err) => {
+    modalFormRef.value?.validate(async (err) => {
       if (!err) {
         const actions = {
           add: {
-            api: () => doCreate(modalForm),
+            api: () => doCreate(modalForm.value),
             cb: () => window.$message.success('新增成功'),
           },
           edit: {
-            api: () => doUpdate(modalForm),
+            api: () => doUpdate(modalForm.value),
             cb: () => window.$message.success('编辑成功'),
           },
         }
-        const action = actions[modalAction]
+        const action = actions[modalAction.value]
 
         try {
-          modalLoading = true
+          modalLoading.value = true
           const data = await action.api()
           action.cb()
-          modalLoading = modalVisible = false
+          modalLoading.value = modalVisible.value = false
           data && refresh(data)
         }
         catch (error) {
-          modalLoading = false
+          modalLoading.value = false
         }
       }
     })
@@ -93,28 +93,31 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
     // 调用删除接口
     const callDeleteAPI = async () => {
       try {
-        modalLoading = true
+        modalLoading.value = true
         const data = await doDelete(JSON.stringify(ids))
         // 针对软删除的情况做判断
         if (data?.code === 0)
           window.$message.success('删除成功')
-        modalLoading = false
+        modalLoading.value = false
         refresh(data)
       }
       catch (error) {
-        modalLoading = false
+        modalLoading.value = false
       }
     }
 
-    needConfirm
-      ? window.$dialog.confirm({
+    if (needConfirm) {
+      window.$dialog.confirm({
         content: '确定删除？',
         confirm: () => callDeleteAPI(),
       })
-      : callDeleteAPI()
+    }
+    else {
+      callDeleteAPI()
+    }
   }
 
-  return $$({
+  return {
     modalVisible,
     modalAction,
     modalTitle,
@@ -126,5 +129,5 @@ export default function ({ name, initForm = {}, doCreate, doDelete, doUpdate, re
     handleSave,
     modalForm,
     modalFormRef,
-  })
+  }
 }

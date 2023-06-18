@@ -1,7 +1,7 @@
 <script setup>
-import { renderCustomIcon, renderIcon } from '@/utils'
+import { renderIcon } from '@/utils'
 
-const props = defineProps({
+defineProps({
   icon: {
     type: String,
     required: true,
@@ -14,20 +14,9 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
-  /** iconify | custom */
-  type: {
-    type: String,
-    default: 'iconify',
-  },
 })
-
-const iconCom = computed(() =>
-  props.type === 'iconify'
-    ? renderIcon(props.icon, { size: props.size, color: props.color })
-    : renderCustomIcon(props.icon, { size: props.size, color: props.color }),
-)
 </script>
 
 <template>
-  <component :is="iconCom" />
+  <component :is="renderIcon(icon, { size, color })" />
 </template>

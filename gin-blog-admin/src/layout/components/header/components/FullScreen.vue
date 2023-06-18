@@ -1,11 +1,13 @@
 <script setup>
+import { NIcon } from 'naive-ui'
 import { useFullscreen } from '@vueuse/core'
+
 const { isFullscreen, toggle } = useFullscreen()
 </script>
 
 <template>
-  <n-icon size="18" mr20 cursor-pointer @click="toggle">
-    <icon-ant-design:fullscreen-exit-outlined v-if="isFullscreen" />
-    <icon-ant-design:fullscreen-outlined v-else />
-  </n-icon>
+  <NIcon size="18" class="mr-20 cursor-pointer" @click="toggle">
+    <span v-if="isFullscreen" class="i-ant-design:fullscreen-exit-outlined" />
+    <span v-else class="i-ant-design:fullscreen-outlined" />
+  </NIcon>
 </template>

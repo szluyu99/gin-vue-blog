@@ -1,11 +1,13 @@
 <script setup>
+import { NIcon } from 'naive-ui'
 import { useThemeStore } from '@/store'
+
 const themeStore = useThemeStore()
 </script>
 
 <template>
-  <n-icon mr-20 cursor-pointer size="18" @click="themeStore.switchDarkMode">
-    <icon-mdi-moon-waning-crescent v-if="themeStore.darkMode" />
-    <icon-mdi-white-balance-sunny v-else />
-  </n-icon>
+  <NIcon class="mr-20 cursor-pointer" size="18" @click="themeStore.switchDarkMode">
+    <span v-if="themeStore.darkMode" class="i-mdi-moon-waning-crescent" />
+    <span v-else class="i-mdi-white-balance-sunny" />
+  </NIcon>
 </template>

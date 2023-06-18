@@ -1,11 +1,13 @@
 <script setup>
+import { NIcon } from 'naive-ui'
 import { useThemeStore } from '@/store'
+
 const themeStore = useThemeStore()
 </script>
 
 <template>
-  <n-icon size="20" cursor-pointer @click="themeStore.switchCollapsed">
-    <icon-mdi:format-indent-increase v-if="themeStore.collapsed" />
-    <icon-mdi:format-indent-decrease v-else />
-  </n-icon>
+  <NIcon size="20" class="cursor-pointer" @click="themeStore.switchCollapsed">
+    <span v-if="themeStore.collapsed" class="i-mdi:format-indent-increase" />
+    <span v-else class="i-mdi:format-indent-decrease" />
+  </NIcon>
 </template>

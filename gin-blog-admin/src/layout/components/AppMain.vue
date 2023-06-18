@@ -1,5 +1,9 @@
 <script setup>
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '@/store'
+
 const { reloadFlag, aliveKeys } = storeToRefs(useAppStore())
 const router = useRouter()
 

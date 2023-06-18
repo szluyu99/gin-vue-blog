@@ -1,10 +1,12 @@
 <script setup>
+import { onMounted } from 'vue'
+
+import AppProvider from './components/common/AppProvider.vue'
 import api from '@/api'
 import { getToken } from '@/utils'
 
-const token = getToken()
-
 onMounted(() => {
+  const token = getToken()
   token && api.report() // token 不为空, 上报用户信息
 })
 </script>
@@ -12,7 +14,6 @@ onMounted(() => {
 <template>
   <AppProvider>
     <router-view v-slot="{ Component }">
-      <!-- 动态组件 -->
       <component :is="Component" />
     </router-view>
   </AppProvider>

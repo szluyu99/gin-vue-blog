@@ -1,4 +1,7 @@
 <script setup>
+import { useRouter } from 'vue-router'
+import { NDropdown } from 'naive-ui'
+
 import { renderIcon } from '@/utils'
 import { useUserStore } from '@/store'
 
@@ -36,10 +39,10 @@ function handleSelect(key) {
 </script>
 
 <template>
-  <n-dropdown :options="options" @select="handleSelect">
-    <div flex items-center cursor-pointer>
-      <img :src="userStore.avatar" mr-10 w-35 h-35 rounded-full>
+  <NDropdown :options="options" @select="handleSelect">
+    <div class="flex cursor-pointer items-center">
+      <img :src="userStore.avatar" class="mr-10 h-35 w-35 rounded-full">
       <span>{{ userStore.nickname }}</span>
     </div>
-  </n-dropdown>
+  </NDropdown>
 </template>

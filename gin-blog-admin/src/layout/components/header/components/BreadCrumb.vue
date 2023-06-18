@@ -1,5 +1,7 @@
 <script setup>
-import { renderCustomIcon, renderIcon } from '@/utils'
+import { useRoute, useRouter } from 'vue-router'
+import { NBreadcrumb, NBreadcrumbItem } from 'naive-ui'
+import { renderIcon } from '@/utils'
 
 const router = useRouter()
 const route = useRoute()
@@ -10,8 +12,6 @@ function handleBreadClick(path) {
 }
 
 function getIcon(meta) {
-  if (meta?.customIcon)
-    return renderCustomIcon(meta.customIcon, { size: 18 })
   if (meta?.icon)
     return renderIcon(meta.icon, { size: 18 })
   return null
@@ -19,14 +19,14 @@ function getIcon(meta) {
 </script>
 
 <template>
-  <n-breadcrumb>
-    <n-breadcrumb-item
+  <NBreadcrumb>
+    <NBreadcrumbItem
       v-for="item in route.matched.filter((item) => !!item.meta?.title)"
       :key="item.path"
       @click="handleBreadClick(item.path)"
     >
       <component :is="getIcon(item.meta)" />
       {{ item.meta?.title }}
-    </n-breadcrumb-item>
-  </n-breadcrumb>
+    </NBreadcrumbItem>
+  </NBreadcrumb>
 </template>

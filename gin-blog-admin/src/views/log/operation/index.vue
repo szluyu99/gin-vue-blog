@@ -1,13 +1,21 @@
 <script setup>
-import { NButton, NPopconfirm, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NCode, NForm, NFormItem, NInput, NPopconfirm, NTag } from 'naive-ui'
+import { useClipboard } from '@vueuse/core'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '操作日志' })
 
 // 请求方法对应不同类型的标签 (计算属性传参)
-const tagType = $computed(() => (type) => {
+function tagType(type) {
   switch (type) {
     case 'GET':
       return 'info'
@@ -20,19 +28,19 @@ const tagType = $computed(() => (type) => {
     default:
       return 'info'
   }
-})
+}
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
   name: '日志',
   doDelete: api.deleteOperationLogs,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 })
 
 const columns = [
@@ -128,20 +136,17 @@ function copyFormatCode(code) {
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="操作日志">
+  <CommonPage title="操作日志">
     <template #action>
       <NButton
-        ml-20
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <TheIcon icon="material-symbols:playlist-remove" :size="18" /> 批量删除
+        <span class="i-material-symbols:playlist-remove mr-5 text-18" /> 批量删除
       </NButton>
     </template>
 
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -150,7 +155,7 @@ function copyFormatCode(code) {
     >
       <template #queryBar>
         <QueryBarItem label="模块名" :label-width="50">
-          <n-input
+          <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
@@ -161,63 +166,60 @@ function copyFormatCode(code) {
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       title="日志详情"
       :show-footer="false"
       :loading="modalLoading"
     >
-      <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="90"
         :model="modalForm"
       >
-        <n-form-item label="操作模块: " path="opt_module">
+        <NFormItem label="操作模块: " path="opt_module">
           {{ modalForm.opt_module }}
-        </n-form-item>
-        <n-form-item label="请求地址: " path="opt_url">
+        </NFormItem>
+        <NFormItem label="请求地址: " path="opt_url">
           {{ modalForm.opt_url }}
-        </n-form-item>
-        <n-form-item label="请求方法: " path="request_method">
+        </NFormItem>
+        <NFormItem label="请求方法: " path="request_method">
           <NTag :type="tagType(modalForm.request_method)">
             {{ modalForm.request_method }}
           </NTag>
-        </n-form-item>
-        <n-form-item label="操作类型: " path="opt_type">
+        </NFormItem>
+        <NFormItem label="操作类型: " path="opt_type">
           {{ modalForm.opt_type }}
-        </n-form-item>
-        <n-form-item label="操作方法: " path="opt_method">
-          <n-code
+        </NFormItem>
+        <NFormItem label="操作方法: " path="opt_method">
+          <NCode
             :code="modalForm.opt_method"
             code-wrap
             language="json"
           />
-        </n-form-item>
-        <n-form-item label="操作人员: " path="nickname">
+        </NFormItem>
+        <NFormItem label="操作人员: " path="nickname">
           {{ modalForm.nickname }}
-        </n-form-item>
-        <n-form-item label="请求参数: " path="request_param">
-          <n-code
-            p-7 cursor-pointer
-            word-wrap
+        </NFormItem>
+        <NFormItem label="请求参数: " path="request_param">
+          <NCode
+            class="word-wrap cursor-pointer p-7"
             :code="modalForm.request_param"
             language="json"
             @click="copyFormatCode(modalForm.request_param)"
           />
-        </n-form-item>
-        <n-form-item label="返回数据: " path="response_data">
-          <n-code
-            p-7 cursor-pointer
+        </NFormItem>
+        <NFormItem label="返回数据: " path="response_data">
+          <NCode
+            class="cursor-pointer p-7"
             :code="JSON.stringify(JSON.parse(modalForm.response_data), null, 2)"
             language="json"
             @click="copyFormatCode(modalForm.response_data)"
           />
-        </n-form-item>
-      </n-form>
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

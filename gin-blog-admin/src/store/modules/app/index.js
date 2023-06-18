@@ -26,8 +26,8 @@ export const useAppStore = defineStore('app', {
       // 以下做法也可以实现白屏效果
       // setTimeout(() => (this.reloadFlag = true), 1000)
 
+      // 滚动到顶部, 模拟刷新
       setTimeout(() => {
-        // 滚动到顶部, 模拟刷新
         document.documentElement.scrollTo({ left: 0, top: 0 })
         window.$loadingBar.finish()
       }, 100)

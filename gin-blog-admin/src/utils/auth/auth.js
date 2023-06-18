@@ -1,7 +1,9 @@
 import { unref } from 'vue'
 import { router } from '@/router'
 
-// 跳转回登录页面
+/**
+ * @description 跳转到登录页面
+ */
 export function toLogin() {
   const currentRoute = unref(router.currentRoute)
   // 跳转回去时记录 redirect 到 query 上
@@ -13,7 +15,9 @@ export function toLogin() {
   })
 }
 
-// 跳转到 404 页面
+/**
+ * @description 跳转到 404 页面
+ */
 export function to404() {
   router.replace({ path: '/404' })
 }

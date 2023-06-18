@@ -2,11 +2,22 @@ import { defineStore } from 'pinia'
 import { router } from '@/router'
 import { sStorage } from '@/utils'
 
-// 激活标签
+/**
+ * @type {string} activeTag 当前激活的标签
+ * @description 从 sessionStorage 中获取当前激活的标签
+ */
 const activeTag = sStorage.get('activeTag')
-// 获取所有标签
+
+/**
+ * @type {string[]} tags 所有标签
+ * @description 从 sessionStorage 中获取所有标签
+ */
 const tags = sStorage.get('tags')
-// 不添加标签的路由路径
+
+/**
+ * @type {string[]} WITHOUT_TAG_PATHS
+ * @description 不添加标签的路由路径
+ */
 const WITHOUT_TAG_PATHS = ['/404', '/login']
 
 export const useTagsStore = defineStore('tag', {
@@ -30,7 +41,7 @@ export const useTagsStore = defineStore('tag', {
     },
     /**
      * 设置当前显示的所有标签
-     * @param {[]} tags 数组
+     * @param {string[]} tags 数组
      */
     setTags(tags) {
       this.tags = tags
@@ -38,13 +49,12 @@ export const useTagsStore = defineStore('tag', {
     },
     /**
      * 添加标签 (不添加白名单中 和 已存在的)
-     * @param {{ name, path, title }} tag 标签对象
+     * @param {{ name, path, title, icon }} tag 标签对象
      */
     addTag(tag = {}) {
       this.setActiveTag(tag.path)
       // 在 白名单中 或 标签栏中已经有的路径 不添加
-      if (WITHOUT_TAG_PATHS.includes(tag.path)
-      || this.tags.some(item => item.path === tag.path))
+      if (WITHOUT_TAG_PATHS.includes(tag.path) || this.tags.some(item => item.path === tag.path))
         return
       this.setTags([...this.tags, tag])
     },

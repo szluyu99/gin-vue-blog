@@ -1,13 +1,20 @@
 <script setup>
-import { NButton, NPopconfirm, NSwitch, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
+import { NButton, NForm, NFormItem, NGradientText, NInput, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch, NTag } from 'naive-ui'
+
+import CommonPage from '@/components/page/CommonPage.vue'
+import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
+import CrudModal from '@/components/table/CrudModal.vue'
+import CrudTable from '@/components/table/CrudTable.vue'
+
 import { formatDate, renderIcon } from '@/utils'
-import { useCRUD } from '@/hooks'
+import { useCRUD } from '@/composables'
 import api from '@/api'
 
 defineOptions({ name: '接口管理' })
 
-const $table = $ref(null)
-const queryItems = $ref({})
+const $table = ref(null)
+const queryItems = ref({})
 
 const {
   modalVisible,
@@ -25,18 +32,18 @@ const {
   doCreate: api.saveOrUpdateResource,
   doDelete: api.deleteResource,
   doUpdate: api.saveOrUpdateResource,
-  refresh: () => $table?.handleSearch(),
+  refresh: () => $table.value?.handleSearch(),
 })
 
 onMounted(() => {
-  $table?.handleSearch()
+  $table.value?.handleSearch()
 })
 
 // 请求方法
 const requestMethods = ['GET', 'POST', 'DELETE', 'PUT']
 
 // 请求方法对应不同类型的标签 (计算属性传参)
-const tagType = $computed(() => (type) => {
+function tagType(type) {
   switch (type) {
     case 'GET':
       return 'info'
@@ -49,7 +56,7 @@ const tagType = $computed(() => (type) => {
     default:
       return 'info'
   }
-})
+}
 
 const columns = [
   { title: '资源名称', key: 'name', width: 80, ellipsis: { tooltip: true } },
@@ -117,7 +124,7 @@ const columns = [
               modalForm.value.parent_id = row.id // 父资源id
             },
           },
-          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 14 }) },
+          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 16 }) },
         ),
         h(
           NButton,
@@ -127,7 +134,7 @@ const columns = [
             type: 'info',
             onClick: () => (row.children ? handleEditModule(row) : handleEdit(row)),
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 14 }) },
+          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
         ),
         h(
           NPopconfirm,
@@ -141,7 +148,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'tiny', quaternary: true, type: 'error' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 14 }) },
+                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
               ),
             default: () => h('div', {}, '确定删除该接口吗?'),
           },
@@ -163,33 +170,31 @@ async function handleUpdateAnonymous(row) {
 }
 
 // 模块相关
-let moduleModalVisible = $ref(false)
+const moduleModalVisible = ref(false)
 function handleAddModule() {
   modalAction.value = 'add'
   modalForm.value = {}
-  moduleModalVisible = true
+  moduleModalVisible.value = true
 }
 function handleEditModule(row) {
   modalAction.value = 'edit'
   modalForm.value = { ...row }
-  moduleModalVisible = true
+  moduleModalVisible.value = true
 }
 async function handleModuleSave() {
   handleSave()
-  moduleModalVisible = false
+  moduleModalVisible.value = false
 }
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="接口管理">
+  <CommonPage title="接口管理">
     <template #action>
       <NButton type="primary" @click="handleAddModule">
-        <TheIcon icon="material-symbols:add" :size="18" /> 新增模块
+        <span class="i-material-symbols:add mr-5 text-18" /> 新增模块
       </NButton>
     </template>
 
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -200,7 +205,7 @@ async function handleModuleSave() {
     >
       <template #queryBar>
         <QueryBarItem label="资源名" :label-width="50">
-          <n-input
+          <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
@@ -211,60 +216,56 @@ async function handleModuleSave() {
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑 资源 -->
     <CrudModal
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
-      @on-save="handleSave"
+      @save="handleSave"
     >
-      <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="80"
         :model="modalForm"
       >
-        <n-form-item label="资源名" path="name">
-          <n-input v-model:value="modalForm.name" placeholder="请输入资源名" />
-        </n-form-item>
-        <n-form-item label="资源路径" path="url">
-          <n-input v-model:value="modalForm.url" placeholder="请输入资源路径" />
-        </n-form-item>
-        <n-form-item label="请求方式" path="request_method">
-          <n-radio-group v-model:value="modalForm.request_method" name="radiogroup">
-            <n-space>
-              <n-radio v-for="method of requestMethods" :key="method" :value="method">
-                <n-gradient-text :type="tagType(method)">
+        <NFormItem label="资源名" path="name">
+          <NInput v-model:value="modalForm.name" placeholder="请输入资源名" />
+        </NFormItem>
+        <NFormItem label="资源路径" path="url">
+          <NInput v-model:value="modalForm.url" placeholder="请输入资源路径" />
+        </NFormItem>
+        <NFormItem label="请求方式" path="request_method">
+          <NRadioGroup v-model:value="modalForm.request_method" name="radiogroup">
+            <NSpace>
+              <NRadio v-for="method of requestMethods" :key="method" :value="method">
+                <NGradientText :type="tagType(method)">
                   {{ method }}
-                </n-gradient-text>
-              </n-radio>
-            </n-space>
-          </n-radio-group>
-        </n-form-item>
-      </n-form>
+                </NGradientText>
+              </NRadio>
+            </NSpace>
+          </NRadioGroup>
+        </NFormItem>
+      </NForm>
     </CrudModal>
 
-    <!-- 新增/编辑 模块 -->
     <CrudModal
       v-model:visible="moduleModalVisible"
       :title="`${modalAction === 'add' ? '新增' : '编辑'}模块`"
       :loading="modalVisible"
-      @on-save="handleModuleSave"
+      @save="handleModuleSave"
     >
-      <!-- 表单 -->
-      <n-form
+      <NForm
         ref="modalFormRef"
         label-placement="left"
         label-align="left"
         :label-width="80"
         :model="modalForm"
       >
-        <n-form-item label="模块名" path="name">
-          <n-input v-model:value="modalForm.name" placeholder="请输入模块名" />
-        </n-form-item>
-      </n-form>
+        <NFormItem label="模块名" path="name">
+          <NInput v-model:value="modalForm.name" placeholder="请输入模块名" />
+        </NFormItem>
+      </NForm>
     </CrudModal>
   </CommonPage>
 </template>

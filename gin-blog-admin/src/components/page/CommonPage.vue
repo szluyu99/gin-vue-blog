@@ -1,17 +1,12 @@
 <script setup>
+import { useRoute } from 'vue-router'
+import { NCard } from 'naive-ui'
+import AppPage from './AppPage.vue'
+
 defineProps({
-  showFooter: {
-    type: Boolean,
-    default: false,
-  },
-  showHeader: {
-    type: Boolean,
-    default: true,
-  },
-  title: {
-    type: String,
-    default: undefined,
-  },
+  showFooter: { type: Boolean, default: true },
+  showHeader: { type: Boolean, default: true },
+  title: { type: String, default: undefined },
 })
 
 const route = useRoute()
@@ -21,21 +16,20 @@ const route = useRoute()
   <AppPage :show-footer="showFooter">
     <header
       v-if="showHeader"
-      flex justify-between items-center
-      px-15 mb-15 min-h-45
+      class="mb-15 min-h-45 flex items-center justify-between px-15"
     >
       <slot v-if="$slots.header" name="header" />
       <template v-else>
-        <h2 color="#333" text-22 font-normal>
+        <h2 class="text-22 font-normal text-[#333] dark:text-[#ccc]">
           {{ title || route.meta?.title }}
         </h2>
-        <div>
+        <div class="space-x-20">
           <slot name="action" />
         </div>
       </template>
     </header>
-    <n-card rounded-10 flex-1>
+    <NCard class="flex-1 rounded-10">
       <slot />
-    </n-card>
+    </NCard>
   </AppPage>
 </template>
