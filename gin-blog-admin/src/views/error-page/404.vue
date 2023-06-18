@@ -1,7 +1,6 @@
 <script setup>
 import { NButton, NResult } from 'naive-ui'
-
-const { replace } = useRouter()
+import AppPage from '@/components/page/AppPage.vue'
 </script>
 
 <template>
@@ -11,7 +10,7 @@ const { replace } = useRouter()
         <img src="@/assets/images/404.webp" width="500">
       </template>
       <template #footer>
-        <NButton @click="replace('/')">
+        <NButton @click="$router.replace('/')">
           返回首页
         </NButton>
       </template>

@@ -405,12 +405,13 @@ pnpm dev
  鸣谢项目：
 
 - [https://butterfly.js.org/](https://butterfly.js.org/)
-- [https://github.com/flipped-aurora/gin-vue-admin](https://github.com/flipped-aurora/gin-vue-admin)
 - [https://github.com/qifengzhang007/GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
 - [https://github.com/X1192176811/blog](https://github.com/X1192176811/blog)
 - [https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin)
 - [https://github.com/antfu/vitesse](https://github.com/antfu/vitesse)
 - ...
+
+⭐ 博客后台的前端基于 [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) 进行二开，感谢作者的开源。
 
 > 需要感谢的绝不止以上这些开源项目，但是一时难以全部列出，后面会慢慢补上。
 
