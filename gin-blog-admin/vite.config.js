@@ -13,9 +13,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: { '@': resolve(__dirname, 'src') },
     },
-    define: {
-      _BUILD_TIME_: JSON.stringify(new Date().toLocaleString()),
-    },
     plugins: [
       vue(),
       unocss(),

@@ -99,7 +99,7 @@ async function handleLogin() {
 </script>
 
 <template>
-  <AppPage show-footer bg-cover :style="{ backgroundImage: `url(${bgImg})` }">
+  <AppPage class="bg-cover" :style="{ backgroundImage: `url(${bgImg})` }">
     <div
       style="transform: translateY(25px)"
       class="m-auto max-w-700 min-w-345 flex items-center justify-center rounded-10 bg-white bg-opacity-60 p-15 shadow"

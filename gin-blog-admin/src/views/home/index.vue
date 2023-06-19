@@ -23,8 +23,6 @@ async function getOneSentence() {
     .then(data => sentence.value = data.hitokoto)
     .catch(() => sentence.value = '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。')
 }
-
-const BUILD_TIME = window._BUILD_TIME_
 </script>
 
 <template>
@@ -102,30 +100,21 @@ const BUILD_TIME = window._BUILD_TIME_
 
       <!-- TODO: 完善首页设计 -->
       <NCard title="项目" size="small" class="mt-15 rounded-10">
-        <div class="text-18">
-          项目构建时间： {{ BUILD_TIME }}
-        </div>
         <template #header-extra>
           <NButton text type="primary">
             更多
           </NButton>
         </template>
-        <div class="flex flex-wrap justify-between">
-          <NCard
-            v-for="i in 10" :key="i"
-            class="my-10 w-300 flex-shrink-0 cursor-pointer hover:shadow-lg"
-            title="Gin Blog Admin"
-            size="small"
-          >
-            <p class="op-60">
-              这是个基于 gin 开发的博客管理后台
-            </p>
-          </NCard>
-          <div class="h-0 w-300" />
-          <div class="h-0 w-300" />
-          <div class="h-0 w-300" />
-          <div class="h-0 w-300" />
-        </div>
+        <NCard
+          v-for="i in 5" :key="i"
+          class="my-10 w-300 flex-shrink-0 cursor-pointer hover:shadow-lg"
+          title="Gin Blog Admin"
+          size="small"
+        >
+          <p class="op-60">
+            这是个基于 gin 开发的博客管理后台
+          </p>
+        </NCard>
       </NCard>
     </div>
   </AppPage>
