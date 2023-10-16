@@ -47,7 +47,7 @@ const passwordForm = ref({
 function updatePassword() {
   passwordFormRef.value?.validate(async (err) => {
     if (!err) {
-      await api.updateCurrentPassword(passwordForm)
+      await api.updateCurrentPassword(passwordForm.value)
       $message.success('修改成功!')
     }
   })
