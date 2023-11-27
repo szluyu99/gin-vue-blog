@@ -1,11 +1,13 @@
-<script setup lang="ts">
+<script setup>
+import { ref } from 'vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
+import TheIcon from '@/components/icon/TheIcon.vue'
 
-const { y } = $(useWindowScroll())
+const { y } = useWindowScroll()
 
-let styleVal = $ref('')
-watchThrottled($$(y), () => {
-  styleVal = (y > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
+const styleVal = ref('')
+watchThrottled(y, () => {
+  styleVal.value = (y.value > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
 }, { throttle: 100 })
 
 const operations = [
@@ -26,16 +28,14 @@ const operations = [
 
 <template>
   <div
-    fixed z-4 right="-35" bottom-85
-    text-20 text-white transition-600
+    class="fixed z-4 -right-35 bottom-85 text-20 text-white transition-600"
     :style="styleVal"
   >
     <div
       v-for="item of operations" :key="item.icon"
-      w-30 h-30 my-3 f-c-c cursor-pointer rounded
-      bg="#49b1f5" hover:bg-amber
+      class="w-30 h-30 my-3 flex items-center justify-center cursor-pointer rounded bg-#49b1f5 hover:bg-amber"
     >
-      <the-icon :icon="item.icon" :size="20" @click="item.fn" />
+      <TheIcon :icon="item.icon" :size="20" @click="item.fn" />
     </div>
   </div>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 // import EmojiList from '@/assets/js/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
@@ -21,22 +23,22 @@ onMounted(() => {
 const topicId = +(useRoute().params.id ?? 0)
 
 // 加载评论
-let commentList = $ref<any>([]) // 评论列表 (分页加载)
-let commentCount = $ref(0) // 评论总数量
-let listLoading = $ref(false) // 列表加载状态
+const commentList = ref<any>([]) // 评论列表 (分页加载)
+const commentCount = ref(0) // 评论总数量
+const listLoading = ref(false) // 列表加载状态
 const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId }) // 加载评论的参数
 async function getComments() {
-  listLoading = true
+  listLoading.value = true
   try {
     const res = await api.getComments(params)
     // * 全局加载更多, 0.8s 延时
     setTimeout(() => {
       params.page_num === 1
-        ? commentList = res.data.pageData
-        : commentList.push(...res.data.pageData)
-      commentCount = res.data.total
+        ? commentList.value = res.data.pageData
+        : commentList.value.push(...res.data.pageData)
+      commentCount.value = res.data.total
       params.page_num++
-      listLoading = false
+      listLoading.value = false
     }, 800)
   }
   catch (err) {
@@ -50,21 +52,21 @@ function reloadComments() {
 }
 
 // * 解决新增评论后刷新数据, 点击回复的顺序错乱问题
-let refresh = $ref(true) // 重新刷新整个评论列表
-watch($$(commentList), () => {
-  refresh = false
+const refresh = ref(true) // 重新刷新整个评论列表
+watch(commentList, () => {
+  refresh.value = false
   nextTick(() => {
-    refresh = true
+    refresh.value = true
   })
 }, { deep: false }) // deep = false 防止 "查看更多" 时刷新整个数据
 
 // 回复相关
 // ! 可以获取 v-for 循环中的 DOM 数组
-const replyFieldRefs = $ref<any>([])
+const replyFieldRefs = ref<any>([])
 // 回复评论
 function replyComment(idx: number, obj: any) {
   // 关闭所有回复框
-  replyFieldRefs.forEach((e: any) => e.setReply(false))
+  replyFieldRefs.value.forEach((e: any) => e.setReply(false))
   // 打开当前点击的回复框
   const curRef = replyFieldRefs[idx]
   curRef.setReply(true)
@@ -75,8 +77,8 @@ function replyComment(idx: number, obj: any) {
 }
 
 // 提交回复后, 重新加载评论回复
-const pageRefs = $ref<any>([]) // 分页
-const checkRefs = $ref<any>([]) // 查看
+const pageRefs = ref<any>([]) // 分页
+const checkRefs = ref<any>([]) // 查看
 async function reloadReplies(idx: number) {
   const { data } = await api.getCommentReplies(
     commentList[idx].id, { page_size: 5, page_num: pageRefs[idx].current },

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { defineComponent, h } from 'vue'
 // import { kebabCase } from 'lodash-es'
-import { useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
+import { NConfigProvider, NDialogProvider, NLoadingBarProvider, NMessageProvider, NNotificationProvider, useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
 // import { useCssVar } from '@vueuse/core'
 // import type { GlobalThemeOverrides } from 'naive-ui'
 
@@ -66,16 +67,16 @@ const NaiveProviderContent = defineComponent({
 </script>
 
 <template>
-  <n-config-provider wh-full>
-    <n-loading-bar-provider>
-      <n-dialog-provider>
-        <n-notification-provider>
-          <n-message-provider>
+  <NConfigProvider class="h-full w-full">
+    <NLoadingBarProvider>
+      <NDialogProvider>
+        <NNotificationProvider>
+          <NMessageProvider>
             <slot />
             <NaiveProviderContent />
-          </n-message-provider>
-        </n-notification-provider>
-      </n-dialog-provider>
-    </n-loading-bar-provider>
-  </n-config-provider>
+          </NMessageProvider>
+        </NNotificationProvider>
+      </NDialogProvider>
+    </NLoadingBarProvider>
+  </NConfigProvider>
 </template>

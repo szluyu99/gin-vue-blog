@@ -1,34 +1,35 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import BannerPage from '@/components/page/BannerPage.vue'
 import api from '@/api'
 
-let loading = $ref(true)
-let categoryList = $ref<any>([])
+const loading = ref(true)
+const categoryList = ref([])
 
 onMounted(async () => {
   const res = await api.getCategorys()
-  categoryList = res.data.list
-  loading = false
+  categoryList.value = res.data.list
+  loading.value = false
 })
 </script>
 
 <template>
   <BannerPage :loading="loading" title="分类" label="category" card>
-    <h2
-      text-center leading-20 mb-6rem text-25 mt-10
-      lg="text-36"
-    >
+    <h2 class="text-center leading-20 mb-6rem text-25 mt-10 lg:text-36">
       分类 - {{ categoryList.length }}
     </h2>
-    <ul class="category-list" px-20>
+    <ul class="category-list px-20">
       <li
         v-for="c of categoryList" :key="c.id"
-        class="category-list-item"
-        cursor-pointer hover:text-violet
+        class="category-list-item cursor-pointer hover:text-violet"
       >
-        <router-link :to="`categories/${c.id}?name=${c.name}`">
+        <RouterLink :to="`categories/${c.id}?name=${c.name}`">
           {{ c.name }}
-        </router-link>
-        <span ml-5 text-4xl text-gray> ({{ c.article_count ?? 0 }}) </span>
+        </RouterLink>
+        <span class="ml-5 text-4xl text-gray">
+          ({{ c.article_count ?? 0 }})
+        </span>
       </li>
     </ul>
   </BannerPage>

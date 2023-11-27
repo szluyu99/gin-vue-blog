@@ -1,79 +1,55 @@
-<script setup lang="ts">
+<script setup>
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useWindowScroll, watchThrottled } from '@vueuse/core'
+import { NAvatar } from 'naive-ui'
+
 import MobileSideBar from './MobileSideBar.vue'
+import TheIcon from '@/components/icon/TheIcon.vue'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 
-const [appStore, userStore] = [useAppStore(), useUserStore()]
-const [router, route] = [useRouter(), useRoute()]
+const appStore = useAppStore()
+const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
 
 // 菜单项 TODO: 直接从路由中加载? 似乎不可行
 const menuOptions = [
-  {
-    text: '首页',
-    icon: 'mdi:home',
-    path: '/',
-  },
+  { text: '首页', icon: 'mdi:home', path: '/' },
   {
     text: '发现',
     icon: 'mdi:apple-safari',
     subMenu: [
-      {
-        text: '归档',
-        icon: 'mdi:archive',
-        path: '/archives',
-      },
-      {
-        text: '分类',
-        icon: 'mdi:menu',
-        path: '/categories',
-      },
-      {
-        text: '标签',
-        icon: 'mdi:tag',
-        path: '/tags',
-      },
+      { text: '归档', icon: 'mdi:archive', path: '/archives' },
+      { text: '分类', icon: 'mdi:menu', path: '/categories' },
+      { text: '标签', icon: 'mdi:tag', path: '/tags' },
     ],
   },
   {
     text: '娱乐',
     icon: 'mdi:gamepad-circle',
     subMenu: [
-      {
-        text: '相册',
-        icon: 'mdi:view-gallery',
-        path: '/albums',
-      },
+      { text: '相册', icon: 'mdi:view-gallery', path: '/albums' },
     ],
   },
-  {
-    text: '友链',
-    icon: 'mdi:vector-link',
-    path: '/links',
-  },
-  {
-    text: '关于',
-    icon: 'mdi:information-outline',
-    path: '/about',
-  },
-  {
-    text: '留言',
-    icon: 'mdi:forum',
-    path: '/message',
-  },
+  { text: '友链', icon: 'mdi:vector-link', path: '/links' },
+  { text: '关于', icon: 'mdi:information-outline', path: '/about' },
+  { text: '留言', icon: 'mdi:forum', path: '/message' },
 ]
 
-let navClass = $ref('nav')
-let barShow = $ref(true)
+const navClass = ref('nav')
+const barShow = ref(true)
 
 // * 监听 y 效果比添加 scroll 监听器效果更好
 // * 节流操作, 效果很好
-const { y } = $(useWindowScroll()) // 通过 $() 解构 ref
-let preY = $ref(0) // 记录上一次的 y 滚动距离
-watchThrottled($$(y), () => {
-  if (Math.abs(preY - y) >= 50) { // 小幅度滚动不进行操作
-    barShow = (y < preY)
-    navClass = (y > 60) ? 'nav-fixed' : 'nav'
-    preY = y
+const { y } = useWindowScroll() // 通过 $() 解构 ref
+const preY = ref(0) // 记录上一次的 y 滚动距离
+watchThrottled(y, () => {
+  if (Math.abs(preY.value - y.value) >= 50) { // 小幅度滚动不进行操作
+    barShow.value = (y.value < preY.value)
+    navClass.value = (y.value > 60) ? 'nav-fixed' : 'nav'
+    preY.value = y.value
   }
 }, { throttle: 100 })
 
@@ -92,17 +68,15 @@ function logout() {
   <Transition name="slide-fade" appear>
     <div
       v-if="barShow" :class="navClass"
-      flex items-center justify-between fixed z-11 inset-x-0 top-0 h-60
-      px-16 py-10
-      lg:hidden
+      class="fixed inset-x-0 top-0 z-11 h-60 flex items-center justify-between px-16 py-10 lg:hidden"
     >
       <!-- 左上角标题 -->
-      <router-link to="/" text-18 font-bold cursor-pointer>
+      <RouterLink to="/" class="text-18 font-bold">
         {{ appStore.blogConfig.website_author }}
-      </router-link>
+      </RouterLink>
       <!-- 右上角图标 -->
-      <div flex items-center>
-        <button mr-10 @click="appStore.setSearchFlag(true)">
+      <div class="flex items-center">
+        <button class="mr-10" @click="appStore.setSearchFlag(true)">
           <TheIcon icon="ic:round-search" :size="22" />
         </button>
         <button @click="appStore.setCollapsed(true)">
@@ -116,70 +90,70 @@ function logout() {
   <!-- 电脑端顶部导航栏 -->
   <Transition name="slide-fade" appear>
     <div
-      v-if="barShow" :class="navClass"
-      fixed z-11 inset-x-0 top-0 h-60
-      hidden lg:block
+      v-if="barShow"
+      :class="navClass"
+      class="fixed inset-x-0 top-0 z-11 hidden h-60 lg:block"
     >
-      <div
-        h-full px-36 flex items-center justify-between
-      >
+      <div class="h-full flex items-center justify-between px-36">
         <!-- 左上角标题 -->
-        <router-link to="/" text-18 font-bold cursor-pointer>
+        <RouterLink to="/" class="text-18 font-bold">
           {{ appStore.blogConfig.website_author }}
-        </router-link>
+        </RouterLink>
         <!-- 右上角菜单 -->
-        <div flex items-center text-6xl>
+        <div class="flex items-center text-6xl">
           <!-- 搜索 -->
           <div class="menus-item">
-            <a class="menu-btn" flex items-center @click="appStore.setSearchFlag(true)">
+            <a class="menu-btn flex items-center" @click="appStore.setSearchFlag(true)">
               <TheIcon icon="mdi:magnify" :size="18" />
-              <span ml-4> 搜索 </span>
+              <span class="ml-4"> 搜索 </span>
             </a>
           </div>
           <!-- 根据数组生成 -->
           <div v-for="item of menuOptions" :key="item.text" class="menus-item">
             <!-- 不包含子菜单 -->
-            <router-link v-if="!item.subMenu" :to="item.path" class="menu-btn" flex items-center>
+            <RouterLink v-if="!item.subMenu" :to="item.path" class="menu-btn flex items-center">
               <TheIcon :icon="item.icon" :size="18" />
-              <span ml-4> {{ item.text }} </span>
-            </router-link>
+              <span class="ml-4"> {{ item.text }} </span>
+            </RouterLink>
             <!-- 包含子菜单 -->
             <div v-else class="menu-btn">
-              <div flex items-center>
+              <div class="flex items-center">
                 <TheIcon :icon="item.icon" :size="18" />
-                <span mx-4> {{ item.text }} </span>
+                <span class="mx-4"> {{ item.text }} </span>
                 <TheIcon icon="ep:arrow-down-bold" :size="18" />
               </div>
               <ul class="menus-submenu">
-                <router-link v-for="sub of item.subMenu" :key="sub.text" :to="sub.path">
-                  <div flex items-center>
+                <RouterLink v-for="sub of item.subMenu" :key="sub.text" :to="sub.path">
+                  <div class="flex items-center">
                     <TheIcon :icon="sub.icon" :size="18" />
-                    <span ml-4> {{ sub.text }} </span>
+                    <span class="ml-4"> {{ sub.text }} </span>
                   </div>
-                </router-link>
+                </RouterLink>
               </ul>
             </div>
           </div>
           <!-- 登录 -->
           <div class="menus-item">
             <a v-if="!userStore.userId" class="menu-btn" @click="appStore.setLoginFlag(true)">
-              <div flex items-center> <i-ph:user-bold text-18 mr-4 /> 登录 </div>
+              <div class="flex items-center">
+                <span class="i-ph:user-bold mr-4 text-18" /> 登录
+              </div>
             </a>
             <template v-else>
-              <n-avatar
+              <NAvatar
                 :size="28"
                 :src="convertImgUrl(userStore.avatar)"
-                round
+                class="round"
                 fallback-src="https://static.talkxj.com/avatar/user.png"
               />
               <ul class="menus-submenu">
-                <router-link to="/user">
-                  <div flex items-center>
-                    <i-mdi:account-circle text-18 mr-4 /> 个人中心
+                <RouterLink to="/user">
+                  <div class="flex items-center">
+                    <span class="i-mdi:account-circle mr-4 text-18" /> 个人中心
                   </div>
-                </router-link>
+                </RouterLink>
                 <a @click="logout">
-                  <i-mdi:logout text-18 /> 退出登录
+                  <span class="i-mdi:logout text-18" /> 退出登录
                 </a>
               </ul>
             </template>
@@ -226,6 +200,7 @@ function logout() {
     transition: all 0.3s ease-in-out;
   }
   .menu-btn {
+    cursor: pointer;
     &:hover::after {
       width: 100%;
     }

@@ -1,17 +1,20 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, ref } from 'vue'
+
 import LinkList from './components/LinkList.vue'
 import AddLink from './components/AddLink.vue'
 import Comment from '@/components/comment/Comment.vue'
+import BannerPage from '@/components/page/BannerPage.vue'
 import api from '@/api'
 
-let loading = $ref(true)
-let linkList = $ref<any>([])
+const loading = ref(true)
+const linkList = ref([])
 
 onMounted(() => {
   api.getLinks().then((res) => {
-    linkList = res.data
+    linkList.value = res.data
   }).finally(() => {
-    loading = false
+    loading.value = false
   })
 })
 </script>

@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { computed, onMounted, reactive } from 'vue'
+import { storeToRefs } from 'pinia'
+
 import EasyTyper from 'easy-typer-js'
 import { useAppStore } from '@/store'
-const { pageList, blogConfig } = $(storeToRefs(useAppStore()))
+
+const { pageList, blogConfig } = storeToRefs(useAppStore())
 
 // 打字机特效配置
 const typeObj = reactive({
@@ -36,7 +40,7 @@ function scrollDown() {
 
 // 根据后端配置动态获取封面
 const coverStyle = computed(() => {
-  const page = pageList.find(e => e.label === 'home')
+  const page = pageList.value.find(e => e.label === 'home')
   return page
     ? `background: url('${page.cover}') center center / cover no-repeat;`
     : 'background: grey center center / cover no-repeat;'
@@ -45,37 +49,33 @@ const coverStyle = computed(() => {
 
 <template>
   <div
-    absolute-lrt h-screen text-center text-white
-    class="banner-fade-down"
+    class="banner-fade-down absolute left-0 right-0 bottom-0 h-screen text-center text-white"
     :style="coverStyle"
   >
-    <div absolute mt-43vh inset-x-0 text-center>
-      <h1 text-28 font-bold animate-zoom-in lg:text-40>
+    <div class="absolute mt-43vh inset-x-0 text-center">
+      <h1 class="text-28 font-bold animate-zoom-in lg:text-40">
         {{ blogConfig.website_name }}
       </h1>
-      <div text-16 lg:text-22>
+      <div class="text-16 lg:text-22">
         {{ typeObj.output }}
-        <span animate-ping> | </span>
+        <span class="animate-ping"> | </span>
       </div>
       <!-- 社交信息（移动端专用） -->
-      <div mt-3 text-22 lg:hidden>
+      <div class="mt-3 text-22 lg:hidden">
         <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
-          <i-ant-design:qq-circle-filled />
+          <span class="i-ant-design:qq-circle-filled inline-block" />
         </a>
-        <a :href="blogConfig.github" target="_blank" mx-18>
-          <i-mdi:github />
+        <a :href="blogConfig.github" target="_blank" class="mx-18">
+          <span class="i-mdi:github inline-block" />
         </a>
         <a :href="blogConfig.gitee" target="_blank">
-          <i-simple-icons:gitee />
+          <span class="i-simple-icons:gitee inline-block" />
         </a>
       </div>
     </div>
     <!-- 向下滚动 -->
-    <div absolute bottom-10 w-full cursor-pointer @click="scrollDown">
-      <i-ep:arrow-down-bold animate-bounce text-white text-25 />
+    <div class="absolute bottom-10 w-full cursor-pointer" @click="scrollDown">
+      <span class="i-ep:arrow-down-bold inline-block animate-bounce text-white text-25" />
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-</style>

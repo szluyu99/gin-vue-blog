@@ -1,34 +1,38 @@
-<script setup lang="ts">
+<script setup>
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+
 import { useAppStore } from '@/store'
 
 dayjs.extend(duration)
-const { blogConfig, viewCount } = $(storeToRefs(useAppStore()))
+const { blogConfig, viewCount } = storeToRefs(useAppStore())
 
 // 每秒刷新时间
-let runTime = $ref('')
+const runTime = ref('')
 
 // 每秒刷新当前时间
 setInterval(() => {
-  const createtime = dayjs(blogConfig.website_createtime)
-  runTime = dayjs.duration(dayjs().diff(createtime)).format('D 天 H 时 m 分 s 秒')
+  const createTime = dayjs(blogConfig.value.website_createtime)
+  runTime.value = dayjs.duration(dayjs().diff(createTime)).format('D 天 H 时 m 分 s 秒')
 }, 1000)
 </script>
 
 <template>
-  <div card-view animate-zoom-in hidden lg:block>
-    <p flex items-center>
-      <i-icon-park:analysis mr-5 text-18 class="animate-bang" />
-      <span text-16> 网站咨询 </span>
+  <div class="card-view animate-zoom-in hidden lg:block">
+    <p class="flex items-center">
+      <span class="i-icon-park:analysis mr-5 text-18 animate-bang" />
+      <span class="text-16"> 网站咨询 </span>
     </p>
-    <p my-10 text-14>
+    <p class="my-10 text-14">
       <span> 运行时间： </span>
-      <span float-right> {{ runTime }} </span>
+      <span class="float-right"> {{ runTime }} </span>
     </p>
-    <p text-14>
+    <p class="text-14">
       <span> 总访问量： </span>
-      <span float-right> {{ viewCount }} </span>
+      <span class="float-right"> {{ viewCount }} </span>
     </p>
   </div>
 </template>

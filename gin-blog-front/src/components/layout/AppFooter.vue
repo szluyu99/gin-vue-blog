@@ -1,11 +1,12 @@
-<script setup lang="ts">
+<script setup>
+import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/store'
 const { blogInfo } = storeToRefs(useAppStore())
 </script>
 
 <template>
-  <footer f-c-c>
-    <div class="footer-wrap" p-y-40 p-x-20 w-full text-14 text-center text-white leading-30>
+  <footer class="flex items-center justify-center">
+    <div class="footer-wrap w-full p-x-20 p-y-40 text-center text-14 leading-30 text-white">
       <p> &copy;{{ 2022 }} - {{ new Date().getFullYear() }} By 阵、雨</p>
       <a href="https://beian.miit.gov.cn/" target="_blank">
         {{ blogInfo.blog_config?.website_record }}

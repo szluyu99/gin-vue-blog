@@ -1,15 +1,17 @@
-<script setup lang="ts">
+<script setup>
+import { storeToRefs } from 'pinia'
+
 import { useAppStore } from '@/store'
 const { blogInfo } = storeToRefs(useAppStore())
 </script>
 
 <template>
-  <div card-view animate-zoom-in hidden lg:block>
-    <p mb-10 flex items-center>
-      <i-fluent-emoji-flat:bell mr-6 text-20 class="animate-bang" />
-      <span text-16> 公告</span>
+  <div class="card-view animate-zoom-in hidden lg:block">
+    <p class="mb-10 flex items-center">
+      <span class="i-fluent-emoji-flat:bell mr-6 text-20 animate-bang" />
+      <span class="text-16"> 公告</span>
     </p>
-    <div text-6xl leading-25>
+    <div class="text-6xl leading-25">
       {{ blogInfo.blog_config?.website_notice }}
     </div>
   </div>

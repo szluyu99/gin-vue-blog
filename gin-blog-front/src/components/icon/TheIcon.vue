@@ -1,24 +1,13 @@
 <script setup>
+import { computed } from 'vue'
 import { renderCustomIcon, renderIcon } from '@/utils'
 
 const props = defineProps({
-  icon: {
-    type: String,
-    required: true,
-  },
-  size: {
-    type: Number,
-    default: 14,
-  },
-  color: {
-    type: String,
-    default: undefined,
-  },
+  icon: { type: String, required: true },
+  size: { type: Number, default: 14 },
+  color: { type: String, default: undefined },
   /** iconify | custom */
-  type: {
-    type: String,
-    default: 'iconify',
-  },
+  type: { type: String, default: 'iconify' },
 })
 
 const iconCom = computed(() =>

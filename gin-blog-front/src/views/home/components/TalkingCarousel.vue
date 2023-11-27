@@ -1,21 +1,23 @@
-<script setup lang="ts">
-let sentence = $ref('书山有路勤为径，学海无涯苦作舟。')
+<script setup>
+import { onMounted, ref } from 'vue'
+
+const sentence = ref('书山有路勤为径，学海无涯苦作舟。')
 
 onMounted(() => {
   fetch('https://v1.hitokoto.cn?c=i')
     .then(res => res.json())
-    .then(data => sentence = data.hitokoto)
+    .then(data => sentence.value = data.hitokoto)
 })
 </script>
 
 <template>
-  <div card-view animate-zoom-in cursor-pointer>
-    <div flex text-center>
-      <i-mdi-chat-outline text-20 />
-      <div flex-1>
+  <div class="card-view animate-zoom-in">
+    <div class="flex text-center">
+      <div class="i-mdi-chat-outline text-20 cursor-pointer" />
+      <div class="flex-1">
         {{ sentence }}
       </div>
-      <i-mdi-chevron-double-right class="arrow" text-20 />
+      <div class="i-mdi-chevron-double-right arrow text-20 cursor-pointer" />
     </div>
   </div>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
+
 import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
@@ -13,7 +15,7 @@ const props = defineProps<{
 const emit = defineEmits(['afterSubmit']) // 调用父方法
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
-let show = $ref(props.show) // 是否显示
+const show = ref(props.show) // 是否显示
 const data = reactive({
   nickname: '', // * 回复用户, 不为空则说明是回复框
   content: '', // 回复内容
@@ -24,11 +26,11 @@ const data = reactive({
 })
 
 // 判断是回复还是评论: 存在 nickname 则是回复
-const isReply = $computed(() => !!data.nickname)
+const isReply = computed(() => !!data.nickname)
 
 // 取消评论
 function setReply(flag: boolean) {
-  show = flag
+  show.value = flag
 }
 
 // 提交评论
@@ -52,7 +54,7 @@ async function submitComment() {
     window.$message?.info('评论成功')
     data.content = ''
 
-    isReply && setReply(false)
+    isReply.value && setReply(false)
     emit('afterSubmit') // 提交后调用刷新方法
   }
   catch (err) {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+import { NForm, NFormItem, NInput, NModal } from 'naive-ui'
 import config from '@/assets/js/config'
 
 import api from '@/api'
@@ -22,7 +24,7 @@ interface LoginInfo {
   password: string
 }
 
-let formModel = $ref<LoginInfo>({
+const formModel = ref<LoginInfo>({
   username: '',
   password: '',
 })
@@ -31,7 +33,7 @@ const rules = {}
 
 // 登录
 async function handleLogin() {
-  const { username, password } = formModel
+  const { username, password } = formModel.value
   if (!username || !password) {
     window.$message?.warning('请输入用户名和密码')
     return
@@ -45,7 +47,7 @@ async function handleLogin() {
       // 加载用户信息, 更新 pinia 中信息, 刷新页面
       await userStore.getUserInfo()
       // 清空表单
-      formModel = { username: '', password: '' }
+      formModel.value = { username: '', password: '' }
     }
     finally {
       loginFlag.value = false
@@ -78,7 +80,7 @@ function openForget() {
 </script>
 
 <template>
-  <n-modal
+  <NModal
     v-model:show="loginFlag"
     display-directive="show"
     preset="card"
@@ -88,23 +90,23 @@ function openForget() {
     px-10 w-360
     lg="w-460"
   >
-    <n-form
+    <NForm
       :model="formModel"
       :rules="rules"
       label-placement="left"
       label-width="70"
       require-mark-placement="right-hanging"
     >
-      <n-form-item label="用户名" path="username">
-        <n-input
+      <NFormItem label="用户名" path="username">
+        <NInput
           v-model:value="formModel.username"
           placeholder="用户名"
           size="large"
           clearable
         />
-      </n-form-item>
-      <n-form-item label="密码" path="password">
-        <n-input
+      </NFormItem>
+      <NFormItem label="密码" path="password">
+        <NInput
           v-model:value="formModel.password"
           type="password"
           show-password-on="click"
@@ -112,8 +114,8 @@ function openForget() {
           size="large"
           clearable
         />
-      </n-form-item>
-    </n-form>
+      </NFormItem>
+    </NForm>
     <template #footer>
       <div text-center mt="-15">
         <button
@@ -136,5 +138,5 @@ function openForget() {
         </div> -->
       </div>
     </template>
-  </n-modal>
+  </NModal>
 </template>

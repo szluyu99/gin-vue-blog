@@ -1,21 +1,23 @@
 <script setup lang="ts">
-// 文章 ref 对象
+import { ref } from 'vue'
+import { useWindowScroll } from '@vueuse/core'
+
 const { preview } = defineProps<{ preview: any }>()
 
 onMounted(() => {
   preview && buildAnchorTitles()
 })
 
-let titles = $ref<any>([]) // 锚点目录
-let currentIdx = $ref(0) // 当前激活的锚点索引
+const titles = ref<any>([]) // 锚点目录
+const currentIdx = ref(0) // 当前激活的锚点索引
 
 function buildAnchorTitles() {
   const anchors = preview.$el.querySelectorAll('h1,h2,h3,h4,h5,h6')
   const titleList = Array.from(anchors).filter((t: any) => !!t.innerText.trim())
   if (!titleList.length)
-    titles = []
+    titles.value = []
   const hTags = Array.from(new Set(titleList.map((t: any) => t.tagName))).sort()
-  titles = titleList.map((el: any, idx: number) => {
+  titles.value = titleList.map((el: any, idx: number) => {
     return {
       title: el.innerText,
       lineIndex: el.getAttribute('data-v-md-line'),
@@ -39,18 +41,18 @@ function handleAnchorClick(anchor: any, idx: number) {
     //   scrollContainer: window,
     //   top: 40,
     // })
-    setTimeout(() => currentIdx = idx, 600)
+    setTimeout(() => currentIdx.value = idx, 600)
   }
 }
 
 // * 实现目录高亮当前位置的标题
 // 思路: 循环的方式将标题距离顶部距离与滚动条当前位置对比, 来确定高亮的标题
-const { y } = $(useWindowScroll())
-watchThrottled($$(y), () => {
-  titles.forEach((e: any, idx: number) => {
+const { y } = useWindowScroll()
+watchThrottled(y, () => {
+  titles.value.forEach((e: any, idx: number) => {
     const heading = preview.$el.querySelector(`[data-v-md-line="${e.lineIndex}"]`)
-    if (y >= heading.offsetTop - 50) // 比 40 稍微多一点
-      currentIdx = idx
+    if (y.value >= heading.offsetTop - 50) // 比 40 稍微多一点
+      currentIdx.value = idx
   })
 }, { throttle: 200 })
 </script>

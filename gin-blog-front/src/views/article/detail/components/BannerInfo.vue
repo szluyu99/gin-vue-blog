@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { formatDate } from '@/utils'
 
 const { article } = defineProps<{ article: any }>()
 
-let wordNum = $ref(0) // 字数统计
-let readTime = $ref('') // 阅读时间
+const wordNum = ref(0) // 字数统计
+const readTime = ref('') // 阅读时间
 
 onMounted(() => {
   // 统计字数
-  wordNum = deleteHTMLTag(article.content).length
+  wordNum.value = deleteHTMLTag(article.content).length
   // 计算阅读时间
-  readTime = `${Math.round(wordNum / 400)}分钟`
+  readTime.value = `${Math.round(wordNum.value / 400)}分钟`
 })
 
 // 删除 HTML 标签

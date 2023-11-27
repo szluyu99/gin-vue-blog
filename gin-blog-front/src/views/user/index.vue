@@ -1,4 +1,9 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { NButton, NForm, NFormItem, NGi, NGrid, NInput } from 'naive-ui'
+
+import BannerPage from '@/components/page/BannerPage.vue'
 import UploadOne from '@/components/upload/UploadOne.vue'
 
 import { useUserStore } from '@/store'
@@ -7,7 +12,7 @@ import api from '@/api'
 const userStore = useUserStore()
 const router = useRouter()
 
-const infoForm = $ref<any>({
+const infoForm = ref({
   avatar: userStore.avatar,
   nickname: userStore.nickname,
   intro: userStore.intro,
@@ -35,40 +40,37 @@ async function updateUserInfo() {
 
 <template>
   <BannerPage label="user" title="个人中心" card>
-    <p text-24 font-bold>
+    <p class="text-24 font-bold">
       基本信息
     </p>
-    <n-grid x-gap="15" cols="12">
-      <n-gi span="4" f-c-c>
-        <UploadOne
-          v-model:preview="infoForm.avatar"
-          :width="140"
-        />
-      </n-gi>
-      <n-gi span="7">
-        <n-form
+    <NGrid x-gap="15" cols="12">
+      <NGi span="4" class="f-c-c">
+        <UploadOne v-model:preview="infoForm.avatar" :width="140" />
+      </NGi>
+      <NGi span="7">
+        <NForm
           ref="infoFormRef"
           label-align="left"
           :label-width="80"
           :model="infoForm"
         >
-          <n-form-item label="昵称" path="nickname">
-            <n-input v-model:value="infoForm.nickname" placeholder="输入您的昵称" />
-          </n-form-item>
-          <n-form-item label="个人网站" path="website">
-            <n-input v-model:value="infoForm.website" placeholder="请输入个人网站" />
-          </n-form-item>
-          <n-form-item label="简介" path="intro">
-            <n-input v-model:value="infoForm.intro" placeholder="介绍一下自己吧" />
-          </n-form-item>
-          <n-form-item label="邮箱" path="email">
-            <n-input v-model:value="infoForm.email" placeholder="请输入邮箱号" disabled />
-          </n-form-item>
-        </n-form>
-        <n-button @click="updateUserInfo">
+          <NFormItem label="昵称" path="nickname">
+            <NInput v-model:value="infoForm.nickname" placeholder="输入您的昵称" />
+          </NFormItem>
+          <NFormItem label="个人网站" path="website">
+            <NInput v-model:value="infoForm.website" placeholder="请输入个人网站" />
+          </NFormItem>
+          <NFormItem label="简介" path="intro">
+            <NInput v-model:value="infoForm.intro" placeholder="介绍一下自己吧" />
+          </NFormItem>
+          <NFormItem label="邮箱" path="email">
+            <NInput v-model:value="infoForm.email" placeholder="请输入邮箱号" disabled />
+          </NFormItem>
+        </NForm>
+        <NButton @click="updateUserInfo">
           修改
-        </n-button>
-      </n-gi>
-    </n-grid>
+        </NButton>
+      </NGi>
+    </NGrid>
   </BannerPage>
 </template>

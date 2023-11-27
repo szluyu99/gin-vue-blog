@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+
 import VMdPreview from '@kangc/v-md-editor/lib/preview'
 import '@kangc/v-md-editor/lib/style/preview.css'
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
@@ -33,7 +35,7 @@ hljs.registerLanguage('go', go)
 hljs.registerLanguage('bash', bash)
 VMdPreview.use(githubTheme, { Hljs: hljs })
 
-let data = $ref<any>({
+const data = ref<any>({
   id: 0,
   title: '',
   content: '',
@@ -52,8 +54,8 @@ let data = $ref<any>({
 })
 
 // 文章内容
-const previewRef = $ref<any>(null)
-let loading = $ref(true)
+const previewRef = ref<any>(null)
+const loading = ref(true)
 
 onMounted(async () => {
   // const rendererMD = new marked.Renderer()
@@ -75,17 +77,17 @@ onMounted(async () => {
   window.$loadingBar?.start()
   try {
     const res = await api.getArticleDetail(+useRoute().params.id)
-    data = res.data
+    data.value = res.data
   }
   finally {
-    loading = false
+    loading.value = false
     window.$loadingBar?.finish()
   }
 })
 
-const styleVal = $computed(() =>
-  data.img
-    ? `background: url('${convertImgUrl(data.img)}') center center / cover no-repeat;`
+const styleVal = computed(() =>
+  data.value.img
+    ? `background: url('${convertImgUrl(data.value.img)}') center center / cover no-repeat;`
     : 'background: rgba(0,0,0,0.1) center center / cover no-repeat;',
 )
 

@@ -1,4 +1,7 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, reactive, ref } from 'vue'
+
+import { NGi, NGrid } from 'naive-ui'
 // 无限轮播图
 import InfiniteLoading from 'v3-infinite-loading'
 // Markdown => Html
@@ -10,16 +13,17 @@ import WebsiteInfo from './components/WebsiteInfo.vue'
 import HomeBanner from './components/HomeBanner.vue'
 import Announcement from './components/Announcement.vue'
 import TalkingCarousel from './components/TalkingCarousel.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
 
 import api from '@/api'
 
-let articleList = $ref<any>([])
-let loading = $ref(false)
+const articleList = ref([])
+const loading = ref(false)
 
 // 无限加载文章
 const params = reactive({ page_size: 5, page_num: 1 }) // 列表加载参数
-const getArticlesInfinite = async ($state: any) => {
-  if (!loading) {
+const getArticlesInfinite = async ($state) => {
+  if (!loading.value) {
     try {
       const res = await api.getArticles(params)
       // 加载完成
@@ -28,9 +32,9 @@ const getArticlesInfinite = async ($state: any) => {
         return
       }
       // 非首次加载, 都是往列表中添加数据
-      articleList.push(...res.data)
+      articleList.value.push(...res.data)
       // 过滤 Markdown 符号
-      articleList.forEach((e: any) => e.content = filterMdSymbol(e.content))
+      articleList.value.forEach(e => e.content = filterMdSymbol(e.content))
       params.page_num++
       $state.loaded()
     }
@@ -41,18 +45,18 @@ const getArticlesInfinite = async ($state: any) => {
 }
 
 onMounted(async () => {
-  loading = true
+  loading.value = true
   // 首次加载
   const res = await api.getArticles(params)
-  articleList = res.data
+  articleList.value = res.data
   // 过滤 Markdown 符号
-  articleList.forEach((e: any) => e.content = filterMdSymbol(e.content))
+  articleList.value.forEach(e => e.content = filterMdSymbol(e.content))
   params.page_num++
-  loading = false
+  loading.value = false
 })
 
 // 过滤 Markdown 符号: 先转 Html 再去除 Html 标签
-function filterMdSymbol(mdStr: string) {
+function filterMdSymbol(mdStr) {
   return marked(mdStr) // 转 HTML
     .replace(/<\/?[^>]*>/g, '') // 正则去除 Html 标签
     .replace(/[|]*\n/, '')
@@ -64,10 +68,10 @@ function filterMdSymbol(mdStr: string) {
   <!-- 首页封面图 -->
   <HomeBanner />
   <!-- 内容 -->
-  <div flex-col justify-center>
-    <div max-w-1230 mx-auto mb-40 px-15 style="margin-top: calc(100vh + 30px)">
-      <n-grid :x-gap="12" :y-gap="8" cols="9 m:12" responsive="screen">
-        <n-gi span="9">
+  <div class="flex-col justify-center">
+    <div class="mx-auto mb-40 max-w-1230 px-15" style="margin-top: calc(100vh + 30px)">
+      <NGrid :x-gap="12" :y-gap="8" cols="9 m:12" responsive="screen">
+        <NGi span="9">
           <!-- 说说轮播 -->
           <TalkingCarousel />
           <!-- 文章列表 -->
@@ -76,7 +80,7 @@ function filterMdSymbol(mdStr: string) {
             :article="item" :idx="idx"
           />
           <!-- 无限加载 -->
-          <div ref="el" f-c-c mt-35>
+          <div ref="el" class="mt-35 flex items-center justify-center">
             <InfiniteLoading @infinite="getArticlesInfinite">
               <!-- TODO: 优化界面 -->
               <template #spinner>
@@ -89,19 +93,19 @@ function filterMdSymbol(mdStr: string) {
               </template>
             </InfiniteLoading>
           </div>
-        </n-gi>
-        <n-gi span="3">
+        </NGi>
+        <NGi span="3">
           <!-- sticky 实现悬浮固定效果 -->
-          <div sticky top-20>
+          <div class="sticky top-20">
             <!-- 博主信息 -->
             <AuthorInfo />
             <!-- 公告 -->
-            <Announcement my-25 />
+            <Announcement class="my-25" />
             <!-- 网站资讯 -->
             <WebsiteInfo />
           </div>
-        </n-gi>
-      </n-grid>
+        </NGi>
+      </NGrid>
     </div>
     <!-- 底部 -->
     <AppFooter />

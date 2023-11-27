@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
 
@@ -9,9 +10,9 @@ const { articleId, likeCount } = defineProps<Props>()
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
 // 点赞数量
-let count = $ref(likeCount)
+const count = ref(likeCount)
 // * 监听父组件传来的 likeCount, 不能直接用 props 中的值初始化 ref 变量
-watch($$(likeCount), newVal => count = newVal)
+watch(() => likeCount, newVal => count.value = newVal)
 
 async function likeArticle() {
   // 判断是否登录
@@ -23,11 +24,11 @@ async function likeArticle() {
     await api.saveLikeArticle(articleId)
     // 判断是否点赞
     if (userStore.articleLikeSet.includes(articleId)) {
-      count--
+      count.value--
       window.$message?.info('已取消')
     }
     else {
-      count++
+      count.value++
       window.$message?.success('已点赞')
     }
     // 维护全局状态中的点赞 Set

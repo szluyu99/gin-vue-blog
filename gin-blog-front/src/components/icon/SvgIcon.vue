@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface Props {
   /** 图标名称(图片的文件名) */
   icon: string

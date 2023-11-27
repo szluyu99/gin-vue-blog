@@ -1,4 +1,6 @@
-<script setup lang="ts">
+<script setup>
+import { computed, ref } from 'vue'
+import { NForm, NFormItem, NInput, NModal } from 'naive-ui'
 import { useAppStore } from '@/store'
 const appStore = useAppStore()
 
@@ -31,7 +33,7 @@ function openLogin() {
 </script>
 
 <template>
-  <n-modal
+  <NModal
     v-model:show="forgetFlag"
     display-directive="show"
     preset="card"
@@ -41,7 +43,7 @@ function openLogin() {
     w-360 px-10
     lg:w-460
   >
-    <n-form
+    <NForm
       ref="formRef"
       :model="formRef"
       :rules="rules"
@@ -49,23 +51,23 @@ function openLogin() {
       label-width="auto"
       require-mark-placement="right-hanging"
     >
-      <n-form-item label="用户名" path="username">
-        <n-input
+      <NFormItem label="用户名" path="username">
+        <NInput
           v-model:value="formRef.username"
           placeholder="用户名"
           clearable
         />
-      </n-form-item>
-      <n-form-item label="密码" path="password">
-        <n-input
+      </NFormItem>
+      <NFormItem label="密码" path="password">
+        <NInput
           v-model:value="formRef.password"
           type="password"
           show-password-on="click"
           placeholder="密码"
           clearable
         />
-      </n-form-item>
-    </n-form>
+      </NFormItem>
+    </NForm>
     <template #footer>
       <div text-center px-15 mt="-15">
         <button
@@ -88,5 +90,5 @@ function openLogin() {
         </div> -->
       </div>
     </template>
-  </n-modal>
+  </NModal>
 </template>

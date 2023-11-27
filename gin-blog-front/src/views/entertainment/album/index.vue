@@ -1,19 +1,22 @@
-<script setup lang="ts">
+<script setup>
+import { useRouter } from 'vue-router'
+import { NButton, NResult } from 'naive-ui'
+import BannerPage from '@/components/page/BannerPage.vue'
 const router = useRouter()
 </script>
 
 <template>
   <BannerPage label="album" card>
-    <n-result
+    <NResult
       status="403"
       title="403 禁止访问"
       description="这里暂时还不能给你看"
     >
       <template #footer>
-        <n-button @click="router.push('/')">
+        <NButton @click="router.push('/')">
           放轻松
-        </n-button>
+        </NButton>
       </template>
-    </n-result>
+    </NResult>
   </BannerPage>
 </template>

@@ -1,21 +1,23 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
 import { convertImgUrl, formatDate } from '@/utils'
 import api from '@/api'
 
 const route = useRoute()
 
-let loading = $ref(true)
-let articleList = $ref<any>([])
-
-const name = $ref(route.query.name) // 标题上显示的 标签/分类 名称
+const loading = ref(true)
+const articleList = ref<any>([])
+const name = ref(route.query.name) // 标题上显示的 标签/分类 名称
 
 onMounted(async () => {
   const res = await api.getArticles({
     category_id: route.params.categoryId,
     tag_id: route.params.tagId,
   })
-  articleList = res.data
-  loading = false
+  articleList.value = res.data
+  loading.value = false
 })
 </script>
 

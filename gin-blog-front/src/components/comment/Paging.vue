@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const { pageTotal = 0, index, commentId }
-= defineProps<{
+import { computed, ref } from 'vue'
+
+const { pageTotal = 0, index, commentId } = defineProps<{
   pageTotal: number // 总页数
   index: number // 索引
   commentId: number// 评论 id
@@ -8,30 +9,30 @@ const { pageTotal = 0, index, commentId }
 
 const emit = defineEmits(['changeCurrent'])
 
-let show = $ref(false) // 是否显示分页
+const show = ref(false) // 是否显示分页
 
 // 当前页数
-let current = $ref(1)
+const current = ref(1)
 // 计算属性传参: 判断当前页数是否激活
-const isActive = computed(() => (i: number) => (i === current))
+const isActive = computed(() => (i: number) => (i === current.value))
 // 上一页
 function prePage() {
-  current -= 1
+  current.value -= 1
   emit('changeCurrent', current, index, commentId)
 }
 // 下一页
 function nextPage() {
-  current += 1
+  current.value += 1
   emit('changeCurrent', current, index, commentId)
 }
 // 跳转指定页数
 function changeCurrent(i: number) {
-  current = i
+  current.value = i
   emit('changeCurrent', current, index, commentId)
 }
 
 function setShow(flag: boolean) {
-  show = flag
+  show.value = flag
 }
 
 defineExpose({ current, setShow })

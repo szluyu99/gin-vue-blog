@@ -1,32 +1,36 @@
-<script setup lang="ts">
+<script setup>
+import { computed, ref } from 'vue'
+import { debouncedWatch } from '@vueuse/core'
+import { NInput, NModal } from 'naive-ui'
+
 import api from '@/api'
 import { useAppStore } from '@/store'
 const appStore = useAppStore()
 
-const searchFlag = $computed({
+const searchFlag = computed({
   get: () => appStore.searchFlag,
   set: val => appStore.setSearchFlag(val),
 })
 
 // 搜索关键字
-const keyword = $ref('')
+const keyword = ref('')
 // 搜索结果
-let articleList = $ref<any>([])
+const articleList = ref([])
 // 防抖 watch, 节流: throttledWatch
 debouncedWatch(
-  $$(keyword),
-  () => keyword ? handleSearch() : articleList = [],
+  keyword,
+  () => keyword.value ? handleSearch() : articleList.value = [],
   { debounce: 300 },
 )
 
 async function handleSearch() {
   const res = await api.searchArticles({ keyword })
-  articleList = res.data
+  articleList.value = res.data
 }
 </script>
 
 <template>
-  <n-modal
+  <NModal
     v-model:show="searchFlag"
     display-directive="show"
     preset="card"
@@ -36,7 +40,7 @@ async function handleSearch() {
     px-10 h-full max-w-360
     lg="max-w-600"
   >
-    <n-input
+    <NInput
       v-model:value="keyword"
       round
       placeholder="输入文章标题或内容..."
@@ -44,9 +48,9 @@ async function handleSearch() {
       clearable
     >
       <template #prefix>
-        <i-mdi:flash text-20 text-yellow />
+        <div class="i-mdi:flash text-20 text-yellow" />
       </template>
-    </n-input>
+    </NInput>
     <hr my-15 border-dashed border-2px border-color="#d2ebfd">
     <div h-400>
       <ul v-if="articleList.length">
@@ -70,7 +74,7 @@ async function handleSearch() {
         找不到您查询的内容：{{ keyword }}
       </div>
     </div>
-  </n-modal>
+  </NModal>
 </template>
 
 <style scoped lang="scss">

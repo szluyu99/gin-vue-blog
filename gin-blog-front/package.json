@@ -31,6 +31,7 @@
     "@iconify/vue": "^4.1.0",
     "@types/marked": "^4.0.8",
     "@types/node": "18.7.18",
+    "@unocss/eslint-config": "^0.57.1",
     "@unocss/reset": "^0.45.30",
     "@vitejs/plugin-vue": "^3.2.0",
     "easy-typer-js": "^2.1.0",
@@ -51,6 +52,6 @@
     "vue-tsc": "^1.0.24"
   },
   "eslintConfig": {
-    "extends": "@antfu"
+    "extends": ["@antfu", "@unocss"]
   }
 }

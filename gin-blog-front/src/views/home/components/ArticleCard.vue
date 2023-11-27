@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { convertImgUrl, formatDate } from '@/utils'
 
 interface Props { idx?: number; article: any }
@@ -12,56 +13,53 @@ const isRightClass = computed(() => idx % 2 === 0
 
 <template>
   <div
-    items-center mt-20
+    class="items-center mt-20
     w-full bg-white rounded-2rem shadow-md
     transition-600 hover:shadow-2xl
     animate-zoom-in animate-duration-700
     flex-col md:flex-row
-    h-430 md:h-280
+    h-430 md:h-280"
   >
     <!-- 封面图 -->
     <div
-      :class="isRightClass" overflow-hidden
-      h-230 w-full md:w="45/100" md:h-full
+      :class="isRightClass"
+      class="h-230 w-full md:w-45/100 md:h-full overflow-hidden"
     >
-      <router-link :to="`/article/${article.id}`">
-        <img wh-full transition-600 hover:scale-110 :src="convertImgUrl(article.img)">
-      </router-link>
+      <RouterLink :to="`/article/${article.id}`">
+        <img class="w-full h-full transition-600 hover:scale-110" :src="convertImgUrl(article.img)">
+      </RouterLink>
     </div>
     <!-- 文章信息 -->
-    <div
-      mt-20 mb-10 w="9/10"
-      md:w="55/100" md:px-45
-    >
-      <router-link :to="`/article/${article.id}`" text-8xl hover:text-violet>
+    <div class="mt-20 mb-10 w-9/10 md:w-55/100 md:px-45">
+      <RouterLink :to="`/article/${article.id}`" class="text-8xl hover:text-violet">
         《{{ article.title }}》
-      </router-link>
-      <div flex flex-wrap pt-15 pb-12 color="#858585" text-14>
+      </RouterLink>
+      <div class="flex flex-wrap pt-15 pb-12 color-#858585 text-14">
         <!-- 置顶 -->
-        <span v-if="article.is_top === 1" flex items-center color="#ff7242">
-          <i-carbon:align-vertical-top mr-3 /> 置顶
+        <span v-if="article.is_top === 1" class="flex items-center color-#ff7242">
+          <div class="i-carbon:align-vertical-top mr-3" /> 置顶
         </span>
-        <span v-if="article.is_top === 1" mx-7>|</span>
+        <span v-if="article.is_top === 1" class="mx-7">|</span>
         <!-- 日期 -->
-        <span flex items-center>
-          <i-mdi-calendar-month-outline mr-3 /> {{ formatDate(article.created_at) }}
+        <span class="flex items-center">
+          <div class="i-mdi-calendar-month-outline mr-3" /> {{ formatDate(article.created_at) }}
         </span>
-        <span mx-7>|</span>
+        <span class="mx-7">|</span>
         <!-- 分类 -->
-        <router-link :to="`/categories/${article.category_id}?name=${article.category.name}`" flex items-center>
-          <i-mdi-inbox-full mr-3 /> {{ article.category.name }}
-        </router-link>
-        <span mx-7>|</span>
+        <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`" class="flex items-center">
+          <div class="i-mdi-inbox-full mr-3" /> {{ article.category.name }}
+        </RouterLink>
+        <span class="mx-7">|</span>
         <!-- 标签 -->
-        <router-link
+        <RouterLink
           v-for="tag in article.tags" :key="tag.id"
           :to="`/tags/${tag.id}?name=${tag.name}`"
-          flex items-center mx-2
+          class="flex items-center mx-2"
         >
-          <i-mdi-tag-multiple mr-2 /> {{ tag.name }}
-        </router-link>
+          <div class="i-mdi-tag-multiple mr-2" /> {{ tag.name }}
+        </RouterLink>
       </div>
-      <div leading-25 class="ell-4">
+      <div class="leading-25 ell-4">
         {{ article.content }}
       </div>
     </div>

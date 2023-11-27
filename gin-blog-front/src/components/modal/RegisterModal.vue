@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+import { NForm, NFormItem, NInput, NModal } from 'naive-ui'
 import config from '@/assets/js/config'
 
 import api from '@/api'
@@ -10,7 +12,7 @@ const registerFlag = computed({
   set: val => appStore.setRegisterFlag(val),
 })
 
-let form = $ref({
+const form = ref({
   username: '',
   password: '',
   code: '',
@@ -20,7 +22,7 @@ const rules = {}
 
 // 注册
 async function handleRegister() {
-  const { username, password, code } = form
+  const { username, password, code } = form.value
   if (!code) {
     window.$message?.warning('请输入发送到邮箱的验证码')
     return
@@ -34,9 +36,9 @@ async function handleRegister() {
   // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
   const doRegister = async () => {
     // 注册
-    await api.register(form)
+    await api.register(form.value)
     window.$notification?.success({ title: '注册成功!', duration: 1500 })
-    form = { username: '', password: '', code: '' }
+    form.value = { username: '', password: '', code: '' }
     // 打开登录弹窗
     openLogin()
   }
@@ -55,11 +57,11 @@ async function handleRegister() {
 // 发送验证码
 async function sendCode() {
   const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
-  if (!reg.test(form.username)) {
+  if (!reg.test(form.value.username)) {
     window.$message?.warning('请输入正确的邮箱格式')
     return
   }
-  await api.sendCode({ email: form.username })
+  await api.sendCode({ email: form.value.username })
   window.$message?.success('邮件发送成功')
 }
 
@@ -71,7 +73,7 @@ function openLogin() {
 </script>
 
 <template>
-  <n-modal
+  <NModal
     v-model:show="registerFlag"
     display-directive="show"
     preset="card"
@@ -81,22 +83,22 @@ function openLogin() {
     px-10 w-360
     lg="w-460"
   >
-    <n-form
+    <NForm
       :model="form"
       :rules="rules"
       label-placement="left"
       label-width="70"
       require-mark-placement="right-hanging"
     >
-      <n-form-item label="邮箱号" path="username">
-        <n-input
+      <NFormItem label="邮箱号" path="username">
+        <NInput
           v-model:value="form.username"
           placeholder="邮箱号，也是用户名"
           clearable
         />
-      </n-form-item>
-      <n-form-item label="验证码" path="code">
-        <n-input
+      </NFormItem>
+      <NFormItem label="验证码" path="code">
+        <NInput
           v-model:value="form.code"
           placeholder="请输入 6 位验证码"
           clearable
@@ -104,17 +106,17 @@ function openLogin() {
         <n-button w-50 text @click="sendCode">
           发送
         </n-button>
-      </n-form-item>
-      <n-form-item label="密码" path="password">
-        <n-input
+      </NFormItem>
+      <NFormItem label="密码" path="password">
+        <NInput
           v-model:value="form.password"
           type="password"
           show-password-on="click"
           placeholder="密码"
           clearable
         />
-      </n-form-item>
-    </n-form>
+      </NFormItem>
+    </NForm>
     <template #footer>
       <div text-center px-15 mt="-15">
         <button
@@ -135,5 +137,5 @@ function openLogin() {
         </div> -->
       </div>
     </template>
-  </n-modal>
+  </NModal>
 </template>

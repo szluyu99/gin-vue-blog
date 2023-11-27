@@ -1,13 +1,15 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, ref } from 'vue'
+import BannerPage from '@/components/page/BannerPage.vue'
 import api from '@/api'
 
-let loading = $ref(true)
-let tagList = $ref<any>({})
+const loading = ref(true)
+const tagList = ref({})
 
 onMounted(() => {
   api.getTags().then((res) => {
-    tagList = res.data.list
-    loading = false
+    tagList.value = res.data.list
+    loading.value = false
   })
 })
 
@@ -23,25 +25,20 @@ function randomColorHex() {
 
 <template>
   <BannerPage :loading="loading" title="标签" label="tag" card>
-    <h2
-      text-center leading-20 mb-8rem text-25 mt-10
-      lg="text-36"
-    >
+    <h2 class="text-center leading-20 mb-8rem text-25 mt-10 lg-text-36">
       标签 - {{ tagList.length }}
     </h2>
-    <div text-center>
-      <router-link
+    <div class="text-center">
+      <RouterLink
         v-for="t of tagList" :key="t.id" :to="`tags/${t.id}?name=${t.name}`"
         :style="{
           'font-size': `${randomFontSize()}px`,
           'color': `${randomColorHex()}`,
         }"
-        px-8 text-8xl leading-45
-        inline-block transition-300
-        i_hover:text-lightblue hover:scale-130
+        class="px-8 text-8xl leading-45 inline-block transition-300 i_hover:text-lightblue hover:scale-130"
       >
         {{ t.name }}
-      </router-link>
+      </RouterLink>
     </div>
   </BannerPage>
 </template>

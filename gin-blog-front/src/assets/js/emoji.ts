@@ -1,3 +1,4 @@
+// TODO: 优化图片资源
 export default <Record<string, string>> {
   '[微笑]': 'https://static.talkxj.com/emoji/smile.jpg',
 

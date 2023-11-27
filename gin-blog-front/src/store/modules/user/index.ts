@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia'
 import { convertImgUrl, getToken, removeToken } from '@/utils'
 import api from '@/api'
 

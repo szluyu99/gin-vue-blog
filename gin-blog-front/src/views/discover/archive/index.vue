@@ -1,24 +1,28 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { NPagination, NTimeline, NTimelineItem } from 'naive-ui'
+import BannerPage from '@/components/page/BannerPage.vue'
 import { formatDate } from '@/utils'
 import api from '@/api'
 
 const router = useRouter()
 
-let loading = $ref(true)
-let total = $ref(0)
-let archiveList = $ref<any>([])
+const loading = ref(true)
+const total = ref(0)
+const archiveList = ref([])
 
-const current = $ref(1) // 当前页数
-watch($$(current), () => getArchives())
+const current = ref(1) // 当前页数
+watch(current, () => getArchives())
 
 async function getArchives() {
   const res = await api.getArchives({
-    page_num: current,
+    page_num: current.value,
     page_size: 10,
   })
-  archiveList = res.data.pageData
-  total = res.data.total
-  loading = false
+  archiveList.value = res.data.pageData
+  total.value = res.data.total
+  loading.value = false
 }
 
 onMounted(() => {
@@ -28,16 +32,16 @@ onMounted(() => {
 
 <template>
   <BannerPage title="归档" label="archive" :loading="loading" card>
-    <n-timeline :icon-size="18" size="large">
-      <n-timeline-item>
+    <NTimeline :icon-size="18" size="large">
+      <NTimelineItem>
         <template #header>
-          <p text-18 pb-20 lg="text-24">
+          <p class="text-18 pb-20 lg:text-24">
             目前共计 {{ archiveList.length }} 篇文章，继续加油！
           </p>
         </template>
-      </n-timeline-item>
+      </NTimelineItem>
       <template v-for="(item, idx) of archiveList" :key="item.id">
-        <n-timeline-item type="info" :content="item.desc">
+        <NTimelineItem type="info" :content="item.desc">
           <template #header>
             <span color="#666" mr-15 lg="text-15">
               {{ formatDate(item.created_at) }}
@@ -50,20 +54,20 @@ onMounted(() => {
             </a>
           </template>
           <template #icon>
-            <i-mdi:circle />
+            <div class="i-mdi:circle" />
           </template>
           <template #footer>
             <hr
               v-if="idx !== archiveList.length - 1"
-              mt-15 mb-15 border-dashed border-1px border-color="#d2ebfd"
+              class="mt-15 mb-15 border-dashed border-1px border-color-#d2ebfd"
             >
           </template>
-        </n-timeline-item>
+        </NTimelineItem>
       </template>
-    </n-timeline>
+    </NTimeline>
     <!-- 分页按钮 -->
-    <div f-c-c mt-20 my-15>
-      <n-pagination
+    <div class="flex items-center justify-center mt-20 my-15">
+      <NPagination
         v-model:page="current"
         :page-count="Math.ceil(total / 10)"
       />
