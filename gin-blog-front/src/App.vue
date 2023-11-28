@@ -1,10 +1,10 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted } from 'vue'
 
 import AppProvider from './components/layout/AppProvider.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import BackToTop from '@/components/other/BackTop.vue'
-import GlobalModel from '@/components/modal/index.vue'
+import GlobalModal from '@/components/modal/index.vue'
 
 import { useAppStore, useUserStore } from '@/store'
 const appStore = useAppStore()
@@ -34,6 +34,6 @@ onMounted(() => {
     <!-- 回到顶部 -->
     <BackToTop />
     <!-- 全局弹窗 -->
-    <GlobalModel />
+    <GlobalModal />
   </AppProvider>
 </template>

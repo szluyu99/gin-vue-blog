@@ -1,7 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { NButton, NResult } from 'naive-ui'
+
 import BannerPage from '@/components/page/BannerPage.vue'
+
 const router = useRouter()
 </script>
 

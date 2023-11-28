@@ -4,6 +4,7 @@ import { NImage } from 'naive-ui'
 
 import { convertImgUrl } from '@/utils'
 import { useAppStore } from '@/store'
+
 // 保持响应式, 否则可能 pinia 中还没拿到数据时, 这里显示无数据
 const { blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
 
@@ -13,15 +14,15 @@ function addToFavorites() {
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in text-center hidden lg:block">
+  <div class="hidden animate-zoom-in text-center lg:block card-view">
     <NImage
       width="110" :src="convertImgUrl(blogConfig.website_avatar)"
-      class="duration-600 hover:rotate-360 py-15"
+      class="py-15 duration-600 hover:rotate-360"
     />
     <p class="text-24">
       {{ blogConfig.website_author }}
     </p>
-    <p class="text-14 my-5">
+    <p class="my-5 text-14">
       {{ blogConfig.website_intro }}
     </p>
     <!-- 博客信息 -->
@@ -48,21 +49,18 @@ function addToFavorites() {
     <!-- 收藏按钮 -->
     <div class="flex justify-center text-center">
       <button
-        class="flex items-center justify-center leading-32 h-32 w-7/8 text-14 rounded-1rem
-        text-white bg-blue-600 hover:bg-orange-600
-        transition-500 ease-in-out
-        transform hover:-translate-y-1 hover:scale-110"
+        class="h-32 w-7/8 f-c-c transform rounded-1rem bg-blue-600 text-14 leading-32 text-white transition-500 ease-in-out hover:scale-110 hover:bg-orange-600 hover:-translate-y-1"
         @click="addToFavorites"
       >
-        <span class="i-material-symbols:bookmark text-18 mr-5" /> 加入书签
+        <span class="i-material-symbols:bookmark mr-5 text-18" /> 加入书签
       </button>
     </div>
     <!-- 社交信息 -->
-    <div class="text-24 my-15 px-40">
+    <div class="my-15 px-40 text-24 space-x-20">
       <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
         <span class="i-ant-design:qq-circle-filled inline-block hover-text-red-500" />
       </a>
-      <a :href="blogConfig.github" target="_blank" class="mx-20">
+      <a :href="blogConfig.github" target="_blank">
         <span class="i-mdi:github inline-block hover:text-red-500" />
       </a>
       <a :href="blogConfig.gitee" target="_blank">

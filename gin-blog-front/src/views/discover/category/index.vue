@@ -16,7 +16,7 @@ onMounted(async () => {
 
 <template>
   <BannerPage :loading="loading" title="分类" label="category" card>
-    <h2 class="text-center leading-20 mb-6rem text-25 mt-10 lg:text-36">
+    <h2 class="mb-6rem mt-10 text-center text-25 leading-20 lg:text-36">
       分类 - {{ categoryList.length }}
     </h2>
     <ul class="category-list px-20">
@@ -27,7 +27,7 @@ onMounted(async () => {
         <RouterLink :to="`categories/${c.id}?name=${c.name}`">
           {{ c.name }}
         </RouterLink>
-        <span class="ml-5 text-4xl text-gray">
+        <span class="ml-5 text-5xl text-gray">
           ({{ c.article_count ?? 0 }})
         </span>
       </li>

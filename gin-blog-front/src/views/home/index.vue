@@ -80,7 +80,7 @@ function filterMdSymbol(mdStr) {
             :article="item" :idx="idx"
           />
           <!-- 无限加载 -->
-          <div ref="el" class="mt-35 flex items-center justify-center">
+          <div ref="el" class="mt-35 f-c-c">
             <InfiniteLoading @infinite="getArticlesInfinite">
               <!-- TODO: 优化界面 -->
               <template #spinner>

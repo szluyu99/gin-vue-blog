@@ -1,8 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { formatDate } from '@/utils'
 
-const { article } = defineProps<{ article: any }>()
+const { article } = defineProps({
+  article: {},
+})
 
 const wordNum = ref(0) // 字数统计
 const readTime = ref('') // 阅读时间
@@ -15,7 +18,7 @@ onMounted(() => {
 })
 
 // 删除 HTML 标签
-function deleteHTMLTag(str: string) {
+function deleteHTMLTag(str) {
   return str
     .replace(/<\/?[^>]*>/g, '')
     .replace(/[|]*\n/, '')
@@ -25,69 +28,56 @@ function deleteHTMLTag(str: string) {
 
 <template>
   <!-- PC 端显示 -->
-  <div
-    text-center text-15 text-light mt-50 mx-15
-    hidden lg:block
-  >
-    <h1 text-24 lg:text-34>
+  <div class="mx-15 mt-50 hidden text-center text-15 text-light lg:block">
+    <h1 class="text-24 lg:text-34">
       {{ article.title }}
     </h1>
-    <p py-8 f-c-c>
-      <i-mdi:calendar text-18 mr-3 /> 发布于 {{ formatDate(article.created_at) }}
-      <span px-6>|</span>
-      <i-mdi:update text-18 mr-3 /> 更新于 {{ formatDate(article.updated_at) }}
-      <span px-6>|</span>
-      <router-link :to="`/categories/${article.category.id}?name=${article.category.name}`" f-c-c>
-        <i-material-symbols:menu text-18 mr-3 /> {{ article.category.name }}
-      </router-link>
+    <p class="f-c-c py-8">
+      <span class="i-mdi:calendar mr-3 text-18" /> 发布于 {{ formatDate(article.created_at) }}
+      <span class="px-6">|</span>
+      <span class="i-mdi:update mr-3 text-18" /> 更新于 {{ formatDate(article.updated_at) }}
+      <span class="px-6">|</span>
+      <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`" class="f-c-c">
+        <span class="i-material-symbols:menu mr-3 text-18" /> {{ article.category.name }}
+      </RouterLink>
     </p>
-    <div f-c-c>
-      <i-ic:twotone-text-snippet text-18 mr-3 /> 字数统计：{{ wordNum }}
-      <span px-6>|</span>
-      <i-mdi:timelapse text-18 mr-3 /> 阅读时长：{{ readTime }}
-      <span px-6>|</span>
-      <i-mdi:eye text-18 mr-3 /> 阅读量：{{ article.view_count }}
-      <span px-6>|</span>
-      <i-ic:outline-insert-comment text-18 mr-3 /> 评论数：{{ article.comment_count }}
+    <div class="f-c-c">
+      <span class="i-ic:twotone-text-snippet mr-3 text-18" /> 字数统计：{{ wordNum }}
+      <span class="px-6">|</span>
+      <span class="i-mdi:timelapse mr-3 text-18" /> 阅读时长：{{ readTime }}
+      <span class="px-6">|</span>
+      <span class="i-mdi:eye mr-3 text-18" /> 阅读量：{{ article.view_count }}
+      <span class="px-6">|</span>
+      <span class="i-ic:outline-insert-comment mr-3 text-18" /> 评论数：{{ article.comment_count }}
     </div>
   </div>
   <!-- 移动端显示 -->
-  <div
-    text-left text-light mt-50 mx-15
-    block lg:hidden
-  >
-    <h1 text-24>
+  <div class="mx-15 mt-50 block text-left text-light lg:hidden">
+    <h1 class="text-24">
       {{ article.title }}
     </h1>
-    <div mt-10 mb-5 flex items-center flex-wrap lg:justify-center>
-      <i-mdi:calendar text-18 mr-3 /> 发布于 {{ formatDate(article.created_at) }}
-      <span px-6>|</span>
-      <i-mdi:update text-18 mr-3 /> 更新于 {{ formatDate(article.updated_at) }}
+    <div class="mb-5 mt-10 flex flex-wrap items-center lg:justify-center">
+      <span class="i-mdi:calendar mr-3 text-18" /> 发布于 {{ formatDate(article.created_at) }}
+      <span class="px-6">|</span>
+      <span class="i-mdi:update mr-3 text-18" /> 更新于 {{ formatDate(article.updated_at) }}
     </div>
     <div>
-      <router-link :to="`/categories/${article.category.id}?name=${article.category.name}`" mr-8>
-        <i-material-symbols:menu text-18 mr-3 /> {{ article.category.name }}
-      </router-link>
-
-      <router-link
-        v-for="tag of article.tags" :key="tag.id"
-        :to="`/tags/${tag.id}?name=${tag.name}`"
-      >
-        <span
-          px-8 py-1 mr-8
-          border-1px rounded-3rem border-blue text-white
-        > {{ tag.name }} </span>
-      </router-link>
+      <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`" class="mr-8">
+        <span class="i-material-symbols:menu mr-3 text-18" /> {{ article.category.name }}
+      </RouterLink>
+      <RouterLink v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
+        <span class="mr-8 border-1px border-blue rounded-3rem px-8 py-1 text-white"> {{ tag.name }} </span>
+      </RouterLink>
     </div>
-    <div my-5>
-      <i-ic:twotone-text-snippet text-18 mr-3 /> 字数统计：{{ wordNum }}
-      <span px-6>|</span>
-      <i-mdi:timelapse text-18 mr-3 /> 阅读时长：{{ readTime }}
+    <div class="my-5">
+      <span class="i-ic:twotone-text-snippet mr-3 text-18" /> 字数统计：{{ wordNum }}
+      <span class="px-6">|</span>
+      <span class="i-mdi:timelapse mr-3 text-18" /> 阅读时长：{{ readTime }}
     </div>
     <div>
-      <i-mdi:eye text-18 mr-3 /> 阅读量：{{ article.view_count }}
+      <span class="i-mdi:eye mr-3 text-18" /> 阅读量：{{ article.view_count }}
       <span px-6>|</span>
-      <i-ic:outline-insert-comment text-18 mr-3 /> 评论数：{{ article.comment_count }}
+      <span class="i-ic:outline-insert-comment mr-3 text-18" /> 评论数：{{ article.comment_count }}
     </div>
   </div>
 </template>

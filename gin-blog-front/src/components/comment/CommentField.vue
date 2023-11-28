@@ -1,16 +1,20 @@
-<script setup lang="ts">
+<script setup>
 import { computed, reactive, ref } from 'vue'
+import { NAvatar } from 'naive-ui'
 
 import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 import { useAppStore, useUserStore } from '@/store'
 
-const props = defineProps<{
-  type: number // 评论类型 1-文章 2-友链
-  show: boolean // 默认是否显示
-  topicId?: number // 主题 id
-}>()
+const props = defineProps({
+  // 评论类型 1-文章 2-友链
+  type: Number,
+  // 默认是否显示
+  show: Boolean,
+  // 主题 id
+  topicId: Number,
+})
 
 const emit = defineEmits(['afterSubmit']) // 调用父方法
 const [userStore, appStore] = [useUserStore(), useAppStore()]
@@ -29,7 +33,7 @@ const data = reactive({
 const isReply = computed(() => !!data.nickname)
 
 // 取消评论
-function setReply(flag: boolean) {
+function setReply(flag) {
   show.value = flag
 }
 
@@ -77,36 +81,36 @@ defineExpose({ data, setReply })
 </script>
 
 <template>
-  <div v-if="show" flex p-10 mt-15 border-1px border-solid border-rounded-1rem border-color="#90939950">
-    <n-avatar
-      round :size="36"
+  <div v-if="show" class="mt-15 flex border-1px border-color-#90939950 border-rounded-1rem border-solid p-10">
+    <NAvatar
+      class="round"
+      :size="36"
       :src="convertImgUrl(userStore.avatar)"
     />
-    <div w-full my-5 ml-12>
+    <div class="my-5 ml-12 w-full">
       <textarea
         v-model="data.content"
         :placeholder="placeholderText"
         rows="5"
-        text-16 w-full
-        bg-light-400
+        class="w-full bg-light-400 text-16"
       />
-      <div flex justify-between>
+      <div class="flex justify-between">
         <!-- TODO: 表情框 -->
-        <i-mdi:emoticon-happy-outline text-24 text-orange cursor-pointer @click="chooseEmoji" />
+        <span class="i-mdi:emoticon-happy-outline cursor-pointer text-24 text-orange" @click="chooseEmoji" />
         <div>
           <span
             v-if="data.nickname"
-            btn bg-bluegray hover:bg-bluegray mr-15
+            class="mr-15 bg-bluegray btn hover:bg-bluegray"
             @click="setReply(false)"
           > 取消 </span>
-          <span btn @click="submitComment"> 提交 </span>
+          <span class="btn" @click="submitComment"> 提交 </span>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 textarea {
   background: url(https://static.talkxj.com/config/commentBack.webp) 100% 100% no-repeat;
   resize: none;

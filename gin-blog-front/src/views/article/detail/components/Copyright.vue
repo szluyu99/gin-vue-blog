@@ -1,39 +1,34 @@
-<script setup lang="ts">
+<script setup>
+import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/store'
 const { blogConfig } = storeToRefs(useAppStore())
 const articleHref = window.location.href
 </script>
 
 <template>
-  <div
-    px-17 py-12 leading-30 text-14
-    border-1 border-dashed border-lightblue
-    lg:text-15
-  >
+  <div class="border-1 border-lightblue border-dashed px-17 py-12 text-14 leading-30 lg:text-15">
     <!-- TODO: 点击复制 -->
-    <div relative>
-      <div
-        absolute right-0 top-0 w-16 h-16
-        rounded-full bg-white border-blue border-4px
-      />
-      <span color="#49b1f5" font-bold> 文章作者： </span>
-      <router-link to="/" color="#99a9bf" class="!underline">
+    <div class="relative">
+      <!-- 右上角的装饰 -->
+      <div class="absolute right-0 top-0 h-16 w-16 border-4px border-blue rounded-full bg-white" />
+      <span class="font-bold color-#49b1f5"> 文章作者： </span>
+      <RouterLink to="/" class="color-#99a9bf !underline">
         {{ blogConfig.website_author }}
-      </router-link>
+      </RouterLink>
     </div>
     <div>
-      <span color="#49b1f5" font-bold> 文章链接： </span>
-      <a :href="articleHref" color="#99a9bf" class="!underline">
+      <span class="font-bold color-#49b1f5"> 文章链接： </span>
+      <a :href="articleHref" class="color-#99a9bf !underline">
         {{ articleHref }}
       </a>
     </div>
     <div>
-      <span color="#49b1f5" font-bold> 版权声明： </span>
+      <span class="font-bold color-#49b1f5"> 版权声明： </span>
       <span>
         本博客所有文章除特别声明外，均采用
         <a
           href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"
-          color="#99a9bf" i_underline
+          class="color-#99a9bf !underline"
         >
           CC BY-NC-SA 4.0
         </a>

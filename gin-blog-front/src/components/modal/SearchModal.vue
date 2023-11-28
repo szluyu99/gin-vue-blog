@@ -5,6 +5,7 @@ import { NInput, NModal } from 'naive-ui'
 
 import api from '@/api'
 import { useAppStore } from '@/store'
+
 const appStore = useAppStore()
 
 const searchFlag = computed({
@@ -16,6 +17,7 @@ const searchFlag = computed({
 const keyword = ref('')
 // 搜索结果
 const articleList = ref([])
+
 // 防抖 watch, 节流: throttledWatch
 debouncedWatch(
   keyword,
@@ -24,7 +26,7 @@ debouncedWatch(
 )
 
 async function handleSearch() {
-  const res = await api.searchArticles({ keyword })
+  const res = await api.searchArticles({ keyword: keyword.value })
   articleList.value = res.data
 }
 </script>
@@ -37,8 +39,7 @@ async function handleSearch() {
     title="本地搜索"
     transform-origin="center"
     :block-scroll="appStore.isMobile"
-    px-10 h-full max-w-360
-    lg="max-w-600"
+    class="h-full max-w-360 px-10 lg:max-w-600"
   >
     <NInput
       v-model:value="keyword"
@@ -51,23 +52,19 @@ async function handleSearch() {
         <div class="i-mdi:flash text-20 text-yellow" />
       </template>
     </NInput>
-    <hr my-15 border-dashed border-2px border-color="#d2ebfd">
-    <div h-400>
+    <hr class="my-15 border-2px border-color-#d2ebfd border-dashed">
+    <div class="h-400">
       <ul v-if="articleList.length">
         <li v-for="item of articleList" :key="item.id">
-          <router-link :to="`/article/${item.id}`">
+          <RouterLink :to="`/article/${item.id}`">
             <span
-              text-17 border-b-1 border-solid border="#999"
+              class="border-b-1 border-#999 border-solid text-17"
               @click="searchFlag = false"
               v-html="item.title"
             />
-          </router-link>
-          <p
-            cursor-pointer color="#555" mt-5
-            class="ell-3"
-            v-html="item.content"
-          />
-          <hr my-10 border-1 border-dashed border="#d2ebfd">
+          </RouterLink>
+          <p clsas="color-#555 mt-5 cursor-pointer ell-3" v-html="item.content" />
+          <hr class="my-10 border-1 border-#d2ebfd border-dashed">
         </li>
       </ul>
       <div v-else-if="keyword">
@@ -78,7 +75,7 @@ async function handleSearch() {
 </template>
 
 <style scoped lang="scss">
-// 省略文字最多 4 行
+// 省略文字最多 N 行
 .ell-3 {
   display: -webkit-box;
   overflow: hidden;

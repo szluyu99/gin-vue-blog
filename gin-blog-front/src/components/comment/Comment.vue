@@ -1,17 +1,20 @@
-<script setup lang="ts">
+<script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { NButton, NImage, NSpin } from 'naive-ui'
 import { useRoute } from 'vue-router'
+
 // import EmojiList from '@/assets/js/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
-import { convertImgUrl, formatDate } from '@/utils'
 
+import { convertImgUrl, formatDate } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
 
-const { type } = defineProps<{
-  type: number // 评论类型: 1-文章, 2-友链
-}>()
+const { type } = defineProps({
+  // 评论类型: 1-文章, 2-友链
+  type: Number,
+})
 
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
@@ -23,10 +26,11 @@ onMounted(() => {
 const topicId = +(useRoute().params.id ?? 0)
 
 // 加载评论
-const commentList = ref<any>([]) // 评论列表 (分页加载)
+const commentList = ref([]) // 评论列表 (分页加载)
 const commentCount = ref(0) // 评论总数量
 const listLoading = ref(false) // 列表加载状态
 const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId }) // 加载评论的参数
+
 async function getComments() {
   listLoading.value = true
   try {
@@ -62,58 +66,60 @@ watch(commentList, () => {
 
 // 回复相关
 // ! 可以获取 v-for 循环中的 DOM 数组
-const replyFieldRefs = ref<any>([])
+const replyFieldRefs = ref(null)
 // 回复评论
-function replyComment(idx: number, obj: any) {
+function replyComment(idx, obj) {
   // 关闭所有回复框
-  replyFieldRefs.value.forEach((e: any) => e.setReply(false))
+  replyFieldRefs.value.forEach(e => e.setReply(false))
   // 打开当前点击的回复框
-  const curRef = replyFieldRefs[idx]
-  curRef.setReply(true)
-  // * 将值传给回复框
-  curRef.data.nickname = obj.nickname // 用户昵称
-  curRef.data.reply_user_id = obj.user_id // 回复用户 id
-  curRef.data.parent_id = commentList[idx].id // 父评论 id
+  const curRef = replyFieldRefs.value[idx]
+  if (curRef) {
+    curRef.setReply(true)
+    // * 将值传给回复框
+    curRef.data.nickname = obj.nickname // 用户昵称
+    curRef.data.reply_user_id = obj.user_id // 回复用户 id
+    curRef.data.parent_id = commentList.value[idx].id // 父评论 id
+  }
 }
 
 // 提交回复后, 重新加载评论回复
-const pageRefs = ref<any>([]) // 分页
-const checkRefs = ref<any>([]) // 查看
-async function reloadReplies(idx: number) {
+const pageRefs = ref([]) // 分页
+const checkRefs = ref([]) // 查看
+async function reloadReplies(idx) {
   const { data } = await api.getCommentReplies(
-    commentList[idx].id, { page_size: 5, page_num: pageRefs[idx].current },
+    commentList.value[idx].id, { page_size: 5, page_num: pageRefs.value[idx].current },
   )
   // * 局部更新某个评论的回复
-  commentList[idx].reply_vo_list = data
-  commentList[idx].reply_count++ // 数量 + 1
+  commentList.value[idx].reply_vo_list = data
+  commentList.value[idx].reply_count++ // 数量 + 1
   // 回复大于 5 条展示评论分页
-  commentList[idx].reply_count > 5 && (pageRefs[idx].setShow(true))
+  commentList.value[idx].reply_count > 5 && (pageRefs.value[idx].setShow(true))
   // 直接隐藏查看
-  checkRefs[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
 }
 
 // "点击查看" 显示更多回复
-async function checkReplies(idx: number, obj: any) {
+async function checkReplies(idx, obj) {
   // 查第一页 (5 条数据)
   const { data } = await api.getCommentReplies(
     obj.id, { page_num: 1, page_size: 5 })
   // 更新对应楼评论的回复列表
   obj.reply_vo_list = data
   // 超过 5 条数据显示分页
-  obj.reply_count > 5 && (pageRefs[idx].setShow(true))
+  obj.reply_count > 5 && (pageRefs.value[idx].setShow(true))
   // 隐藏 "点击查看"
-  checkRefs[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
 }
 
 // 修改回复分页中当前页数
-async function changeReplyCurrent(pageNum: number, idx: number, commentId: number) {
+async function changeReplyCurrent(pageNum, idx, commentId) {
   const { data } = await api.getCommentReplies(
     commentId, { page_num: pageNum, page_size: 5 })
   commentList[idx].reply_vo_list = data
 }
 
 // TODO: 点赞
-async function likeComment(comment: any) {
+async function likeComment(comment) {
   // 判断是否登录
   if (!userStore.userId) {
     appStore.setLoginFlag(true)
@@ -140,13 +146,13 @@ async function likeComment(comment: any) {
 }
 
 // 判断当前用户是否点赞过该评论
-const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(id))
+const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
 </script>
 
 <template>
   <div>
-    <p text-20 font-bold flex items-center>
-      <i-fa:comments mr-5 text-24 text-blue /> 评论
+    <p class="flex items-center text-20 font-bold">
+      <span class="i-fa:comments mr-5 text-24 text-blue" /> 评论
     </p>
     <!-- 评论框 -->
     <CommentField
@@ -158,104 +164,100 @@ const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(
     <!-- 评论详情 -->
     <div v-if="commentCount > 0 && refresh">
       <!-- 评论数量 -->
-      <p mt-30 mb-15 text-20 font-bold flex items-center>
+      <p class="mb-15 mt-30 flex items-center text-20 font-bold">
         <span> {{ commentCount }} 评论 </span>
-        <i-uiw:reload
-          ml-15 cursor-pointer text-18
+        <span
+          class="i-uiw:reload ml-15 cursor-pointer text-18"
           :class="listLoading ? 'animate-spin' : ''"
           @click="reloadComments"
         />
       </p>
       <!-- 评论列表 -->
-      <div v-for="(comment, idx) of commentList" :key="comment.id" my-5 flex>
+      <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-5 flex">
         <div>
-          <n-image
+          <NImage
             :src="convertImgUrl(comment.avatar)"
             width="40"
-            duration-600 hover-rotate-360
+            class="duration-600 hover-rotate-360"
           />
         </div>
-        <div flex-col flex-1 ml-10>
+        <div class="ml-10 flex-col flex-1">
           <!-- 评论人名称 -->
           <p>
             <!-- 根据是否有 website 显示不同效果 -->
-            <span v-if="!comment.website" text-14>
+            <span v-if="!comment.website" class="text-14">
               {{ comment.nickname }}
             </span>
             <a
               v-else :href="comment.website" target="_blank"
-              color="#1abc9c" font-500 transition-300
+              class="font-500 color-#1abc9c transition-300"
             >
               {{ comment.nickname }}
             </a>
             <!-- 博主标记 -->
             <span
               v-if="comment.user_id === 10"
-              bg="#ffa51e" color="#fff"
-              px-6 py-1 ml-6 rounded-3 text-12 inline-block
+              class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-12 color-#fff"
             >
               博主
             </span>
           </p>
           <!-- 楼层 + 时间 + 点赞 + 回复按钮 -->
-          <div flex justify-between text-12>
-            <div color="#b3b3b3" py-5 flex items-center>
+          <div class="flex justify-between text-12">
+            <div class="flex items-center py-5 color-#b3b3b3">
               <span> {{ commentCount - idx }}楼 </span>
-              <span mx-10> {{ formatDate(comment.created_at) }} </span>
+              <span class="mx-10"> {{ formatDate(comment.created_at) }} </span>
               <button
-                i-mdi:thumb-up
+                class="i-mdi:thumb-up hover-bg-red"
                 :class="isLike(comment.id) ? 'bg-red' : ''"
-                hover-bg-red
                 @click="likeComment(comment)"
               />
               <span v-show="comment.like_count"> {{ comment.like_count }} </span>
             </div>
-            <button color="#ef2f11" @click="replyComment(idx, comment)">
+            <button class="color-#ef2f11" @click="replyComment(idx, comment)">
               回复
             </button>
           </div>
           <!-- 评论内容 -->
-          <div my-3 v-html="comment.content" />
+          <div class="my-3" v-html="comment.content" />
 
           <!-- 评论回复 start -->
-          <div v-for="reply of comment.reply_vo_list" :key="reply.id" mt-10 flex>
+          <div v-for="reply of comment.reply_vo_list" :key="reply.id" class="mt-10 flex">
             <div>
-              <n-image
+              <NImage
                 :src="convertImgUrl(reply.avatar)"
                 width="40"
-                duration-600 hover-rotate-360
+                class="duration-600 hover-rotate-360"
               />
             </div>
-            <div flex-col flex-1 ml-10>
+            <div class="ml-10 flex-col flex-1">
               <!-- 回复人名称 -->
               <div>
                 <!-- 根据是否有 website 显示不同效果 -->
-                <span v-if="!reply.website" text-14>
+                <span v-if="!reply.website" class="text-14">
                   {{ reply.nickname }}
                 </span>
                 <a
                   v-else :href="reply.website" target="_blank"
-                  color="#1abc9c" font-500 transition-300
+                  class="font-500 color-#1abc9c transition-300"
                 >
                   {{ reply.nickname }}
                 </a>
                 <!-- 博主标记 -->
                 <span
                   v-if="reply.user_id === 10"
-                  bg="#ffa51e" color="#fff"
-                  px-6 py-1 ml-6 rounded-3 text-12 inline-block
+                  class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-12 color-#fff"
                 >
                   博主
                 </span>
               </div>
               <!-- 时间 + 点赞 + 回复按钮 -->
-              <div flex justify-between text-12>
-                <div color="#b3b3b3" py-5 flex items-center>
-                  <span mr-10> {{ formatDate(reply.created_at) }} </span>
+              <div class="flex justify-between text-12">
+                <div class="flex items-center py-5 color-#b3b3b3">
+                  <span class="mr-10"> {{ formatDate(reply.created_at) }} </span>
                   <button
-                    i-mdi:thumb-up
+                    class="i-mdi:thumb-up hover-bg-red"
                     :class="isLike(reply.id) ? 'bg-red' : ''"
-                    hover-bg-red
                     @click="likeComment(reply)"
                   />
                   <span v-show="reply.like_count"> {{ reply.like_count }} </span>
@@ -275,7 +277,7 @@ const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(
                     @{{ reply.reply_nickname }}
                   </a> ，
                 </template>
-                <span my-3 v-html="reply.content" />
+                <span class="my-3" v-html="reply.content" />
               </div>
             </div>
           </div>
@@ -285,10 +287,10 @@ const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(
           <div
             v-show="comment.reply_count > 3"
             ref="checkRefs"
-            mt-15 color="#6d757a" text-13
+            class="mt-15 text-13 color-#6d757a"
           >
             共 <b> {{ comment.reply_count }} </b>  条回复
-            <button color="#00a1d6" @click="checkReplies(idx, comment)">
+            <button class="color-#00a1d6" @click="checkReplies(idx, comment)">
               ，点击查看
             </button>
           </div>
@@ -309,24 +311,24 @@ const isLike = computed(() => (id: number) => userStore.commentLikeSet.includes(
             @after-submit="reloadReplies(idx)"
           />
           <!-- 分隔线: 注意最后一个评论没有线 -->
-          <div v-if="(idx + 1) !== commentCount" h-1 bg-light-500 my-10 />
+          <div v-if="(idx + 1) !== commentCount" class="my-10 h-1 bg-light-500" />
         </div>
       </div>
       <!-- 加载更多 -->
-      <div f-c-c m-15>
-        <n-button
+      <div class="m-15 f-c-c">
+        <NButton
           v-if="commentCount > commentList.length && !listLoading"
           text @click="getComments"
         >
           点击加载更多...
-        </n-button>
-        <div v-if="listLoading" animate-bounce>
-          <n-spin size="small" />
+        </NButton>
+        <div v-if="listLoading" class="animate-bounce">
+          <NSpin size="small" />
         </div>
       </div>
     </div>
     <!-- 没有评论的提示 -->
-    <div v-else text-center mt-30 mb-10 text-zinc text-16>
+    <div v-else class="mb-10 mt-30 text-center text-16 text-zinc">
       暂无评论，来发评论吧~
     </div>
   </div>

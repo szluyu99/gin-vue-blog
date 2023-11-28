@@ -1,14 +1,18 @@
 import { getLocal, removeLocal, setLocal } from '@/utils'
 
 const TOKEN_CODE = 'blog_access_token'
-/** token过期时间：6小时 */
+
+/** token 过期时间：6小时 */
 const DURATION = 6 * 60 * 60
 
 export function getToken() {
   return getLocal(TOKEN_CODE)
 }
 
-export function setToken(token: string) {
+/**
+ * @param {String} token
+ */
+export function setToken(token) {
   setLocal(TOKEN_CODE, token, DURATION)
 }
 

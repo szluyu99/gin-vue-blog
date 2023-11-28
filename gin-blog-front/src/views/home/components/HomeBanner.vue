@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, onMounted, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
 
@@ -48,12 +48,9 @@ const coverStyle = computed(() => {
 </script>
 
 <template>
-  <div
-    class="banner-fade-down absolute left-0 right-0 bottom-0 h-screen text-center text-white"
-    :style="coverStyle"
-  >
-    <div class="absolute mt-43vh inset-x-0 text-center">
-      <h1 class="text-28 font-bold animate-zoom-in lg:text-40">
+  <div class="banner-fade-down absolute bottom-0 left-0 right-0 h-screen text-center text-white" :style="coverStyle">
+    <div class="absolute inset-x-0 mt-43vh text-center">
+      <h1 class="animate-zoom-in text-28 font-bold lg:text-40">
         {{ blogConfig.website_name }}
       </h1>
       <div class="text-16 lg:text-22">
@@ -61,11 +58,11 @@ const coverStyle = computed(() => {
         <span class="animate-ping"> | </span>
       </div>
       <!-- 社交信息（移动端专用） -->
-      <div class="mt-3 text-22 lg:hidden">
+      <div class="mt-3 text-22 lg:hidden space-x-18">
         <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
           <span class="i-ant-design:qq-circle-filled inline-block" />
         </a>
-        <a :href="blogConfig.github" target="_blank" class="mx-18">
+        <a :href="blogConfig.github" target="_blank">
           <span class="i-mdi:github inline-block" />
         </a>
         <a :href="blogConfig.gitee" target="_blank">
@@ -75,7 +72,7 @@ const coverStyle = computed(() => {
     </div>
     <!-- 向下滚动 -->
     <div class="absolute bottom-10 w-full cursor-pointer" @click="scrollDown">
-      <span class="i-ep:arrow-down-bold inline-block animate-bounce text-white text-25" />
+      <span class="i-ep:arrow-down-bold inline-block animate-bounce text-25 text-white" />
     </div>
   </div>
 </template>

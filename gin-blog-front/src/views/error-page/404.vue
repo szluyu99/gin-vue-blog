@@ -1,15 +1,20 @@
-<script setup lang="ts">
+<script setup>
+import { useRouter } from 'vue-router'
+import { NButton, NResult } from 'naive-ui'
+
+import BannerPage from '@/components/page/BannerPage.vue'
+
 const route = useRouter()
 </script>
 
 <template>
   <BannerPage label="404" card>
-    <n-result status="404" title="404 资源不存在" description="生活总归带点荒谬">
+    <NResult status="404" title="404 资源不存在" description="生活总归带点荒谬">
       <template #footer>
-        <n-button @click="route.push('/')">
+        <NButton @click="route.push('/')">
           回到首页
-        </n-button>
+        </NButton>
       </template>
-    </n-result>
+    </NResult>
   </BannerPage>
 </template>

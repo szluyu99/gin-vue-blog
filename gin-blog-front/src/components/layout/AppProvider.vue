@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { defineComponent, h } from 'vue'
 // import { kebabCase } from 'lodash-es'
 import { NConfigProvider, NDialogProvider, NLoadingBarProvider, NMessageProvider, NNotificationProvider, useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'

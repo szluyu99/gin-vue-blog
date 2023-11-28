@@ -1,5 +1,10 @@
-<script setup lang="ts">
-const { tagList = [] } = defineProps<{ tagList: any }>()
+<script setup>
+const { tagList } = defineProps({
+  tagList: {
+    type: Array,
+    default: () => [],
+  },
+})
 
 function share() {
   window.$message?.info('暂时不支持分享功能')
@@ -7,31 +12,20 @@ function share() {
 </script>
 
 <template>
-  <div flex items-center justify-between>
-    <div>
-      <router-link
-        v-for="tag of tagList" :key="tag.id"
-        :to="`/tags/${tag.id}?name=${tag.name}`"
-      >
-        <span
-          px-7 py-3 mr-3 text-12
-          border-1px rounded-3rem border-blue color="#49b1f5"
-          lg:text-14
-        >
+  <div class="flex items-center justify-between">
+    <div class="space-x-6">
+      <RouterLink v-for="tag of tagList" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
+        <span class="border-1px border-blue rounded-3rem px-7 py-3 text-12 color-#49b1f5 lg:text-14">
           {{ tag.name }}
         </span>
-      </router-link>
+      </RouterLink>
     </div>
 
-    <div
-      flex justify-between w-120 text-25
-      lg="text-28 w-140"
-      @click="share"
-    >
-      <i-mdi:wechat text-green cursor-pointer />
-      <i-mdi:sina-weibo text-orange cursor-pointer />
-      <i-mdi:qqchat text-red cursor-pointer />
-      <i-mdi:telegram text-blue cursor-pointer />
+    <div class="flex justify-between text-20 space-x-7" @click="share">
+      <span class="i-mdi:wechat cursor-pointer text-green" />
+      <span class="i-mdi:sina-weibo cursor-pointer text-orange" />
+      <span class="i-mdi:qqchat cursor-pointer text-red" />
+      <span class="i-mdi:telegram cursor-pointer text-blue" />
     </div>
   </div>
 </template>

@@ -2,7 +2,13 @@
 // 如果包含 http 说明是 Web 图片资源
 // 否则是服务器上的图片，需要拼接服务器路径
 const SERVER_URL = import.meta.env.VITE_SERVER_URL
-export function convertImgUrl(imgUrl: string | undefined) {
+
+/**
+ * 将相对地址转换为完整的图片路径
+ * @param {String} imgUrl
+ * @returns
+ */
+export function convertImgUrl(imgUrl) {
   if (!imgUrl)
     return 'http://dummyimage.com/400x400'
   if (imgUrl.startsWith('http'))
@@ -11,6 +17,6 @@ export function convertImgUrl(imgUrl: string | undefined) {
 }
 
 export * from './common'
-export * from './storage'
+export * from './local'
 export * from './http'
-export * from './auth'
+export * from './token'

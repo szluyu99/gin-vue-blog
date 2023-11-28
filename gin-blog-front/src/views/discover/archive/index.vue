@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { NPagination, NTimeline, NTimelineItem } from 'naive-ui'
+
 import BannerPage from '@/components/page/BannerPage.vue'
 import { formatDate } from '@/utils'
 import api from '@/api'
@@ -35,7 +36,7 @@ onMounted(() => {
     <NTimeline :icon-size="18" size="large">
       <NTimelineItem>
         <template #header>
-          <p class="text-18 pb-20 lg:text-24">
+          <p class="pb-20 text-18 lg:text-24">
             目前共计 {{ archiveList.length }} 篇文章，继续加油！
           </p>
         </template>
@@ -43,13 +44,10 @@ onMounted(() => {
       <template v-for="(item, idx) of archiveList" :key="item.id">
         <NTimelineItem type="info" :content="item.desc">
           <template #header>
-            <span color="#666" mr-15 lg="text-15">
+            <span class="mr-15 color-#666 lg:text-15">
               {{ formatDate(item.created_at) }}
             </span>
-            <a
-              color="#666" lg="text-16"
-              @click="router.push(`/article/${item.id}`)"
-            >
+            <a class="color-#666 lg:text-16" @click="router.push(`/article/${item.id}`)">
               {{ item.title }}
             </a>
           </template>
@@ -57,20 +55,14 @@ onMounted(() => {
             <div class="i-mdi:circle" />
           </template>
           <template #footer>
-            <hr
-              v-if="idx !== archiveList.length - 1"
-              class="mt-15 mb-15 border-dashed border-1px border-color-#d2ebfd"
-            >
+            <hr v-if="idx !== archiveList.length - 1" class="mb-15 mt-15 border-1px border-color-#d2ebfd border-dashed">
           </template>
         </NTimelineItem>
       </template>
     </NTimeline>
     <!-- 分页按钮 -->
-    <div class="flex items-center justify-center mt-20 my-15">
-      <NPagination
-        v-model:page="current"
-        :page-count="Math.ceil(total / 10)"
-      />
+    <div class="my-15 mt-20 f-c-c">
+      <NPagination v-model:page="current" :page-count="Math.ceil(total / 10)" />
     </div>
   </BannerPage>
 </template>

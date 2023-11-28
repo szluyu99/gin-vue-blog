@@ -5,7 +5,7 @@ const { blogInfo } = storeToRefs(useAppStore())
 </script>
 
 <template>
-  <footer class="flex items-center justify-center">
+  <footer class="f-c-c">
     <div class="footer-wrap w-full p-x-20 p-y-40 text-center text-14 leading-30 text-white">
       <p> &copy;{{ 2022 }} - {{ new Date().getFullYear() }} By 阵、雨</p>
       <a href="https://beian.miit.gov.cn/" target="_blank">

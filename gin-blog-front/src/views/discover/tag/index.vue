@@ -7,8 +7,8 @@ const loading = ref(true)
 const tagList = ref({})
 
 onMounted(() => {
-  api.getTags().then((res) => {
-    tagList.value = res.data.list
+  api.getTags().then((resp) => {
+    tagList.value = resp.data.list
     loading.value = false
   })
 })
@@ -25,7 +25,7 @@ function randomColorHex() {
 
 <template>
   <BannerPage :loading="loading" title="标签" label="tag" card>
-    <h2 class="text-center leading-20 mb-8rem text-25 mt-10 lg-text-36">
+    <h2 class="mb-8rem mt-10 text-center text-25 leading-20 lg:text-36">
       标签 - {{ tagList.length }}
     </h2>
     <div class="text-center">
@@ -35,7 +35,7 @@ function randomColorHex() {
           'font-size': `${randomFontSize()}px`,
           'color': `${randomColorHex()}`,
         }"
-        class="px-8 text-8xl leading-45 inline-block transition-300 i_hover:text-lightblue hover:scale-130"
+        class="inline-block px-8 text-8xl leading-45 transition-300 hover:scale-130 !hover:text-lightblue"
       >
         {{ t.name }}
       </RouterLink>

@@ -1,33 +1,34 @@
-<script setup lang="ts">
+<script setup>
 import { convertImgUrl, formatDate } from '@/utils'
-const { articleList = [] } = defineProps<{ articleList: any }>()
+
+const { articleList } = defineProps({
+  articleList: Array,
+})
 </script>
 
 <template>
   <Transition name="slide-fade" appear>
-    <div card-view>
-      <div flex items-center>
-        <i-akar-icons:clock text-6xl />
-        <span text-16 ml-10> 最新文章 </span>
+    <div class="card-view">
+      <div class="flex items-center">
+        <span class="i-akar-icons:clock text-6xl" />
+        <span class="ml-10 text-16"> 最新文章 </span>
       </div>
       <ul>
-        <router-link
-          v-for="item of articleList"
-          :key="item.title" :to="`/article/${item.id}`"
-          my-3 border-b-1 border-dashed last:border-none
-        >
-          <div flex items-center py-6>
-            <img :src="convertImgUrl(item.img)" overflow-hidden w-58 h-58>
-            <div flex-1 pl-10 break-all overflow-hidden>
-              <p text-14>
-                {{ item.title }}
-              </p>
-              <p text-13 text-blueGray>
-                {{ formatDate(item.created_at) }}
-              </p>
+        <li v-for="item of articleList" :key="item.title">
+          <RouterLink :to="`/article/${item.id}`" class="my-3 border-b-1 border-dashed last:border-none">
+            <div class="flex items-center py-6">
+              <img :src="convertImgUrl(item.img)" class="h-58 w-58 overflow-hidden">
+              <div class="flex-1 overflow-hidden break-all pl-10">
+                <p class="text-14">
+                  {{ item.title }}
+                </p>
+                <p class="text-13 text-blueGray">
+                  {{ formatDate(item.created_at) }}
+                </p>
+              </div>
             </div>
-          </div>
-        </router-link>
+          </RouterLink>
+        </li>
       </ul>
     </div>
   </Transition>

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { NButton, NForm, NFormItem, NGi, NGrid, NInput } from 'naive-ui'
 
@@ -28,7 +28,7 @@ onMounted(() => {
 
 async function updateUserInfo() {
   try {
-    await api.updateUser(infoForm)
+    await api.updateUser(infoForm.value)
     window.$message?.success('修改成功!')
     userStore.getUserInfo() // 重新获取用户信息
   }

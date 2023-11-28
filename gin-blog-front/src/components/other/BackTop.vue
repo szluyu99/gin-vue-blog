@@ -33,7 +33,7 @@ const operations = [
   >
     <div
       v-for="item of operations" :key="item.icon"
-      class="w-30 h-30 my-3 flex items-center justify-center cursor-pointer rounded bg-#49b1f5 hover:bg-amber"
+      class="w-30 h-30 my-3 f-c-c cursor-pointer rounded bg-#49b1f5 hover:bg-amber"
     >
       <TheIcon :icon="item.icon" :size="20" @click="item.fn" />
     </div>

@@ -1,6 +1,6 @@
 import {
   defineConfig,
-  presetAttributify,
+  // presetAttributify,
   presetIcons,
   presetUno,
   presetWebFonts,
@@ -13,17 +13,8 @@ export default defineConfig({
   shortcuts: [
     ['btn', 'px-15 py-5 rounded-1rem inline-block bg-[#49b1f5] text-white cursor-pointer hover:bg-[#ff7242] disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50'],
     ['icon-btn', 'text-[0.9em] inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600 !outline-none'],
-    ['wh-full', 'w-full h-full'],
-    ['f-ic', 'flex items-center'],
     ['f-c-c', 'flex justify-center items-center'],
     ['flex-col', 'flex flex-col'],
-    ['absolute-lt', 'absolute left-0 top-0'],
-    ['absolute-lb', 'absolute left-0 bottom-0'],
-    ['absolute-rt', 'absolute right-0 top-0'],
-    ['absolute-rb', 'absolute right-0 bottom-0'],
-    ['absolute-lrt', 'absolute left-0 right-0 bottom-0'],
-    ['absolute-center', 'absolute-lt f-c-c wh-full'],
-    ['text-ellipsis', 'truncate'],
     ['card-view', 'bg-white p-15 rounded-2rem hover:shadow-2xl transition-500'],
   ],
   rules: [
@@ -32,7 +23,7 @@ export default defineConfig({
   ],
   presets: [
     presetUno(),
-    presetAttributify(),
+    // presetAttributify(),
     presetIcons({
       scale: 1.2,
       warn: true,

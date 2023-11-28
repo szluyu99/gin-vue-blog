@@ -21,12 +21,12 @@ setInterval(() => {
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in hidden lg:block">
+  <div class="hidden animate-zoom-in lg:block space-y-10 card-view">
     <p class="flex items-center">
-      <span class="i-icon-park:analysis mr-5 text-18 animate-bang" />
+      <span class="animate-bang i-icon-park:analysis mr-5 text-18" />
       <span class="text-16"> 网站咨询 </span>
     </p>
-    <p class="my-10 text-14">
+    <p class="text-14">
       <span> 运行时间： </span>
       <span class="float-right"> {{ runTime }} </span>
     </p>
@@ -37,7 +37,7 @@ setInterval(() => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .animate-bang {
   animation: bang 0.8s linear infinite;
 }

@@ -1,12 +1,14 @@
-<script setup lang="ts">
-import { ref, watch } from 'vue'
+<script setup>
+import { computed, ref, watch } from 'vue'
 import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
 
-interface Props { articleId: number; likeCount: number }
-const { articleId, likeCount } = defineProps<Props>()
+const { articleId, likeCount } = defineProps({
+  articleId: Number,
+  likeCount: Number,
 
-// store hook
+})
+
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
 // 点赞数量
@@ -48,16 +50,12 @@ function rewardArticle() {
 </script>
 
 <template>
-  <div f-c-c color="#fff">
-    <button
-      f-c-c py-6 mr-10 w-110 rounded-2
-      :class="isLike ? 'bg-red' : 'bg-gray'"
-      @click="likeArticle"
-    >
-      <i-mdi:thumb-up text-18 mr-3 /> 点赞 {{ count }}
+  <div class="f-c-c color-#fff">
+    <button class="mr-10 w-110 f-c-c rounded-2 py-6" :class="isLike ? 'bg-red' : 'bg-gray'" @click="likeArticle">
+      <span class="i-mdi:thumb-up mr-3" /> 点赞 {{ count }}
     </button>
-    <button f-c-c py-6 ml-10 w-110 rounded-2 bg="blue" @click="rewardArticle">
-      <i-mdi:qrcode text-18 mr-3 /> 打赏
+    <button class="ml-10 w-110 f-c-c rounded-2 bg-blue py-6" @click="rewardArticle">
+      <span class="i-mdi:qrcode mr-3" /> 打赏
     </button>
   </div>
 </template>

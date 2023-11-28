@@ -1,23 +1,25 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useWindowScroll } from '@vueuse/core'
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useWindowScroll, watchThrottled } from '@vueuse/core'
 
-const { preview } = defineProps<{ preview: any }>()
+const { preview } = defineProps({
+  preview: {},
+})
 
 onMounted(() => {
   preview && buildAnchorTitles()
 })
 
-const titles = ref<any>([]) // 锚点目录
+const titles = ref([]) // 锚点目录
 const currentIdx = ref(0) // 当前激活的锚点索引
 
 function buildAnchorTitles() {
   const anchors = preview.$el.querySelectorAll('h1,h2,h3,h4,h5,h6')
-  const titleList = Array.from(anchors).filter((t: any) => !!t.innerText.trim())
+  const titleList = Array.from(anchors).filter(t => !!t.innerText.trim())
   if (!titleList.length)
     titles.value = []
-  const hTags = Array.from(new Set(titleList.map((t: any) => t.tagName))).sort()
-  titles.value = titleList.map((el: any, idx: number) => {
+  const hTags = Array.from(new Set(titleList.map(t => t.tagName))).sort()
+  titles.value = titleList.map((el, idx) => {
     return {
       title: el.innerText,
       lineIndex: el.getAttribute('data-v-md-line'),
@@ -28,7 +30,7 @@ function buildAnchorTitles() {
 }
 
 // 点击锚点目录
-function handleAnchorClick(anchor: any, idx: number) {
+function handleAnchorClick(anchor, idx) {
   const heading = preview.$el.querySelector(`[data-v-md-line="${anchor.lineIndex}"]`)
   // const heading = preview.querySelector(`#${anchor.title}`)
   if (heading) {
@@ -49,7 +51,7 @@ function handleAnchorClick(anchor: any, idx: number) {
 // 思路: 循环的方式将标题距离顶部距离与滚动条当前位置对比, 来确定高亮的标题
 const { y } = useWindowScroll()
 watchThrottled(y, () => {
-  titles.value.forEach((e: any, idx: number) => {
+  titles.value.forEach((e, idx) => {
     const heading = preview.$el.querySelector(`[data-v-md-line="${e.lineIndex}"]`)
     if (y.value >= heading.offsetTop - 50) // 比 40 稍微多一点
       currentIdx.value = idx
@@ -59,15 +61,15 @@ watchThrottled(y, () => {
 
 <template>
   <Transition name="slide-fade" appear>
-    <div card-view mb-15>
-      <div flex items-center mb-10 text-18>
-        <i-fa-solid:list-ul />
-        <span ml-10>目录</span>
+    <div class="mb-15 card-view">
+      <div class="mb-10 flex items-center text-18">
+        <span class="i-fa-solid:list-ul" />
+        <span class="ml-10">目录</span>
       </div>
       <div
         v-for="(anchor, idx) of titles" :key="anchor.title"
-        py-4 rounded-1 border-l-4 border-transparent color="#666261"
-        :class="currentIdx === idx ? 'bg-#00c4b6 text-white border-l-#009d92' : '' "
+        class="border-l-4 border-transparent rounded-1 py-4 color-#666261"
+        :class="currentIdx === idx && 'bg-#00c4b6 text-white border-l-#009d92'"
         :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }"
         @click="handleAnchorClick(anchor, idx)"
       >

@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup>
 import { computed, ref } from 'vue'
-import { NForm, NFormItem, NInput, NModal } from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NModal } from 'naive-ui'
 import config from '@/assets/js/config'
 
 import api from '@/api'
@@ -44,7 +44,7 @@ async function handleRegister() {
   }
 
   if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
-    const captcha = new (window as any).TencentCaptcha(config.TENCENT_CAPTCHA, async (res: any) => {
+    const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
       res.ret === 0 && doRegister()
     })
     captcha.show()
@@ -80,8 +80,7 @@ function openLogin() {
     title="注册"
     :block-scroll="appStore.isMobile"
     transform-origin="center"
-    px-10 w-360
-    lg="w-460"
+    class="w-360 px-10 lg:w-460"
   >
     <NForm
       :model="form"
@@ -103,9 +102,9 @@ function openLogin() {
           placeholder="请输入 6 位验证码"
           clearable
         />
-        <n-button w-50 text @click="sendCode">
+        <NButton text class="w-50" @click="sendCode">
           发送
-        </n-button>
+        </NButton>
       </NFormItem>
       <NFormItem label="密码" path="password">
         <NInput
@@ -118,18 +117,18 @@ function openLogin() {
       </NFormItem>
     </NForm>
     <template #footer>
-      <div text-center px-15 mt="-15">
+      <div class="px-15 text-center -mt-15">
         <button
-          w-full py-7 rounded-1rem text-white bg-red hover:bg-orange
+          class="w-full rounded-1rem bg-red py-7 text-white hover:bg-orange"
           @click="handleRegister"
         >
           注册
         </button>
-        <div mt-25 mb-10 text-left>
+        <div class="mb-10 mt-25 text-left">
           已有账号？
-          <n-button text @click="openLogin">
+          <NButton text @click="openLogin">
             登录
-          </n-button>
+          </NButton>
         </div>
       <!-- TODO: 第三方登录 -->
       <!-- <div text-center text-10 color="#aaa">

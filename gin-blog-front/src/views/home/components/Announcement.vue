@@ -1,14 +1,13 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-
 import { useAppStore } from '@/store'
 const { blogInfo } = storeToRefs(useAppStore())
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in hidden lg:block">
+  <div class="hidden animate-zoom-in lg:block card-view">
     <p class="mb-10 flex items-center">
-      <span class="i-fluent-emoji-flat:bell mr-6 text-20 animate-bang" />
+      <span class="i-fluent-emoji-flat:bell animate-bang mr-6 text-20" />
       <span class="text-16"> 公告</span>
     </p>
     <div class="text-6xl leading-25">
@@ -17,7 +16,7 @@ const { blogInfo } = storeToRefs(useAppStore())
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .animate-bang {
   animation: bang 0.8s linear infinite;
 }

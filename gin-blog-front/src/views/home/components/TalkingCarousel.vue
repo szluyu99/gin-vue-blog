@@ -11,23 +11,23 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in">
+  <div class="animate-zoom-in card-view">
     <div class="flex text-center">
-      <div class="i-mdi-chat-outline text-20 cursor-pointer" />
+      <div class="i-mdi-chat-outline cursor-pointer text-20" />
       <div class="flex-1">
         {{ sentence }}
       </div>
-      <div class="i-mdi-chevron-double-right arrow text-20 cursor-pointer" />
+      <div class="arrow i-mdi-chevron-double-right cursor-pointer text-20" />
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .arrow {
   animation: 1s passing infinite;
 }
 
-// 左 -> 右 闪的特效
+/* 左 -> 右 闪的特效 */
 @keyframes passing {
   0% {
     transform: translateX(-50%);

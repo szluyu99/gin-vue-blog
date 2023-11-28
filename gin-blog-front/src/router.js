@@ -1,9 +1,6 @@
-import type { App } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { setupRouterGuard } from './guard'
-import type { RoutesType } from '~/types/router'
 
-const basicRoutes: RoutesType = [
+const basicRoutes = [
   {
     name: 'Home',
     path: '/',
@@ -108,14 +105,14 @@ const basicRoutes: RoutesType = [
   },
 ]
 
-const router = createRouter({
+export const router = createRouter({
   // history: createWebHistory('/blog'),
   history: createWebHistory('/'),
   routes: basicRoutes,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 })
 
-export function setupRouter(app: App) {
-  setupRouterGuard(router)
-  app.use(router)
-}
+router.afterEach((to) => {
+  document.title = `${to.meta?.title ?? import.meta.env.VITE_APP_TITLE}`
+})
+

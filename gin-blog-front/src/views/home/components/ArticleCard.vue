@@ -1,9 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
 import { convertImgUrl, formatDate } from '@/utils'
 
-interface Props { idx?: number; article: any }
-const { idx = 0, article } = defineProps<Props>()
+const { idx, article } = defineProps({
+  idx: Number,
+  article: {},
+})
 
 // 判断图片放置位置 (左 or 右)
 const isRightClass = computed(() => idx % 2 === 0
@@ -12,29 +14,19 @@ const isRightClass = computed(() => idx % 2 === 0
 </script>
 
 <template>
-  <div
-    class="items-center mt-20
-    w-full bg-white rounded-2rem shadow-md
-    transition-600 hover:shadow-2xl
-    animate-zoom-in animate-duration-700
-    flex-col md:flex-row
-    h-430 md:h-280"
-  >
+  <div class="mt-20 h-430 w-full flex-col animate-zoom-in animate-duration-700 items-center rounded-2rem bg-white shadow-md transition-600 md:h-280 md:flex-row hover:shadow-2xl">
     <!-- 封面图 -->
-    <div
-      :class="isRightClass"
-      class="h-230 w-full md:w-45/100 md:h-full overflow-hidden"
-    >
+    <div :class="isRightClass" class="h-230 w-full overflow-hidden md:h-full md:w-45/100">
       <RouterLink :to="`/article/${article.id}`">
-        <img class="w-full h-full transition-600 hover:scale-110" :src="convertImgUrl(article.img)">
+        <img class="h-full w-full transition-600 hover:scale-110" :src="convertImgUrl(article.img)">
       </RouterLink>
     </div>
     <!-- 文章信息 -->
-    <div class="mt-20 mb-10 w-9/10 md:w-55/100 md:px-45">
+    <div class="mb-10 mt-20 w-9/10 md:w-55/100 md:px-45">
       <RouterLink :to="`/article/${article.id}`" class="text-8xl hover:text-violet">
         《{{ article.title }}》
       </RouterLink>
-      <div class="flex flex-wrap pt-15 pb-12 color-#858585 text-14">
+      <div class="flex flex-wrap pb-12 pt-15 text-14 color-#858585">
         <!-- 置顶 -->
         <span v-if="article.is_top === 1" class="flex items-center color-#ff7242">
           <div class="i-carbon:align-vertical-top mr-3" /> 置顶
@@ -54,20 +46,20 @@ const isRightClass = computed(() => idx % 2 === 0
         <RouterLink
           v-for="tag in article.tags" :key="tag.id"
           :to="`/tags/${tag.id}?name=${tag.name}`"
-          class="flex items-center mx-2"
+          class="mx-2 flex items-center"
         >
           <div class="i-mdi-tag-multiple mr-2" /> {{ tag.name }}
         </RouterLink>
       </div>
-      <div class="leading-25 ell-4">
+      <div class="ell-4 leading-25">
         {{ article.content }}
       </div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
-// 省略文字最多 4 行
+<style scoped>
+/* 省略文字最多 4 行 */
 .ell-4 {
   display: -webkit-box;
   overflow: hidden;
