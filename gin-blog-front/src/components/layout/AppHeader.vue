@@ -144,7 +144,7 @@ function logout() {
                 :size="28"
                 :src="convertImgUrl(userStore.avatar)"
                 class="round"
-                fallback-src="https://static.talkxj.com/avatar/user.png"
+                fallback-src="https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png"
               />
               <ul class="menus-submenu">
                 <RouterLink to="/user">

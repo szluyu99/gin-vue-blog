@@ -21,11 +21,11 @@ onMounted(() => {
 
 <template>
   <AppProvider>
-    <div class="h-full w-full flex-col">
+    <div class="h-full w-full flex flex-col">
       <!-- 顶部导航栏 -->
       <AppHeader />
       <!-- 中间内容(包含底部信息) -->
-      <article class="flex-col flex-1">
+      <article class="flex flex-1 flex-col">
         <RouterView v-slot="{ Component, route }">
           <component :is="Component" :key="route.path" />
         </RouterView>

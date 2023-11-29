@@ -181,7 +181,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             class="duration-600 hover-rotate-360"
           />
         </div>
-        <div class="ml-10 flex-col flex-1">
+        <div class="ml-10 flex flex-1 flex-col">
           <!-- 评论人名称 -->
           <p>
             <!-- 根据是否有 website 显示不同效果 -->
@@ -230,7 +230,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
                 class="duration-600 hover-rotate-360"
               />
             </div>
-            <div class="ml-10 flex-col flex-1">
+            <div class="ml-10 flex flex-1 flex-col">
               <!-- 回复人名称 -->
               <div>
                 <!-- 根据是否有 website 显示不同效果 -->
@@ -333,4 +333,3 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
     </div>
   </div>
 </template>
-

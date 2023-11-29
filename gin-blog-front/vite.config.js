@@ -6,7 +6,6 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig((configEnv) => {
-  // const isBuild = configEnv.command === 'build' // 判断是否是打包
   const env = loadEnv(configEnv.mode, process.cwd())
 
   return {
@@ -34,9 +33,9 @@ export default defineConfig((configEnv) => {
         },
       },
     },
-    optimizeDeps: {
-      include: ['@kangc/v-md-editor/lib/theme/vuepress.js'],
-    },
+    // optimizeDeps: {
+    //   include: ['@kangc/v-md-editor/lib/theme/vuepress.js'],
+    // },
     build: {
       reportCompressedSize: false,
       sourcemap: false,

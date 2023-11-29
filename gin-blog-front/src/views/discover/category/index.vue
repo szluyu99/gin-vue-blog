@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
 import BannerPage from '@/components/page/BannerPage.vue'
 import api from '@/api'
 

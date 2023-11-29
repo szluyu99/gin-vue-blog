@@ -68,7 +68,7 @@ function filterMdSymbol(mdStr) {
   <!-- 首页封面图 -->
   <HomeBanner />
   <!-- 内容 -->
-  <div class="flex-col justify-center">
+  <div class="flex flex-col justify-center">
     <div class="mx-auto mb-40 max-w-1230 px-15" style="margin-top: calc(100vh + 30px)">
       <NGrid :x-gap="12" :y-gap="8" cols="9 m:12" responsive="screen">
         <NGi span="9">

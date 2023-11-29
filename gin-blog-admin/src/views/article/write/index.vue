@@ -147,14 +147,14 @@ function renderTag(tag, index) {
 
 <template>
   <CommonPage :show-header="false" show-footer title="写文章">
-    <div class="mb-15 flex items-center bg-white">
+    <div class="mb-15 flex items-center bg-white space-x-10">
       <NInput
         v-model:value="formModel.title"
         type="text"
         class="mr-20 flex-1 py-5 text-18 font-bold color-primary"
         placeholder="输入文章标题..."
       />
-      <NButton ghost type="error" class="mr-10" :loading="btnLoading" @click="handleDraft">
+      <NButton ghost type="error" :loading="btnLoading" @click="handleDraft">
         <span v-if="!btnLoading" class="i-line-md:uploading-loop mr-5 text-18" />
         保存草稿
       </NButton>

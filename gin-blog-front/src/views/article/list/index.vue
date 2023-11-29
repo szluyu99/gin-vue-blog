@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { NGi, NGrid } from 'naive-ui'
 
+import BannerPage from '@/components/page/BannerPage.vue'
 import { convertImgUrl, formatDate } from '@/utils'
 import api from '@/api'
 

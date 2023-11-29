@@ -1,7 +1,5 @@
 {
   "recommendations": [
-    "Vue.volar",
-    "antfu.vite",
     "antfu.iconify",
     "antfu.unocss",
     "antfu.goto-alias",

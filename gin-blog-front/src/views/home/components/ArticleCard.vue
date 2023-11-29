@@ -14,7 +14,7 @@ const isRightClass = computed(() => idx % 2 === 0
 </script>
 
 <template>
-  <div class="mt-20 h-430 w-full flex-col animate-zoom-in animate-duration-700 items-center rounded-2rem bg-white shadow-md transition-600 md:h-280 md:flex-row hover:shadow-2xl">
+  <div class="mt-20 h-430 w-full flex flex-col animate-zoom-in animate-duration-700 items-center rounded-2rem bg-white shadow-md transition-600 md:h-280 md:flex-row hover:shadow-2xl">
     <!-- 封面图 -->
     <div :class="isRightClass" class="h-230 w-full overflow-hidden md:h-full md:w-45/100">
       <RouterLink :to="`/article/${article.id}`">

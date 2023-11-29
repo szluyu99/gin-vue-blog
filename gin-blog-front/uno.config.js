@@ -1,21 +1,19 @@
 import {
   defineConfig,
-  // presetAttributify,
   presetIcons,
   presetUno,
   presetWebFonts,
-  // transformerDirectives,
-  // transformerVariantGroup,
+  transformerDirectives,
+  transformerVariantGroup,
 } from 'unocss'
 
 export default defineConfig({
   exclude: ['node_modules', '.git', '.github', '.husky', '.vscode', 'build', 'dist', 'mock', 'public', 'types', './stats.html'],
   shortcuts: [
+    ['f-c-c', 'flex justify-center items-center'],
+    ['card-view', 'bg-white p-15 rounded-2rem hover:shadow-2xl transition-500'],
     ['btn', 'px-15 py-5 rounded-1rem inline-block bg-[#49b1f5] text-white cursor-pointer hover:bg-[#ff7242] disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50'],
     ['icon-btn', 'text-[0.9em] inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600 !outline-none'],
-    ['f-c-c', 'flex justify-center items-center'],
-    ['flex-col', 'flex flex-col'],
-    ['card-view', 'bg-white p-15 rounded-2rem hover:shadow-2xl transition-500'],
   ],
   rules: [
     [/^bc-(.+)$/, ([, color]) => ({ 'border-color': `#${color}` })],
@@ -78,4 +76,8 @@ export default defineConfig({
       dark: '#18181c',
     },
   },
+  transformers: [
+    transformerDirectives(),
+    transformerVariantGroup(),
+  ],
 })

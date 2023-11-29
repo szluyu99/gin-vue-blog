@@ -1,4 +1,4 @@
-import { request } from '@/utils'
+import { request } from '@/utils/http'
 
 export default {
   login: (data = {}) => request.post('/login', data),

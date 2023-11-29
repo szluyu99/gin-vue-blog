@@ -1,40 +1,62 @@
 <script setup>
-import { computed, defineProps, onMounted, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { NSpin } from 'naive-ui'
+
 import AppFooter from '../layout/AppFooter.vue'
 import { useAppStore } from '@/store'
 
-const {
-  label = 'default', // 封面
-  showFooter = true, // 默认显示底部
-  card = false, // 默认不以卡片视图显示
-  loading = false,
-  title = useRoute().meta?.title, // 默认从路由加载 title
-} = defineProps({
-  label: String,
-  title: String,
-  showFooter: Boolean,
-  loading: Boolean,
-  card: Boolean,
+// 注意, 如果使用了解构赋值的形式, watch 会失效
+// const {
+//   label = 'default', // 封面
+//   showFooter = true, // 默认显示底部
+//   card = false, // 默认不以卡片视图显示
+//   loading = false,
+//   title = useRoute().meta?.title, // 默认从路由加载 title
+// }
+
+const props = defineProps({
+// 封面
+  label: {
+    type: String,
+    default: 'default',
+  },
+  // 默认显示底部
+  showFooter: {
+    type: Boolean,
+    default: true,
+  },
+  // 默认不以卡片视图显示
+  card: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  title: {
+    type: String,
+    default: () => useRoute().meta?.title, // 默认从路由加载 title
+  },
 })
 
 const { pageList } = storeToRefs(useAppStore())
 
 onMounted(() => {
-  loading && window.$loadingBar?.start()
+  if (props.loading) {
+    window.$loadingBar?.start()
+  }
 })
 
-watch(() => loading, (newVal) => {
-  newVal
-    ? window.$loadingBar?.start()
-    : window.$loadingBar?.finish()
+watch(() => props.loading, (newVal) => {
+  newVal ? window.$loadingBar?.start() : window.$loadingBar?.finish()
 })
 
 // 根据后端配置动态获取封面
 const coverStyle = computed(() => {
-  const page = pageList.value.find(e => e.label === label)
+  const page = pageList.value.find(e => e.label === props.label)
   return page
     ? `background: url('${page.cover}') center center / cover no-repeat;`
     : 'background: grey center center / cover no-repeat;'
@@ -45,17 +67,17 @@ const coverStyle = computed(() => {
   <!-- 顶部图片 -->
   <div :style="coverStyle" class="banner-fade-down absolute inset-x-0 top-0 h-280 f-c-c lg:h-400">
     <h1 class="mt-40 animate-fade-in-down animate-duration-800 text-26 font-bold text-light lg:text-40">
-      {{ title }}
+      {{ props.title }}
     </h1>
   </div>
   <!-- 主体内容 -->
   <main class="mx-5 flex-1">
     <!-- 内容在 spin 中 -->
-    <NSpin :show="loading" size="large">
+    <NSpin :show="props.loading" size="large">
       <!-- 卡片视图 -->
-      <template v-if="card">
+      <template v-if="props.card">
         <div class="card-fade-up mx-auto mb-40 mt-300 mt-440 max-w-970 min-h-180 pb-30 pt-30 pt-50 card-view lg:px-55">
-          <slot v-if="!loading" />
+          <slot v-if="!props.loading" />
         </div>
       </template>
       <!-- 常规视图 -->
@@ -67,7 +89,7 @@ const coverStyle = computed(() => {
     </NSpin>
   </main>
   <!-- 底部 -->
-  <footer v-if="showFooter">
+  <footer v-if="props.showFooter">
     <AppFooter />
   </footer>
 </template>

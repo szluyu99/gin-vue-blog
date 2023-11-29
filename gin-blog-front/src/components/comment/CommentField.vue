@@ -112,7 +112,8 @@ defineExpose({ data, setReply })
 
 <style scoped>
 textarea {
-  background: url(https://static.talkxj.com/config/commentBack.webp) 100% 100% no-repeat;
+  /* background: url(https://w.wallhaven.cc/full/1p/wallhaven-1poo61.jpg) 100% 100% no-repeat; */
+  background-color:ghostwhite;
   resize: none;
 }
 </style>
