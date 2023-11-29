@@ -6,7 +6,7 @@
 
 <p align=center>
 <a href="http://www.hahacode.cn">
-<img src="https://img-blog.csdnimg.cn/fe2f1034cf7c4bd795552d47373ee405.jpeg"  width="200" hight="200" alt="阵、雨的个人博客" style="border-radius: 50%">
+<img src="./images/头像.jpeg"  width="200" hight="200" alt="阵、雨的个人博客" style="border-radius: 50%">
 </a>
 </p>
 
@@ -22,7 +22,7 @@
     </a>
 </p>
 
-[在线预览](#在线预览) | [项目介绍](#项目介绍) | [技术介绍](#技术介绍) | [目录结构](#目录结构) | [环境介绍](#环境介绍) | [快速开始](#快速开始) | [总结&鸣谢](#总结鸣谢)  | [后续计划](#后续计划) | [更新日志](#更新日志)
+[在线预览](#在线预览) | [项目介绍](#项目介绍) | [技术介绍](#技术介绍) | [目录结构](#目录结构) | [环境介绍](#环境介绍) | [快速开始](#快速开始) | [总结&鸣谢](#总结鸣谢)  | [后续计划](#后续计划)
 
 您的 Star 是我坚持的动力，感谢大家的支持，欢迎提交 Pr 共同改进项目。
 
@@ -42,17 +42,13 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 
 在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)
 
-> 本项目在线接口文档由 Apifox 生成，由于项目架构调整，有些接口待完善和修改
-> 
-> 由于一开始不会用，接口文档生成的信息不全（如返回响应、响应示例），后续完善
-
 以下放几张简单的预览图，强烈建议点击上面的[预览链接](#在线预览)进去体验下：
 
-![前台首页图片](https://img-blog.csdnimg.cn/fd25f0e52cdc467893925a48d0d66662.png)
+![前台首页图片](./images/前台首页.png)
 
-![前台首页文章列表](https://img-blog.csdnimg.cn/005cee463d3c4e729a1dd7bbee41e963.png)
+![前台首页文章列表](./images/前台文章列表.png)
 
-![后台文章列表](https://img-blog.csdnimg.cn/18c39f63b7b64f7bbd2a4ab764552d13.png)
+![后台文章列表](./images/后台文章列表.png)
 
 ## 项目介绍
 
@@ -246,29 +242,7 @@ deploy
 
 目前推荐安装插件已经写到 `.vscode/extensions.json` 中，使用 VsCode 打开项目会推荐安装。
 
-> 注意，一定要用 VsCode 打开 gin-blog-admin 和 gin-blog-front 这两个前端项目，而不是打开 gin-vue-blog 这个目录！
-
-前端必备插件：
-
-| 插件                   | 作用           |
-| -------------------- | ------------ |
-| Volar                | Vue 官方插件     |
-| UnoCSS               | Unocss 官方插件  |
-| Iconify IntelliSense | Iconify 提示插件 |
-
-后端必备插件：
-
-| 插件  | 作用          |
-| --- | ----------- |
-| Go  | Golang 官方插件 |
-
-其他插件：（个人推荐，用于提升开发体验）
-
-| 名称                     | 作用         |
-| ---------------------- | ---------- |
-| Better Comments        | 优化代码注释显示效果 |
-| TODO Highlight         | 高亮 TODO    |
-| Highlight Matching Tag | 高亮匹配的标签    |
+> 注意，使用 VsCode 打开 gin-blog-admin 和 gin-blog-front 这两个项目，而不是打开 gin-vue-blog 这个目录！
 
 ## 快速开始
 
@@ -293,7 +267,7 @@ git config --global core.autocrlf false
 
 ### 方式一：Docker Compose 一键运行
 
-> 该部分最近在重新修正
+> 该部分目前可能有 BUG，最近在重新修正
 
 需要有 Docker 和 Docker Compose 的环境
 
@@ -325,11 +299,46 @@ docker-compose up -d
 
 ### 方式二：常规运行
 
-> 自行安装 Golang、Node、MySQL、Redis 环境：
-> 
-> Golang 安装参考 [官方文档](https://go.dev/doc/install)
-> Node 安装建议使用 [Nvm](https://nvm.uihtm.com/) 
-> MySQL、Redis 建议使用 Docker 运行
+需要安装 Golang、Node、MySQL、Redis 环境：
+ 
+Golang 安装参考 [官方文档](https://go.dev/doc/install)
+
+Node 安装建议使用 [Nvm](https://nvm.uihtm.com/)，也可以直接去 [Node 官网](https://nodejs.org/en) 下载
+
+MySQL、Redis 建议使用 Docker 安装
+
+Docker 安装 MySQL：
+
+```bash
+# 注意: 必须安装 MySQL 8.0 以上版本
+docker pull mysql:8.0
+
+# 运行 MySQL
+docker run --name mysql8 -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:8.0
+
+# 查看是否运行成功, STATUS 为 Up 即成功
+docker ps
+
+# 进入容器, CTRL + D 退出
+docker exec -it mysql8 bash
+mysql -u root -p123456
+```
+
+Docker 安装 Redis：
+
+```bash
+docker pull redis:7.0
+
+# 运行 Redis
+docker run --name redis7 -p 6379:6379 -d redis:7.0
+
+# 查看是否运行成功, STATUS 为 Up 即成功
+docker ps
+
+# 进入容器, CTRL + D 退出
+docker exec -it redis7 bash
+redis-cli
+```
 
 需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。
 
@@ -396,7 +405,7 @@ pnpm dev
 
 ### 项目部署
 
-> TODO
+TODO
 
 ## 总结鸣谢
 
@@ -431,6 +440,7 @@ pnpm dev
 - ~~博客前台适配移动端~~ 🆗
 - ~~文章详情, 目录锚点跟随~~ 🆗
 - ~~邮箱注册 + 邮件发送验证码~~ 🆗
+- 修改测试环境的数据库为 SQLite3，方便运行
 
 后续有空安排上：
 

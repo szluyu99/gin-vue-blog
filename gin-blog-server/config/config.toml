@@ -15,7 +15,7 @@ Port = "3306"
 Config = ""         # 其他配置, 例如时区
 Dbname = "gvb"      # 数据库名称
 Username = "root"
-Password = "root" # 数据库密码
+Password = "123456" # 数据库密码
 # 日志级别 silent, error, warn, info, 默认 info
 LogMode = "error" # silent 相当于关闭日志
 
