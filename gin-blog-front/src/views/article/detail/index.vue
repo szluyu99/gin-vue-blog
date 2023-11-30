@@ -2,19 +2,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { NGi, NGrid } from 'naive-ui'
+import { marked } from 'marked'
 
-import VMdPreview from '@kangc/v-md-editor/lib/preview'
-import '@kangc/v-md-editor/lib/style/preview.css'
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
-import '@kangc/v-md-editor/lib/theme/style/github.css'
-
-// 引入全部语言包 (不推荐)
 import hljs from 'highlight.js/lib/core'
-// 按需引入语言包
-import json from 'highlight.js/lib/languages/json'
-import javascript from 'highlight.js/lib/languages/javascript'
-import go from 'highlight.js/lib/languages/go'
-import bash from 'highlight.js/lib/languages/bash'
 
 import BannerInfo from './components/BannerInfo.vue'
 import Copyright from './components/Copyright.vue'
@@ -30,12 +20,6 @@ import Comment from '@/components/comment/Comment.vue'
 
 import { convertImgUrl } from '@/utils'
 import api from '@/api'
-
-hljs.registerLanguage('json', json)
-hljs.registerLanguage('javascript', javascript)
-hljs.registerLanguage('go', go)
-hljs.registerLanguage('bash', bash)
-VMdPreview.use(githubTheme, { Hljs: hljs })
 
 const data = ref({
   id: 0,
@@ -73,6 +57,12 @@ onMounted(() => {
     loading.value = false
     window.$loadingBar?.finish()
   })
+
+  setTimeout(() => {
+    document.querySelectorAll('pre code').forEach((el) => {
+      hljs.highlightElement(el)
+    })
+  }, 50)
 })
 
 const styleVal = computed(() =>
@@ -99,16 +89,11 @@ const styleVal = computed(() =>
       <NGi span="12 m:9">
         <div class="pt-30 card-view">
           <!-- 文章内容 -->
-          <VMdPreview
+          <article
             ref="previewRef"
-            :text="data.content"
-            class="lg:mx-20"
-          />
-          <!-- <div
-            ref="previewRef"
-            class="markdown-body"
+            class="prose prose-truegray max-w-none lg:mx-40"
             v-html="marked(data.content)"
-          /> -->
+          />
           <!-- 版权声明 -->
           <Copyright class="mb-20 lg:mx-20" />
           <!-- 标签、转发 -->

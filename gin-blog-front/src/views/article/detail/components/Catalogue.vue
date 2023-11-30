@@ -3,7 +3,10 @@ import { onMounted, ref } from 'vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
 
 const { preview } = defineProps({
-  preview: {},
+  preview: {
+    type: Object,
+    required: true,
+  },
 })
 
 onMounted(() => {
@@ -14,7 +17,7 @@ const titles = ref([]) // 锚点目录
 const currentIdx = ref(0) // 当前激活的锚点索引
 
 function buildAnchorTitles() {
-  const anchors = preview.$el.querySelectorAll('h1,h2,h3,h4,h5,h6')
+  const anchors = preview.querySelectorAll('h1,h2,h3,h4,h5,h6')
   const titleList = Array.from(anchors).filter(t => !!t.innerText.trim())
   if (!titleList.length)
     titles.value = []
@@ -31,18 +34,12 @@ function buildAnchorTitles() {
 
 // 点击锚点目录
 function handleAnchorClick(anchor, idx) {
-  const heading = preview.$el.querySelector(`[data-v-md-line="${anchor.lineIndex}"]`)
-  // const heading = preview.querySelector(`#${anchor.title}`)
+  const heading = preview.querySelector(`#${anchor.title}`)
   if (heading) {
     window.scrollTo({
       behavior: 'smooth',
       top: heading.offsetTop - 40,
     })
-    // preview.scrollToTarget({
-    //   target: heading,
-    //   scrollContainer: window,
-    //   top: 40,
-    // })
     setTimeout(() => currentIdx.value = idx, 600)
   }
 }
@@ -52,8 +49,8 @@ function handleAnchorClick(anchor, idx) {
 const { y } = useWindowScroll()
 watchThrottled(y, () => {
   titles.value.forEach((e, idx) => {
-    const heading = preview.$el.querySelector(`[data-v-md-line="${e.lineIndex}"]`)
-    if (y.value >= heading.offsetTop - 50) // 比 40 稍微多一点
+    const heading = preview.querySelector(`#${e.title}`)
+    if (heading && y.value >= heading.offsetTop - 50) // 比 40 稍微多一点
       currentIdx.value = idx
   })
 }, { throttle: 200 })

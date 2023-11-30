@@ -33,9 +33,6 @@ export default defineConfig((configEnv) => {
         },
       },
     },
-    // optimizeDeps: {
-    //   include: ['@kangc/v-md-editor/lib/theme/vuepress.js'],
-    // },
     build: {
       reportCompressedSize: false,
       sourcemap: false,

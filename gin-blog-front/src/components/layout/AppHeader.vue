@@ -100,7 +100,7 @@ function logout() {
           {{ appStore.blogConfig.website_author }}
         </RouterLink>
         <!-- 右上角菜单 -->
-        <div class="flex items-center text-6xl">
+        <div class="flex items-center text-6xl space-x-18">
           <!-- 搜索 -->
           <div class="menus-item">
             <a class="menu-btn flex items-center" @click="appStore.setSearchFlag(true)">
@@ -108,7 +108,6 @@ function logout() {
               <span class="ml-4"> 搜索 </span>
             </a>
           </div>
-          <!-- 根据数组生成 -->
           <div v-for="item of menuOptions" :key="item.text" class="menus-item">
             <!-- 不包含子菜单 -->
             <RouterLink v-if="!item.subMenu" :to="item.path" class="menu-btn flex items-center">
@@ -184,7 +183,7 @@ function logout() {
 .menus-item {
   position: relative;
   display: inline-block;
-  margin: 0 0 0 3.8rem;
+  // margin: 0 0 0 1rem;
   a {
     transition: all 0.2s;
   }

@@ -1,11 +1,13 @@
 import {
   defineConfig,
   presetIcons,
+  presetTypography,
   presetUno,
   presetWebFonts,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
+import presetRemToPx from '@unocss/preset-rem-to-px'
 
 export default defineConfig({
   exclude: ['node_modules', '.git', '.github', '.husky', '.vscode', 'build', 'dist', 'mock', 'public', 'types', './stats.html'],
@@ -21,7 +23,7 @@ export default defineConfig({
   ],
   presets: [
     presetUno(),
-    // presetAttributify(),
+    presetRemToPx({ baseFontSize: 4 }),
     presetIcons({
       scale: 1.2,
       warn: true,
@@ -33,6 +35,7 @@ export default defineConfig({
         mono: 'DM Mono',
       },
     }),
+    presetTypography(),
   ],
   variants: [
     (matcher) => {

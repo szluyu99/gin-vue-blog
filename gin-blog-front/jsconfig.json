@@ -1,14 +1,10 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
-    "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"]
