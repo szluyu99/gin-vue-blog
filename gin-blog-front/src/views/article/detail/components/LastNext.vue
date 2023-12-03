@@ -9,9 +9,9 @@ const { lastArticle, nextArticle } = defineProps({
 
 <template>
   <div class="flex flex-wrap bg-#000 text-white lg:flex-nowrap">
-    <div v-if="lastArticle.id" class="art-card relative h-150 w-full overflow-hidden">
+    <div v-if="lastArticle.id" class="group relative h-150 w-full overflow-hidden">
       <RouterLink :to="`/article/${lastArticle.id}`">
-        <img class="art-img h-full w-full opacity-40" :src="convertImgUrl(lastArticle.img)">
+        <img :src="convertImgUrl(lastArticle.img)" class="h-full w-full object-cover opacity-40 transition-600 group-hover:scale-110 group-hover:opacity-80">
         <!-- top:50%; translateY: -50%; 实现绝对定位中的垂直居中 -->
         <div class="absolute top-1/2 w-full px-40 leading-25 -translate-y-1/2">
           <p> 上一篇 </p>
@@ -19,9 +19,9 @@ const { lastArticle, nextArticle } = defineProps({
         </div>
       </RouterLink>
     </div>
-    <div v-if="nextArticle.id" class="art-card relative h-150 w-full overflow-hidden">
+    <div v-if="nextArticle.id" class="group relative h-150 w-full overflow-hidden">
       <RouterLink :to="`/article/${nextArticle.id}`">
-        <img class="art-img h-full w-full opacity-40" :src="convertImgUrl(nextArticle.img)">
+        <img :src="convertImgUrl(nextArticle.img)" class="h-full w-full object-cover opacity-40 transition-600 group-hover:scale-110 group-hover:opacity-80">
         <div class="absolute top-1/2 w-full px-40 text-right leading-25 -translate-y-1/2">
           <p> 下一篇 </p>
           <p> {{ nextArticle.title }} </p>
@@ -30,15 +30,3 @@ const { lastArticle, nextArticle } = defineProps({
     </div>
   </div>
 </template>
-
-<style scoped>
-.art-img {
-  transition: all 0.6s;
-  object-fit: cover;
-}
-
-.art-card:hover .art-img {
-  opacity: 0.8;
-  transform: scale(1.1);
-}
-</style>

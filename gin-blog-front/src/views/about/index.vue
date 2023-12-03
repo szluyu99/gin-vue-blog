@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { NImage } from 'naive-ui'
 import { marked } from 'marked'
 import hljs from 'highlight.js/lib/core'
 
@@ -27,11 +26,11 @@ onMounted(async () => {
 
 <template>
   <BannerPage label="about" title="关于我" card>
-    <div class="text-center">
-      <NImage width="100" :src="blogConfig.website_avatar" class="duration-600 hover-rotate-360" />
+    <div class="flex justify-center">
+      <img :src="blogConfig.website_avatar" class="w-100 duration-600 hover:rotate-360" alt="author header">
     </div>
     <div class="flex justify-center">
-      <article class="prose prose-truegray max-w-none">
+      <article class="max-w-none prose prose-truegray">
         <div v-html="marked.parse(content)" />
       </article>
     </div>

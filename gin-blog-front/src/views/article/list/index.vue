@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { NGi, NGrid } from 'naive-ui'
 
 import BannerPage from '@/components/page/BannerPage.vue'
 import { convertImgUrl, formatDate } from '@/utils'
@@ -25,10 +24,10 @@ onMounted(async () => {
 
 <template>
   <BannerPage :loading="loading" :title="`${route.meta?.title} - ${name}`" label="article_list">
-    <NGrid x-gap="15" y-gap="15" cols="1 m:3" responsive="screen">
-      <NGi v-for="article of articleList" :key="article.id">
+    <div class="grid grid-cols-12 gap-x-15 gap-y-10">
+      <div v-for="article of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
         <!-- 卡片 -->
-        <div class="animate-zoom-in animate-duration-700 rounded-2rem bg-white shadow-md transition-300 hover:shadow-2xl">
+        <div class="animate-zoom-in animate-duration-650 rounded-2rem bg-white shadow-md transition-300 hover:shadow-2xl">
           <!-- 图片 -->
           <div class="overflow-hidden">
             <RouterLink :to="`/article/${article.id}`">
@@ -39,7 +38,7 @@ onMounted(async () => {
           <div>
             <!-- 标题 -->
             <RouterLink :to="`/article/${article.id}`">
-              <p class="px-15 pb-6 pt-12 text-17 hover:color-violet">
+              <p class="inline-block px-15 pb-6 pt-12 text-17 hover:color-violet">
                 {{ article.title }}
               </p>
             </RouterLink>
@@ -68,7 +67,7 @@ onMounted(async () => {
             </p>
           </div>
         </div>
-      </NGi>
-    </NGrid>
+      </div>
+    </div>
   </BannerPage>
 </template>

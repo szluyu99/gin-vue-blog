@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { NAvatar, NSwitch } from 'naive-ui'
+import { NSwitch } from 'naive-ui'
 import vueDanmaku from 'vue3-danmaku'
 
 import api from '@/api'
@@ -116,7 +116,7 @@ const coverStyle = computed(() => {
       >
         <template #dm="{ danmu }">
           <div class="flex items-center rounded-20 bg-#00000060 px-6 py-4 text-15 text-white lg:px-8 lg:py-5 lg:text-16">
-            <NAvatar round size="small" :src="convertImgUrl(danmu.avatar)" />
+            <img class="h-28 rounded-full" :src="convertImgUrl(danmu.avatar)" alt="danmu avatar">
             <span class="ml-10"> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
           </div>
         </template>

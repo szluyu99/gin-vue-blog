@@ -1,6 +1,7 @@
-// 自定义样式
-import './styles/index.scss'
-import './styles/animate.scss'
+// custom style
+import './styles/index.css'
+import './styles/common.css'
+import './styles/animate.css'
 
 // unocss
 import 'uno.css'

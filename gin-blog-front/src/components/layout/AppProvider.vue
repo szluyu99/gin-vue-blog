@@ -1,11 +1,6 @@
 <script setup>
 import { defineComponent, h } from 'vue'
-// import { kebabCase } from 'lodash-es'
 import { NConfigProvider, NDialogProvider, NLoadingBarProvider, NMessageProvider, NNotificationProvider, useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
-// import { useCssVar } from '@vueuse/core'
-// import type { GlobalThemeOverrides } from 'naive-ui'
-
-// import { useThemeStore } from '@/store'
 
 // 挂载 naive 组件的方法至 window, 方便全局使用
 function setupNaiveTools() {
@@ -23,47 +18,6 @@ const NaiveProviderContent = defineComponent({
     return h('div')
   },
 })
-
-// const themStore = useThemeStore()
-
-// type ThemeVars = Exclude<GlobalThemeOverrides['common'], undefined>
-// type ThemeVarsKeys = keyof ThemeVars
-
-// watch(
-//   () => themStore.naiveThemeOverrides.common,
-//   (common) => {
-//     for (const key in common) {
-//       useCssVar(`--${kebabCase(key)}`, document.documentElement).value = common[key as ThemeVarsKeys] || ''
-//       if (key === 'primaryColor')
-//         window.localStorage.setItem('__THEME_COLOR__', common[key as ThemeVarsKeys] || '')
-//     }
-//   },
-//   { immediate: true },
-// )
-
-// watch(
-//   () => themStore.darkMode,
-//   (newValue) => {
-//     if (newValue)
-//       document.documentElement.classList.add('dark')
-//     else
-//       document.documentElement.classList.remove('dark')
-//   },
-//   {
-//     immediate: true,
-//   },
-// )
-
-// function handleWindowResize() {
-//   themStore.setIsMobile(document.body.offsetWidth <= 640)
-// }
-// onMounted(() => {
-//   handleWindowResize()
-//   window.addEventListener('resize', handleWindowResize)
-// })
-// onBeforeUnmount(() => {
-//   window.removeEventListener('resize', handleWindowResize)
-// })
 </script>
 
 <template>

@@ -2,9 +2,10 @@
 import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NSpin } from 'naive-ui'
 
 import AppFooter from '../layout/AppFooter.vue'
+import ULoading from '@/components/ui/ULoading.vue'
+
 import { useAppStore } from '@/store'
 
 // 注意, 如果使用了解构赋值的形式, watch 会失效
@@ -73,10 +74,10 @@ const coverStyle = computed(() => {
   <!-- 主体内容 -->
   <main class="mx-5 flex-1">
     <!-- 内容在 spin 中 -->
-    <NSpin :show="props.loading" size="large">
+    <ULoading :show="props.loading">
       <!-- 卡片视图 -->
       <template v-if="props.card">
-        <div class="card-fade-up mx-auto mb-40 mt-300 mt-440 max-w-970 min-h-180 pb-30 pt-30 pt-50 card-view lg:px-55">
+        <div class="card-fade-up card-view mx-auto mb-40 mt-300 max-w-970 min-h-180 pb-30 pt-30 pt-50 lg:mt-440 lg:px-55">
           <slot v-if="!props.loading" />
         </div>
       </template>
@@ -86,7 +87,7 @@ const coverStyle = computed(() => {
           <slot />
         </div>
       </template>
-    </NSpin>
+    </ULoading>
   </main>
   <!-- 底部 -->
   <footer v-if="props.showFooter">

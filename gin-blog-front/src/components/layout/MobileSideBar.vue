@@ -1,9 +1,9 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NAvatar, NDrawer, NDrawerContent } from 'naive-ui'
-
+import { NDrawer, NDrawerContent } from 'naive-ui'
 import TheIcon from '@/components/icon/TheIcon.vue'
+
 import { useAppStore, useUserStore } from '@/store'
 const { collapsed, blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
 
@@ -33,13 +33,17 @@ function logout() {
   <NDrawer v-model:show="collapsed" :width="250" class="opacity-98">
     <NDrawerContent>
       <div class="pt-15 text-center">
-        <NAvatar :size="80" round :src="blogConfig.website_avatar" />
-        <p class="text-20">
-          {{ blogConfig.website_author }}
-        </p>
-        <p class="my-3 text-13">
-          {{ blogConfig.website_intro }}
-        </p>
+        <div class="flex justify-center">
+          <img :src="blogConfig.website_avatar" class="h-80 rounded-full" alt="">
+        </div>
+        <div class="mb-3 mt-6">
+          <p class="text-20">
+            {{ blogConfig.website_author }}
+          </p>
+          <p class="mt-3 text-13">
+            {{ blogConfig.website_intro }}
+          </p>
+        </div>
         <!-- 博客信息 -->
         <div class="flex justify-center py-10 text-14">
           <RouterLink to="/archives" class="flex-1" @click="appStore.setCollapsed(false)">

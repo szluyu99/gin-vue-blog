@@ -1,11 +1,11 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
-import { NButton, NImage, NSpin } from 'naive-ui'
 import { useRoute } from 'vue-router'
 
 // import EmojiList from '@/assets/js/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
+import ULoading from '@/components/ui/ULoading.vue'
 
 import { convertImgUrl, formatDate } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
@@ -174,13 +174,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       </p>
       <!-- 评论列表 -->
       <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-5 flex">
-        <div>
-          <NImage
-            :src="convertImgUrl(comment.avatar)"
-            width="40"
-            class="duration-600 hover-rotate-360"
-          />
-        </div>
+        <img :src="convertImgUrl(comment.avatar)" class="h-40 w-40 duration-600 hover:rotate-360">
         <div class="ml-10 flex flex-1 flex-col">
           <!-- 评论人名称 -->
           <p>
@@ -223,13 +217,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
 
           <!-- 评论回复 start -->
           <div v-for="reply of comment.reply_vo_list" :key="reply.id" class="mt-10 flex">
-            <div>
-              <NImage
-                :src="convertImgUrl(reply.avatar)"
-                width="40"
-                class="duration-600 hover-rotate-360"
-              />
-            </div>
+            <img :src="convertImgUrl(reply.avatar)" class="h-40 w-40 duration-600 hover:rotate-360">
             <div class="ml-10 flex flex-1 flex-col">
               <!-- 回复人名称 -->
               <div>
@@ -262,7 +250,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
                   />
                   <span v-show="reply.like_count"> {{ reply.like_count }} </span>
                 </div>
-                <button color="#ef2f11" @click="replyComment(idx, reply)">
+                <button class="color-#ef2f11" @click="replyComment(idx, reply)">
                   回复
                 </button>
               </div>
@@ -316,15 +304,13 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       </div>
       <!-- 加载更多 -->
       <div class="m-15 f-c-c">
-        <NButton
+        <button
           v-if="commentCount > commentList.length && !listLoading"
           text @click="getComments"
         >
           点击加载更多...
-        </NButton>
-        <div v-if="listLoading" class="animate-bounce">
-          <NSpin size="small" />
-        </div>
+        </button>
+        <ULoading :show="listLoading" />
       </div>
     </div>
     <!-- 没有评论的提示 -->

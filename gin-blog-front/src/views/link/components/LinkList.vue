@@ -1,5 +1,4 @@
 <script setup>
-import { NGi, NGrid, NImage, NResult } from 'naive-ui'
 import { convertImgUrl } from '@/utils'
 
 const { linkList } = defineProps({
@@ -17,37 +16,38 @@ const { linkList } = defineProps({
       <span class="i-mdi:link-variant mr-5 text-28 text-blue" />
       <span class="text-20 font-bold color-#344c67"> 友情链接 </span>
     </p>
-    <!-- 友链数量为 0 -->
-    <template v-if="!linkList.length">
-      <NResult
-        status="418"
-        title="暂无友情链接"
-        description="可以在后台添加"
-      />
-    </template>
     <!-- 友链数量不为 0 -->
-    <template v-else>
-      <!-- 链接列表 -->
-      <NGrid x-gap="6" y-gap="12" cols="1 m:3" item-responsive responsive="screen">
-        <NGi
-          v-for="link of linkList" :key="link.id"
-          :span="1"
-          class="link-wrapper relative rounded-8 transition-300"
-        >
-          <a :href="link.address" target="_blank" class="flex flex-row p-5 hover:text-white">
-            <div class="z-10 mr-5 w-120 f-c-c">
-              <NImage :src="convertImgUrl(link.avatar)" width="65" class="avatar rounded-full transition-600" />
+    <!-- 链接列表 -->
+    <div v-if="!linkList.length" class="grid grid-cols-3 gap-x-12 gap-y-6">
+      <div
+        v-for="link of linkList" :key="link.id"
+        class="link-wrapper group relative col-span-3 rounded-8 transition-300 sm:col-span-1"
+      >
+        <a :href="link.address" target="_blank" class="flex flex-row p-5 hover:text-white">
+          <!-- 头像 -->
+          <div class="z-10 mr-5 w-120 f-c-c">
+            <img :src="convertImgUrl(link.avatar)" class="w-65 rounded-full duration-600 group-hover:rotate-360">
+          </div>
+          <!-- 描述 -->
+          <div class="z-10 h-95 w-260 f-c-c">
+            <div class="text-center">
+              <p class="text-18 font-bold"> {{ link.name }} </p>
+              <p class="flex-1"> {{ link.intro }} </p>
             </div>
-            <div class="z-10 h-95 w-260 f-c-c text-center">
-              <div>
-                <p class="text-18 font-bold"> {{ link.name }} </p>
-                <p class="flex-1"> {{ link.intro }} </p>
-              </div>
-            </div>
-          </a>
-        </NGi>
-      </NGrid>
-    </template>
+          </div>
+        </a>
+      </div>
+    </div>
+    <!-- 友链数量为 0 -->
+    <div v-else class="text-center">
+      <img class="inline h-260" src="/images/empty_friend_link.svg" alt="暂无友情链接">
+      <div class="mt-3 space-y-4">
+        <p class="text-30">
+          暂无友情链接
+        </p>
+        <p> 可以在后台添加 </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -73,9 +73,6 @@ const { linkList } = defineProps({
     transition-duration: 0.3s;
     transition-property: transform;
     transform: scale(0);
-  }
-  &:hover .avatar {
-    transform: rotate(360deg);
   }
 }
 </style>

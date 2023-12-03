@@ -1,8 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { debouncedWatch } from '@vueuse/core'
-import { NInput, NModal } from 'naive-ui'
+import { NInput } from 'naive-ui'
 
+import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
 import { useAppStore } from '@/store'
 
@@ -32,46 +33,43 @@ async function handleSearch() {
 </script>
 
 <template>
-  <NModal
-    v-model:show="searchFlag"
-    display-directive="show"
-    preset="card"
-    title="本地搜索"
-    transform-origin="center"
-    :block-scroll="appStore.isMobile"
-    class="h-full max-w-360 px-10 lg:max-w-600"
-  >
-    <NInput
-      v-model:value="keyword"
-      round
-      placeholder="输入文章标题或内容..."
-      size="large"
-      clearable
-    >
-      <template #prefix>
-        <div class="i-mdi:flash text-20 text-yellow" />
-      </template>
-    </NInput>
-    <hr class="my-15 border-2px border-color-#d2ebfd border-dashed">
-    <div class="h-400">
-      <ul v-if="articleList.length">
-        <li v-for="item of articleList" :key="item.id">
-          <RouterLink :to="`/article/${item.id}`">
-            <span
-              class="border-b-1 border-#999 border-solid text-17"
-              @click="searchFlag = false"
-              v-html="item.title"
-            />
-          </RouterLink>
-          <p clsas="color-#555 mt-5 cursor-pointer ell-3" v-html="item.content" />
-          <hr class="my-10 border-1 border-#d2ebfd border-dashed">
-        </li>
-      </ul>
-      <div v-else-if="keyword">
-        找不到您查询的内容：{{ keyword }}
+  <UModal v-model="searchFlag" :width="600">
+    <div class="m-0">
+      <div class="mb-15 text-18 font-bold">
+        本地搜索
+      </div>
+      <NInput
+        v-model:value="keyword"
+        round
+        placeholder="输入文章标题或内容..."
+        size="large"
+        clearable
+      >
+        <template #prefix>
+          <div class="i-mdi:flash text-20 text-yellow" />
+        </template>
+      </NInput>
+      <hr class="my-15 border-2px border-color-#d2ebfd border-dashed">
+      <div class="h-400">
+        <ul v-if="articleList.length">
+          <li v-for="item of articleList" :key="item.id">
+            <RouterLink :to="`/article/${item.id}`">
+              <span
+                class="border-b-1 border-#999 border-solid text-17"
+                @click="searchFlag = false"
+                v-html="item.title"
+              />
+            </RouterLink>
+            <p clsas="color-#555 mt-5 cursor-pointer ell-3" v-html="item.content" />
+            <hr class="my-10 border-1 border-#d2ebfd border-dashed">
+          </li>
+        </ul>
+        <div v-else-if="keyword">
+          找不到您查询的内容：{{ keyword }}
+        </div>
       </div>
     </div>
-  </NModal>
+  </UModal>
 </template>
 
 <style scoped lang="scss">

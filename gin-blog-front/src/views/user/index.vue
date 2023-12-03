@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { NButton, NForm, NFormItem, NGi, NGrid, NInput } from 'naive-ui'
+import { NForm, NFormItem, NInput } from 'naive-ui'
 
 import BannerPage from '@/components/page/BannerPage.vue'
 import UploadOne from '@/components/upload/UploadOne.vue'
@@ -40,20 +40,15 @@ async function updateUserInfo() {
 
 <template>
   <BannerPage label="user" title="个人中心" card>
-    <p class="text-24 font-bold">
+    <p class="mb-6 text-24 font-bold">
       基本信息
     </p>
-    <NGrid x-gap="15" cols="12">
-      <NGi span="4" class="f-c-c">
+    <div class="grid grid-cols-12 gap-15">
+      <div class="col-span-4 f-c-c">
         <UploadOne v-model:preview="infoForm.avatar" :width="140" />
-      </NGi>
-      <NGi span="7">
-        <NForm
-          ref="infoFormRef"
-          label-align="left"
-          :label-width="80"
-          :model="infoForm"
-        >
+      </div>
+      <div class="col-span-7">
+        <NForm ref="infoFormRef" label-align="left" :label-width="80" :model="infoForm">
           <NFormItem label="昵称" path="nickname">
             <NInput v-model:value="infoForm.nickname" placeholder="输入您的昵称" />
           </NFormItem>
@@ -67,10 +62,11 @@ async function updateUserInfo() {
             <NInput v-model:value="infoForm.email" placeholder="请输入邮箱号" disabled />
           </NFormItem>
         </NForm>
-        <NButton @click="updateUserInfo">
+        <button @click="updateUserInfo">
           修改
-        </NButton>
-      </NGi>
-    </NGrid>
+        </button>
+      </div>
+      <div class="col-span-1" />
+    </div>
   </BannerPage>
 </template>

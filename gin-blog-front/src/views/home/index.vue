@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 
-import { NGi, NGrid } from 'naive-ui'
 // 无限轮播图
 import InfiniteLoading from 'v3-infinite-loading'
 // Markdown => Html
@@ -70,8 +69,9 @@ function filterMdSymbol(mdStr) {
   <!-- 内容 -->
   <div class="flex flex-col justify-center">
     <div class="mx-auto mb-40 max-w-1230 px-15" style="margin-top: calc(100vh + 30px)">
-      <NGrid :x-gap="12" :y-gap="8" cols="9 m:12" responsive="screen">
-        <NGi span="9">
+      <div class="grid grid-cols-12 gap-15">
+        <!-- 左半部分 -->
+        <div class="col-span-12 lg:col-span-9">
           <!-- 说说轮播 -->
           <TalkingCarousel />
           <!-- 文章列表 -->
@@ -93,8 +93,9 @@ function filterMdSymbol(mdStr) {
               </template>
             </InfiniteLoading>
           </div>
-        </NGi>
-        <NGi span="3">
+        </div>
+        <!-- 右半部分 -->
+        <div class="col-span-0 lg:col-span-3">
           <!-- sticky 实现悬浮固定效果 -->
           <div class="sticky top-20">
             <!-- 博主信息 -->
@@ -104,8 +105,8 @@ function filterMdSymbol(mdStr) {
             <!-- 网站资讯 -->
             <WebsiteInfo />
           </div>
-        </NGi>
-      </NGrid>
+        </div>
+      </div>
     </div>
     <!-- 底部 -->
     <AppFooter />

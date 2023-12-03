@@ -1,8 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NButton, NForm, NFormItem, NInput, NModal } from 'naive-ui'
+import { NForm, NFormItem, NInput } from 'naive-ui'
 import config from '@/assets/js/config'
 
+import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
 import { useAppStore } from '@/store'
 const appStore = useAppStore()
@@ -73,15 +74,10 @@ function openLogin() {
 </script>
 
 <template>
-  <NModal
-    v-model:show="registerFlag"
-    display-directive="show"
-    preset="card"
-    title="注册"
-    :block-scroll="appStore.isMobile"
-    transform-origin="center"
-    class="w-360 px-10 lg:w-460"
-  >
+  <UModal v-model="registerFlag" :width="500">
+    <div class="mb-15 text-18 font-bold">
+      注册
+    </div>
     <NForm
       :model="form"
       :rules="rules"
@@ -102,9 +98,9 @@ function openLogin() {
           placeholder="请输入 6 位验证码"
           clearable
         />
-        <NButton text class="w-50" @click="sendCode">
+        <button class="w-50 duration-300 hover:text-emerald" @click="sendCode">
           发送
-        </NButton>
+        </button>
       </NFormItem>
       <NFormItem label="密码" path="password">
         <NInput
@@ -116,25 +112,23 @@ function openLogin() {
         />
       </NFormItem>
     </NForm>
-    <template #footer>
-      <div class="px-15 text-center -mt-15">
-        <button
-          class="w-full rounded-1rem bg-red py-7 text-white hover:bg-orange"
-          @click="handleRegister"
-        >
-          注册
+    <div class="my-10 px-15 text-center">
+      <button
+        class="w-full rounded-1rem bg-red py-7 text-white hover:bg-orange"
+        @click="handleRegister"
+      >
+        注册
+      </button>
+      <div class="mb-10 mt-25 text-left">
+        已有账号？
+        <button class="duration-300 hover:text-emerald" @click="openLogin">
+          登录
         </button>
-        <div class="mb-10 mt-25 text-left">
-          已有账号？
-          <NButton text @click="openLogin">
-            登录
-          </NButton>
-        </div>
+      </div>
       <!-- TODO: 第三方登录 -->
       <!-- <div text-center text-10 color="#aaa">
           社交帐号登录
         </div> -->
-      </div>
-    </template>
-  </NModal>
+    </div>
+  </UModal>
 </template>

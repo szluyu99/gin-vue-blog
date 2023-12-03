@@ -1,7 +1,5 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { NImage } from 'naive-ui'
-
 import { convertImgUrl } from '@/utils'
 import { useAppStore } from '@/store'
 
@@ -15,10 +13,9 @@ function addToFavorites() {
 
 <template>
   <div class="hidden animate-zoom-in text-center lg:block card-view">
-    <NImage
-      width="110" :src="convertImgUrl(blogConfig.website_avatar)"
-      class="py-15 duration-600 hover:rotate-360"
-    />
+    <div class="flex justify-center">
+      <img class="w-110 py-15 duration-600 hover:rotate-360" :src="convertImgUrl(blogConfig.website_avatar)" alt="author header">
+    </div>
     <p class="text-24">
       {{ blogConfig.website_author }}
     </p>
@@ -49,7 +46,7 @@ function addToFavorites() {
     <!-- 收藏按钮 -->
     <div class="flex justify-center text-center">
       <button
-        class="h-32 w-7/8 f-c-c transform rounded-1rem bg-blue-600 text-14 leading-32 text-white transition-500 ease-in-out hover:scale-110 hover:bg-orange-600 hover:-translate-y-1"
+        class="h-32 w-7/8 f-c-c transform rounded-1rem bg-blue-600 text-14 leading-32 text-white transition-300 ease-in-out hover:scale-110 hover:bg-orange-600 hover:-translate-y-1"
         @click="addToFavorites"
       >
         <span class="i-material-symbols:bookmark mr-5 text-18" /> 加入书签

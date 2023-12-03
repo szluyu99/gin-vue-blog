@@ -9,7 +9,7 @@ import BannerPage from '@/components/page/BannerPage.vue'
         404 资源不存在
       </span>
       <div class="flex justify-center">
-        <img class="w-200" src="../../../public/images/404.svg" alt="404">
+        <img class="w-200" src="images/404.svg" alt="404">
       </div>
       <button @click="$router.push('/')">
         回到首页

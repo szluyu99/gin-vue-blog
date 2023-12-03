@@ -10,69 +10,69 @@ const { preview } = defineProps({
 })
 
 onMounted(() => {
-  preview && buildAnchorTitles()
+  preview && buildAnchors()
 })
 
-const titles = ref([]) // 锚点目录
-const currentIdx = ref(0) // 当前激活的锚点索引
+const selectAnchor = ref('')
+const anchors = ref([])
+const headings = Array.from(preview.querySelectorAll('h1,h2,h3,h4,h5,h6'))
 
-function buildAnchorTitles() {
-  const anchors = preview.querySelectorAll('h1,h2,h3,h4,h5,h6')
-  const titleList = Array.from(anchors).filter(t => !!t.innerText.trim())
-  if (!titleList.length)
-    titles.value = []
+function buildAnchors() {
+  // 用于确认层级
+  const titleList = Array.from(headings).filter(t => !!t.innerText.trim())
   const hTags = Array.from(new Set(titleList.map(t => t.tagName))).sort()
-  titles.value = titleList.map((el, idx) => {
-    return {
-      title: el.innerText,
-      lineIndex: el.getAttribute('data-v-md-line'),
-      indent: hTags.indexOf(el.tagName),
-      number: idx + 1, // 序号
-    }
-  })
-}
 
-// 点击锚点目录
-function handleAnchorClick(anchor, idx) {
-  const heading = preview.querySelector(`#${anchor.title}`)
-  if (heading) {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: heading.offsetTop - 40,
+  let count = 0 // 解决重名问题
+  for (let i = 0; i < headings.length; i++) {
+    const anchor = headings[i].textContent.trim()
+    // 手动构造 id, 在后面加上序号防止重名
+    headings[i].id = `${anchor}-${count++}`
+    anchors.value.push({
+      id: headings[i].id,
+      name: headings[i].innerText,
+      indent: hTags.indexOf(headings[i].tagName),
     })
-    setTimeout(() => currentIdx.value = idx, 600)
   }
 }
 
-// * 实现目录高亮当前位置的标题
+function handleClickAnchor(id) {
+  const anchorElement = document.getElementById(id)
+  window.scrollTo({
+    behavior: 'smooth',
+    top: anchorElement.offsetTop - 40,
+  })
+  setTimeout(() => selectAnchor.value = id, 600)
+}
+
+// 实现目录高亮当前的位置的标题
 // 思路: 循环的方式将标题距离顶部距离与滚动条当前位置对比, 来确定高亮的标题
 const { y } = useWindowScroll()
 watchThrottled(y, () => {
-  titles.value.forEach((e, idx) => {
-    const heading = preview.querySelector(`#${e.title}`)
-    if (heading && y.value >= heading.offsetTop - 50) // 比 40 稍微多一点
-      currentIdx.value = idx
+  anchors.value.forEach((e) => {
+    const value = headings.find(ee => ee.id === e.id)
+    if (value && y.value >= value.offsetTop - 50) { // 控制距离标题多远才算该标题
+      selectAnchor.value = value.id
+    }
   })
 }, { throttle: 200 })
 </script>
 
 <template>
   <Transition name="slide-fade" appear>
-    <div class="mb-15 card-view">
+    <div class="card-view mb-15">
       <div class="mb-10 flex items-center text-18">
         <span class="i-fa-solid:list-ul" />
         <span class="ml-10">目录</span>
       </div>
-      <div
-        v-for="(anchor, idx) of titles" :key="anchor.title"
-        class="border-l-4 border-transparent rounded-1 py-4 color-#666261"
-        :class="currentIdx === idx && 'bg-#00c4b6 text-white border-l-#009d92'"
-        :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }"
-        @click="handleAnchorClick(anchor, idx)"
-      >
-        <!-- TODO: 带子序号: 1.1, 1.2 这种 -->
-        <button> {{ anchor.title }} </button>
-        <!-- <button> {{ anchor.number }} . {{ anchor.title }} </button> -->
+      <div v-for="anchor of anchors" :key="anchor.id">
+        <div
+          class="cursor-pointer border-l-4 border-transparent rounded-1 py-4 color-#666261 hover:bg-#00c4b6 hover:bg-opacity-30"
+          :class="anchor.id === selectAnchor && 'bg-#00c4b6 text-white border-l-#009d92'"
+          :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }"
+          @click="handleClickAnchor(anchor.id)"
+        >
+          {{ anchor.name }}
+        </div>
       </div>
     </div>
   </Transition>

@@ -1,11 +1,9 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { NAvatar } from 'naive-ui'
 
 import { convertImgUrl } from '@/utils'
-import api from '@/api'
-
 import { useAppStore, useUserStore } from '@/store'
+import api from '@/api'
 
 const props = defineProps({
   // 评论类型 1-文章 2-友链
@@ -82,11 +80,7 @@ defineExpose({ data, setReply })
 
 <template>
   <div v-if="show" class="mt-15 flex border-1px border-color-#90939950 border-rounded-1rem border-solid p-10">
-    <NAvatar
-      class="round"
-      :size="36"
-      :src="convertImgUrl(userStore.avatar)"
-    />
+    <img class="h-36 w-36" :src="convertImgUrl(userStore.avatar)">
     <div class="my-5 ml-12 w-full">
       <textarea
         v-model="data.content"
@@ -100,10 +94,10 @@ defineExpose({ data, setReply })
         <div>
           <span
             v-if="data.nickname"
-            class="mr-15 bg-bluegray btn hover:bg-bluegray"
+            class="the-button mr-15 bg-bluegray hover:bg-bluegray"
             @click="setReply(false)"
           > 取消 </span>
-          <span class="btn" @click="submitComment"> 提交 </span>
+          <span class="the-button" @click="submitComment"> 提交 </span>
         </div>
       </div>
     </div>

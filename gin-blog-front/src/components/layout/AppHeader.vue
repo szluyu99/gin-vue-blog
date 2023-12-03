@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
-import { NAvatar } from 'naive-ui'
 
 import MobileSideBar from './MobileSideBar.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
@@ -139,12 +138,7 @@ function logout() {
               </div>
             </a>
             <template v-else>
-              <NAvatar
-                :size="28"
-                :src="convertImgUrl(userStore.avatar)"
-                class="round"
-                fallback-src="https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png"
-              />
+              <img :src="convertImgUrl(userStore.avatar)" class="w-30 cursor-pointer rounded-full">
               <ul class="menus-submenu">
                 <RouterLink to="/user">
                   <div class="flex items-center">
@@ -152,7 +146,9 @@ function logout() {
                   </div>
                 </RouterLink>
                 <a @click="logout">
-                  <span class="i-mdi:logout text-18" /> 退出登录
+                  <div class="flex items-center">
+                    <span class="i-mdi:logout mr-4 text-18" /> 退出登录
+                  </div>
                 </a>
               </ul>
             </template>

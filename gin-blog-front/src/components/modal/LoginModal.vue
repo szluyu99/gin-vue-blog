@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NForm, NFormItem, NInput, NModal } from 'naive-ui'
+import { NForm, NFormItem, NInput } from 'naive-ui'
+
+import UModal from '@/components/ui/UModal.vue'
 import config from '@/assets/js/config'
 
 import api from '@/api'
@@ -75,47 +77,41 @@ function openForget() {
 </script>
 
 <template>
-  <NModal
-    v-model:show="loginFlag"
-    display-directive="show"
-    preset="card"
-    title="登录"
-    :block-scroll="appStore.isMobile"
-    transform-origin="center"
-    class="w-360 px-10 lg:w-460"
-  >
-    <NForm
-      :model="formModel"
-      :rules="rules"
-      label-placement="left"
-      label-width="70"
-      require-mark-placement="right-hanging"
-    >
-      <NFormItem label="用户名" path="username">
-        <NInput
-          v-model:value="formModel.username"
-          placeholder="用户名"
-          size="large"
-          clearable
-        />
-      </NFormItem>
-      <NFormItem label="密码" path="password">
-        <NInput
-          v-model:value="formModel.password"
-          type="password"
-          show-password-on="click"
-          placeholder="密码"
-          size="large"
-          clearable
-        />
-      </NFormItem>
-    </NForm>
-    <template #footer>
-      <div class="text-center -mt-15">
+  <UModal v-model="loginFlag" :width="500">
+    <div class="mx-0 my-5">
+      <div class="mb-15 text-24 font-bold">
+        登录
+      </div>
+      <NForm
+        :model="formModel"
+        :rules="rules"
+        size="medium"
+        label-placement="left"
+        label-width="70"
+        require-mark-placement="right-hanging"
+      >
+        <NFormItem label="用户名" path="username">
+          <NInput
+            v-model:value="formModel.username"
+            placeholder="用户名"
+            clearable
+          />
+        </NFormItem>
+        <NFormItem label="密码" path="password">
+          <NInput
+            v-model:value="formModel.password"
+            type="password"
+            show-password-on="click"
+            placeholder="密码"
+            clearable
+          />
+        </NFormItem>
+      </NForm>
+      <div class="my-10 px-15 text-center">
         <button class="w-full rounded-1rem bg-blue py-7 text-white hover:bg-light-blue" @click="handleLogin">
           登录
         </button>
-        <div class="mb-10 mt-25 flex justify-between">
+        <div class="mt-15 flex justify-between">
           <button @click="openRegister">
             立即注册
           </button>
@@ -128,6 +124,6 @@ function openForget() {
           社交帐号登录
         </div> -->
       </div>
-    </template>
-  </NModal>
+    </div>
+  </UModal>
 </template>
