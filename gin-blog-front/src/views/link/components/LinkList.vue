@@ -1,7 +1,7 @@
 <script setup>
 import { convertImgUrl } from '@/utils'
 
-const { linkList } = defineProps({
+defineProps({
   linkList: {
     type: Array,
     default: () => [],
@@ -16,12 +16,12 @@ const { linkList } = defineProps({
       <span class="i-mdi:link-variant mr-5 text-28 text-blue" />
       <span class="text-20 font-bold color-#344c67"> 友情链接 </span>
     </p>
-    <!-- 友链数量不为 0 -->
     <!-- 链接列表 -->
-    <div v-if="!linkList.length" class="grid grid-cols-3 gap-x-12 gap-y-6">
+    <!-- 友链数量不为 0 -->
+    <div v-if="linkList.length" class="grid grid-cols-3 gap-x-12 gap-y-6">
       <div
         v-for="link of linkList" :key="link.id"
-        class="link-wrapper group relative col-span-3 rounded-8 transition-300 sm:col-span-1"
+        class="group link-wrapper relative col-span-3 rounded-8 transition-300 sm:col-span-1"
       >
         <a :href="link.address" target="_blank" class="flex flex-row p-5 hover:text-white">
           <!-- 头像 -->

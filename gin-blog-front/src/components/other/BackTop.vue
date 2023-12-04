@@ -1,10 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
-import TheIcon from '@/components/icon/TheIcon.vue'
+import { Icon } from '@iconify/vue'
 
 const { y } = useWindowScroll()
-
 const styleVal = ref('')
 watchThrottled(y, () => {
   styleVal.value = (y.value > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
@@ -27,15 +26,12 @@ const operations = [
 </script>
 
 <template>
-  <div
-    class="fixed z-4 -right-35 bottom-85 text-20 text-white transition-600"
-    :style="styleVal"
-  >
+  <div class="fixed bottom-85 z-4 text-20 text-white transition-600 -right-35" :style="styleVal">
     <div
       v-for="item of operations" :key="item.icon"
-      class="w-30 h-30 my-3 f-c-c cursor-pointer rounded bg-#49b1f5 hover:bg-amber"
+      class="my-3 h-30 w-30 f-c-c cursor-pointer rounded bg-#49b1f5 duration-300 hover:bg-amber"
     >
-      <TheIcon :icon="item.icon" :size="20" @click="item.fn" />
+      <Icon class="h-20 w-20" :icon="item.icon" @click="item.fn" />
     </div>
   </div>
 </template>

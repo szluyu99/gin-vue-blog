@@ -26,7 +26,7 @@ const props = defineProps({
   },
   zIndex: {
     type: Number,
-    default: 30,
+    default: 40,
   },
 })
 
@@ -59,7 +59,7 @@ function close() {
         isOpen ? 'visible' : 'invisible duration-100 ease-in',
       ]"
       :style="{
-        zIndex,
+        'z-index': zIndex,
       }"
     >
       <!-- overlay -->

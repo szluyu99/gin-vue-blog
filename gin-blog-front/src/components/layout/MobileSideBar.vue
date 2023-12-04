@@ -1,8 +1,9 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NDrawer, NDrawerContent } from 'naive-ui'
-import TheIcon from '@/components/icon/TheIcon.vue'
+
+import { Icon } from '@iconify/vue'
+import UDrawer from '@/components/ui/UDrawer.vue'
 
 import { useAppStore, useUserStore } from '@/store'
 const { collapsed, blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
@@ -30,12 +31,13 @@ function logout() {
 </script>
 
 <template>
-  <NDrawer v-model:show="collapsed" :width="250" class="opacity-98">
-    <NDrawerContent>
+  <UDrawer v-model="collapsed" placement="right" :width="250">
+    <div class="mx-20">
       <div class="pt-15 text-center">
         <div class="flex justify-center">
-          <img :src="blogConfig.website_avatar" class="h-80 rounded-full" alt="">
+          <img :src="blogConfig.website_avatar" class="h-80 rounded-full" alt="作者头像">
         </div>
+        <!-- 头像和介绍 -->
         <div class="mb-3 mt-6">
           <p class="text-20">
             {{ blogConfig.website_author }}
@@ -70,7 +72,7 @@ function logout() {
       <!-- 菜单 -->
       <div v-for="item of menuOptions" :key="item.text" class="m-8 p-3">
         <RouterLink :to="item.path" class="flex items-center" @click="appStore.setCollapsed(false)">
-          <TheIcon :icon="item.icon" :size="20" />
+          <Icon :icon="item.icon" />
           <span class="ml-25 text-15"> {{ item.text }} </span>
         </RouterLink>
       </div>
@@ -78,23 +80,23 @@ function logout() {
       <div>
         <template v-if="!userStore.userId">
           <div class="m-8 flex items-center p-3" @click="appStore.setLoginFlag(true)">
-            <TheIcon icon="ph:user-bold" :size="20" />
+            <Icon icon="ph:user-bold" />
             <span class="ml-25 text-15"> 登录 </span>
           </div>
         </template>
         <template v-else>
           <RouterLink to="/user">
-            <div class="m-8 flex items-center p-5" @click="appStore.setCollapsed(false)">
-              <TheIcon icon="mdi:account-circle" :size="20" />
+            <div class="m-8 flex items-center p-3" @click="appStore.setCollapsed(false)">
+              <Icon icon="mdi:account-circle" />
               <span class="ml-25 text-15"> 个人中心 </span>
             </div>
           </RouterLink>
-          <div class="m-8 flex items-center p-5" @click="logout">
-            <TheIcon icon="mdi:logout" :size="20" />
+          <div class="m-8 flex items-center p-3" @click="logout">
+            <Icon icon="mdi:logout" />
             <span class="ml-25 text-15"> 退出登录 </span>
           </div>
         </template>
       </div>
-    </NDrawerContent>
-  </NDrawer>
+    </div>
+  </UDrawer>
 </template>

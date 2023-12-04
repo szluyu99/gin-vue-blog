@@ -2,9 +2,9 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
+import { Icon } from '@iconify/vue'
 
 import MobileSideBar from './MobileSideBar.vue'
-import TheIcon from '@/components/icon/TheIcon.vue'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 
@@ -76,10 +76,10 @@ function logout() {
       <!-- 右上角图标 -->
       <div class="flex items-center">
         <button class="mr-10" @click="appStore.setSearchFlag(true)">
-          <TheIcon icon="ic:round-search" :size="22" />
+          <Icon icon="ic:round-search" :size="22" />
         </button>
         <button @click="appStore.setCollapsed(true)">
-          <TheIcon icon="ic:sharp-menu" :size="22" />
+          <Icon icon="ic:sharp-menu" :size="22" />
         </button>
       </div>
     </div>
@@ -103,27 +103,27 @@ function logout() {
           <!-- 搜索 -->
           <div class="menus-item">
             <a class="menu-btn flex items-center" @click="appStore.setSearchFlag(true)">
-              <TheIcon icon="mdi:magnify" :size="18" />
+              <Icon icon="mdi:magnify" class="text-18" />
               <span class="ml-4"> 搜索 </span>
             </a>
           </div>
           <div v-for="item of menuOptions" :key="item.text" class="menus-item">
             <!-- 不包含子菜单 -->
             <RouterLink v-if="!item.subMenu" :to="item.path" class="menu-btn flex items-center">
-              <TheIcon :icon="item.icon" :size="18" />
+              <Icon :icon="item.icon" class="text-18" />
               <span class="ml-4"> {{ item.text }} </span>
             </RouterLink>
             <!-- 包含子菜单 -->
             <div v-else class="menu-btn">
               <div class="flex items-center">
-                <TheIcon :icon="item.icon" :size="18" />
+                <Icon :icon="item.icon" class="text-18" />
                 <span class="mx-4"> {{ item.text }} </span>
-                <TheIcon icon="ep:arrow-down-bold" :size="18" />
+                <Icon icon="ep:arrow-down-bold" class="text-18" />
               </div>
               <ul class="menus-submenu">
                 <RouterLink v-for="sub of item.subMenu" :key="sub.text" :to="sub.path">
                   <div class="flex items-center">
-                    <TheIcon :icon="sub.icon" :size="18" />
+                    <Icon :icon="sub.icon" class="text-18" />
                     <span class="ml-4"> {{ sub.text }} </span>
                   </div>
                 </RouterLink>
@@ -134,7 +134,8 @@ function logout() {
           <div class="menus-item">
             <a v-if="!userStore.userId" class="menu-btn" @click="appStore.setLoginFlag(true)">
               <div class="flex items-center">
-                <span class="i-ph:user-bold mr-4 text-18" /> 登录
+                <Icon icon="ph:user-bold" class="text-18" />
+                <span class="ml-4"> 登录 </span>
               </div>
             </a>
             <template v-else>
@@ -142,12 +143,12 @@ function logout() {
               <ul class="menus-submenu">
                 <RouterLink to="/user">
                   <div class="flex items-center">
-                    <span class="i-mdi:account-circle mr-4 text-18" /> 个人中心
+                    <Icon icon="mdi:account-circle" class="mr-4 text-20" /> 个人中心
                   </div>
                 </RouterLink>
                 <a @click="logout">
                   <div class="flex items-center">
-                    <span class="i-mdi:logout mr-4 text-18" /> 退出登录
+                    <Icon icon="mdi:logout" class="mr-4 text-20" /> 退出登录
                   </div>
                 </a>
               </ul>
