@@ -1,9 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NForm, NFormItem, NInput } from 'naive-ui'
 
 import UModal from '@/components/ui/UModal.vue'
-import config from '@/assets/js/config'
+import config from '@/assets/config'
 
 import api from '@/api'
 import { setToken } from '@/utils'
@@ -21,34 +20,28 @@ const loginFlag = computed({
   set: val => appStore.setLoginFlag(val),
 })
 
-const formModel = ref({
+const form = ref({
   username: '',
   password: '',
 })
 
-const rules = {}
-
 // 登录
 async function handleLogin() {
-  const { username, password } = formModel.value
+  const { username, password } = form.value
   if (!username || !password) {
     window.$message?.warning('请输入用户名和密码')
     return
   }
 
   const doLogin = async (username, password) => {
-    try {
-      const res = await api.login({ username, password })
-      window.$notification?.success({ title: '登录成功!', duration: 1500 })
-      setToken(res.data.token) // 保存在本地
-      // 加载用户信息, 更新 pinia 中信息, 刷新页面
-      await userStore.getUserInfo()
-      // 清空表单
-      formModel.value = { username: '', password: '' }
-    }
-    finally {
-      loginFlag.value = false
-    }
+    const result = await api.login({ username, password })
+    window.$notification?.success({ title: '登录成功!', duration: 1500 })
+    setToken(result.data.token) // 保存在本地
+    // 加载用户信息, 更新 pinia 中信息, 刷新页面
+    await userStore.getUserInfo()
+    // 清空表单
+    form.value = { username: '', password: '' }
+    loginFlag.value = false
   }
 
   if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
@@ -58,8 +51,7 @@ async function handleLogin() {
         res.ret === 0 && doLogin(username, password)
       })
     captcha.show()
-  }
-  else {
+  } else {
     doLogin(username, password)
   }
 }
@@ -77,38 +69,29 @@ function openForget() {
 </script>
 
 <template>
-  <UModal v-model="loginFlag" :width="500">
-    <div class="mx-0 my-5">
-      <div class="mb-15 text-24 font-bold">
+  <UModal v-model="loginFlag" :width="480">
+    <div class="mx-10 my-5">
+      <div class="mb-15 text-18 font-bold">
         登录
       </div>
-      <NForm
-        :model="formModel"
-        :rules="rules"
-        size="medium"
-        label-placement="left"
-        label-width="70"
-        require-mark-placement="right-hanging"
-      >
-        <NFormItem label="用户名" path="username">
-          <NInput
-            v-model:value="formModel.username"
-            placeholder="用户名"
-            clearable
-          />
-        </NFormItem>
-        <NFormItem label="密码" path="password">
-          <NInput
-            v-model:value="formModel.password"
-            type="password"
-            show-password-on="click"
-            placeholder="密码"
-            clearable
-          />
-        </NFormItem>
-      </NForm>
-      <div class="my-10 px-15 text-center">
-        <button class="w-full rounded-1rem bg-blue py-7 text-white hover:bg-light-blue" @click="handleLogin">
+      <div class="my-30 space-y-15">
+        <div class="flex items-center">
+          <span class="mr-15 inline-block w-60 text-right"> 用户名 </span>
+          <input
+            v-model="form.username" required placeholder="用户名"
+            class="block w-full border-0 rounded-md p-8 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+          >
+        </div>
+        <div class="flex items-center">
+          <span class="mr-15 inline-block w-60 text-right"> 密码 </span>
+          <input
+            v-model="form.password" type="password" placeholder="密码"
+            class="block w-full border-0 rounded-md p-8 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+          >
+        </div>
+      </div>
+      <div class="my-10 text-center">
+        <button class="w-full rounded-1rem bg-blue py-8 text-white hover:bg-light-blue" @click="handleLogin">
           登录
         </button>
         <div class="mt-15 flex justify-between">

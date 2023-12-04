@@ -1,8 +1,8 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { NSwitch } from 'naive-ui'
 import vueDanmaku from 'vue3-danmaku'
+import USwitch from '@/components/ui/USwitch.vue'
 
 import api from '@/api'
 import { convertImgUrl } from '@/utils'
@@ -81,7 +81,7 @@ const coverStyle = computed(() => {
       </div>
       <ul class="ml-20 text-left text-white">
         <li class="mt-25 flex items-center">
-          循环播放： <NSwitch v-model:value="isLoop" class="ml-5" />
+          循环播放： <USwitch v-model="isLoop" />
         </li>
         <li class="my-20">
           操作弹幕：
@@ -95,9 +95,8 @@ const coverStyle = computed(() => {
             停止
           </button>
         </li>
-        <li class="mb-15">
-          隐藏弹幕：
-          <NSwitch v-model:value="isHide" class="ml-5" />
+        <li class="mb-15 flex items-center">
+          隐藏弹幕： <USwitch v-model="isHide" class="ml-5" />
         </li>
       </ul>
     </div>

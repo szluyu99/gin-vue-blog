@@ -1,10 +1,9 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { NPagination, NTimeline, NTimelineItem } from 'naive-ui'
+import dayjs from 'dayjs'
 
 import BannerPage from '@/components/page/BannerPage.vue'
-import { formatDate } from '@/utils'
 import api from '@/api'
 
 const router = useRouter()
@@ -19,7 +18,7 @@ watch(current, () => getArchives())
 async function getArchives() {
   const res = await api.getArchives({
     page_num: current.value,
-    page_size: 10,
+    page_size: 50,
   })
   archiveList.value = res.data.pageData
   total.value = res.data.total
@@ -29,40 +28,49 @@ async function getArchives() {
 onMounted(() => {
   getArchives()
 })
+
+const activity = [
+  { id: 1, type: 'created', person: { name: 'Chelsea Hagon' }, date: '7d ago', dateTime: '2023-01-23T10:32' },
+  { id: 2, type: 'edited', person: { name: 'Chelsea Hagon' }, date: '6d ago', dateTime: '2023-01-23T11:03' },
+  { id: 3, type: 'sent', person: { name: 'Chelsea Hagon' }, date: '6d ago', dateTime: '2023-01-23T11:24' },
+  {
+    id: 4,
+    type: 'commented',
+    person: {
+      name: 'Chelsea Hagon',
+      imageUrl:
+        'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    },
+    comment: 'Called client, they reassured me the invoice would be paid by the 25th.',
+    date: '3d ago',
+    dateTime: '2023-01-23T15:56',
+  },
+  { id: 5, type: 'viewed', person: { name: 'Alex Curren' }, date: '2d ago', dateTime: '2023-01-24T09:12' },
+  { id: 6, type: 'paid', person: { name: 'Alex Curren' }, date: '1d ago', dateTime: '2023-01-24T09:20' },
+]
 </script>
 
 <template>
   <BannerPage title="归档" label="archive" :loading="loading" card>
-    <NTimeline :icon-size="18" size="large">
-      <NTimelineItem>
-        <template #header>
-          <p class="pb-20 text-18 lg:text-24">
-            目前共计 {{ archiveList.length }} 篇文章，继续加油！
-          </p>
-        </template>
-      </NTimelineItem>
-      <template v-for="(item, idx) of archiveList" :key="item.id">
-        <NTimelineItem type="info" :content="item.desc">
-          <template #header>
-            <span class="mr-15 color-#666 lg:text-15">
-              {{ formatDate(item.created_at) }}
-            </span>
-            <a class="color-#666 lg:text-16" @click="router.push(`/article/${item.id}`)">
-              {{ item.title }}
-            </a>
-          </template>
-          <template #icon>
-            <div class="i-mdi:circle" />
-          </template>
-          <template #footer>
-            <hr v-if="idx !== archiveList.length - 1" class="mb-15 mt-15 border-1px border-color-#d2ebfd border-dashed">
-          </template>
-        </NTimelineItem>
-      </template>
-    </NTimeline>
-    <!-- 分页按钮 -->
-    <div class="my-15 mt-20 f-c-c">
+    <p class="pb-20 text-18 lg:text-24">
+      目前共计 {{ archiveList.length }} 篇文章，继续加油！
+    </p>
+    <template v-for="(item, idx) of archiveList" :key="item.id">
+      <div class="flex items-center gap-10">
+        <div class="i-mdi:circle bg-blue" />
+        <span class="color-#666 lg:text-15">
+          {{ dayjs(item.created_at).format('YYYY-MM-DD') }}
+        </span>
+        <a class="color-#666 lg:text-16 hover:text-orange" @click="router.push(`/article/${item.id}`)">
+          {{ item.title }}
+        </a>
+      </div>
+      <hr v-if="idx !== archiveList.length - 1" class="my-15 border-1 border-color-#d2ebfd border-dashed">
+    </template>
+
+    <!-- TODO: 分页 -->
+    <!-- <div class="my-15 mt-20 f-c-c">
       <NPagination v-model:page="current" :page-count="Math.ceil(total / 10)" />
-    </div>
+    </div> -->
   </BannerPage>
 </template>

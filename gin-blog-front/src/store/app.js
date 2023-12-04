@@ -1,4 +1,3 @@
-import { nextTick } from 'vue'
 import { defineStore } from 'pinia'
 import api from '@/api'
 import { convertImgUrl } from '@/utils'
@@ -7,7 +6,6 @@ export const useAppStore = defineStore('app', {
   persist: true, // pinia 持久化插件
   state() {
     return {
-      reloadFlag: true,
       // 搜索
       searchFlag: false,
       // 登录
@@ -27,6 +25,7 @@ export const useAppStore = defineStore('app', {
           website_intro: '往事随风而去',
           website_avatar: '',
         },
+        pageList: [],
       },
     }
   },
@@ -46,17 +45,6 @@ export const useAppStore = defineStore('app', {
     setForgetFlag(flag) { this.forgetFlag = flag },
     setSearchFlag(flag) { this.searchFlag = flag },
 
-    async reloadPage() {
-      window.$loadingBar?.start()
-      this.reloadFlag = false
-      await nextTick()
-      this.reloadFlag = true
-
-      setTimeout(() => {
-        document.documentElement.scrollTo({ left: 0, top: 0 })
-        window.$loadingBar?.finish()
-      }, 100)
-    },
     async getBlogInfo() {
       try {
         const res = await api.getHomeData()
@@ -73,5 +61,3 @@ export const useAppStore = defineStore('app', {
     },
   },
 })
-
-// export default useAppStore

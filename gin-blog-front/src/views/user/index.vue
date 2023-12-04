@@ -1,7 +1,6 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { NForm, NFormItem, NInput } from 'naive-ui'
 
 import BannerPage from '@/components/page/BannerPage.vue'
 import UploadOne from '@/components/upload/UploadOne.vue'
@@ -12,7 +11,7 @@ import api from '@/api'
 const userStore = useUserStore()
 const router = useRouter()
 
-const infoForm = ref({
+const form = reactive({
   avatar: userStore.avatar,
   nickname: userStore.nickname,
   intro: userStore.intro,
@@ -28,7 +27,7 @@ onMounted(() => {
 
 async function updateUserInfo() {
   try {
-    await api.updateUser(infoForm.value)
+    await api.updateUser(form)
     window.$message?.success('修改成功!')
     userStore.getUserInfo() // 重新获取用户信息
   }
@@ -40,29 +39,33 @@ async function updateUserInfo() {
 
 <template>
   <BannerPage label="user" title="个人中心" card>
-    <p class="mb-6 text-24 font-bold">
+    <p class="mb-6 text-22 font-bold">
       基本信息
     </p>
     <div class="grid grid-cols-12 gap-15">
       <div class="col-span-4 f-c-c">
-        <UploadOne v-model:preview="infoForm.avatar" :width="140" />
+        <UploadOne v-model:preview="form.avatar" :width="140" />
       </div>
       <div class="col-span-7">
-        <NForm ref="infoFormRef" label-align="left" :label-width="80" :model="infoForm">
-          <NFormItem label="昵称" path="nickname">
-            <NInput v-model:value="infoForm.nickname" placeholder="输入您的昵称" />
-          </NFormItem>
-          <NFormItem label="个人网站" path="website">
-            <NInput v-model:value="infoForm.website" placeholder="请输入个人网站" />
-          </NFormItem>
-          <NFormItem label="简介" path="intro">
-            <NInput v-model:value="infoForm.intro" placeholder="介绍一下自己吧" />
-          </NFormItem>
-          <NFormItem label="邮箱" path="email">
-            <NInput v-model:value="infoForm.email" placeholder="请输入邮箱号" disabled />
-          </NFormItem>
-        </NForm>
-        <button @click="updateUserInfo">
+        <div class="my-25 space-y-12">
+          <div
+            v-for="item of [
+              { label: '昵称', key: 'nickname' },
+              { label: '个人网站', key: 'website' },
+              { label: '简介', key: 'intro' },
+              { label: '邮箱', key: 'email' },
+            ]" :key="item.label"
+          >
+            <div class="mb-5">
+              {{ item.label }}
+            </div>
+            <input
+              v-model="form[item.key]" required :placeholder="`请输入${item.label}`"
+              class="block w-full border-0 rounded-md px-8 py-6 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+            >
+          </div>
+        </div>
+        <button class="the-button mt-8" @click="updateUserInfo">
           修改
         </button>
       </div>

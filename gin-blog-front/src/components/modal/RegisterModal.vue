@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NForm, NFormItem, NInput } from 'naive-ui'
-import config from '@/assets/js/config'
+import config from '@/assets/config'
 
 import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
@@ -74,61 +73,55 @@ function openLogin() {
 </script>
 
 <template>
-  <UModal v-model="registerFlag" :width="500">
-    <div class="mb-15 text-18 font-bold">
-      注册
-    </div>
-    <NForm
-      :model="form"
-      :rules="rules"
-      label-placement="left"
-      label-width="70"
-      require-mark-placement="right-hanging"
-    >
-      <NFormItem label="邮箱号" path="username">
-        <NInput
-          v-model:value="form.username"
-          placeholder="邮箱号，也是用户名"
-          clearable
-        />
-      </NFormItem>
-      <NFormItem label="验证码" path="code">
-        <NInput
-          v-model:value="form.code"
-          placeholder="请输入 6 位验证码"
-          clearable
-        />
-        <button class="w-50 duration-300 hover:text-emerald" @click="sendCode">
-          发送
-        </button>
-      </NFormItem>
-      <NFormItem label="密码" path="password">
-        <NInput
-          v-model:value="form.password"
-          type="password"
-          show-password-on="click"
-          placeholder="密码"
-          clearable
-        />
-      </NFormItem>
-    </NForm>
-    <div class="my-10 px-15 text-center">
-      <button
-        class="w-full rounded-1rem bg-red py-7 text-white hover:bg-orange"
-        @click="handleRegister"
-      >
+  <UModal v-model="registerFlag" :width="480">
+    <div class="mx-10 my-5">
+      <div class="mb-15 text-18 font-bold">
         注册
-      </button>
-      <div class="mb-10 mt-25 text-left">
-        已有账号？
-        <button class="duration-300 hover:text-emerald" @click="openLogin">
-          登录
-        </button>
       </div>
+      <div class="my-30 space-y-15">
+        <div class="flex items-center">
+          <span class="mr-20 inline-block w-60 text-right"> 邮箱号 </span>
+          <input
+            v-model="form.username" required placeholder="邮箱号，也是用户名"
+            class="block w-full border-0 rounded-md p-7 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+          >
+        </div>
+        <div class="flex items-center">
+          <span class="mr-20 inline-block w-60 text-right"> 验证码 </span>
+          <input
+            v-model="form.code" required placeholder="请输入 6 位验证码"
+            class="block w-5/6 border-0 rounded-md p-7 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+          >
+          <button class="w-1/6" @click="sendCode">
+            发送
+          </button>
+        </div>
+        <div class="flex items-center">
+          <span class="mr-20 inline-block w-60 text-right"> 密码 </span>
+          <input
+            v-model="form.password" required type="password" placeholder="密码"
+            class="block w-full border-0 rounded-md p-7 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+          >
+        </div>
+      </div>
+      <div class="my-10 text-center">
+        <button
+          class="w-full rounded-1rem bg-red py-8 text-white hover:bg-orange"
+          @click="handleRegister"
+        >
+          注册
+        </button>
+        <div class="mb-10 mt-25 text-left">
+          已有账号？
+          <button class="duration-300 hover:text-emerald" @click="openLogin">
+            登录
+          </button>
+        </div>
       <!-- TODO: 第三方登录 -->
       <!-- <div text-center text-10 color="#aaa">
           社交帐号登录
         </div> -->
+      </div>
     </div>
   </UModal>
 </template>

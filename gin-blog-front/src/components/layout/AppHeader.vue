@@ -76,10 +76,10 @@ function logout() {
       <!-- 右上角图标 -->
       <div class="flex items-center">
         <button class="mr-10" @click="appStore.setSearchFlag(true)">
-          <Icon icon="ic:round-search" :size="22" />
+          <Icon icon="ic:round-search" class="h-22 w-22" />
         </button>
         <button @click="appStore.setCollapsed(true)">
-          <Icon icon="ic:sharp-menu" :size="22" />
+          <Icon icon="ic:sharp-menu" class="h-22 w-22" />
         </button>
       </div>
     </div>

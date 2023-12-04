@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-// import EmojiList from '@/assets/js/emoji'
+// import EmojiList from '@/assets/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
 import ULoading from '@/components/ui/ULoading.vue'

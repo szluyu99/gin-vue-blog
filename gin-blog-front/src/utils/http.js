@@ -32,6 +32,7 @@ request.interceptors.response.use(
     const { data } = response
     if (data?.code !== 0) { // 与后端约定业务状态码
       window.$message.error(data?.message)
+      return Promise.reject(data)
     }
     return Promise.resolve(data)
   },

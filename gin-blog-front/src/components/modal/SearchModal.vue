@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { debouncedWatch } from '@vueuse/core'
-import { NInput } from 'naive-ui'
 
 import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
@@ -38,34 +37,35 @@ async function handleSearch() {
       <div class="mb-15 text-18 font-bold">
         本地搜索
       </div>
-      <NInput
-        v-model:value="keyword"
-        round
-        placeholder="输入文章标题或内容..."
-        size="large"
-        clearable
-      >
-        <template #prefix>
-          <div class="i-mdi:flash text-20 text-yellow" />
-        </template>
-      </NInput>
-      <hr class="my-15 border-2px border-color-#d2ebfd border-dashed">
-      <div class="h-400">
-        <ul v-if="articleList.length">
-          <li v-for="item of articleList" :key="item.id">
-            <RouterLink :to="`/article/${item.id}`">
-              <span
-                class="border-b-1 border-#999 border-solid text-17"
-                @click="searchFlag = false"
-                v-html="item.title"
-              />
-            </RouterLink>
-            <p clsas="color-#555 mt-5 cursor-pointer ell-3" v-html="item.content" />
-            <hr class="my-10 border-1 border-#d2ebfd border-dashed">
-          </li>
-        </ul>
-        <div v-else-if="keyword">
-          找不到您查询的内容：{{ keyword }}
+      <div>
+        <div class="relative mt-2 rounded-md shadow-sm">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-6">
+            <div class="i-mdi:flash text-20 text-yellow" />
+          </div>
+          <input
+            v-model="keyword"
+            class="block w-full border-0 rounded-full py-8 pl-32 pr-20 text-gray-900 outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-green-300"
+            placeholder="输入文章标题或内容..."
+          >
+        </div>
+        <hr class="my-15 border-2px border-color-#d2ebfd border-dashed">
+        <div class="h-400">
+          <ul v-if="articleList.length">
+            <li v-for="item of articleList" :key="item.id">
+              <RouterLink :to="`/article/${item.id}`">
+                <span
+                  class="border-b-1 border-#999 border-solid text-17"
+                  @click="searchFlag = false"
+                  v-html="item.title"
+                />
+              </RouterLink>
+              <p clsas="color-#555 mt-5 cursor-pointer ell-3" v-html="item.content" />
+              <hr class="my-10 border-1 border-#d2ebfd border-dashed">
+            </li>
+          </ul>
+          <div v-else-if="keyword">
+            找不到您查询的内容：{{ keyword }}
+          </div>
         </div>
       </div>
     </div>

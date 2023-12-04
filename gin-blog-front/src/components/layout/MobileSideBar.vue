@@ -72,7 +72,7 @@ function logout() {
       <!-- 菜单 -->
       <div v-for="item of menuOptions" :key="item.text" class="m-8 p-3">
         <RouterLink :to="item.path" class="flex items-center" @click="appStore.setCollapsed(false)">
-          <Icon :icon="item.icon" />
+          <Icon :icon="item.icon" class="text-18" />
           <span class="ml-25 text-15"> {{ item.text }} </span>
         </RouterLink>
       </div>
@@ -87,12 +87,12 @@ function logout() {
         <template v-else>
           <RouterLink to="/user">
             <div class="m-8 flex items-center p-3" @click="appStore.setCollapsed(false)">
-              <Icon icon="mdi:account-circle" />
+              <Icon icon="mdi:account-circle" class="text-18" />
               <span class="ml-25 text-15"> 个人中心 </span>
             </div>
           </RouterLink>
           <div class="m-8 flex items-center p-3" @click="logout">
-            <Icon icon="mdi:logout" />
+            <Icon icon="mdi:logout" class="text-18" />
             <span class="ml-25 text-15"> 退出登录 </span>
           </div>
         </template>
