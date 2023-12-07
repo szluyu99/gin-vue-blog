@@ -1,6 +1,5 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NIcon, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { convertImgUrl, getToken } from '@/utils'
 
 const props = defineProps({
@@ -8,64 +7,68 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  width: {
-    type: Number,
-    default: 120,
-  },
 })
 
 const emit = defineEmits(['update:preview'])
 
 const token = getToken() // 图片上传需要 Token
-const previewImg = ref(props.preview)
-
-// 上传图片
-function handleImgUpload({ event }) {
-  const respStr = event?.target.response
-  const res = JSON.parse(respStr)
-  if (res.code !== 0) {
-    window.$message?.error(res.message)
-    return
-  }
-  previewImg.value = res.data
-  emit('update:preview', previewImg)
-}
+const previewImg = ref(props.preview) // 图片预览
 
 // 判断是本地上传的图片或网络资源
 // 开发环境可以使用本地文件上传, 生产环境建议使用云存储
 const imgUrl = computed(() => convertImgUrl(previewImg.value))
 
-defineExpose({ previewImg })
+const fileRef = ref(null)
+
+async function handleFileChange() {
+  const file = fileRef.value.files[0]
+  const formData = new FormData()
+  formData.append('file', file)
+  try {
+    const response = await fetch('/api/front/upload', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    })
+
+    const responseJSON = await response.json()
+    if (responseJSON.code !== 0) {
+      window.$message?.error(responseJSON.message)
+      return
+    }
+
+    previewImg.value = responseJSON.data
+    emit('update:preview', previewImg)
+  } catch (err) {
+    console.error(err)
+    window.$message?.error('文件上传失败')
+  }
+}
 </script>
 
 <template>
-  <div>
-    <!-- 如果文件上传需要登录, 注意 headers -->
-    <NUpload
-      action="/api/front/upload"
-      :headers="{ Authorization: `Bearer ${token}` }"
-      :show-file-list="false"
-      @finish="handleImgUpload"
-    >
+  <!-- TODO: 拖拽文件上传 -->
+  <main class="flex items-center justify-center bg-gray-100 font-sans">
+    <label for="dropzone-file" class="mx-auto max-w-300 w-full cursor-pointer items-center border-1 border-blue-400 rounded-xl border-dashed bg-white p-6 text-center">
       <template v-if="previewImg">
-        <img
-          class="cursor-pointer border-2 border-color-#d9d9d9 rounded-2rem border-dashed hover:border-color-lightblue"
-          :style="{ width: `${props.width}px` }"
-          :src="imgUrl" alt="文章封面"
-        >
+        <div class="group relative">
+          <img class="h-160 w-160" :src="imgUrl" alt="user avatar">
+          <div class="absolute bottom-0 left-0 right-0 top-0 f-c-c cursor-pointer">
+            <button class="i-mdi:upload pointer-events-none inline-block text-50 text-white opacity-35 duration-200 group-hover:opacity-80" />
+          </div>
+        </div>
       </template>
       <template v-else>
-        <NUploadDragger>
-          <div class="mb-12">
-            <NIcon size="58" :depth="3">
-              <span class="i-mdi:upload" />
-            </NIcon>
+        <div class="h-160 w-160 f-c-c">
+          <div class="flex flex-col items-center">
+            <span class="i-mdi:upload text-58 text-blue-500" />
+            <span class="text-blue-400"> 点击上传文件</span>
           </div>
-          <NText class="text-14">
-            点击或者拖动文件到该区域来上传
-          </NText>
-        </NUploadDragger>
+        </div>
       </template>
-    </NUpload>
-  </div>
+      <input id="dropzone-file" ref="fileRef" type="file" class="hidden" @change="handleFileChange">
+    </label>
+  </main>
 </template>

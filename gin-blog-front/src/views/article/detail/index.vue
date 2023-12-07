@@ -43,12 +43,10 @@ const previewRef = ref(null)
 const loading = ref(true)
 
 onMounted(() => {
-  window.$loadingBar?.start()
   api.getArticleDetail(+useRoute().params.id).then((res) => {
     data.value = res.data
   }).finally(() => {
     loading.value = false
-    window.$loadingBar?.finish()
   })
 
   setTimeout(() => {

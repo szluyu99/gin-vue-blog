@@ -56,7 +56,7 @@ function logout() {
   userStore.logout()
   if (route.name === 'User') // 如果在个人信息页登出则回到首页
     router.push('/')
-  window.$notification?.success({ title: '退出登录成功!', duration: 1500 })
+  window.$notify.success('退出登录成功!')
 }
 
 // const blogTitle = import.meta.env.VITE_APP_TITLE

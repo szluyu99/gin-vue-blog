@@ -3,7 +3,6 @@ import { convertImgUrl, getToken, removeToken } from '@/utils'
 import api from '@/api'
 
 export const useUserStore = defineStore('user', {
-  persist: true,
   state() {
     return {
       userInfo: {},

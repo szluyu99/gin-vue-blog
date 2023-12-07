@@ -44,7 +44,7 @@ async function updateUserInfo() {
     </p>
     <div class="grid grid-cols-12 gap-15">
       <div class="col-span-4 f-c-c">
-        <UploadOne v-model:preview="form.avatar" :width="140" />
+        <UploadOne v-model:preview="form.avatar" />
       </div>
       <div class="col-span-7">
         <div class="my-25 space-y-12">

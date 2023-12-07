@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM golang:1.20-alpine as builder
 # 设置工作目录
 WORKDIR /gvb
 # 将当前目录内容拷到工作目录 (相对路径)

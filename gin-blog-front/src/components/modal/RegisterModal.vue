@@ -37,7 +37,7 @@ async function handleRegister() {
   const doRegister = async () => {
     // 注册
     await api.register(form.value)
-    window.$notification?.success({ title: '注册成功!', duration: 1500 })
+    window.$notify?.success('注册成功!')
     form.value = { username: '', password: '', code: '' }
     // 打开登录弹窗
     openLogin()

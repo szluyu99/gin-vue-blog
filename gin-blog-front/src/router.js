@@ -1,4 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import NProgress from 'nprogress'
+import './styles/nprogress.css'
+
+NProgress.configure({ showSpinner: false })
 
 const basicRoutes = [
   {
@@ -116,3 +120,9 @@ router.afterEach((to) => {
   document.title = `${to.meta?.title ?? import.meta.env.VITE_APP_TITLE}`
 })
 
+router.beforeEach((to, from, next) => {
+  NProgress.start()
+  for (let i = 0; i < 5; i++) NProgress.inc()
+  setTimeout(() => NProgress.done(), 300)
+  next()
+})

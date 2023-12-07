@@ -23,6 +23,12 @@ import { router } from './router'
 import { pinia } from './store'
 import App from './App.vue'
 
+// 全局 toast
+import { useToast } from './components/ui/useToast'
+import { useNotify } from './components/ui/useNotify'
+window.$message = useNotify({ position: 'top', align: 'center', timeout: 3000, closeable: true })
+window.$notify = useToast({ position: 'top', align: 'right', timeout: 3000, closeable: true })
+
 hljs.registerLanguage('go', go)
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('bash', bash)

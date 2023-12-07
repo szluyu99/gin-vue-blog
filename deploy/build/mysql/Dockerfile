@@ -1,4 +1,4 @@
-FROM mysql:latest
+FROM mysql:8.0
 
 # 定义工作目录
 ENV WORK_PATH /usr/local/work

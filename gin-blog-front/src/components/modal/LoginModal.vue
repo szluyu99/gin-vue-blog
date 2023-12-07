@@ -35,7 +35,7 @@ async function handleLogin() {
 
   const doLogin = async (username, password) => {
     const result = await api.login({ username, password })
-    window.$notification?.success({ title: '登录成功!', duration: 1500 })
+    window.$notify?.success('登录成功!')
     setToken(result.data.token) // 保存在本地
     // 加载用户信息, 更新 pinia 中信息, 刷新页面
     await userStore.getUserInfo()

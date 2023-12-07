@@ -45,16 +45,6 @@ const props = defineProps({
 
 const { pageList } = storeToRefs(useAppStore())
 
-onMounted(() => {
-  if (props.loading) {
-    window.$loadingBar?.start()
-  }
-})
-
-watch(() => props.loading, (newVal) => {
-  newVal ? window.$loadingBar?.start() : window.$loadingBar?.finish()
-})
-
 // 根据后端配置动态获取封面
 const coverStyle = computed(() => {
   const page = pageList.value.find(e => e.label === props.label)

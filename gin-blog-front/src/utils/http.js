@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
-import { getToken } from './token'
+import { getToken, removeToken } from './token'
+import { router } from '@/router'
 
 export const request = axios.create(
   {
@@ -38,6 +39,12 @@ request.interceptors.response.use(
   },
   // 响应失败拦截
   (error) => {
+    const { code, message } = error
+    if (code === 401) {
+      removeToken()
+      window.$message.error(message)
+      router.push('/')
+    }
     return Promise.reject(error)
   },
 )
