@@ -59,12 +59,12 @@ defineExpose({
   <Teleport to="body">
     <div
       v-show="flux.events.length"
-      class="fixed w-4/5 sm:w-400"
+      class="pointer-events-none fixed w-4/5 sm:w-[400px]"
       :class="{
         'left-1/2 -translate-x-1/2': align === 'center',
         'left-16': align === 'left',
         'right-16': align === 'right',
-        'top-34': position === 'top', // top-4
+        'top-4': position === 'top',
         'bottom-6 ': position === 'bottom',
       }"
       :style="{ zIndex }"
@@ -87,17 +87,16 @@ defineExpose({
         <li
           v-for="event in flux.events" :key="event.id"
           :class="{
-            'pb-6': position === 'bottom',
-            'pt-6': position === 'top',
+            'pb-2': position === 'bottom',
+            'pt-2': position === 'top',
           }"
         >
           <slot :type="event.type" :content="event.content">
-            <!-- 定义主题相关的颜色 -->
             <div class="pointer-events-auto w-full overflow-hidden rounded-lg bg-white ring-1 ring-black ring-opacity-5">
-              <div class="flex justify-between p-16">
+              <div class="flex justify-between px-4 py-3">
                 <div class="flex items-center">
                   <div
-                    class="mr-6 h-26 w-25"
+                    class="mr-6 h-6 w-6"
                     :class="{
                       'i-mdi:check-circle text-green': event.type === 'success',
                       'i-mdi:information-outline text-blue': event.type === 'info',
@@ -105,17 +104,15 @@ defineExpose({
                       'i-mdi:alert-circle-outline text-red': event.type === 'error',
                     }"
                   />
-                  <div class="ml-3">
+                  <div class="ml-1">
                     <slot>
-                      <div class="text-16">
-                        {{ event.content }}
-                      </div>
+                      <div> {{ event.content }} </div>
                     </slot>
                   </div>
                 </div>
                 <button
                   v-if="closeable"
-                  class="i-mdi:close h-22 w-22 flex items-center justify-center rounded-full rounded-full p-1 font-bold"
+                  class="i-mdi:close h-5 w-5 flex items-center justify-center rounded-full rounded-full p-1 font-bold text-gray-400 hover:text-gray-600"
                   @click="flux.remove(event)"
                 />
               </div>

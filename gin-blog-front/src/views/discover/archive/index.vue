@@ -3,7 +3,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 
-import BannerPage from '@/components/page/BannerPage.vue'
+import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
 
 const router = useRouter()
@@ -52,20 +52,20 @@ const activity = [
 
 <template>
   <BannerPage title="归档" label="archive" :loading="loading" card>
-    <p class="pb-20 text-18 lg:text-24">
+    <p class="pb-5 text-lg lg:text-2xl">
       目前共计 {{ archiveList.length }} 篇文章，继续加油！
     </p>
     <template v-for="(item, idx) of archiveList" :key="item.id">
-      <div class="flex items-center gap-10">
-        <div class="i-mdi:circle bg-blue" />
-        <span class="color-#666 lg:text-15">
+      <div class="flex items-center gap-2">
+        <div class="i-mdi:circle bg-blue text-sm" />
+        <span class="text-sm color-#666 lg:text-base">
           {{ dayjs(item.created_at).format('YYYY-MM-DD') }}
         </span>
-        <a class="color-#666 lg:text-16 hover:text-orange" @click="router.push(`/article/${item.id}`)">
+        <a class="color-#666 lg:text-lg hover:text-orange" @click="router.push(`/article/${item.id}`)">
           {{ item.title }}
         </a>
       </div>
-      <hr v-if="idx !== archiveList.length - 1" class="my-15 border-1 border-color-#d2ebfd border-dashed">
+      <hr v-if="idx !== archiveList.length - 1" class="my-4 border-1 border-color-#d2ebfd border-dashed">
     </template>
 
     <!-- TODO: 分页 -->

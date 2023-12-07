@@ -1,4 +1,29 @@
-import { decrypto, encrypto } from './common'
+const CryptoSecret = '__SecretKey__'
+
+/**
+ * 加密数据
+ * @param {any} data - 数据
+ */
+function encrypto(data) {
+  const newData = JSON.stringify(data)
+  const encryptedData = btoa(CryptoSecret + newData)
+  return encryptedData
+}
+
+/**
+ * 解密数据
+ * @param {String} cipherText - 密文
+ */
+function decrypto(cipherText) {
+  const decryptedData = atob(cipherText)
+  const originalText = decryptedData.replace(CryptoSecret, '')
+  try {
+    const parsedData = JSON.parse(originalText)
+    return parsedData
+  } catch (error) {
+    return null
+  }
+}
 
 const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7
 

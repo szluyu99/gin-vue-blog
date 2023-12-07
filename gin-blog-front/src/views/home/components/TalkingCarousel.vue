@@ -11,13 +11,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="animate-zoom-in card-view">
+  <div class="card-view animate-zoom-in">
     <div class="flex text-center">
-      <div class="i-mdi-chat-outline cursor-pointer text-20" />
+      <div class="i-mdi-chat-outline cursor-pointer text-xl" />
       <div class="flex-1">
         {{ sentence }}
       </div>
-      <div class="arrow i-mdi-chevron-double-right cursor-pointer text-20" />
+      <div class="arrow i-mdi-chevron-double-right cursor-pointer text-xl" />
     </div>
   </div>
 </template>

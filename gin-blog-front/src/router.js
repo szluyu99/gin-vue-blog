@@ -110,7 +110,6 @@ const basicRoutes = [
 ]
 
 export const router = createRouter({
-  // history: createWebHistory('/blog'),
   history: createWebHistory('/'),
   routes: basicRoutes,
   scrollBehavior: () => ({ left: 0, top: 0 }),

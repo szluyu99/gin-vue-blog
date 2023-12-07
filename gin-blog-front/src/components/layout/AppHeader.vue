@@ -67,19 +67,19 @@ function logout() {
   <Transition name="slide-fade" appear>
     <div
       v-if="barShow" :class="navClass"
-      class="fixed inset-x-0 top-0 z-11 h-60 flex items-center justify-between px-16 py-10 lg:hidden"
+      class="fixed inset-x-0 top-0 z-11 h-[60px] flex items-center justify-between px-4 py-2 lg:hidden"
     >
       <!-- 左上角标题 -->
-      <RouterLink to="/" class="text-18 font-bold">
+      <RouterLink to="/" class="text-[18px] font-bold">
         {{ appStore.blogConfig.website_author }}
       </RouterLink>
       <!-- 右上角图标 -->
-      <div class="flex items-center">
-        <button class="mr-10" @click="appStore.setSearchFlag(true)">
-          <Icon icon="ic:round-search" class="h-22 w-22" />
+      <div class="flex items-center gap-2">
+        <button @click="appStore.setSearchFlag(true)">
+          <Icon icon="ic:round-search" class="text-2xl" />
         </button>
         <button @click="appStore.setCollapsed(true)">
-          <Icon icon="ic:sharp-menu" class="h-22 w-22" />
+          <Icon icon="ic:sharp-menu" class="text-2xl" />
         </button>
       </div>
     </div>
@@ -91,40 +91,40 @@ function logout() {
     <div
       v-if="barShow"
       :class="navClass"
-      class="fixed inset-x-0 top-0 z-11 hidden h-60 lg:block"
+      class="fixed inset-x-0 top-0 z-11 hidden h-[60px] lg:block"
     >
-      <div class="h-full flex items-center justify-between px-36">
+      <div class="h-full flex items-center justify-between px-9">
         <!-- 左上角标题 -->
-        <RouterLink to="/" class="text-18 font-bold">
+        <RouterLink to="/" class="text-xl font-bold">
           {{ appStore.blogConfig.website_author }}
         </RouterLink>
         <!-- 右上角菜单 -->
-        <div class="flex items-center text-6xl space-x-18">
+        <div class="flex items-center space-x-4">
           <!-- 搜索 -->
           <div class="menus-item">
             <a class="menu-btn flex items-center" @click="appStore.setSearchFlag(true)">
-              <Icon icon="mdi:magnify" class="text-18" />
-              <span class="ml-4"> 搜索 </span>
+              <Icon icon="mdi:magnify" class="text-xl" />
+              <span class="ml-1"> 搜索 </span>
             </a>
           </div>
           <div v-for="item of menuOptions" :key="item.text" class="menus-item">
             <!-- 不包含子菜单 -->
             <RouterLink v-if="!item.subMenu" :to="item.path" class="menu-btn flex items-center">
-              <Icon :icon="item.icon" class="text-18" />
-              <span class="ml-4"> {{ item.text }} </span>
+              <Icon :icon="item.icon" class="text-xl" />
+              <span class="ml-1"> {{ item.text }} </span>
             </RouterLink>
             <!-- 包含子菜单 -->
             <div v-else class="menu-btn">
               <div class="flex items-center">
-                <Icon :icon="item.icon" class="text-18" />
-                <span class="mx-4"> {{ item.text }} </span>
-                <Icon icon="ep:arrow-down-bold" class="text-18" />
+                <Icon :icon="item.icon" class="text-xl" />
+                <span class="mx-1"> {{ item.text }} </span>
+                <Icon icon="ep:arrow-down-bold" class="text-xl" />
               </div>
               <ul class="menus-submenu">
                 <RouterLink v-for="sub of item.subMenu" :key="sub.text" :to="sub.path">
                   <div class="flex items-center">
-                    <Icon :icon="sub.icon" class="text-18" />
-                    <span class="ml-4"> {{ sub.text }} </span>
+                    <Icon :icon="sub.icon" class="text-xl" />
+                    <span class="ml-1"> {{ sub.text }} </span>
                   </div>
                 </RouterLink>
               </ul>
@@ -134,21 +134,21 @@ function logout() {
           <div class="menus-item">
             <a v-if="!userStore.userId" class="menu-btn" @click="appStore.setLoginFlag(true)">
               <div class="flex items-center">
-                <Icon icon="ph:user-bold" class="text-18" />
-                <span class="ml-4"> 登录 </span>
+                <Icon icon="ph:user-bold" class="text-xl" />
+                <span class="ml-1"> 登录 </span>
               </div>
             </a>
             <template v-else>
-              <img :src="convertImgUrl(userStore.avatar)" class="w-30 cursor-pointer rounded-full">
+              <img :src="convertImgUrl(userStore.avatar)" class="w-8 cursor-pointer rounded-full">
               <ul class="menus-submenu">
                 <RouterLink to="/user">
                   <div class="flex items-center">
-                    <Icon icon="mdi:account-circle" class="mr-4 text-20" /> 个人中心
+                    <Icon icon="mdi:account-circle" class="mr-1 text-xl" /> 个人中心
                   </div>
                 </RouterLink>
                 <a @click="logout">
                   <div class="flex items-center">
-                    <Icon icon="mdi:logout" class="mr-4 text-20" /> 退出登录
+                    <Icon icon="mdi:logout" class="mr-1 text-xl" /> 退出登录
                   </div>
                 </a>
               </ul>

@@ -6,11 +6,10 @@ const articleHref = window.location.href
 </script>
 
 <template>
-  <div class="border-1 border-lightblue border-dashed px-17 py-12 text-14 leading-30 lg:text-15">
+  <div class="border-1 border-lightblue border-dashed px-4 py-3 leading-7">
     <!-- TODO: 点击复制 -->
     <div class="relative">
-      <!-- 右上角的装饰 -->
-      <div class="absolute right-0 top-0 h-16 w-16 border-4px border-blue rounded-full bg-white" />
+      <div class="absolute right-0 top-0 h-5 w-5 border-4px border-blue rounded-full bg-white" />
       <span class="font-bold color-#49b1f5"> 文章作者： </span>
       <RouterLink to="/" class="color-#99a9bf !underline">
         {{ blogConfig.website_author }}

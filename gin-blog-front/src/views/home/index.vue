@@ -68,19 +68,21 @@ function filterMdSymbol(mdStr) {
   <HomeBanner />
   <!-- 内容 -->
   <div class="flex flex-col justify-center">
-    <div class="mx-auto mb-40 max-w-1230 px-15" style="margin-top: calc(100vh + 30px)">
-      <div class="grid grid-cols-12 gap-15">
+    <div class="mx-auto mb-0 max-w-[1230px] px-4" style="margin-top: calc(100vh + 30px)">
+      <div class="grid grid-cols-12 gap-5">
         <!-- 左半部分 -->
         <div class="col-span-12 lg:col-span-9">
           <!-- 说说轮播 -->
-          <TalkingCarousel />
+          <TalkingCarousel class="mb-5" />
           <!-- 文章列表 -->
-          <ArticleCard
-            v-for="(item, idx) in articleList" :key="item.id"
-            :article="item" :idx="idx"
-          />
+          <div class="space-y-5">
+            <ArticleCard
+              v-for="(item, idx) in articleList" :key="item.id"
+              :article="item" :idx="idx"
+            />
+          </div>
           <!-- 无限加载 -->
-          <div ref="el" class="mt-35 f-c-c">
+          <div ref="el" class="mt-9 f-c-c">
             <InfiniteLoading @infinite="getArticlesInfinite">
               <!-- TODO: 优化界面 -->
               <template #spinner>
@@ -97,11 +99,11 @@ function filterMdSymbol(mdStr) {
         <!-- 右半部分 -->
         <div class="col-span-0 lg:col-span-3">
           <!-- sticky 实现悬浮固定效果 -->
-          <div class="sticky top-20">
+          <div class="sticky top-5 space-y-5">
             <!-- 博主信息 -->
             <AuthorInfo />
             <!-- 公告 -->
-            <Announcement class="my-25" />
+            <Announcement />
             <!-- 网站资讯 -->
             <WebsiteInfo />
           </div>

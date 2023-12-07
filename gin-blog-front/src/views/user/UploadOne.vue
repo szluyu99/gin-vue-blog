@@ -51,19 +51,19 @@ async function handleFileChange() {
 <template>
   <!-- TODO: 拖拽文件上传 -->
   <main class="flex items-center justify-center bg-gray-100 font-sans">
-    <label for="dropzone-file" class="mx-auto max-w-300 w-full cursor-pointer items-center border-1 border-blue-400 rounded-xl border-dashed bg-white p-6 text-center">
+    <label for="dropzone-file" class="mx-auto max-w-[300px] w-full cursor-pointer items-center border-1 border-blue-400 rounded-xl border-dashed bg-white p-2 text-center">
       <template v-if="previewImg">
         <div class="group relative">
-          <img class="h-160 w-160" :src="imgUrl" alt="user avatar">
+          <img class="lg:h-[160px] lg:w-[160px]" :src="imgUrl" alt="user avatar">
           <div class="absolute bottom-0 left-0 right-0 top-0 f-c-c cursor-pointer">
-            <button class="i-mdi:upload pointer-events-none inline-block text-50 text-white opacity-35 duration-200 group-hover:opacity-80" />
+            <button class="i-mdi:upload pointer-events-none inline-block text-[50px] text-white opacity-35 duration-200 group-hover:opacity-80" />
           </div>
         </div>
       </template>
       <template v-else>
-        <div class="h-160 w-160 f-c-c">
+        <div class="f-c-c lg:h-[160px] lg:w-[160px]">
           <div class="flex flex-col items-center">
-            <span class="i-mdi:upload text-58 text-blue-500" />
+            <span class="i-mdi:upload text-[58px] text-blue-500" />
             <span class="text-blue-400"> 点击上传文件</span>
           </div>
         </div>

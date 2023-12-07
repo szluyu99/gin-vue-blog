@@ -50,12 +50,12 @@ function rewardArticle() {
 </script>
 
 <template>
-  <div class="f-c-c color-#fff">
-    <button class="mr-10 w-110 f-c-c rounded-2 py-6" :class="isLike ? 'bg-red' : 'bg-gray'" @click="likeArticle">
-      <span class="i-mdi:thumb-up mr-3" /> 点赞 {{ count }}
+  <div class="f-c-c color-#fff space-x-4">
+    <button class="w-[110px] f-c-c rounded-sm py-1.5 text-sm" :class="isLike ? 'bg-red' : 'bg-gray'" @click="likeArticle">
+      <span class="i-mdi:thumb-up mr-1" /> 点赞 {{ count }}
     </button>
-    <button class="ml-10 w-110 f-c-c rounded-2 bg-blue py-6" @click="rewardArticle">
-      <span class="i-mdi:qrcode mr-3" /> 打赏
+    <button class="w-[110px] f-c-c rounded-sm bg-blue py-1.5 text-sm" @click="rewardArticle">
+      <span class="i-mdi:qrcode mr-1" /> 打赏
     </button>
   </div>
 </template>

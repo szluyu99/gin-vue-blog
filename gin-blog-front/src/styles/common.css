@@ -1,10 +1,10 @@
 /* 通用按钮 */
 .the-button {
-  @apply px-15 py-5 rounded-1rem inline-block bg-[#49b1f5] text-white cursor-pointer
+  @apply px-4 py-1 rounded-lg inline-block bg-[#49b1f5] text-white cursor-pointer duration-200;
   @apply hover:bg-[#ff7242] disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50;
 }
 
 /* 卡片面板 */
 .card-view {
-  @apply bg-white p-15 rounded-2rem hover:shadow-2xl transition-500;
+  @apply bg-white p-3 rounded-xl hover:shadow-2xl transition-500;
 }

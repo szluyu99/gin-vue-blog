@@ -70,31 +70,31 @@ function openForget() {
 
 <template>
   <UModal v-model="loginFlag" :width="480">
-    <div class="mx-10 my-5">
-      <div class="mb-15 text-18 font-bold">
+    <div class="mx-2 my-1">
+      <div class="mb-4 text-xl font-bold">
         登录
       </div>
-      <div class="my-30 space-y-15">
+      <div class="my-7 space-y-4">
         <div class="flex items-center">
-          <span class="mr-15 inline-block w-60 text-right"> 用户名 </span>
+          <span class="mr-4 inline-block w-16 text-right"> 用户名 </span>
           <input
             v-model="form.username" required placeholder="用户名"
-            class="block w-full border-0 rounded-md p-8 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+            class="block w-full border-0 rounded-md p-2 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
           >
         </div>
         <div class="flex items-center">
-          <span class="mr-15 inline-block w-60 text-right"> 密码 </span>
+          <span class="mr-4 inline-block w-16 text-right"> 密码 </span>
           <input
             v-model="form.password" type="password" placeholder="密码"
-            class="block w-full border-0 rounded-md p-8 text-15 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+            class="block w-full border-0 rounded-md p-2 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
           >
         </div>
       </div>
-      <div class="my-10 text-center">
-        <button class="w-full rounded-1rem bg-blue py-8 text-white hover:bg-light-blue" @click="handleLogin">
+      <div class="my-2 text-center">
+        <button class="w-full rounded-lg bg-blue py-2 text-white hover:bg-light-blue" @click="handleLogin">
           登录
         </button>
-        <div class="mt-15 flex justify-between">
+        <div class="mt-4 flex justify-between">
           <button @click="openRegister">
             立即注册
           </button>

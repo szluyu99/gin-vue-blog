@@ -1,9 +1,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import dayjs from 'dayjs'
 
-import BannerPage from '@/components/page/BannerPage.vue'
-import { convertImgUrl, formatDate } from '@/utils'
+import BannerPage from '@/components/BannerPage.vue'
+import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 const route = useRoute()
@@ -46,7 +47,7 @@ onMounted(async () => {
               <!-- 发布日期 -->
               <span class="flex items-center">
                 <span class="i-mdi:clock-outline mr-3 text-20" />
-                <span class="text-16"> {{ formatDate(article.created_at) }} </span>
+                <span class="text-16"> {{ dayjs(article.created_at).format('YYYY-MM-DD') }} </span>
               </span>
               <!-- 分类 -->
               <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`">

@@ -13,15 +13,15 @@ function share() {
 
 <template>
   <div class="flex items-center justify-between">
-    <div class="space-x-6">
+    <div class="space-x-2">
       <RouterLink v-for="tag of tagList" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
-        <span class="border-1px border-blue rounded-3rem px-7 py-3 text-12 color-#49b1f5 lg:text-14">
+        <span class="border-1px border-blue rounded-xl px-2 py-1 text-xs color-#49b1f5 lg:text-sm">
           {{ tag.name }}
         </span>
       </RouterLink>
     </div>
 
-    <div class="flex justify-between text-20 space-x-7" @click="share">
+    <div class="flex justify-between text-xl space-x-2" @click="share">
       <span class="i-mdi:wechat cursor-pointer text-green" />
       <span class="i-mdi:sina-weibo cursor-pointer text-orange" />
       <span class="i-mdi:qqchat cursor-pointer text-red" />

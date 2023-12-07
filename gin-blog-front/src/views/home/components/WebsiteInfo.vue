@@ -21,16 +21,16 @@ setInterval(() => {
 </script>
 
 <template>
-  <div class="hidden animate-zoom-in lg:block space-y-10 card-view">
-    <p class="flex items-center">
-      <span class="animate-bang i-icon-park:analysis mr-5 text-18" />
-      <span class="text-16"> 网站咨询 </span>
+  <div class="card-view hidden animate-zoom-in lg:block space-y-2">
+    <p class="flex items-center text-lg">
+      <span class="animate-bang i-icon-park:analysis mr-2" />
+      <span> 网站咨询 </span>
     </p>
-    <p class="text-14">
+    <p class="">
       <span> 运行时间： </span>
       <span class="float-right"> {{ runTime }} </span>
     </p>
-    <p class="text-14">
+    <p class="">
       <span> 总访问量： </span>
       <span class="float-right"> {{ viewCount }} </span>
     </p>
@@ -40,15 +40,5 @@ setInterval(() => {
 <style scoped>
 .animate-bang {
   animation: bang 0.8s linear infinite;
-}
-
-@keyframes bang {
-  0%,
-  100% {
-    transform: scale(1.1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
 }
 </style>

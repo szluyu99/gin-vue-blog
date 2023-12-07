@@ -49,16 +49,16 @@ const coverStyle = computed(() => {
 
 <template>
   <div class="banner-fade-down absolute bottom-0 left-0 right-0 h-screen text-center text-white" :style="coverStyle">
-    <div class="absolute inset-x-0 mt-43vh text-center">
-      <h1 class="animate-zoom-in text-28 font-bold lg:text-40">
+    <div class="absolute inset-x-0 mt-43vh text-center space-y-3">
+      <h1 class="animate-zoom-in text-4xl font-bold lg:text-5xl">
         {{ blogConfig.website_name }}
       </h1>
-      <div class="text-16 lg:text-22">
+      <div class="text-lg lg:text-xl">
         {{ typeObj.output }}
         <span class="animate-ping"> | </span>
       </div>
       <!-- 社交信息（移动端专用） -->
-      <div class="mt-3 text-22 lg:hidden space-x-18">
+      <div class="text-xl lg:hidden space-x-5">
         <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
           <span class="i-ant-design:qq-circle-filled inline-block" />
         </a>
@@ -71,8 +71,8 @@ const coverStyle = computed(() => {
       </div>
     </div>
     <!-- 向下滚动 -->
-    <div class="absolute bottom-10 w-full cursor-pointer" @click="scrollDown">
-      <span class="i-ep:arrow-down-bold inline-block animate-bounce text-25 text-white" />
+    <div class="absolute bottom-0 w-full cursor-pointer" @click="scrollDown">
+      <span class="i-ep:arrow-down-bold inline-block animate-bounce text-2xl text-white" />
     </div>
   </div>
 </template>

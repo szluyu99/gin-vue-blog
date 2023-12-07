@@ -32,68 +32,63 @@ function logout() {
 
 <template>
   <UDrawer v-model="collapsed" placement="right" :width="250">
-    <div class="mx-20">
-      <div class="pt-15 text-center">
+    <div class="mx-5">
+      <div class="pt-4 text-center space-y-3">
         <div class="flex justify-center">
-          <img :src="blogConfig.website_avatar" class="h-80 rounded-full" alt="作者头像">
+          <img :src="blogConfig.website_avatar" class="h-20 rounded-full" alt="作者头像">
         </div>
         <!-- 头像和介绍 -->
-        <div class="mb-3 mt-6">
-          <p class="text-20">
+        <div class="space-y-1">
+          <p class="text-lg">
             {{ blogConfig.website_author }}
           </p>
-          <p class="mt-3 text-13">
+          <p class="text-sm">
             {{ blogConfig.website_intro }}
           </p>
         </div>
         <!-- 博客信息 -->
-        <div class="flex justify-center py-10 text-14">
+        <div class="flex justify-center text-sm">
           <RouterLink to="/archives" class="flex-1" @click="appStore.setCollapsed(false)">
-            <p>文章</p>
-            <p class="text-15">
-              {{ articleCount }}
-            </p>
+            <p> 文章 </p>
+            <p> {{ articleCount }} </p>
           </RouterLink>
           <RouterLink to="/categories" class="flex-1" @click="appStore.setCollapsed(false)">
-            <p>分类</p>
-            <p class="text-15">
-              {{ categoryCount }}
-            </p>
+            <p> 分类 </p>
+            <p> {{ categoryCount }} </p>
           </RouterLink>
           <RouterLink to="/tags" class="flex-1" @click="appStore.setCollapsed(false)">
-            <p>标签</p>
-            <p class="text-15">
-              {{ tagCount }}
-            </p>
+            <p> 标签 </p>
+            <p> {{ tagCount }} </p>
           </RouterLink>
         </div>
-        <hr class="mb-10 mt-5 border-2px border-color-#d2ebfd border-dashed">
       </div>
+      <!-- 分隔线 -->
+      <hr class="my-4 border-2 border-color-#d2ebfd border-dashed">
       <!-- 菜单 -->
-      <div v-for="item of menuOptions" :key="item.text" class="m-8 p-3">
+      <div v-for="item of menuOptions" :key="item.text" class="m-2 p-1">
         <RouterLink :to="item.path" class="flex items-center" @click="appStore.setCollapsed(false)">
-          <Icon :icon="item.icon" class="text-18" />
-          <span class="ml-25 text-15"> {{ item.text }} </span>
+          <Icon :icon="item.icon" class="text-lg" />
+          <span class="ml-5"> {{ item.text }} </span>
         </RouterLink>
       </div>
       <!-- 登录 -->
       <div>
         <template v-if="!userStore.userId">
-          <div class="m-8 flex items-center p-3" @click="appStore.setLoginFlag(true)">
-            <Icon icon="ph:user-bold" />
-            <span class="ml-25 text-15"> 登录 </span>
+          <div class="m-2 flex items-center p-1" @click="appStore.setLoginFlag(true)">
+            <Icon icon="ph:user-bold" class="text-lg" />
+            <span class="ml-5"> 登录 </span>
           </div>
         </template>
         <template v-else>
           <RouterLink to="/user">
-            <div class="m-8 flex items-center p-3" @click="appStore.setCollapsed(false)">
-              <Icon icon="mdi:account-circle" class="text-18" />
-              <span class="ml-25 text-15"> 个人中心 </span>
+            <div class="m-2 flex items-center p-1" @click="appStore.setCollapsed(false)">
+              <Icon icon="mdi:account-circle" class="text-lg" />
+              <span class="ml-5"> 个人中心 </span>
             </div>
           </RouterLink>
-          <div class="m-8 flex items-center p-3" @click="logout">
-            <Icon icon="mdi:logout" class="text-18" />
-            <span class="ml-25 text-15"> 退出登录 </span>
+          <div class="m-2 flex items-center p-1" @click="logout">
+            <Icon icon="mdi:logout" class="text-lg" />
+            <span class="ml-5"> 退出登录 </span>
           </div>
         </template>
       </div>

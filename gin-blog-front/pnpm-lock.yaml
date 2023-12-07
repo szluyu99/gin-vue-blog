@@ -14,9 +14,6 @@ dependencies:
   axios:
     specifier: ^1.3.2
     version: registry.npmmirror.com/axios@1.3.2
-  crypto-js:
-    specifier: ^4.1.1
-    version: registry.npmmirror.com/crypto-js@4.1.1
   dayjs:
     specifier: ^1.11.7
     version: registry.npmmirror.com/dayjs@1.11.7
@@ -61,9 +58,6 @@ devDependencies:
   '@unocss/eslint-config':
     specifier: ^0.57.1
     version: registry.npmmirror.com/@unocss/eslint-config@0.57.1(eslint@8.34.0)(typescript@4.9.5)
-  '@unocss/preset-rem-to-px':
-    specifier: ^0.57.7
-    version: 0.57.7
   '@unocss/reset':
     specifier: ^0.45.30
     version: registry.npmmirror.com/@unocss/reset@0.45.30
@@ -124,16 +118,6 @@ packages:
   /@types/web-bluetooth@0.0.20:
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==, tarball: https://registry.npmmirror.com/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz}
     dev: false
-
-  /@unocss/core@0.57.7:
-    resolution: {integrity: sha512-1d36M0CV3yC80J0pqOa5rH1BX6g2iZdtKmIb3oSBN4AWnMCSrrJEPBrUikyMq2TEQTrYWJIVDzv5A9hBUat3TA==, tarball: https://registry.npmmirror.com/@unocss/core/-/core-0.57.7.tgz}
-    dev: true
-
-  /@unocss/preset-rem-to-px@0.57.7:
-    resolution: {integrity: sha512-oYUiOrcslracgc2UJEdSLWTrRwwHkXYYXMDqzGyiLQmtQRoovSCPYHspPfhYNMWBc7tRRIUzNlpOQKMB1C+x+Q==, tarball: https://registry.npmmirror.com/@unocss/preset-rem-to-px/-/preset-rem-to-px-0.57.7.tgz}
-    dependencies:
-      '@unocss/core': 0.57.7
-    dev: true
 
   /@vueuse/core@10.6.1(vue@3.2.47):
     resolution: {integrity: sha512-Pc26IJbqgC9VG1u6VY/xrXXfxD33hnvxBnKrLlA2LJlyHII+BSrRoTPJgGYq7qZOu61itITFUnm6QbacwZ4H8Q==, tarball: https://registry.npmmirror.com/@vueuse/core/-/core-10.6.1.tgz}
@@ -2106,12 +2090,6 @@ packages:
       shebang-command: registry.npmmirror.com/shebang-command@2.0.0
       which: registry.npmmirror.com/which@2.0.2
     dev: true
-
-  registry.npmmirror.com/crypto-js@4.1.1:
-    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/crypto-js/-/crypto-js-4.1.1.tgz}
-    name: crypto-js
-    version: 4.1.1
-    dev: false
 
   registry.npmmirror.com/css-tree@2.3.1:
     resolution: {integrity: sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/css-tree/-/css-tree-2.3.1.tgz}

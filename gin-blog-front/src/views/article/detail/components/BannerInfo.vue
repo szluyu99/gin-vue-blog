@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { formatDate } from '@/utils'
+import dayjs from 'dayjs'
 
 const { article } = defineProps({
   article: {},
@@ -24,60 +24,66 @@ function deleteHTMLTag(str) {
     .replace(/[|]*\n/, '')
     .replace(/&npsp;/gi, '')
 }
+
+function formatDate(date) {
+  return dayjs(date).format('YYYY-MM-DD')
+}
 </script>
 
 <template>
   <!-- PC 端显示 -->
-  <div class="mx-15 mt-50 hidden text-center text-15 text-light lg:block">
-    <h1 class="text-24 lg:text-34">
+  <div class="mx-4 mt-12 hidden text-center text-light lg:block">
+    <h1 class="text-3xl">
       {{ article.title }}
     </h1>
-    <p class="f-c-c py-8">
-      <span class="i-mdi:calendar mr-3 text-18" /> 发布于 {{ formatDate(article.created_at) }}
-      <span class="px-6">|</span>
-      <span class="i-mdi:update mr-3 text-18" /> 更新于 {{ formatDate(article.updated_at) }}
-      <span class="px-6">|</span>
+    <p class="f-c-c py-2">
+      <span class="i-mdi:calendar mr-1 text-lg" /> 发布于 {{ formatDate(article.created_at) }}
+      <span class="px-2">|</span>
+      <span class="i-mdi:update mr-1 text-lg" /> 更新于 {{ formatDate(article.updated_at) }}
+      <span class="px-2">|</span>
       <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`" class="f-c-c">
-        <span class="i-material-symbols:menu mr-3 text-18" /> {{ article.category.name }}
+        <span class="i-material-symbols:menu mr-1 text-lg" /> {{ article.category.name }}
       </RouterLink>
     </p>
     <div class="f-c-c">
-      <span class="i-ic:twotone-text-snippet mr-3 text-18" /> 字数统计：{{ wordNum }}
-      <span class="px-6">|</span>
-      <span class="i-mdi:timelapse mr-3 text-18" /> 阅读时长：{{ readTime }}
-      <span class="px-6">|</span>
-      <span class="i-mdi:eye mr-3 text-18" /> 阅读量：{{ article.view_count }}
-      <span class="px-6">|</span>
-      <span class="i-ic:outline-insert-comment mr-3 text-18" /> 评论数：{{ article.comment_count }}
+      <span class="i-ic:twotone-text-snippet mr-1 text-lg" /> 字数统计：{{ wordNum }}
+      <span class="px-2">|</span>
+      <span class="i-mdi:timelapse mr-1 text-lg" /> 阅读时长：{{ readTime }}
+      <span class="px-2">|</span>
+      <span class="i-mdi:eye mr-1 text-lg" /> 阅读量：{{ article.view_count }}
+      <span class="px-2">|</span>
+      <span class="i-ic:outline-insert-comment mr-1 text-lg" /> 评论数：{{ article.comment_count }}
     </div>
   </div>
   <!-- 移动端显示 -->
-  <div class="mx-15 mt-50 block text-left text-light lg:hidden">
-    <h1 class="text-24">
+  <div class="mx-4 mt-12 block text-left text-light lg:hidden space-y-1.5">
+    <h1 class="text-2xl">
       {{ article.title }}
     </h1>
-    <div class="mb-5 mt-10 flex flex-wrap items-center lg:justify-center">
-      <span class="i-mdi:calendar mr-3 text-18" /> 发布于 {{ formatDate(article.created_at) }}
-      <span class="px-6">|</span>
-      <span class="i-mdi:update mr-3 text-18" /> 更新于 {{ formatDate(article.updated_at) }}
+    <div class="mb-1 mt-2 flex flex-wrap items-center lg:justify-center">
+      <span class="i-mdi:calendar mr-1" /> 发布于 {{ formatDate(article.created_at) }}
+      <span class="px-2">|</span>
+      <span class="i-mdi:update mr-1" /> 更新于 {{ formatDate(article.updated_at) }}
     </div>
-    <div>
-      <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`" class="mr-8">
-        <span class="i-material-symbols:menu mr-3 text-18" /> {{ article.category.name }}
-      </RouterLink>
+    <div class="flex gap-2">
+      <div class="f-c-c">
+        <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`">
+          <span class="i-material-symbols:menu mr-1" /> {{ article.category.name }}
+        </RouterLink>
+      </div>
       <RouterLink v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
-        <span class="mr-8 border-1px border-blue rounded-3rem px-8 py-1 text-white"> {{ tag.name }} </span>
+        <span class="border-1px border-blue rounded-xl px-2 py-1 text-sm text-white"> {{ tag.name }} </span>
       </RouterLink>
     </div>
-    <div class="my-5">
-      <span class="i-ic:twotone-text-snippet mr-3 text-18" /> 字数统计：{{ wordNum }}
-      <span class="px-6">|</span>
-      <span class="i-mdi:timelapse mr-3 text-18" /> 阅读时长：{{ readTime }}
+    <div>
+      <span class="i-ic:twotone-text-snippet mr-1" /> 字数统计：{{ wordNum }}
+      <span class="px-2">|</span>
+      <span class="i-mdi:timelapse mr-1" /> 阅读时长：{{ readTime }}
     </div>
     <div>
-      <span class="i-mdi:eye mr-3 text-18" /> 阅读量：{{ article.view_count }}
-      <span px-6>|</span>
-      <span class="i-ic:outline-insert-comment mr-3 text-18" /> 评论数：{{ article.comment_count }}
+      <span class="i-mdi:eye mr-1" /> 阅读量：{{ article.view_count }}
+      <span class="px-2">|</span>
+      <span class="i-ic:outline-insert-comment mr-1" /> 评论数：{{ article.comment_count }}
     </div>
   </div>
 </template>

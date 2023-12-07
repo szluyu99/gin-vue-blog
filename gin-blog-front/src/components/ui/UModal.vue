@@ -58,9 +58,7 @@ function close() {
       :class="[
         isOpen ? 'visible' : 'invisible duration-100 ease-in',
       ]"
-      :style="{
-        'z-index': zIndex,
-      }"
+      :style="{ 'z-index': zIndex }"
     >
       <!-- overlay -->
       <div
@@ -71,12 +69,12 @@ function close() {
         @click.self="close"
       />
       <!-- dialog -->
-      <div class="min-h-full flex items-center justify-center p-20 sm:p-6">
+      <div class="min-h-full flex items-center justify-center p-3">
         <div
           v-bind="$attrs"
           class="relative inline-block w-full rounded-lg bg-white shadow-xl transition-all dark:bg-gray-900"
           :class="[
-            padded ? 'p-15 lg:py-20 lg:px-30' : 'p-5',
+            padded ? 'p-4 lg:py-5 lg:px-7' : 'p-1',
             isOpen
               ? 'translate-y-0 opacity-100 duration-300 sm:scale-100'
               : 'translate-y-4 opacity-0 duration-300 sm:translate-y-0 sm:scale-95',
@@ -87,7 +85,7 @@ function close() {
         >
           <button
             v-if="dismissButton"
-            class="absolute right-20 top-20 h-23 w-23 rounded-full bg-gray-100 p-1 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            class="absolute right-5 top-5 h-6 w-6 rounded-full bg-gray-100 p-1 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
             @click="close"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">

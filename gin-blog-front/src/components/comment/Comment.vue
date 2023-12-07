@@ -1,13 +1,14 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import dayjs from 'dayjs'
 
 // import EmojiList from '@/assets/emoji'
 import CommentField from './CommentField.vue' // 评论 / 回复 框
 import Paging from './Paging.vue' // 分页
 import ULoading from '@/components/ui/ULoading.vue'
 
-import { convertImgUrl, formatDate } from '@/utils'
+import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
 
@@ -151,8 +152,8 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
 
 <template>
   <div>
-    <p class="flex items-center text-20 font-bold">
-      <span class="i-fa:comments mr-5 text-24 text-blue" /> 评论
+    <p class="flex items-center text-xl font-bold">
+      <span class="i-fa:comments mr-3 text-blue" /> 评论
     </p>
     <!-- 评论框 -->
     <CommentField
@@ -162,24 +163,24 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       @after-submit="reloadComments"
     />
     <!-- 评论详情 -->
-    <div v-if="commentCount > 0 && refresh">
+    <div v-if="commentCount && refresh">
       <!-- 评论数量 -->
-      <p class="mb-15 mt-30 flex items-center text-20 font-bold">
+      <p class="mb-4 mt-7 flex items-center text-xl font-bold">
         <span> {{ commentCount }} 评论 </span>
         <span
-          class="i-uiw:reload ml-15 cursor-pointer text-18"
+          class="i-uiw:reload ml-4 cursor-pointer text-xl"
           :class="listLoading ? 'animate-spin' : ''"
           @click="reloadComments"
         />
       </p>
       <!-- 评论列表 -->
-      <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-5 flex">
-        <img :src="convertImgUrl(comment.avatar)" class="h-40 w-40 duration-600 hover:rotate-360">
-        <div class="ml-10 flex flex-1 flex-col">
+      <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-1 flex">
+        <img :src="convertImgUrl(comment.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+        <div class="ml-3 flex flex-1 flex-col">
           <!-- 评论人名称 -->
           <p>
             <!-- 根据是否有 website 显示不同效果 -->
-            <span v-if="!comment.website" class="text-14">
+            <span v-if="!comment.website" class="text-sm">
               {{ comment.nickname }}
             </span>
             <a
@@ -191,16 +192,16 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             <!-- 博主标记 -->
             <span
               v-if="comment.user_id === 10"
-              class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-12 color-#fff"
+              class="ml-2 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-xs color-#fff"
             >
               博主
             </span>
           </p>
           <!-- 楼层 + 时间 + 点赞 + 回复按钮 -->
-          <div class="flex justify-between text-12">
-            <div class="flex items-center py-5 color-#b3b3b3">
+          <div class="flex justify-between text-sm">
+            <div class="flex items-center gap-2 py-1 color-#b3b3b3">
               <span> {{ commentCount - idx }}楼 </span>
-              <span class="mx-10"> {{ formatDate(comment.created_at) }} </span>
+              <span> {{ dayjs(comment.created_at).format('YYYY-MM-DD') }} </span>
               <button
                 class="i-mdi:thumb-up hover-bg-red"
                 :class="isLike(comment.id) ? 'bg-red' : ''"
@@ -213,16 +214,15 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             </button>
           </div>
           <!-- 评论内容 -->
-          <div class="my-3" v-html="comment.content" />
-
+          <div class="my-1" v-html="comment.content" />
           <!-- 评论回复 start -->
-          <div v-for="reply of comment.reply_vo_list" :key="reply.id" class="mt-10 flex">
-            <img :src="convertImgUrl(reply.avatar)" class="h-40 w-40 duration-600 hover:rotate-360">
-            <div class="ml-10 flex flex-1 flex-col">
+          <div v-for="reply of comment.reply_vo_list" :key="reply.id" class="mt-2 flex">
+            <img :src="convertImgUrl(reply.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+            <div class="ml-2 flex flex-1 flex-col">
               <!-- 回复人名称 -->
               <div>
                 <!-- 根据是否有 website 显示不同效果 -->
-                <span v-if="!reply.website" class="text-14">
+                <span v-if="!reply.website" class="text-sm">
                   {{ reply.nickname }}
                 </span>
                 <a
@@ -234,15 +234,15 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
                 <!-- 博主标记 -->
                 <span
                   v-if="reply.user_id === 10"
-                  class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-12 color-#fff"
+                  class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-sm color-#fff"
                 >
                   博主
                 </span>
               </div>
               <!-- 时间 + 点赞 + 回复按钮 -->
-              <div class="flex justify-between text-12">
+              <div class="flex justify-between text-sm">
                 <div class="flex items-center py-5 color-#b3b3b3">
-                  <span class="mr-10"> {{ formatDate(reply.created_at) }} </span>
+                  <span class="mr-10"> {{ dayjs(reply.created_at).format('YYYY-MM-DD') }} </span>
                   <button
                     class="i-mdi:thumb-up hover-bg-red"
                     :class="isLike(reply.id) ? 'bg-red' : ''"
@@ -299,11 +299,11 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             @after-submit="reloadReplies(idx)"
           />
           <!-- 分隔线: 注意最后一个评论没有线 -->
-          <div v-if="(idx + 1) !== commentCount" class="my-10 h-1 bg-light-500" />
+          <div v-if="(idx + 1) !== commentCount" class="my-2 h-1 bg-light-500" />
         </div>
       </div>
       <!-- 加载更多 -->
-      <div class="m-15 f-c-c">
+      <div class="m-4 f-c-c">
         <button
           v-if="commentCount > commentList.length && !listLoading"
           text @click="getComments"
@@ -314,7 +314,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       </div>
     </div>
     <!-- 没有评论的提示 -->
-    <div v-else class="mb-10 mt-30 text-center text-16 text-zinc">
+    <div v-else class="mb-10 mt-30 text-center text-zinc">
       暂无评论，来发评论吧~
     </div>
   </div>

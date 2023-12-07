@@ -1,17 +1,25 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
+import UToast from '@/components/ui/UToast.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
-import BackToTop from '@/components/other/BackTop.vue'
 import GlobalModal from '@/components/modal/index.vue'
+import BackToTop from '@/components/BackTop.vue'
 
 import { useAppStore, useUserStore } from '@/store'
 const appStore = useAppStore()
 const userStore = useUserStore()
 
+const messageRef = ref(null)
+const notifyRef = ref(null)
+
 onMounted(() => {
   appStore.getBlogInfo()
   userStore.getUserInfo()
+
+  // 挂载全局提示
+  window.$message = messageRef.value
+  window.$notify = notifyRef.value
 })
 
 // 禁止右键菜单
@@ -19,6 +27,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <UToast ref="messageRef" position="top" align="center" :timeout="3000" closeable />
+  <UToast ref="notifyRef" position="top" align="right" :timeout="3000" closeable />
+
   <div class="h-full w-full flex flex-col">
     <!-- 顶部导航栏 -->
     <AppHeader />
