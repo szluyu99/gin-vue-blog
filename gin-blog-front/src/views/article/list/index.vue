@@ -25,47 +25,50 @@ onMounted(async () => {
 
 <template>
   <BannerPage :loading="loading" :title="`${route.meta?.title} - ${name}`" label="article_list">
-    <div class="grid grid-cols-12 gap-x-15 gap-y-10">
+    <div class="grid grid-cols-12 gap-x-4 gap-y-2">
       <div v-for="article of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
         <!-- 卡片 -->
-        <div class="animate-zoom-in animate-duration-650 rounded-2rem bg-white shadow-md transition-300 hover:shadow-2xl">
+        <div class="animate-zoom-in animate-duration-650 rounded-xl bg-white pb-2 shadow-md transition-300 hover:shadow-2xl">
           <!-- 图片 -->
           <div class="overflow-hidden">
             <RouterLink :to="`/article/${article.id}`">
-              <img :src="convertImgUrl(article.img)" class="h-220 w-full rounded-t-1rem transition-600 hover:scale-110">
+              <img :src="convertImgUrl(article.img)" class="h-[220px] w-full rounded-t-xl transition-600 hover:scale-110">
             </RouterLink>
           </div>
           <!-- 内容 -->
           <div>
-            <!-- 标题 -->
-            <RouterLink :to="`/article/${article.id}`">
-              <p class="inline-block px-15 pb-6 pt-12 text-17 hover:color-violet">
-                {{ article.title }}
-              </p>
-            </RouterLink>
-            <p class="flex justify-between px-15 py-3">
-              <!-- 发布日期 -->
-              <span class="flex items-center">
-                <span class="i-mdi:clock-outline mr-3 text-20" />
-                <span class="text-16"> {{ dayjs(article.created_at).format('YYYY-MM-DD') }} </span>
-              </span>
-              <!-- 分类 -->
-              <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`">
-                <div class="flex items-center text-#4c4948 hover:color-violet">
-                  <span class="i-ic:outline-bookmark mr-3 text-20" />
-                  <span class="text-16"> {{ article.category.name }} </span>
-                </div>
+            <div class="space-y-1.5">
+              <!-- 标题 -->
+              <RouterLink :to="`/article/${article.id}`">
+                <p class="inline-block px-3 pt-2 hover:color-violet">
+                  {{ article.title }}
+                </p>
               </RouterLink>
-            </p>
-            <div class="my-5 h-1 border-1px rounded-1rem" />
+              <div class="flex justify-between px-3">
+                <!-- 发布日期 -->
+                <span class="flex items-center">
+                  <span class="i-mdi:clock-outline mr-1" />
+                  <span> {{ dayjs(article.created_at).format('YYYY-MM-DD') }} </span>
+                </span>
+                <!-- 分类 -->
+                <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`">
+                  <div class="flex items-center text-#4c4948 transition-300 hover:color-violet">
+                    <span class="i-ic:outline-bookmark mr-1" />
+                    <span> {{ article.category.name }} </span>
+                  </div>
+                </RouterLink>
+              </div>
+            </div>
+            <!-- divider -->
+            <div class="my-2 h-0.5 bg-gray-200" />
             <!-- 标签 -->
-            <p class="px-15 pb-10 pt-6">
+            <div class="px-3 space-x-1.5">
               <RouterLink v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">
-                <span class="mr-3rem inline-block cursor-pointer rounded-3rem from-green-400 to-blue-500 bg-gradient-to-r px-12 py-3 text-12 text-white transition-500 hover:scale-120 hover:from-pink-500 hover:to-yellow-500">
+                <span class="inline-block cursor-pointer rounded-xl from-green-400 to-blue-500 bg-gradient-to-r px-2 py-1 text-xs text-white transition-500 hover:scale-110 hover:from-pink-500 hover:to-yellow-500">
                   {{ tag.name }}
                 </span>
               </RouterLink>
-            </p>
+            </div>
           </div>
         </div>
       </div>

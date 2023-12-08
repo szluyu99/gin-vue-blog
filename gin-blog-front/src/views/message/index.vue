@@ -38,7 +38,7 @@ async function send() {
   const data = {
     avatar: userStore.avatar,
     nickname: userStore.nickname,
-    content,
+    content: content.value,
   }
   await api.saveMessage(data)
   dmRef.value.push(data)

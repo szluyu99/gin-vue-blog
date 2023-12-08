@@ -7,6 +7,7 @@ import GlobalModal from '@/components/modal/index.vue'
 import BackToTop from '@/components/BackTop.vue'
 
 import { useAppStore, useUserStore } from '@/store'
+
 const appStore = useAppStore()
 const userStore = useUserStore()
 
@@ -27,7 +28,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- 顶部中间的消息提示 -->
   <UToast ref="messageRef" position="top" align="center" :timeout="3000" closeable />
+  <!-- 右上方的消息通知 -->
   <UToast ref="notifyRef" position="top" align="right" :timeout="3000" closeable />
 
   <div class="h-full w-full flex flex-col">
