@@ -8,7 +8,7 @@ import { useAppStore } from '@/store'
 const { pageList, blogConfig } = storeToRefs(useAppStore())
 
 // 打字机特效配置
-const typeObj = reactive({
+const typer = reactive({
   output: '',
   isEnd: false, // 全局控制是否终止
   speed: 300, // 打字速度
@@ -27,8 +27,8 @@ function getOneSentence() {
   // 一言 + 打字机特效
   fetch('https://v1.hitokoto.cn?c=i')
     .then(res => res.json())
-    .then(data => new EasyTyper(typeObj, data.hitokoto, () => {}, () => {}))
-    .catch(() => new EasyTyper(typeObj, '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {}))
+    .then(data => new EasyTyper(typer, data.hitokoto, () => {}, () => {}))
+    .catch(() => new EasyTyper(typer, '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {}))
 }
 
 function scrollDown() {
@@ -49,16 +49,16 @@ const coverStyle = computed(() => {
 
 <template>
   <div class="banner-fade-down absolute bottom-0 left-0 right-0 h-screen text-center text-white" :style="coverStyle">
-    <div class="absolute inset-x-0 mt-43vh text-center space-y-3">
+    <div class="absolute inset-x-0 mt-[43vh] text-center space-y-3">
       <h1 class="animate-zoom-in text-4xl font-bold lg:text-5xl">
         {{ blogConfig.website_name }}
       </h1>
       <div class="text-lg lg:text-xl">
-        {{ typeObj.output }}
+        {{ typer.output }}
         <span class="animate-ping"> | </span>
       </div>
       <!-- 社交信息（移动端专用） -->
-      <div class="text-xl lg:hidden space-x-5">
+      <div class="text-2xl lg:hidden space-x-5">
         <a :href="`http://wpa.qq.com/msgrd?v=3&uin=${blogConfig.qq}&site=qq&menu=yes`" target="_blank">
           <span class="i-ant-design:qq-circle-filled inline-block" />
         </a>

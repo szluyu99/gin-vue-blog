@@ -2,10 +2,10 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NInputNumber, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 import IconPicker from '@/components/icon/IconPicker.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
 
@@ -16,13 +16,15 @@ import api from '@/api'
 defineOptions({ name: '菜单管理' })
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  keyword: '',
+})
 
 // 表单初始化内容
-const initForm = ref({
+const initForm = {
   order_num: 1,
   is_hidden: 0,
-})
+}
 
 const {
   modalVisible,
@@ -114,14 +116,14 @@ const columns = [
             type: 'primary',
             style: `display: ${row.children ? '' : 'none'};`,
             onClick: () => {
-              initForm.value.is_catalogue = false // 设置非目录(显示组件路径)
-              initForm.value.component = '' // 手动清空组件路径
-              initForm.value.parent_id = row.id // 设置父菜单id
+              initForm.is_catalogue = false // 设置非目录(显示组件路径)
+              initForm.component = '' // 手动清空组件路径
+              initForm.parent_id = row.id // 设置父菜单id
               showMenuType.value = false
               handleAdd()
             },
           },
-          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 16 }) },
+          { default: () => '新增', icon: renderIcon('material-symbols:add', {}) },
         ),
         h(
           NButton,
@@ -134,12 +136,12 @@ const columns = [
               handleEdit(row)
             },
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
+          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', {}) },
         ),
         h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete([row.id], false),
+            onPositiveClick: () => handleDelete(row.id, false),
           },
           {
             trigger: () =>
@@ -152,7 +154,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+                  icon: renderIcon('material-symbols:delete-outline', {}),
                 },
               ),
             default: () => h('div', {}, '确定删除该菜单吗?'),
@@ -165,35 +167,36 @@ const columns = [
 
 // 修改是否隐藏
 async function handleUpdateHidden(row) {
-  if (!row.id)
-    return
-  row.publishing = true
-  row.is_hidden = row.is_hidden === 0 ? 1 : 0
-  await api.saveOrUpdateMenu(row)
-  row.publishing = false
-  $message?.success(row.is_hidden ? '已隐藏' : '已取消隐藏')
+  if (row.id) {
+    row.publishing = true
+    row.is_hidden = (row.is_hidden === 0 ? 1 : 0)
+    await api.saveOrUpdateMenu(row)
+    row.publishing = false
+    $message?.success(row.is_hidden ? '已隐藏' : '已取消隐藏')
+  }
 }
 
 // 新增菜单(可选目录)
 function handleClickAdd() {
   showMenuType.value = true
-  initForm.value.is_catalogue = true // 默认选中"目录"
-  initForm.value.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
-  initForm.value.parent_id = 0 // 目录和一级菜单的父id是 0
+  initForm.is_catalogue = true // 默认选中"目录"
+  initForm.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
+  initForm.parent_id = 0 // 目录和一级菜单的父id是 0
   handleAdd()
 }
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="菜单管理">
+  <CommonPage title="菜单管理">
     <template #action>
       <NButton type="primary" @click="handleClickAdd">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新建菜单
+        <template #icon>
+          <span class="i-material-symbols:add" />
+        </template>
+        新建菜单
       </NButton>
     </template>
 
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -203,26 +206,24 @@ function handleClickAdd() {
       :single-line="true"
     >
       <template #queryBar>
-        <QueryBarItem label="菜单名" :label-width="50">
+        <QueryItem label="菜单名" :label-width="50">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
             placeholder="请输入菜单名"
-            @keydown.enter="$table?.handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑/查看 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
       @save="handleSave"
     >
-      <!-- 表单 -->
       <NForm
         ref="modalFormRef"
         label-placement="left"

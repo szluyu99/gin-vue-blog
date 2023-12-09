@@ -3,14 +3,7 @@
     "Vue.volar",
     "antfu.iconify",
     "antfu.unocss",
-    "antfu.goto-alias",
     "dbaeumer.vscode-eslint",
-    "EditorConfig.EditorConfig",
-    "formulahendry.auto-rename-tag",
-    "formulahendry.auto-close-tag",
-    "vincaslt.highlight-matching-tag",
-    "formulahendry.auto-complete-tag",
-    "wayou.vscode-todo-highlight",
-    "aaron-bond.better-comments",
+    "EditorConfig.EditorConfig"
   ]
 }

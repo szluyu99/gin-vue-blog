@@ -5,6 +5,7 @@ import config from '@/assets/config'
 import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
 import { useAppStore } from '@/store'
+
 const appStore = useAppStore()
 
 const registerFlag = computed({
@@ -17,8 +18,6 @@ const form = ref({
   password: '',
   code: '',
 })
-
-const rules = {}
 
 // 注册
 async function handleRegister() {

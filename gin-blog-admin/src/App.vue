@@ -7,7 +7,7 @@ import { getToken } from '@/utils'
 
 onMounted(() => {
   const token = getToken()
-  token && api.report() // token 不为空, 上报用户信息
+  token && api.report() // 上报用户信息
 })
 </script>
 

@@ -1,5 +1,7 @@
 ## 博客交流群
 
+2023-12-09：最近项目处于重构中，会经历快速迭代，线上版本不一定是最新，暂时不要上生产环境
+
 项目交流 QQ 群号：777260310
 
 ## 博客介绍
@@ -87,7 +89,7 @@ Github 上有很多优秀的前后台框架，本项目也参考了许多开源�
 
 ### 技术介绍
 
-> 这里只写一些主流的通用技术，详细第三方库：前端参考 `package.json` 文件，后端参考 `go.mod` 文件
+> 这里写一些主流的通用技术，详细第三方库：前端参考 `package.json` 文件，后端参考 `go.mod` 文件
 
 前端技术栈: 使用 pnpm 包管理工具
 
@@ -250,6 +252,8 @@ deploy
 
 需要修改源码的话，参考常规运行，前后端分开运行。
 
+本项目开发环境是 Linux，如果 Windows 下运行有奇奇怪怪的问题，可以进群交流或提 Issue
+
 ### 拉取项目前的准备 (Windows)
 
 如果是 Windows 系统，需要先执行以下指令，否则 Docker 构建过程会出 BUG。
@@ -267,7 +271,7 @@ git config --global core.autocrlf false
 
 ### 方式一：Docker Compose 一键运行
 
-> 该部分目前可能有 BUG，最近在重新修正
+> 2023-12-09：该部分目前可能有 BUG，最近在重新修正，可以参考方式二进行运行
 
 需要有 Docker 和 Docker Compose 的环境
 
@@ -301,11 +305,13 @@ docker-compose up -d
 
 需要安装 Golang、Node、MySQL、Redis 环境：
  
-Golang 安装参考 [官方文档](https://go.dev/doc/install)
+- Golang 安装参考 [官方文档](https://go.dev/doc/install)
 
-Node 安装建议使用 [Nvm](https://nvm.uihtm.com/)，也可以直接去 [Node 官网](https://nodejs.org/en) 下载
+- Node 安装建议使用 [Nvm](https://nvm.uihtm.com/)，也可以直接去 [Node 官网](https://nodejs.org/en) 下载
 
-MySQL、Redis 建议使用 Docker 安装
+- MySQL、Redis 建议使用 Docker 安装
+
+> 以下使用 Docker 安装环境，未做持久化处理，仅用于开发和演示
 
 Docker 安装 MySQL：
 
@@ -371,7 +377,7 @@ go run main.go
 - 普通用户 user 123456
 - 测试用户 test 123456
 
-前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 pnpm
+前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 `pnpm`
 
 ```bash
 npm install -g pnpm
@@ -421,7 +427,7 @@ TODO
 - [https://github.com/antfu/vitesse](https://github.com/antfu/vitesse)
 - ...
 
-⭐ 博客后台的前端基于 [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) 进行二开，感谢作者的开源。
+⭐ 博客后台的前端基于 [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) 进行二开，感谢作者的开源。但是和原项目区别较大，详见 [gin-blog-admin/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/gin-blog-admin)
 
 > 需要感谢的绝不止以上这些开源项目，但是一时难以全部列出，后面会慢慢补上。
 

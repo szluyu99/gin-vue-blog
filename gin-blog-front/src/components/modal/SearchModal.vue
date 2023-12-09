@@ -26,8 +26,8 @@ debouncedWatch(
 )
 
 async function handleSearch() {
-  const res = await api.searchArticles({ keyword: keyword.value })
-  articleList.value = res.data
+  const resp = await api.searchArticles({ keyword: keyword.value })
+  articleList.value = resp.data
 }
 </script>
 
@@ -80,4 +80,3 @@ async function handleSearch() {
   -webkit-box-orient: vertical;
 }
 </style>
-

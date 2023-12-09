@@ -50,10 +50,8 @@ onMounted(() => {
   })
 
   setTimeout(() => {
-    document.querySelectorAll('pre code').forEach((el) => {
-      hljs.highlightElement(el)
-    })
-  }, 100)
+    document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
+  }, 300)
 })
 
 const styleVal = computed(() =>

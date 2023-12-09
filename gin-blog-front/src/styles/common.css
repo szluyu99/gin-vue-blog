@@ -6,5 +6,5 @@
 
 /* 卡片面板 */
 .card-view {
-  @apply bg-white p-3 rounded-xl hover:shadow-2xl transition-500;
+  @apply bg-white p-3 rounded-xl transition-500 hover:shadow-2xl;
 }

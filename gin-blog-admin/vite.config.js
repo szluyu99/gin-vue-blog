@@ -1,42 +1,40 @@
-import { resolve } from 'node:path'
+import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import unocss from 'unocss/vite'
-import visualizer from 'rollup-plugin-visualizer'
+import viteCompression from 'vite-plugin-compression'
+import { visualizer } from 'rollup-plugin-visualizer'
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
+  const env = loadEnv(mode, process.cwd())
 
   return {
-    base: process.env.VITE_PUBLIC_PATH || '/',
+    base: env.VITE_PUBLIC_PATH || '/',
     resolve: {
-      alias: { '@': resolve(__dirname, 'src') },
+      alias: {
+        '@': path.resolve(process.cwd(), 'src'),
+        '~': path.resolve(process.cwd()),
+      },
     },
     plugins: [
       vue(),
       unocss(),
-      visualizer({
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-      }),
+      viteCompression({ algorithm: 'gzip' }),
+      visualizer({ open: true, gzipSize: true, brotliSize: true }),
     ],
     server: {
-      hmr: true,
       host: '0.0.0.0',
-      port: 3000,
+      port: env.VITE_PORT,
+      open: false,
       proxy: {
         '/api': {
-          target: 'http://localhost:8765',
+          target: env.VITE_SERVER_URL,
           changeOrigin: true,
         },
       },
     },
     // https://cn.vitejs.dev/guide/api-javascript.html#build
     build: {
-      target: 'es2015',
-      reportCompressedSize: false,
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
     },
     esbuild: {

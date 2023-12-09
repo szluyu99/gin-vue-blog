@@ -3,11 +3,9 @@ import { convertImgUrl, getToken, removeToken } from '@/utils'
 import api from '@/api'
 
 export const useUserStore = defineStore('user', {
-  state() {
-    return {
-      userInfo: {},
-    }
-  },
+  state: () => ({
+    userInfo: {},
+  }),
   getters: {
     userId: state => state.userInfo.id ?? '',
     nickname: state => state.userInfo.nickname ?? '',
@@ -25,8 +23,8 @@ export const useUserStore = defineStore('user', {
         return
 
       try {
-        const res = await api.getUser()
-        if (res.code === 0) {
+        const resp = await api.getUser()
+        if (resp.code === 0) {
           const {
             id,
             nickname,
@@ -36,7 +34,7 @@ export const useUserStore = defineStore('user', {
             email,
             article_like_set,
             comment_like_set,
-          } = res.data
+          } = resp.data
           this.userInfo = {
             id,
             nickname,
@@ -48,11 +46,13 @@ export const useUserStore = defineStore('user', {
             commentLikeSet: comment_like_set.map(e => +e),
           }
           this.userInfo.avatar = convertImgUrl(this.userInfo.avatar)
-          return Promise.resolve(res.data)
-        } else {
-          return Promise.reject(res)
+          return Promise.resolve(resp.data)
         }
-      } catch (error) {
+        else {
+          return Promise.reject(resp)
+        }
+      }
+      catch (error) {
         return Promise.reject(error)
       }
     },
@@ -72,4 +72,3 @@ export const useUserStore = defineStore('user', {
     },
   },
 })
-

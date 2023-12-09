@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue'
 import { NButton, NDropdown, NForm, NFormItem, NImage, NInput } from 'naive-ui'
 
-import CrudModal from '@/components/table/CrudModal.vue'
-import UploadOne from '@/components/upload/UploadOne.vue'
-import CommonPage from '@/components/page/CommonPage.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import UploadOne from '@/components//UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
 
 import { convertImgUrl, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -29,7 +29,6 @@ const {
   refresh: fetchData,
 })
 
-// ref 语法糖使用
 const pageList = ref([])
 const reloadFlag = ref(false)
 const uploadOneRef = ref(null) // 图片上传 ref 对象
@@ -52,22 +51,24 @@ function refreshImg(img) {
 
 // 注意 handleSelect 第一个参数
 function handleSelect(key, page) {
-  if (key === 'edit')
+  if (key === 'edit') {
     handleEdit(page)
-  else if (key === 'delete')
+  }
+  else if (key === 'delete') {
     handleDelete([page.id])
+  }
 }
 
 const options = [
   {
     label: '编辑',
     key: 'edit',
-    icon: renderIcon('mingcute:edit-2-line', { size: '15px' }),
+    icon: renderIcon('mingcute:edit-2-line', {}),
   },
   {
     label: '删除',
     key: 'delete',
-    icon: renderIcon('mingcute:delete-back-line', { size: '15px' }),
+    icon: renderIcon('mingcute:delete-back-line', {}),
   },
 ]
 </script>
@@ -76,7 +77,10 @@ const options = [
   <CommonPage title="页面管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新建页面
+        <template #icon>
+          <span class="i-material-symbols:add" />
+        </template>
+        新建页面
       </NButton>
     </template>
     <div class="flex flex-wrap justify-between">
@@ -103,7 +107,6 @@ const options = [
       <div class="h-0 w-300" />
     </div>
 
-    <!-- 新增/编辑/查看 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       width="550px"

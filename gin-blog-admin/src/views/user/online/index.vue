@@ -2,8 +2,8 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NImage, NPopconfirm } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import api from '@/api'
@@ -20,12 +20,12 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 50,
+    width: 40,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 50,
-        'imgProps': { style: { 'border-radius': '3px' } },
+        'height': 40,
+        'imgProps': { style: { 'border-radius': '1px' } },
         'src': convertImgUrl(row.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
@@ -112,7 +112,7 @@ const columns = [
               { size: 'small', type: 'primary' },
               {
                 default: () => '下线',
-                icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+                icon: renderIcon('material-symbols:delete-outline', {}),
               },
             ),
           default: () => h('div', {}, '确定强制该用户下线吗?'),
@@ -126,11 +126,11 @@ const columns = [
 async function handleForceOffline(row) {
   try {
     await api.forceOfflineUser(row)
-    $message.success('该用户已被强制下线!')
+    window.$message.success('该用户已被强制下线!')
     $table.value?.handleSearch()
   }
   catch (err) {
-    $message.error('强制下线失败!')
+    window.$message.error('强制下线失败!')
   }
 }
 </script>

@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { NAvatar, NButton, NCard, NGi, NGradientText, NGrid, NStatistic } from 'naive-ui'
 
-import AppPage from '@/components/page/AppPage.vue'
+import AppPage from '@/components/common/AppPage.vue'
 import { useUserStore } from '@/store'
 import api from '@/api'
 
@@ -26,7 +26,7 @@ async function getOneSentence() {
 </script>
 
 <template>
-  <AppPage :show-footer="true">
+  <AppPage>
     <div class="flex-1">
       <NCard class="rounded-10">
         <div class="flex items-center">

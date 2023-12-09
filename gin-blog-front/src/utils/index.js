@@ -5,8 +5,8 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 /**
  * 将相对地址转换为完整的图片路径
- * @param {String} imgUrl
- * @returns {String}
+ * @param {string} imgUrl
+ * @returns {string} 完整的图片路径
  */
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {

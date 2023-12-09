@@ -8,6 +8,7 @@ import api from '@/api'
 import { setToken } from '@/utils'
 
 import { useAppStore, useUserStore } from '@/store'
+
 const [appStore, userStore] = [useAppStore(), useUserStore()]
 
 const registerFlag = computed({
@@ -46,12 +47,12 @@ async function handleLogin() {
 
   if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
   // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-    const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA,
-      async (res) => {
-        res.ret === 0 && doLogin(username, password)
-      })
+    const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
+      res.ret === 0 && doLogin(username, password)
+    })
     captcha.show()
-  } else {
+  }
+  else {
     doLogin(username, password)
   }
 }

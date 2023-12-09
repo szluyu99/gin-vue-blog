@@ -1,19 +1,19 @@
-import path from 'path'
+import path from 'node:path'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import unocss from 'unocss/vite'
 import viteCompression from 'vite-plugin-compression'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig((configEnv) => {
   const env = loadEnv(configEnv.mode, process.cwd())
 
   return {
-    base: env.VITE_PUBLIC_PATH,
+    base: env.VITE_PUBLIC_PATH || '/',
     resolve: {
       alias: {
-        '@': path.resolve(path.resolve(process.cwd()), 'src'), // 项目 src 路径
-        '~': path.resolve(process.cwd()), // 项目根路径
+        '@': path.resolve(path.resolve(process.cwd()), 'src'),
+        '~': path.resolve(process.cwd()),
       },
     },
     plugins: [
@@ -28,18 +28,14 @@ export default defineConfig((configEnv) => {
       open: false,
       proxy: {
         '/api/front': {
-          target: 'http://localhost:5678', // TODO: 后端 URL
+          target: env.VITE_BACKEND_URL,
           changeOrigin: true,
         },
       },
     },
+    // https://cn.vitejs.dev/guide/api-javascript.html#build
     build: {
-      reportCompressedSize: false,
-      sourcemap: false,
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制 (单位 kb)
-      commonjsOptions: {
-        ignoreTryCatch: false,
-      },
     },
   }
 })

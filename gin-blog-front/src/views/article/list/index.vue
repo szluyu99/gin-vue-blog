@@ -14,11 +14,11 @@ const articleList = ref([])
 const name = ref(route.query.name) // 标题上显示的 标签/分类 名称
 
 onMounted(async () => {
-  const res = await api.getArticles({
+  const resp = await api.getArticles({
     category_id: route.params.categoryId,
     tag_id: route.params.tagId,
   })
-  articleList.value = res.data
+  articleList.value = resp.data
   loading.value = false
 })
 </script>

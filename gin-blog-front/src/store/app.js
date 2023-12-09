@@ -1,34 +1,26 @@
 import { defineStore } from 'pinia'
-import api from '@/api'
 import { convertImgUrl } from '@/utils'
+import api from '@/api'
 
 export const useAppStore = defineStore('app', {
-  persist: true, // pinia 持久化插件
-  state() {
-    return {
-      // 搜索
-      searchFlag: false,
-      // 登录
-      loginFlag: false,
-      // 注册
-      registerFlag: false,
-      // 忘记密码
-      forgetFlag: false,
+  persist: true,
+  state: () => ({
+    searchFlag: false,
+    loginFlag: false,
+    registerFlag: false,
 
-      // 侧边栏折叠（移动端）
-      collapsed: false,
+    collapsed: false, // 侧边栏折叠（移动端）
 
-      blogInfo: {
-        blog_config: {
-          website_name: '阵、雨的个人博客',
-          website_author: '阵、雨',
-          website_intro: '往事随风而去',
-          website_avatar: '',
-        },
-        pageList: [],
+    blogInfo: {
+      blog_config: {
+        website_name: '阵、雨的个人博客',
+        website_author: '阵、雨',
+        website_intro: '往事随风而去',
+        website_avatar: '',
       },
-    }
-  },
+      pageList: [],
+    },
+  }),
   getters: {
     isMobile: () => !!navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i),
     articleCount: state => state.blogInfo.article_count ?? 0,
@@ -42,20 +34,21 @@ export const useAppStore = defineStore('app', {
     setCollapsed(flag) { this.collapsed = flag },
     setLoginFlag(flag) { this.loginFlag = flag },
     setRegisterFlag(flag) { this.registerFlag = flag },
-    setForgetFlag(flag) { this.forgetFlag = flag },
     setSearchFlag(flag) { this.searchFlag = flag },
 
     async getBlogInfo() {
       try {
-        const res = await api.getHomeData()
-        if (res.code === 0) {
-          this.blogInfo = res.data
+        const resp = await api.getHomeData()
+        if (resp.code === 0) {
+          this.blogInfo = resp.data
           this.blogInfo.page_list?.map(e => (e.cover = convertImgUrl(e.cover)))
           this.blogInfo.blog_config.website_avatar = convertImgUrl(this.blogInfo.blog_config.website_avatar)
-        } else {
-          return Promise.reject(res)
         }
-      } catch (err) {
+        else {
+          return Promise.reject(resp)
+        }
+      }
+      catch (err) {
         return Promise.reject(err)
       }
     },

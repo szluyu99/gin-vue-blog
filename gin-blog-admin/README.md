@@ -1,5 +1,11 @@
 本后台项目基于这个项目骨架：[https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin), 感谢开源作者的奉献。
 
+## 项目路由
+
+后端路由：由后端传来一个基础的菜单数组, 前端组装成可访问的路由格式 
+
+前端路由: 加载前端写死的路由, 根据其 meta.requireAuth 判断是否需要鉴权, 同时由前端判断角色
+
 ## 相比 Vue Naive Admin 项目的变化
 
 原则：一个问题不需要太多解决方案，所以本项目中只保留最常用的解决方案，如果实在不能解决需求，需要自行添加

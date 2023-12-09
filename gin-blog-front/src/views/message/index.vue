@@ -25,8 +25,8 @@ const danmus = ref([{
 }])
 
 onMounted(async () => {
-  const res = await api.getMessages()
-  danmus.value = [...danmus.value, ...res.data]
+  const resp = await api.getMessages()
+  danmus.value = [...danmus.value, ...resp.data]
 })
 
 async function send() {
@@ -103,7 +103,7 @@ const coverStyle = computed(() => {
       </ul>
     </div>
     <!-- 弹幕列表 -->
-    <div class="absolute inset-0 top-60">
+    <div class="absolute inset-0 top-[60px]">
       <vue-danmaku
         ref="dmRef"
         v-model:danmus="danmus"
@@ -117,7 +117,7 @@ const coverStyle = computed(() => {
       >
         <template #dm="{ danmu }">
           <div class="flex items-center rounded-3xl bg-#00000060 px-2 py-1 text-white lg:px-4 lg:py-2">
-            <img class="h-[28px] rounded-full" :src="convertImgUrl(danmu.avatar)" alt="danmu avatar">
+            <img class="h-[28px] rounded-full" :src="convertImgUrl(danmu.avatar)" alt="avatar">
             <span class="ml-2 text-sm"> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
           </div>
         </template>

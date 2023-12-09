@@ -1,16 +1,25 @@
 <script setup>
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { NLayout, NLayoutSider } from 'naive-ui'
 
-import { header, tags } from '../../setting/theme.json'
-import AppHeader from './components/header/index.vue'
-import AppMain from './components/AppMain.vue'
-import Sidebar from './components/sidebar/index.vue'
-import AppTags from './components/tags/index.vue'
+import AppHeader from './header/index.vue'
+import Sidebar from './sidebar/index.vue'
+import AppTags from './tags/index.vue'
 
-import { useThemeStore } from '@/store'
+import { useTagStore, useThemeStore } from '@/store'
+import themes from '@/assets/themes'
 
 const { collapsed } = storeToRefs(useThemeStore())
+const { reloading, aliveKeys } = storeToRefs(useTagStore())
+const router = useRouter()
+
+// 缓存的路由名
+const keepAliveRouteNames = computed(() => {
+  const allRoutes = router.getRoutes() // 所有路由
+  return allRoutes.filter(route => route.meta?.keepAlive).map(route => route.name)
+})
 </script>
 
 <template>
@@ -30,18 +39,26 @@ const { collapsed } = storeToRefs(useThemeStore())
     <article class="flex flex-1 flex-col overflow-hidden">
       <!-- 头部 -->
       <header
-        :style="`height: ${header.height}px`"
         class="flex items-center border-b-1 border-gray-200 border-b-solid px-15"
+        :style="{ height: `${themes.header.height}px` }"
       >
         <AppHeader />
       </header>
       <!-- 标签栏 -->
-      <section v-if="tags.visible" class="border-b border-gray-200 border-b-solid">
-        <AppTags :style="{ height: `${tags.height}px` }" />
+      <section v-if="themes.tags.visible" class="border-b border-gray-200 border-b-solid">
+        <AppTags :style="{ height: `${themes.tags.height}px` }" />
       </section>
       <!-- 主体内容 -->
       <section class="flex-1 overflow-hidden">
-        <AppMain />
+        <RouterView v-slot="{ Component, route }">
+          <KeepAlive :include="keepAliveRouteNames">
+            <component
+              :is="Component"
+              v-if="reloading"
+              :key="aliveKeys[route.name] || route.fullPath"
+            />
+          </keepalive>
+        </RouterView>
       </section>
     </article>
   </NLayout>

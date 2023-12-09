@@ -10,10 +10,8 @@
 	height: 100%;
 }
 
-.loading-svg {
-	width: 128px;
-	height: 128px;
-	color: var(--primary-color);
+.loading-logo {
+  height: 120px;
 }
 
 .loading-spin__container {
@@ -87,5 +85,5 @@
 .loading-title {
   font-size: 28px;
 	font-weight: 500;
-  color: #6a6a6a;
+  color: var(--primary-color);
 }

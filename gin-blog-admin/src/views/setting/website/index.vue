@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { NButton, NDatePicker, NForm, NFormItem, NInput, NRadio, NRadioGroup, NTabPane, NTabs } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import UploadOne from '@/components/upload/UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import UploadOne from '@/components//UploadOne.vue'
 
 import { useAppStore } from '@/store'
 import api from '@/api'
@@ -11,10 +11,36 @@ import api from '@/api'
 defineOptions({ name: '网站管理' })
 
 const appStore = useAppStore()
-appStore.getBlogInfo()
 
 const formRef = ref(null)
-const form = ref(appStore.blogConfig)
+const form = ref({
+  website_avatar: '',
+  website_name: '阵、雨的个人博客',
+  website_author: '阵、雨',
+  website_intro: '往事随风而去',
+  website_notice: '博客后端基于 gin、gorm 开发\n博客前端基于 Vue3、TS、NaiveUI 开发\n努力开发中...冲冲冲！加油！',
+  website_createtime: '2022-11-01',
+  website_record: '鲁ICP备2022040119号',
+  social_login_list: [],
+  social_url_list: [],
+  qq: '123456789',
+  github: 'https://github.com/szluyu99',
+  gitee: 'https://gitee.com/szluyu99',
+  tourist_avatar: 'https://cdn.hahacode.cn/16815451239215dc82548dcadcd578a5bbc8d5deaa.jpg',
+  user_avatar: 'https://cdn.hahacode.cn/2299fc4d14c94e6183b082973b35855d.png',
+  article_cover: 'https://cdn.hahacode.cn/1679461519cc592408198d67faf1290ff8969dc614.png',
+  is_comment_review: 1,
+  is_message_review: 1,
+  is_email_notice: 0,
+  is_reward: 0,
+  wechat_qrcode: 'http://dummyimage.com/100x100',
+  alipay_ode: 'http://dummyimage.com/100x100',
+})
+
+onMounted(async () => {
+  await appStore.getBlogInfo()
+  form.value = { ...appStore.blogConfig }
+})
 
 function handleSave() {
   formRef.value?.validate(async (err) => {
@@ -24,7 +50,7 @@ function handleSave() {
         await api.updateBlogConfig(form.value)
         $loadingBar?.finish()
         $message.success('博客信息更新成功')
-        appStore.getBlogInfo() // 重新加载信息
+        appStore.getBlogInfo()
       }
       catch (err) {
         $loadingBar?.error()
@@ -35,7 +61,7 @@ function handleSave() {
 </script>
 
 <template>
-  <CommonPage :show-header="false">
+  <CommonPage :show-header="false" show-footer>
     <NTabs type="line" animated>
       <NTabPane name="website" tab="网站信息">
         <NForm

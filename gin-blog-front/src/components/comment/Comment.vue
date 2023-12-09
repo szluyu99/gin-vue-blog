@@ -35,13 +35,13 @@ const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId })
 async function getComments() {
   listLoading.value = true
   try {
-    const res = await api.getComments(params)
+    const resp = await api.getComments(params)
     // * 全局加载更多, 0.8s 延时
     setTimeout(() => {
       params.page_num === 1
-        ? commentList.value = res.data.pageData
-        : commentList.value.push(...res.data.pageData)
-      commentCount.value = res.data.total
+        ? commentList.value = resp.data.pageData
+        : commentList.value.push(...resp.data.pageData)
+      commentCount.value = resp.data.total
       params.page_num++
       listLoading.value = false
     }, 800)

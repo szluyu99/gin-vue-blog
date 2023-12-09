@@ -2,10 +2,10 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NGradientText, NInput, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch, NTag } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -14,7 +14,9 @@ import api from '@/api'
 defineOptions({ name: '接口管理' })
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  keyword: '',
+})
 
 const {
   modalVisible,
@@ -191,7 +193,10 @@ async function handleModuleSave() {
   <CommonPage title="接口管理">
     <template #action>
       <NButton type="primary" @click="handleAddModule">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新增模块
+        <template #icon>
+          <span class="i-material-symbols:add" />
+        </template>
+        新增模块
       </NButton>
     </template>
 
@@ -204,15 +209,15 @@ async function handleModuleSave() {
       :single-line="true"
     >
       <template #queryBar>
-        <QueryBarItem label="资源名" :label-width="50">
+        <QueryItem label="资源名" :label-width="50">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
             placeholder="请输入资源名"
-            @keydown.enter="$table?.handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 

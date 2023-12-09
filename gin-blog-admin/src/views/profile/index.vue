@@ -2,14 +2,13 @@
 import { ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NTabPane, NTabs } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import UploadOne from '@/components/upload/UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import UploadOne from '@/components//UploadOne.vue'
 import { useUserStore } from '@/store'
 import api from '@/api'
 
 const userStore = useUserStore()
 
-// 用户信息的表单
 const infoFormRef = ref(null)
 const infoForm = ref({
   avatar: userStore.avatar,
@@ -17,6 +16,7 @@ const infoForm = ref({
   intro: userStore.intro,
   website: userStore.website,
 })
+
 async function updateProfile() {
   infoFormRef.value?.validate(async (err) => {
     if (!err) {

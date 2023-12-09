@@ -3,13 +3,13 @@ import { defineOptions, h, onActivated, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NButton, NImage, NInput, NPopconfirm, NSelect, NSwitch, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { convertImgUrl, downloadFile, formatDate, getToken, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate, getToken, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
-import { articleTypeMap, articleTypeOptions } from '@/constant/data'
+import { articleTypeMap, articleTypeOptions } from '@/assets/config'
 import api from '@/api'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
@@ -23,7 +23,12 @@ const categoryOptions = ref([])
 const tagOptions = ref([])
 
 const $table = ref(null)
-const queryItems = ref({}) // 条件搜索
+const queryItems = ref({
+  title: '', // 标题
+  type: null, // 类型
+  category_id: null, // 分类
+  tag_id: null, // 标签
+}) // 条件搜索
 const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
 
 const { handleDelete } = useCRUD({
@@ -87,10 +92,7 @@ const columns = [
       const group = []
       for (let i = 0; i < tags.length; i++) {
         group.push(
-          h(NTag,
-            { type: 'info', style: { margin: '2px 3px' } },
-            { default: () => tags[i].name },
-          ),
+          h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => tags[i].name }),
         )
       }
       return h('div', group.length ? group : '无')
@@ -288,29 +290,50 @@ function afterUpload({ event }) {
     $message.error('文章导入失败！')
   }
 }
+
+function downloadFile(content, fileName) {
+  const aEle = document.createElement('a') // 创建下载链接
+  aEle.download = fileName // 设置下载的名称
+  aEle.style.display = 'none'// 隐藏的可下载链接
+  // 字符内容转变成 blob 地址
+  const blob = new Blob([content])
+  aEle.href = URL.createObjectURL(blob)
+  // 绑定点击时间
+  document.body.appendChild(aEle)
+  aEle.click()
+  // 然后移除
+  document.body.removeChild(aEle)
+}
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="文章列表">
-    <!-- 操作栏 -->
+  <CommonPage title="文章列表">
     <template #action>
       <NButton type="primary" @click="$router.replace('/article/write')">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新建文章
+        <template #icon>
+          <i class="i-material-symbols:add" />
+        </template>
+        新建文章
       </NButton>
       <NButton
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:recycling-rounded mr-5 text-18" /> 批量删除
+        <template #icon>
+          <i class="i-material-symbols:recycling-rounded" />
+        </template>
+        批量删除
       </NButton>
       <NButton
         type="info"
         :disabled="!$table?.selections.length"
         @click="exportArticles($table?.selections)"
       >
-        <span class="i-mdi:export mr-5 text-18" /> 批量导出
+        <template #icon>
+          <i class="i-mdi:export" />
+        </template>
+        批量导出
       </NButton>
       <div class="inline-block">
         <NUpload
@@ -322,12 +345,15 @@ function afterUpload({ event }) {
           @finish="afterUpload"
         >
           <NButton type="success">
-            <span class="i-mdi:import mr-5 text-18" /> 批量导入
+            <template #icon>
+              <i class="i-mdi:import" />
+            </template>
+            批量导入
           </NButton>
         </NUpload>
       </div>
     </template>
-    <!-- 导航栏 -->
+
     <NTabs type="line" animated @update:value="handleChangeTab">
       <template #prefix>
         状态
@@ -338,7 +364,7 @@ function afterUpload({ event }) {
       <NTabPane name="draft" tab="草稿箱" />
       <NTabPane name="delete" tab="回收站" />
     </NTabs>
-    <!-- 表格 -->
+
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -347,7 +373,7 @@ function afterUpload({ event }) {
       :get-data="api.getArticles"
     >
       <template #queryBar>
-        <QueryBarItem label="标题" :label-width="40" :content-width="180">
+        <QueryItem label="标题" :label-width="40" :content-width="180">
           <NInput
             v-model:value="queryItems.title"
             clearable
@@ -355,8 +381,8 @@ function afterUpload({ event }) {
             placeholder="请输入标题"
             @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
-        <QueryBarItem label="类型" :label-width="40" :content-width="160">
+        </QueryItem>
+        <QueryItem label="类型" :label-width="40" :content-width="160">
           <NSelect
             v-model:value="queryItems.type"
             clearable
@@ -364,8 +390,8 @@ function afterUpload({ event }) {
             :options="articleTypeOptions"
             @update:value="$table?.handleSearch()"
           />
-        </QueryBarItem>
-        <QueryBarItem label="分类" :label-width="40" :content-width="160">
+        </QueryItem>
+        <QueryItem label="分类" :label-width="40" :content-width="160">
           <NSelect
             v-model:value="queryItems.category_id"
             clearable
@@ -374,8 +400,8 @@ function afterUpload({ event }) {
             :options="categoryOptions"
             @update:value="$table?.handleSearch()"
           />
-        </QueryBarItem>
-        <QueryBarItem label="标签" :label-width="40" :content-width="160">
+        </QueryItem>
+        <QueryItem label="标签" :label-width="40" :content-width="160">
           <NSelect
             v-model:value="queryItems.tag_id"
             clearable
@@ -384,7 +410,7 @@ function afterUpload({ event }) {
             :options="tagOptions"
             @update:value="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
   </CommonPage>

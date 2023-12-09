@@ -11,37 +11,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in">
+  <div class="card-view animate-zoom-in animate-duration-600">
     <div class="flex text-center">
-      <div class="i-mdi-chat-outline cursor-pointer text-xl" />
+      <button class="i-mdi-chat-outline text-xl" />
       <div class="flex-1">
         {{ sentence }}
       </div>
-      <div class="arrow i-mdi-chevron-double-right cursor-pointer text-xl" />
+      <button class="animate-arrow i-mdi-chevron-double-right text-2xl" />
     </div>
   </div>
 </template>
 
 <style scoped>
-.arrow {
+.animate-arrow {
   animation: 1s passing infinite;
 }
 
 /* 左 -> 右 闪的特效 */
 @keyframes passing {
-  0% {
-    transform: translateX(-50%);
-    opacity: 0;
-  }
-
-  50% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(50%);
-    opacity: 0;
-  }
+  0% { transform: translateX(-50%); opacity: 0; }
+  50% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(50%); opacity: 0; }
 }
 </style>

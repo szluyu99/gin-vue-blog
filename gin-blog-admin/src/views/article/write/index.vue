@@ -1,43 +1,50 @@
 <script setup>
-import { h, nextTick, onActivated, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { h, nextTick, onActivated, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { NButton, NDynamicTags, NForm, NFormItem, NInput, NRadio, NRadioGroup, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
 import MdEditor from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import UploadOne from '@/components/upload/UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import UploadOne from '@/components//UploadOne.vue'
 
-import { articleTypeOptions } from '@/constant/data'
-import { useAppStore, useTagsStore } from '@/store'
+import { articleTypeOptions } from '@/assets/config'
+import { useTagStore } from '@/store'
 import api from '@/api'
 
 defineOptions({ name: '发布文章' })
 
-const [router, route] = [useRouter(), useRoute()]
-const [appStore, tagsStore] = [useAppStore(), useTagsStore()]
+const route = useRoute()
+// const router = useRouter()
+const tagStore = useTagStore()
 
 const categoryOptions = ref([]) // 分类选项
 const tagOptions = ref([]) // 标签选项
 let backTagOptions = [] // 备份标签选项
 
 // 解决同时查看多篇文章, 切换标签不刷新的问题
-watch(route, async () => appStore.reloadPage())
+watch(route, async () => tagStore.reloadTag())
+
+onMounted(async () => {
+  fetchData()
+})
 
 onActivated(async () => {
-  api.getCategoryOption()
-    .then(res => categoryOptions.value = res.data.map(e => ({ value: e.label, label: e.label })))
-  api.getTagOption()
-    .then((res) => {
-      tagOptions.value = res.data.map(e => ({ value: e.label, label: e.label }))
-      backTagOptions = tagOptions.value
-    })
-  // 根据路由中的 id 参数获取文章信息
-  await getArticleInfo()
-  // TODO: 优化文章显示白屏加载效果
-  await nextTick(() => {})
+  fetchData()
 })
+
+async function fetchData() {
+  getArticleInfo()
+  api.getCategoryOption().then((resp) => {
+    categoryOptions.value = resp.data.map(e => ({ value: e.label, label: e.label }))
+  })
+  api.getTagOption().then((resp) => {
+    tagOptions.value = resp.data.map(e => ({ value: e.label, label: e.label }))
+    backTagOptions = tagOptions.value
+  })
+  await nextTick()
+}
 
 const formRef = ref(null)
 const formModel = ref({
@@ -65,13 +72,10 @@ async function getArticleInfo() {
 
   // 存在 id, 表示是编辑文章
   window.$loadingBar?.start()
-  $message.loading('加载中...')
   try {
-    const res = await api.getArticleById(id)
-    formModel.value = res.data
-
+    const resp = await api.getArticleById(id)
+    formModel.value = resp.data
     window.$loadingBar?.finish()
-    $message?.success('加载成功')
   }
   catch (err) {
     window.$loadingBar?.error()
@@ -99,14 +103,14 @@ async function handleSave() {
   formRef.value?.validate(async (err) => {
     if (!err) {
       btnLoading.value = true
-      $message.loading('正在保存...')
+      // $message.loading('正在保存...')
       try {
         await api.saveOrUpdateArticle(formModel.value)
         modalVisible.value = false
         $message.success('操作成功!')
         // 关闭当前标签, 并跳转回文章列表
-        tagsStore.removeTag(route.path)
-        await router.replace({ path: '/article/list', query: { needRefresh: true } })
+        tagStore.removeTag(route.path)
+        // await router.replace({ path: '/article/list', query: { needRefresh: true } })
       }
       catch (err) {
         console.error(err)
@@ -146,7 +150,7 @@ function renderTag(tag, index) {
 </script>
 
 <template>
-  <CommonPage :show-header="false" show-footer title="写文章">
+  <CommonPage :show-header="false" title="写文章">
     <div class="mb-15 flex items-center bg-white space-x-10">
       <NInput
         v-model:value="formModel.title"
@@ -155,15 +159,19 @@ function renderTag(tag, index) {
         placeholder="输入文章标题..."
       />
       <NButton ghost type="error" :loading="btnLoading" @click="handleDraft">
-        <span v-if="!btnLoading" class="i-line-md:uploading-loop mr-5 text-18" />
+        <template #icon>
+          <span v-if="!btnLoading" class="i-line-md:uploading-loop" />
+        </template>
         保存草稿
       </NButton>
       <NButton type="error" :loading="btnLoading" @click="handlePublish">
-        <span v-if="!btnLoading" class="i-line-md:confirm-circle mr-5 text-18" />
+        <template #icon>
+          <span v-if="!btnLoading" class="i-line-md:confirm-circle" />
+        </template>
         发布文章
       </NButton>
     </div>
-    <!-- markdown 编辑器 -->
+
     <MdEditor v-model="formModel.content" style="height: calc(100vh - 305px)" />
 
     <CrudModal
@@ -173,7 +181,6 @@ function renderTag(tag, index) {
       show-footer
       @save="handleSave"
     >
-      <!-- 表单 -->
       <NForm
         ref="formRef"
         label-placement="left"

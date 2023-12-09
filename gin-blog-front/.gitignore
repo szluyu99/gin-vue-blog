@@ -1,11 +1,38 @@
-.DS_Store
-.vite-ssg-dist
-.vite-ssg-temp
-*.local
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build
 dist
 dist-ssr
-node_modules
-.idea/
-*.log
+*.local
 
+# MacOS
+.DS_Store
+
+# Vim swap files
+*.swp
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# rollup-plugin-visualizer
 stats.html
+
+# Dotenv
+*.local
+!.env.sample

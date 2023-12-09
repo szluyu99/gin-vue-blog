@@ -1,1 +1,2 @@
-export { default as useCRUD } from './useCRUD'
+export * from './useCRUD'
+export * from './useForm'

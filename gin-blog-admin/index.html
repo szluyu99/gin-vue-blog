@@ -9,19 +9,28 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- 允许加载 http 资源 -->
-  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/resource/loading.css" />
   <title> Gin Vue Blog </title>
   <!-- 腾讯验证码 -->
   <!-- <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script> -->
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
 </head>
 
-<body>
+<body class="dark:text-#e9e9e9 auto-bg">
   <div id="app" class="w-full h-full">
-    <!-- 白屏时的 loading 效果 -->
+    <!-- loading -->
     <div class="loading-container">
-      <div id="loadingLogo" class="loading-svg"></div>
+      <img class="loading-logo" src="/resource/logo.svg" alt="logo" />
       <div class="loading-spin__container">
         <div class="loading-spin">
           <div class="left-0 top-0 loading-spin-item"></div>

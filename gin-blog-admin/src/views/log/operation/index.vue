@@ -3,10 +3,10 @@ import { h, onMounted, ref } from 'vue'
 import { NButton, NCode, NForm, NFormItem, NInput, NPopconfirm, NTag } from 'naive-ui'
 import { useClipboard } from '@vueuse/core'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -31,9 +31,18 @@ function tagType(type) {
 }
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  keyword: '',
+})
 
-const { modalVisible, modalLoading, handleDelete, modalForm, modalFormRef, handleView } = useCRUD({
+const {
+  modalVisible,
+  modalLoading,
+  handleDelete,
+  modalForm,
+  modalFormRef,
+  handleView,
+} = useCRUD({
   name: '日志',
   doDelete: api.deleteOperationLogs,
   refresh: () => $table.value?.handleSearch(),
@@ -99,7 +108,7 @@ const columns = [
           },
           {
             default: () => '查看',
-            icon: renderIcon('ic:outline-remove-red-eye', { size: 16 }),
+            icon: renderIcon('ic:outline-remove-red-eye', {}),
           },
         ),
         h(
@@ -117,7 +126,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+                  icon: renderIcon('material-symbols:delete-outline', {}),
                 },
               ),
             default: () => h('div', {}, '确定删除该日志吗?'),
@@ -131,7 +140,7 @@ const columns = [
 function copyFormatCode(code) {
   const { copy } = useClipboard()
   copy(JSON.stringify(JSON.parse(code), null, 2))
-  $message.success('内容已复制到剪切板!')
+  window.$message.success('内容已复制到剪切板!')
 }
 </script>
 
@@ -143,7 +152,10 @@ function copyFormatCode(code) {
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:playlist-remove mr-5 text-18" /> 批量删除
+        <template #icon>
+          <span class="i-material-symbols:playlist-remove" />
+        </template>
+        批量删除
       </NButton>
     </template>
 
@@ -154,7 +166,7 @@ function copyFormatCode(code) {
       :get-data="api.getOperationLogs"
     >
       <template #queryBar>
-        <QueryBarItem label="模块名" :label-width="50">
+        <QueryItem label="模块名" :label-width="50">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
@@ -162,7 +174,7 @@ function copyFormatCode(code) {
             placeholder="请输入模块名或描述"
             @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 
@@ -171,6 +183,7 @@ function copyFormatCode(code) {
       title="日志详情"
       :show-footer="false"
       :loading="modalLoading"
+      width="full"
     >
       <NForm
         ref="modalFormRef"
@@ -206,7 +219,7 @@ function copyFormatCode(code) {
         <NFormItem label="请求参数: " path="request_param">
           <NCode
             class="word-wrap cursor-pointer p-7"
-            :code="modalForm.request_param"
+            :code="JSON.stringify(JSON.parse(modalForm.request_param), null, 2)"
             language="json"
             @click="copyFormatCode(modalForm.request_param)"
           />

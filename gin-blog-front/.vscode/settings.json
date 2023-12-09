@@ -38,10 +38,5 @@
     "json",
     "jsonc",
     "yaml"
-  ],
-  "fileNestingUpdater.autoUpdate": true,
-  "fileNestingUpdater.autoUpdateInterval": 720,
-  "fileNestingUpdater.promptOnAutoUpdate": true,
-  "fileNestingUpdater.upstreamRepo": "antfu/vscode-file-nesting-config",
-  "fileNestingUpdater.upstreamBranch": "main"
+  ]
 }

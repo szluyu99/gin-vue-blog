@@ -1,5 +1,22 @@
 @charset "UTF-8";
 
+/* Inter Font */
+:root {
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+}
+
+@supports (font-variation-settings: normal) {
+  :root { font-family: InterVariable, sans-serif; }
+}
+
+html, body, #app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   /* 根路径加载静态资源, 让每个路由下都能加载到 */
   cursor: url("/cursor/normal.cur"), auto;
@@ -16,13 +33,6 @@ body {
   -moz-user-select: none;
   -webkit-user-select: none; */
 }
-
-/* html, body, #app, {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-} */
 
 /* 设置鼠标图标 */
 a,

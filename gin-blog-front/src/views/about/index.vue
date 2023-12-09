@@ -8,13 +8,14 @@ import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
 
 import { useAppStore } from '@/store'
+
 const { blogConfig } = storeToRefs(useAppStore())
 
 const content = ref('')
 
 onMounted(async () => {
-  const res = await api.about()
-  content.value = res.data
+  const resp = await api.about()
+  content.value = resp.data
   setTimeout(() => {
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
   }, 100)

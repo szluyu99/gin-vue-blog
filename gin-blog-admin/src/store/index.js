@@ -10,4 +10,8 @@ export function setupStore(app) {
   app.use(pinia)
 }
 
-export * from './modules'
+export * from './modules/app'
+export * from './modules/permission'
+export * from './modules/tag'
+export * from './modules/theme'
+export * from './modules/user'

@@ -8,8 +8,8 @@ const loading = ref(true)
 const categoryList = ref([])
 
 onMounted(async () => {
-  const res = await api.getCategorys()
-  categoryList.value = res.data.list
+  const resp = await api.getCategorys()
+  categoryList.value = resp.data.list
   loading.value = false
 })
 </script>

@@ -2,10 +2,10 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NPopconfirm, NSwitch, NTag, NTree } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -14,7 +14,9 @@ import api from '@/api'
 defineOptions({ name: '角色管理' })
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  keyword: '',
+})
 
 const {
   modalVisible,
@@ -168,17 +170,23 @@ const columns = [
 </script>
 
 <template>
-  <CommonPage show-footer title="角色管理">
+  <CommonPage title="角色管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新建角色
+        <template #icon>
+          <i class="i-material-symbols:add" />
+        </template>
+        新建角色
       </NButton>
       <NButton
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:add mr-5 text-18" /> 批量删除
+        <template #icon>
+          <i class="i-material-symbols:add" />
+        </template>
+        批量删除
       </NButton>
     </template>
 
@@ -189,7 +197,7 @@ const columns = [
       :get-data="api.getRoles"
     >
       <template #queryBar>
-        <QueryBarItem label="角色名" :label-width="50">
+        <QueryItem label="角色名" :label-width="50">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
@@ -197,7 +205,7 @@ const columns = [
             placeholder="请输入角色名"
             @keydown.enter=" $table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 

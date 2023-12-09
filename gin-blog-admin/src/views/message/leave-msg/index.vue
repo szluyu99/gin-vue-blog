@@ -2,9 +2,9 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NImage, NInput, NPopconfirm, NTabPane, NTabs, NTag } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -17,8 +17,12 @@ onMounted(() => {
 })
 
 const $table = ref(null)
-const queryItems = ref({}) // 条件查询参数
-const extraParams = ref({}) // 额外参数
+const queryItems = ref({
+  nickname: '',
+})
+const extraParams = ref({
+  is_review: null, // 评论状态: 0-审核中, 1-通过
+})
 
 const { handleDelete } = useCRUD({
   name: '留言',
@@ -116,12 +120,11 @@ const columns = [
             {
               size: 'small',
               type: 'warning',
-              style: 'margin-left: 15px;',
               onClick: () => handleUpdateReview([row.id], 0),
             },
             {
               default: () => '撤下',
-              icon: renderIcon('mi:circle-error', { size: 16 }),
+              icon: renderIcon('mi:circle-error', {}),
             },
           )
           : h(
@@ -134,7 +137,7 @@ const columns = [
             },
             {
               default: () => '通过',
-              icon: renderIcon('mi:circle-check', { size: 16 }),
+              icon: renderIcon('mi:circle-check', {}),
             },
           ),
         h(
@@ -185,7 +188,7 @@ function handleChangeTab(value) {
 
 <template>
   <!-- 业务页面 -->
-  <CommonPage show-footer title="留言管理">
+  <CommonPage title="留言管理">
     <!-- 操作栏 -->
     <template #action>
       <NButton
@@ -193,14 +196,20 @@ function handleChangeTab(value) {
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:recycling-rounded mr-5 text-18" /> 批量删除
+        <template #icon>
+          <span class="i-material-symbols:recycling-rounded" />
+        </template>
+        批量删除
       </NButton>
       <NButton
         type="success"
         :disabled="!$table?.selections.length"
         @click="handleUpdateReview($table.selections, 1)"
       >
-        <span class="i-ic:outline-approval mr-5 text-18" /> 批量通过
+        <template #icon>
+          <span class="i-ic:outline-approval" />
+        </template>
+        批量通过
       </NButton>
     </template>
     <!-- 标签栏 -->
@@ -225,7 +234,7 @@ function handleChangeTab(value) {
       :get-data="api.getMessages"
     >
       <template #queryBar>
-        <QueryBarItem label="用户" :label-width="40" :content-width="180">
+        <QueryItem label="用户" :label-width="40" :content-width="180">
           <NInput
             v-model:value="queryItems.nickname"
             clearable
@@ -233,7 +242,7 @@ function handleChangeTab(value) {
             placeholder="请输入用户昵称"
             @keydown.enter=" $table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
   </CommonPage>

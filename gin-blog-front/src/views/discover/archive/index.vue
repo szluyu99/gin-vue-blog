@@ -16,12 +16,12 @@ const current = ref(1) // 当前页数
 watch(current, () => getArchives())
 
 async function getArchives() {
-  const res = await api.getArchives({
+  const resp = await api.getArchives({
     page_num: current.value,
     page_size: 50,
   })
-  archiveList.value = res.data.pageData
-  total.value = res.data.total
+  archiveList.value = resp.data.pageData
+  total.value = resp.data.total
   loading.value = false
 }
 

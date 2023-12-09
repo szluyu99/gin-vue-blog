@@ -1,10 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { NButton } from 'naive-ui'
+
 import MdEditor from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 
-import CommonPage from '@/components/page/CommonPage.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
 import api from '@/api'
 
 defineOptions({ name: '关于我' })
@@ -13,8 +14,8 @@ const aboutContent = ref('')
 const btnLoading = ref(false)
 
 onMounted(async () => {
-  const res = await api.getAbout()
-  aboutContent.value = res.data
+  const resp = await api.getAbout()
+  aboutContent.value = resp.data
 })
 
 async function handleSave() {
@@ -36,7 +37,10 @@ async function handleSave() {
         关于我
       </div>
       <NButton type="primary" :loading="btnLoading" @click="handleSave">
-        <span v-if="!btnLoading" class="i-line-md:confirm-circle mr-5 text-18" /> 保存
+        <template #icon>
+          <span v-if="!btnLoading" class="i-line-md:confirm-circle" />
+        </template>
+        保存
       </NButton>
     </div>
     <MdEditor v-model="aboutContent" style="height: calc(100vh - 305px)" />

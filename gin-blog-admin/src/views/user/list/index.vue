@@ -2,31 +2,41 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NCheckbox, NCheckboxGroup, NForm, NFormItem, NImage, NInput, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
+import { loginTypeMap, loginTypeOptions } from '@/assets/config'
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
-import { loginTypeMap, loginTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 defineOptions({ name: '用户列表' })
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  nickname: '',
+  login_type: '',
+})
 
-const { modalVisible, modalLoading, handleSave, modalForm, modalFormRef, handleEdit } = useCRUD({
+const {
+  modalVisible,
+  modalLoading,
+  handleSave,
+  handleEdit,
+  modalForm,
+  modalFormRef,
+} = useCRUD({
   name: '用户',
   doUpdate: api.updateUser,
   refresh: () => $table.value?.handleSearch(),
 })
 
-const roleOption = ref([])
+const roleOptions = ref([])
 
 onMounted(() => {
-  api.getRoleOption().then(res => roleOption.value = res.data)
+  api.getRoleOption().then(res => roleOptions.value = res.data)
   $table.value?.handleSearch()
 })
 
@@ -170,7 +180,7 @@ const columns = [
           },
           {
             default: () => '编辑',
-            icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+            icon: renderIcon('material-symbols:delete-outline', {}),
           },
         ),
       ]
@@ -200,9 +210,7 @@ async function handleUpdateDisable(row) {
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="用户列表">
-    <!-- 表格 -->
+  <CommonPage title="用户列表">
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -210,29 +218,28 @@ async function handleUpdateDisable(row) {
       :get-data="api.getUsers"
     >
       <template #queryBar>
-        <QueryBarItem label="昵称" :label-width="40">
+        <QueryItem label="昵称" :label-width="40">
           <NInput
             v-model:value="queryItems.nickname"
             clearable
             type="text"
             placeholder="请输入用户昵称"
-            @keydown.enter="$table?.handleSearch"
+            @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
-        <QueryBarItem label="登录方式" :label-width="70" :content-width="180">
+        </QueryItem>
+        <QueryItem label="登录方式" :label-width="70" :content-width="180">
           <NSelect
             v-model:value="queryItems.login_type"
             clearable
             filterable
             placeholder="请选择登录方式"
             :options="loginTypeOptions"
-            @update:value="$table?.handleSearch"
+            @update:value="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       title="修改用户"
@@ -257,7 +264,7 @@ async function handleUpdateDisable(row) {
           <NCheckboxGroup v-model:value="modalForm.role_ids">
             <NSpace item-style="display: flex;">
               <NCheckbox
-                v-for="item in roleOption"
+                v-for="item in roleOptions"
                 :key="item.value"
                 :value="item.value"
                 :label="item.label"

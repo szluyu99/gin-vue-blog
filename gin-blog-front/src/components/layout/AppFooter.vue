@@ -1,6 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/store'
+
 const { blogInfo } = storeToRefs(useAppStore())
 </script>
 

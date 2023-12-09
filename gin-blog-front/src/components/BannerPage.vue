@@ -57,17 +57,17 @@ const coverStyle = computed(() => {
 <template>
   <!-- 顶部图片 -->
   <div :style="coverStyle" class="banner-fade-down absolute inset-x-0 top-0 h-[280px] f-c-c lg:h-[400px]">
-    <h1 class="mt-[40px] animate-fade-in-down animate-duration-800 text-[26px] font-bold text-light lg:text-4xl">
+    <h1 class="mt-[40px] animate-fade-in-down animate-duration-800 text-3xl font-bold text-light lg:text-4xl">
       {{ props.title }}
     </h1>
   </div>
   <!-- 主体内容 -->
-  <main class="mx-1 flex-1">
+  <main class="mx-1 mb-10 flex-1">
     <!-- 内容在 spin 中 -->
     <ULoading :show="props.loading">
       <!-- 卡片视图 -->
       <template v-if="props.card">
-        <div class="card-fade-up card-view mx-auto mb-10 mt-[300px] max-w-[970px] min-h-[180px] py-8 lg:mt-[440px] lg:px-[55px]">
+        <div class="card-view card-fade-up mx-auto mb-10 mt-[300px] max-w-[970px] min-h-[180px] py-8 lg:mt-[440px] lg:px-[55px]">
           <slot v-if="!props.loading" />
         </div>
       </template>
@@ -80,7 +80,5 @@ const coverStyle = computed(() => {
     </ULoading>
   </main>
   <!-- 底部 -->
-  <footer v-if="props.showFooter">
-    <AppFooter />
-  </footer>
+  <AppFooter v-if="props.showFooter" />
 </template>

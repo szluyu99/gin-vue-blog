@@ -10,7 +10,7 @@ export function getToken() {
 }
 
 /**
- * @param {String} token
+ * @param {string} token
  */
 export function setToken(token) {
   setLocal(TOKEN_CODE, token, DURATION)
@@ -19,4 +19,3 @@ export function setToken(token) {
 export function removeToken() {
   removeLocal(TOKEN_CODE)
 }
-

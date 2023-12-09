@@ -2,13 +2,13 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NImage, NInput, NPopconfirm, NSelect, NTabPane, NTabs, NTag } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
+import { commentTypeMap, commentTypeOptions } from '@/assets/config'
 import { convertImgUrl, formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
-import { commentTypeMap, commentTypeOptions } from '@/constant/data'
 import api from '@/api'
 
 defineOptions({ name: '评论管理' })
@@ -18,10 +18,19 @@ onMounted(() => {
 })
 
 const $table = ref(null)
-const queryItems = ref({}) // 条件查询参数
-const extraParams = ref({}) // 额外参数
+// 条件查询参数
+const queryItems = ref({
+  nickname: '',
+  type: '',
+})
+// 额外参数
+const extraParams = ref({
+  is_review: null, // 评论状态: 0-审核中, 1-通过
+})
 
-const { handleDelete } = useCRUD({
+const {
+  handleDelete,
+} = useCRUD({
   name: '评论',
   doDelete: api.deleteComments,
   refresh: () => $table.value?.handleSearch(),
@@ -44,13 +53,7 @@ const columns = [
       })
     },
   },
-  {
-    title: '评论人',
-    key: 'nickname',
-    width: 50,
-    align: 'center',
-    ellipsis: { tooltip: true },
-  },
+  { title: '评论人', key: 'nickname', width: 50, align: 'center', ellipsis: { tooltip: true } },
   {
     title: '回复对象',
     key: 'reply_nick_name',
@@ -165,11 +168,11 @@ const columns = [
 // 修改评论审核: is_review 0-撤下审核, 1-通过审核
 async function handleUpdateReview(ids, is_review) {
   if (!ids.length) {
-    $message.info('请选择要审核的数据')
+    window.$message.info('请选择要审核的数据')
     return
   }
   await api.updateCommentReview({ ids, is_review })
-  $message?.success(is_review ? '审核成功' : '撤下成功')
+  window.$message?.success(is_review ? '审核成功' : '撤下成功')
   $table.value?.handleSearch()
 }
 
@@ -191,23 +194,27 @@ function handleChangeTab(value) {
 </script>
 
 <template>
-  <!-- 业务页面 -->
-  <CommonPage show-footer title="评论管理">
-    <!-- 操作栏 -->
+  <CommonPage title="评论管理">
     <template #action>
       <NButton
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:recycling-rounded mr-5 text-18" /> 批量删除
+        <template #icon>
+          <span class="i-material-symbols:recycling-rounded" />
+        </template>
+        批量删除
       </NButton>
       <NButton
         type="success"
         :disabled="!$table?.selections.length"
         @click="handleUpdateReview($table.selections, 1)"
       >
-        <span class="i-ic:outline-approval mr-5 text-18" /> 批量通过
+        <template #icon>
+          <span class="i-ic:outline-approval" />
+        </template>
+        批量通过
       </NButton>
     </template>
     <!-- 标签栏 -->
@@ -232,7 +239,7 @@ function handleChangeTab(value) {
       :get-data="api.getComments"
     >
       <template #queryBar>
-        <QueryBarItem label="用户" :label-width="40" :content-width="180">
+        <QueryItem label="用户" :label-width="40" :content-width="180">
           <NInput
             v-model:value="queryItems.nickname"
             clearable
@@ -240,8 +247,8 @@ function handleChangeTab(value) {
             placeholder="请输入用户昵称"
             @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
-        <QueryBarItem label="来源" :label-width="40" :content-width="160">
+        </QueryItem>
+        <QueryItem label="来源" :label-width="40" :content-width="160">
           <NSelect
             v-model:value="queryItems.type"
             clearable
@@ -250,7 +257,7 @@ function handleChangeTab(value) {
             :options="commentTypeOptions"
             @update:value="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
   </CommonPage>

@@ -6,6 +6,7 @@ export default defineConfig({
     presetUno(),
     presetRemToPx({ baseFontSize: 4 }),
     presetIcons({
+      scale: 1.2,
       extraProperties: {
         'display': 'inline-block',
         'vertical-align': 'middle',
@@ -34,6 +35,7 @@ export default defineConfig({
       error_hover: 'var(--error-color-hover)',
       error_pressed: 'var(--error-color-pressed)',
       error_active: 'var(--error-color-active)',
+      dark: '#18181c',
     },
   },
 })

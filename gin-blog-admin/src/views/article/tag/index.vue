@@ -2,10 +2,10 @@
 import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NPopconfirm, NTag } from 'naive-ui'
 
-import CommonPage from '@/components/page/CommonPage.vue'
-import QueryBarItem from '@/components/query-bar/QueryBarItem.vue'
-import CrudModal from '@/components/table/CrudModal.vue'
-import CrudTable from '@/components/table/CrudTable.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { formatDate, renderIcon } from '@/utils'
 import { useCRUD } from '@/composables'
@@ -14,7 +14,13 @@ import api from '@/api'
 defineOptions({ name: '标签管理' })
 
 const $table = ref(null)
-const queryItems = ref({})
+const queryItems = ref({
+  keyword: '',
+})
+
+onMounted(() => {
+  $table.value?.handleSearch()
+})
 
 const {
   modalVisible,
@@ -35,10 +41,6 @@ const {
   refresh: () => $table.value?.handleSearch(),
 })
 
-onMounted(() => {
-  $table.value?.handleSearch()
-})
-
 const columns = [
   { type: 'selection', width: 15, fixed: 'left' },
   {
@@ -50,12 +52,7 @@ const columns = [
       return h(NTag, { type: 'info' }, { default: () => row.name })
     },
   },
-  {
-    title: '文章量',
-    key: 'article_count',
-    width: 30,
-    align: 'center',
-  },
+  { title: '文章量', key: 'article_count', width: 30, align: 'center' },
   {
     title: '创建日期',
     key: 'created_at',
@@ -120,21 +117,26 @@ const columns = [
 </script>
 
 <template>
-  <CommonPage show-footer title="标签管理">
+  <CommonPage title="标签管理">
     <template #action>
       <NButton type="primary" @click="handleAdd">
-        <span class="i-material-symbols:add mr-5 text-18" /> 新建标签
+        <template #icon>
+          <i class="i-material-symbols:add" />
+        </template>
+        新建标签
       </NButton>
       <NButton
         type="error"
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
-        <span class="i-material-symbols:playlist-remove mr-5 text-18" /> 批量删除
+        <template #icon>
+          <span class="i-material-symbols:playlist-remove" />
+        </template>
+        批量删除
       </NButton>
     </template>
 
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -142,7 +144,7 @@ const columns = [
       :get-data="api.getTags"
     >
       <template #queryBar>
-        <QueryBarItem label="标签名" :label-width="50">
+        <QueryItem label="标签名" :label-width="50">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
@@ -150,18 +152,16 @@ const columns = [
             placeholder="请输入标签名"
             @keydown.enter="$table?.handleSearch()"
           />
-        </QueryBarItem>
+        </QueryItem>
       </template>
     </CrudTable>
 
-    <!-- 新增/编辑/查看 弹窗 -->
     <CrudModal
       v-model:visible="modalVisible"
       :title="modalTitle"
       :loading="modalLoading"
       @save="handleSave"
     >
-      <!-- 表单 -->
       <NForm
         ref="modalFormRef"
         label-placement="left"

@@ -13,7 +13,6 @@ const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
 
-// 菜单项 TODO: 直接从路由中加载? 似乎不可行
 const menuOptions = [
   { text: '首页', icon: 'mdi:home', path: '/' },
   {
@@ -42,7 +41,7 @@ const barShow = ref(true)
 
 // * 监听 y 效果比添加 scroll 监听器效果更好
 // * 节流操作, 效果很好
-const { y } = useWindowScroll() // 通过 $() 解构 ref
+const { y } = useWindowScroll()
 const preY = ref(0) // 记录上一次的 y 滚动距离
 watchThrottled(y, () => {
   if (Math.abs(preY.value - y.value) >= 50) { // 小幅度滚动不进行操作
@@ -54,8 +53,10 @@ watchThrottled(y, () => {
 
 function logout() {
   userStore.logout()
-  if (route.name === 'User') // 如果在个人信息页登出则回到首页
+  // 如果在个人信息页登出则回到首页
+  if (route.name === 'User') {
     router.push('/')
+  }
   window.$notify.success('退出登录成功!')
 }
 
@@ -65,21 +66,18 @@ function logout() {
 <template>
   <!-- 移动端顶部导航栏 -->
   <Transition name="slide-fade" appear>
-    <div
-      v-if="barShow" :class="navClass"
-      class="fixed inset-x-0 top-0 z-11 h-[60px] flex items-center justify-between px-4 py-2 lg:hidden"
-    >
+    <div v-if="barShow" :class="navClass" class="fixed inset-x-0 top-0 z-11 h-[60px] flex items-center justify-between px-4 py-2 lg:hidden">
       <!-- 左上角标题 -->
       <RouterLink to="/" class="text-[18px] font-bold">
         {{ appStore.blogConfig.website_author }}
       </RouterLink>
       <!-- 右上角图标 -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 text-2xl">
         <button @click="appStore.setSearchFlag(true)">
-          <Icon icon="ic:round-search" class="text-2xl" />
+          <Icon icon="ic:round-search" />
         </button>
         <button @click="appStore.setCollapsed(true)">
-          <Icon icon="ic:sharp-menu" class="text-2xl" />
+          <Icon icon="ic:sharp-menu" />
         </button>
       </div>
     </div>
@@ -88,11 +86,7 @@ function logout() {
   <MobileSideBar />
   <!-- 电脑端顶部导航栏 -->
   <Transition name="slide-fade" appear>
-    <div
-      v-if="barShow"
-      :class="navClass"
-      class="fixed inset-x-0 top-0 z-11 hidden h-[60px] lg:block"
-    >
+    <div v-if="barShow" :class="navClass" class="fixed inset-x-0 top-0 z-11 hidden h-[60px] lg:block">
       <div class="h-full flex items-center justify-between px-9">
         <!-- 左上角标题 -->
         <RouterLink to="/" class="text-xl font-bold">
