@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       vue(),
       unocss(),
       viteCompression({ algorithm: 'gzip' }),
-      visualizer({ open: true, gzipSize: true, brotliSize: true }),
+      visualizer({ open: false, gzipSize: true, brotliSize: true }),
     ],
     server: {
       host: '0.0.0.0',

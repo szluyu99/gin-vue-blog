@@ -1,3 +1,9 @@
+最新版：在安装好环境的基础上
+- 执行 `build_start.sh` 一键构建 Docker 容器
+- 执行 `docker_clear.sh` 一键清理 Docker 容器
+
+----
+
 一键运行分成两步：
 1. 环境准备: 需要 Docker 和 Docker Compose 环境
 2. 开始运行: 进入 start 目录执行指令
@@ -121,6 +127,8 @@ docker-compose up -d
 ```bash
 docker-compose up -d --build
 ```
+
+以上操作我放在 `build_start.sh` 中了，直接执行该脚本即可
 
 ## 线上部署的注意事项
 

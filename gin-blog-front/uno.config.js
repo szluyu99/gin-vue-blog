@@ -8,7 +8,6 @@ import {
 } from 'unocss'
 
 export default defineConfig({
-  exclude: ['node_modules', '.git', '.github', '.husky', '.vscode', 'build', 'dist', 'mock', 'public', 'types', './stats.html'],
   shortcuts: [
     ['f-c-c', 'flex justify-center items-center'],
   ],
