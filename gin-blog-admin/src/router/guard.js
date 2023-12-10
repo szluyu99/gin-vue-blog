@@ -1,4 +1,4 @@
-import { getToken } from '@/utils'
+import { useAuthStore } from '@/store'
 
 export function setupRouterGuard(router) {
   createPageLoadingGuard(router)
@@ -16,29 +16,48 @@ function createPageLoadingGuard(router) {
   router.onError(() => window.$loadingBar?.error())
 }
 
+// 无需 Token 也能访问的页面
+const WHITE_LIST = ['/login', '/404']
 /**
  * 根据有无 Token 判断能否访问页面
  */
 function createPermissionGuard(router) {
   // 路由前置守卫: 根据有没有 Token 判断前往哪个页面
   router.beforeEach(async (to) => {
-    const token = getToken()
-    if (!token) {
-      // 登录 和 404 不需要 Token
-      if (['/login', '/404'].includes(to.path)) {
-        return true
-      }
-      // 重定向到登录页, 并且携带 redirect 参数, 登录后自动重定向到原本的目标页面
-      return { path: 'login', query: { ...to.query, redirect: to.path } }
+    if (WHITE_LIST.includes(to.path)) {
+      return true
     }
+
+    const { accessToken } = useAuthStore()
+
+    // 没有 Token
+    if (!accessToken) {
+      window.$message.error('没有 Token，请重新登录！')
+      // 重定向到登录页, 并且携带 redirect 参数, 登录后自动重定向到原本的目标页面
+      if (to.path !== '/') {
+        return { path: '/login', query: { ...to.query, redict: to.path } }
+      }
+      else {
+        return { path: '/login', query: { ...to.query } }
+      }
+    }
+
+    // 有 Token 的时候无需访问登录页面
     if (to.path === '/login') {
       return { path: '/' }
+    }
+
+    // 能在路由中找到, 则正常访问
+    if (router.getRoutes().find(e => e.name === to.name)) {
+      return true
     }
 
     // TODO: 刷新 Token
     // await refreshAccessToken()
 
-    return true
+    // TODO: 判断是无权限还是 404
+
+    return { name: '404', query: { path: to.fullPath } }
   })
 }
 

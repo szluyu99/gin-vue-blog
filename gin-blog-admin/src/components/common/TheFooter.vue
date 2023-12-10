@@ -1,8 +1,4 @@
 <script setup>
-import { storeToRefs } from 'pinia'
-import { useAppStore } from '@/store'
-
-const { blogConfig } = storeToRefs(useAppStore())
 </script>
 
 <template>
@@ -11,12 +7,6 @@ const { blogConfig } = storeToRefs(useAppStore())
       Copyright©2023
       <a href="https://github.com/szluyu99" target="__blank" hover="decoration-underline color-primary">
         szluyu99
-      </a>
-    </p>
-    <p>
-      <!-- TODO: 解决有时候不显示接口获取的备案信息问题 -->
-      <a href="http://beian.miit.gov.cn/" target="__blank" hover="decoration-underline color-primary">
-        {{ blogConfig.website_record ?? '备案信息未知' }}
       </a>
     </p>
   </footer>

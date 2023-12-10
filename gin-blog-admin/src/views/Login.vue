@@ -7,14 +7,14 @@ import { NButton, NCheckbox, NInput } from 'naive-ui'
 import AppPage from '@/components/common/AppPage.vue'
 
 import { addDynamicRoutes } from '@/router'
-import { getLocal, removeLocal, setLocal, setToken } from '@/utils'
-import { useAppStore, useUserStore } from '@/store'
+import { getLocal, removeLocal, setLocal } from '@/utils'
+import { useAuthStore, useUserStore } from '@/store'
 import api from '@/api'
 
 const title = import.meta.env.VITE_TITLE // 环境变量中读取
 
 const userStore = useUserStore()
-const appStore = useAppStore()
+const authStore = useAuthStore()
 const router = useRouter()
 const { query } = useRoute()
 
@@ -47,16 +47,15 @@ async function handleLogin() {
 
   const doLogin = async (username, password) => {
     loading.value = true
-    $message.loading('正在验证...')
+    // $message.loading('正在验证...')
 
     // 登录接口
     try {
       const resp = await api.login({ username, password })
-      setToken(resp.data.token) // 持久化 token
+      authStore.setToken(resp.data.token)
       $message.success('登录成功')
 
       await userStore.getUserInfo() // 获取用户信息
-      await appStore.getBlogInfo() // 获取博客信息
 
       // "记住我" 功能
       isRemember ? setLocal('loginInfo', { username, password }) : removeLocal('loginInfo')
@@ -104,7 +103,7 @@ async function handleLogin() {
       </div>
 
       <div class="w-320 flex flex-col px-20 py-35">
-        <h5 class="flex items-center justify-center text-24 font-normal text-gray">
+        <h5 class="flex items-center justify-center text-24 text-gray font-normal">
           <img src="/image/logo.svg" alt="logo" class="mr-10 h-50 w-50">
           {{ title }}
         </h5>

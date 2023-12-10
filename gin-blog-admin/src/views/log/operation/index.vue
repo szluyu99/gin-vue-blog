@@ -8,7 +8,7 @@ import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -85,7 +85,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.created_at),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -108,7 +108,7 @@ const columns = [
           },
           {
             default: () => '查看',
-            icon: renderIcon('ic:outline-remove-red-eye', {}),
+            icon: () => h('i', { class: 'i-ic:outline-remove-red-eye' }),
           },
         ),
         h(
@@ -126,7 +126,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', {}),
+                  icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
                 },
               ),
             default: () => h('div', {}, '确定删除该日志吗?'),

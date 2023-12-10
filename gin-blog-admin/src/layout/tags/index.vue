@@ -72,13 +72,12 @@ async function handleContextMenu(e, tagItem) {
   setContextMenuShow(true)
 }
 
-// 刷新
-function handleRefresh() {
-  // 重置 keepAlive
-  if (route.meta?.keepAlive) {
-    tagStore.setAliveKey(route.name, +new Date())
+function handleRefresh(tag) {
+  // 只有当前标签会刷新
+  if (route.name === tag.name) {
+    tagStore.updateAliveKey(route.name)
+    tagStore.reloadTag()
   }
-  tagStore.reloadTag()
 }
 </script>
 
@@ -87,7 +86,7 @@ function handleRefresh() {
     <NTag
       v-for="tag in tagStore.tags" :key="tag.path"
       ref="tabRefs"
-      class="mx-5 cursor-pointer rounded-4 px-13 hover:text-primary"
+      class="mx-5 rounded-4 px-13 hover:border-blue hover:border-red hover:text-primary"
       :type="tagStore.activeTag === tag.path ? 'primary' : 'default'"
       :closable="tagStore.tags.length > 1"
       @click="handleTagClick(tag.path)"
@@ -95,24 +94,15 @@ function handleRefresh() {
       @contextmenu.prevent="handleContextMenu($event, tag)"
     >
       <template #icon>
-        <TheIcon
-          v-if="tag.icon"
-          :icon="tag.icon"
-          :size="16"
-          class="cursor-pointer"
-          @click="handleRefresh"
-        />
-        <div
-          v-else
-          class="i-mdi:refresh cursor-pointer text-17"
-          @click="handleRefresh"
-        />
+        <div :class="{ 'cursor-pointer': $route.name === tag.name }" @click="handleRefresh(tag)">
+          <TheIcon v-if="tag.icon" :icon="tag.icon" :size="16" />
+          <i v-else class="i-mdi:refresh text-17" />
+        </div>
       </template>
       <div class="px-3">
         {{ tag.title }}
       </div>
     </NTag>
-    <!-- 自定义右键菜单 -->
     <ContextMenu
       v-if="contextMenuOption.show"
       v-model:show="contextMenuOption.show"

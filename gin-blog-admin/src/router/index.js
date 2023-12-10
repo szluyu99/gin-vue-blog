@@ -1,10 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { EMPTY_ROUTE, NOT_FOUND_ROUTE, basicRoutes } from './routes'
+import { basicRoutes } from './routes'
 import { setupRouterGuard } from './guard'
 
-import { getToken } from '@/utils'
-import { usePermissionStore, useUserStore } from '@/store'
+import { useAuthStore, usePermissionStore, useUserStore } from '@/store'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/admin'
@@ -25,11 +24,10 @@ export async function setupRouter(app) {
  * ! 添加动态路由: 根据配置由前端或后端生成路由
  */
 export async function addDynamicRoutes() {
-  const token = getToken()
+  const authStore = useAuthStore()
 
-  // 没有 token 的情况
-  if (!token) {
-    router.addRoute(EMPTY_ROUTE)
+  if (!authStore.accessToken) {
+    authStore.toLogin()
     return
   }
 
@@ -50,10 +48,6 @@ export async function addDynamicRoutes() {
 
     // 将当前没有的路由添加进去
     accessRoutes.forEach(route => !router.hasRoute(route.name) && router.addRoute(route))
-    // 移除 EMPTY_ROUTE 页面
-    router.hasRoute(EMPTY_ROUTE.name) && router.removeRoute(EMPTY_ROUTE.name)
-    // 添加 404 页面
-    router.addRoute(NOT_FOUND_ROUTE)
   }
   catch (err) {
     console.error('addDynamicRoutes Error: ', err)
@@ -66,7 +60,7 @@ export async function addDynamicRoutes() {
 export async function resetRouter() {
   router.getRoutes().forEach((route) => {
     const name = route.name
-    if (!basicRoutes.some(e => e.name === name)) {
+    if (!basicRoutes.some(e => e.name === name) && router.hasRoute(name)) {
       router.removeRoute(name)
     }
   })

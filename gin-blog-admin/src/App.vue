@@ -1,20 +1,33 @@
 <script setup>
 import { onMounted } from 'vue'
+import { NConfigProvider, darkTheme, dateZhCN, zhCN } from 'naive-ui'
+import hljs from 'highlight.js/lib/core'
+import json from 'highlight.js/lib/languages/json'
 
-import AppProvider from './components/common/AppProvider.vue'
+import { useAuthStore, useThemeStore } from '@/store'
+import themes from '@/assets/themes'
 import api from '@/api'
-import { getToken } from '@/utils'
+
+hljs.registerLanguage('json', json)
+const themeStore = useThemeStore()
 
 onMounted(() => {
-  const token = getToken()
-  token && api.report() // 上报用户信息
+  const { accessToken } = useAuthStore()
+  accessToken && api.report() // 上报用户信息
 })
 </script>
 
 <template>
-  <AppProvider>
-    <router-view v-slot="{ Component }">
+  <NConfigProvider
+    class="h-full w-full"
+    :theme="themeStore.darkMode ? darkTheme : undefined"
+    :theme-overrides="themes.naiveThemeOverrides"
+    :locale="zhCN"
+    :date-locale="dateZhCN"
+    :hljs="hljs"
+  >
+    <RouterView v-slot="{ Component }">
       <component :is="Component" />
-    </router-view>
-  </AppProvider>
+    </RouterView>
+  </NConfigProvider>
 </template>

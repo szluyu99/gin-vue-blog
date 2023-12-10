@@ -8,7 +8,7 @@ import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -107,7 +107,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.created_at),
-          icon: renderIcon('mdi:clock-time-three-outline', { size: 17 }),
+          icon: () => h('i', { class: 'i-mdi:clock-time-three-outline' }),
         },
       )
     },
@@ -127,7 +127,7 @@ const columns = [
             type: 'primary',
             onClick: () => handleEdit(row),
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', {}) },
+          { default: () => '编辑', icon: () => h('i', { class: 'i-material-symbols:edit-outline' }) },
         ),
         h(
           NPopconfirm,
@@ -136,7 +136,7 @@ const columns = [
             trigger: () => h(
               NButton,
               { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', {}) },
+              { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
             ),
             default: () => h('div', {}, '确定删除该分类吗?'),
           },

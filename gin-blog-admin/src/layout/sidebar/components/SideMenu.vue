@@ -84,20 +84,28 @@ function getMenuItem(route, basePath = '') {
 }
 
 function getIcon(meta) {
-  if (meta?.icon)
+  if (meta?.icon) {
     return renderIcon(meta.icon, { size: 18 })
+  }
   return null
 }
 
-function handleMenuSelect(key, item) {
+function handleMenuSelect(_, item) {
   if (isExternal(item.path)) {
     window.open(item.path)
+    return
   }
-  else {
-    (item.path === curRoute.path)
-      ? tagStore.reloadTag()
-      : router.push(item.path)
+
+  if (item.path === curRoute.path) {
+    // tagStore.reloadTag(curRoute.path)
+    return
   }
+
+  // 如果 tagStore 中没有该 tag, 需要重新渲染
+  if (!tagStore.tags.some(e => e.path === item.path)) {
+    tagStore.updateAliveKey(item.key)
+  }
+  router.push(item.path)
 }
 
 /**

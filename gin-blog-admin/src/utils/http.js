@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken } from './token'
+import { useAuthStore } from '@/store'
 
 export const request = axios.create(
   {
@@ -15,12 +15,10 @@ request.interceptors.request.use(
       return config
     }
 
-    // TODO: get token from localstorage
-    const token = getToken()
-    if (!token) {
-      return Promise.reject(new AxiosError('当前没有登录，请先登录！', 401))
+    const { accessToken } = useAuthStore()
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
     }
-    config.headers.Authorization = config.headers.Authorization || `Bearer ${token}`
     return config
   },
   // 请求失败拦截
@@ -32,21 +30,35 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   // 响应成功拦截
   (response) => {
-    const { data } = response
-    if (data?.code !== 0) { // ! 与后端约定业务状态码
-      window.$message.error(data?.message)
-      return Promise.reject(data)
+    // 业务信息
+    const responseData = response.data
+    const { code, message } = responseData
+    if (code !== 0) { // ! 与后端约定业务状态码
+      window.$message.error(message)
+      if (code === 1201) { // Token 存在问题
+        const authStore = useAuthStore()
+        authStore.toLogin()
+        window.$message.error(message)
+        return
+      }
+      if (code === 1203) { // 被强制退出
+        const authStore = useAuthStore()
+        authStore.forceOffline()
+        return
+      }
+      return Promise.reject(responseData)
     }
-    return Promise.resolve(data)
+    return Promise.resolve(responseData)
   },
   // 响应失败拦截
   (error) => {
-    const { code } = error
-    if (code === 401) {
-      removeToken()
-      // window.$message.error(message)
-      router.push('/')
-    }
+    // 主要使用业务状态码决定状态, 一般不根据 HTTP 状态码进行操作
+    // const { code } = error
+    // if (code === 401) {
+    //   removeToken()
+    //   // window.$message.error(message)
+    //   router.push('/')
+    // }
     return Promise.reject(error)
   },
 )

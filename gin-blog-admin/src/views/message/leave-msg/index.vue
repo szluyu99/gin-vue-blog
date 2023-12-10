@@ -6,7 +6,7 @@ import CommonPage from '@/components/common/CommonPage.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { convertImgUrl, formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -88,7 +88,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.created_at),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -124,7 +124,7 @@ const columns = [
             },
             {
               default: () => '撤下',
-              icon: renderIcon('mi:circle-error', {}),
+              icon: () => h('i', { class: 'i-mi:circle-error' }),
             },
           )
           : h(
@@ -137,7 +137,7 @@ const columns = [
             },
             {
               default: () => '通过',
-              icon: renderIcon('mi:circle-check', {}),
+              icon: () => h('i', { class: 'i-mi:circle-check' }),
             },
           ),
         h(
@@ -148,7 +148,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
+                { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
               ),
             default: () => h('div', {}, '确定删除该条留言吗?'),
           },

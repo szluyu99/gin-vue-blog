@@ -7,7 +7,7 @@ import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -126,7 +126,7 @@ const columns = [
               modalForm.value.parent_id = row.id // 父资源id
             },
           },
-          { default: () => '新增', icon: renderIcon('material-symbols:add', { size: 16 }) },
+          { default: () => '新增', icon: () => h('i', { class: 'i-material-symbols:add' }) },
         ),
         h(
           NButton,
@@ -136,7 +136,7 @@ const columns = [
             type: 'info',
             onClick: () => (row.children ? handleEditModule(row) : handleEdit(row)),
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
+          { default: () => '编辑', icon: () => h('i', { class: 'i-material-symbols:edit-outline' }) },
         ),
         h(
           NPopconfirm,
@@ -150,7 +150,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'tiny', quaternary: true, type: 'error' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
+                { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
               ),
             default: () => h('div', {}, '确定删除该接口吗?'),
           },

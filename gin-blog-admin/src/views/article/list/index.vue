@@ -7,7 +7,7 @@ import CommonPage from '@/components/common/CommonPage.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { convertImgUrl, formatDate, getToken, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import { articleTypeMap, articleTypeOptions } from '@/assets/config'
 import api from '@/api'
@@ -17,19 +17,23 @@ defineOptions({ name: '文章列表' })
 
 const route = useRoute()
 const router = useRouter()
-const token = getToken()
 
 const categoryOptions = ref([])
 const tagOptions = ref([])
 
 const $table = ref(null)
+
 const queryItems = ref({
   title: '', // 标题
   type: null, // 类型
   category_id: null, // 分类
   tag_id: null, // 标签
-}) // 条件搜索
-const extraParams = ref({}) // 控制文章状态: 公开, 私密, 草稿箱, 回收站
+})
+
+const extraParams = ref({
+  is_delete: null, // 0-未删除, 1-回收站
+  status: null, // null-all, 1-公开, 2-私密, 3-草稿
+})
 
 const { handleDelete } = useCRUD({
   name: '文章',
@@ -136,7 +140,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.updated_at),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -180,7 +184,7 @@ const columns = [
                 await $table.value?.handleSearch()
               },
             },
-            { default: () => '恢复', icon: renderIcon('majesticons:eye-line', { size: 16 }) },
+            { default: () => '恢复', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
           )
           : h(
             NButton,
@@ -190,7 +194,7 @@ const columns = [
               secondary: true,
               onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
             },
-            { default: () => '查看', icon: renderIcon('majesticons:eye-line', { size: 16 }) },
+            { default: () => '查看', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
           ),
         h(
           NPopconfirm,
@@ -200,7 +204,7 @@ const columns = [
               h(
                 NButton,
                 { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-                { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
+                { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
               ),
             default: () => h('div', {}, '确定删除该文章吗?'),
           },
@@ -338,7 +342,6 @@ function downloadFile(content, fileName) {
       <div class="inline-block">
         <NUpload
           action="/api/article/import"
-          :headers="{ Authorization: `Bearer ${token}` }"
           :show-file-list="false"
           multiple
           @before-upload="beforeUpload"

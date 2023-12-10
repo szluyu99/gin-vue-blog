@@ -271,7 +271,7 @@ git config --global core.autocrlf false
 
 ### 方式一：Docker Compose 一键运行
 
-> 2023-12-09：该部分目前可能有 BUG，最近在重新修正，可以参考方式二进行运行
+> 2023-12-09：该部分最近在重新修正，可以参考方式二进行运行
 
 需要有 Docker 和 Docker Compose 的环境
 

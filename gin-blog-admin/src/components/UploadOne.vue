@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { NIcon, NText, NUpload, NUploadDragger } from 'naive-ui'
-import { convertImgUrl, getToken } from '@/utils'
+import { useAuthStore } from '@/store'
+import { convertImgUrl } from '@/utils'
 
 const props = defineProps({
   preview: {
@@ -16,7 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:preview'])
 
-const token = getToken() // 图片上传需要 Token
+const { accessToken } = useAuthStore()
 const previewImg = ref(props.preview)
 
 watch(() => props.preview, val => previewImg.value = val)
@@ -44,7 +45,7 @@ defineExpose({ previewImg })
   <div>
     <NUpload
       action="/api/upload"
-      :headers="{ Authorization: `Bearer ${token}` }"
+      :headers="{ Authorization: `Bearer ${accessToken}` }"
       :show-file-list="false"
       @finish="handleImgUpload"
     >

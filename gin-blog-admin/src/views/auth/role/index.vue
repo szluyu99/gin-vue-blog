@@ -7,7 +7,7 @@ import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -120,7 +120,7 @@ const columns = [
           },
           {
             default: () => '菜单权限',
-            icon: renderIcon('material-symbols:edit-outline', { size: 16 }),
+            icon: () => h('i', { class: 'i-material-symbols:edit-outline' }),
           },
         ),
         h(
@@ -137,7 +137,7 @@ const columns = [
           },
           {
             default: () => '资源权限',
-            icon: renderIcon('ic:baseline-folder-open', { size: 16 }),
+            icon: () => h('i', { class: 'i-ic:baseline-folder-open' }),
           },
         ),
         h(
@@ -157,7 +157,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', { size: 16 }),
+                  icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
                 },
               ),
             default: () => h('div', {}, '确定删除该角色吗?'),

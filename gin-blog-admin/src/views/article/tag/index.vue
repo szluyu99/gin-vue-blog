@@ -7,7 +7,7 @@ import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -52,7 +52,12 @@ const columns = [
       return h(NTag, { type: 'info' }, { default: () => row.name })
     },
   },
-  { title: '文章量', key: 'article_count', width: 30, align: 'center' },
+  {
+    title: '文章量',
+    key: 'article_count',
+    width: 30,
+    align: 'center',
+  },
   {
     title: '创建日期',
     key: 'created_at',
@@ -64,7 +69,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.created_at),
-          icon: renderIcon('mdi:clock-time-three-outline', { size: 17 }),
+          icon: () => h('i', { class: 'i-mdi:clock-time-three-outline' }),
         },
       )
     },
@@ -80,7 +85,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.updated_at),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -96,7 +101,7 @@ const columns = [
         h(
           NButton,
           { size: 'small', type: 'primary', onClick: () => handleEdit(row) },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', { size: 16 }) },
+          { default: () => '编辑', icon: () => h('i', { class: 'i-material-symbols:edit-outline' }) },
         ),
         h(
           NPopconfirm,
@@ -105,7 +110,7 @@ const columns = [
             trigger: () => h(
               NButton,
               { size: 'small', type: 'error', style: 'margin-left: 15px;' },
-              { default: () => '删除', icon: renderIcon('material-symbols:delete-outline', { size: 16 }) },
+              { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
             ),
             default: () => h('div', {}, '确定删除该标签吗?'),
           },
@@ -114,6 +119,11 @@ const columns = [
     },
   },
 ]
+
+function handleSorterChange(sorter) {
+  // TODO: 添加后端排序
+  console.log(sorter)
+}
 </script>
 
 <template>
@@ -142,6 +152,7 @@ const columns = [
       v-model:query-items="queryItems"
       :columns="columns"
       :get-data="api.getTags"
+      @sorter-change="handleSorterChange"
     >
       <template #queryBar>
         <QueryItem label="标签名" :label-width="50">

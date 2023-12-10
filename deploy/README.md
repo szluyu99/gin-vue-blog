@@ -1,6 +1,10 @@
-最新版：在安装好环境的基础上
-- 执行 `build_start.sh` 一键构建 Docker 容器
-- 执行 `docker_clear.sh` 一键清理 Docker 容器
+最新版：有以下几个脚本
+- `build_web.sh`：打包 Web 项目并将静态资源移到容器构建目录
+- `docker_clear.sh`：清理本项目相关的旧 Docker 容器
+- `docker_start.sh`：启动本项目的 Docker 容器构建
+- `bootstrap.sh`：一键执行以上操作
+
+一般来说，直接运行 `bootstrap.sh` 即可，每次自动清理旧容器，打包最新代码，并构建新容器
 
 ----
 

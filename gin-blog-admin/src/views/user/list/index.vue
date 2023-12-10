@@ -8,7 +8,7 @@ import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { loginTypeMap, loginTypeOptions } from '@/assets/config'
-import { convertImgUrl, formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -120,7 +120,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.created_at),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -136,7 +136,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.last_login_time),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -180,7 +180,7 @@ const columns = [
           },
           {
             default: () => '编辑',
-            icon: renderIcon('material-symbols:delete-outline', {}),
+            icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
           },
         ),
       ]

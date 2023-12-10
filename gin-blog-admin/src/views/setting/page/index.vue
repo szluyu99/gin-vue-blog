@@ -1,14 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { h, onMounted, ref } from 'vue'
 import { NButton, NDropdown, NForm, NFormItem, NImage, NInput } from 'naive-ui'
 
 import CrudModal from '@/components/crud/CrudModal.vue'
 import UploadOne from '@/components//UploadOne.vue'
 import CommonPage from '@/components/common/CommonPage.vue'
 
-import { convertImgUrl, renderIcon } from '@/utils'
+import { convertImgUrl } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
+
+// FIXME: 只有这个页面的 KeepAlive 为什么没有生效？
 
 const {
   modalVisible,
@@ -38,8 +40,8 @@ onMounted(async () => {
 })
 
 async function fetchData() {
-  const res = await api.getPages()
-  pageList.value = res.data
+  const resp = await api.getPages()
+  pageList.value = resp.data
 }
 
 // 根据输入的链接刷新预览图片
@@ -49,7 +51,6 @@ function refreshImg(img) {
   setTimeout(() => reloadFlag.value = false, 1000)
 }
 
-// 注意 handleSelect 第一个参数
 function handleSelect(key, page) {
   if (key === 'edit') {
     handleEdit(page)
@@ -63,12 +64,12 @@ const options = [
   {
     label: '编辑',
     key: 'edit',
-    icon: renderIcon('mingcute:edit-2-line', {}),
+    icon: () => h('i', { class: 'i-mingcute:edit-2-line' }),
   },
   {
     label: '删除',
     key: 'delete',
-    icon: renderIcon('mingcute:delete-back-line', {}),
+    icon: () => h('i', { class: 'i-mingcute:delete-back-line' }),
   },
 ]
 </script>
@@ -78,7 +79,7 @@ const options = [
     <template #action>
       <NButton type="primary" @click="handleAdd">
         <template #icon>
-          <span class="i-material-symbols:add" />
+          <i class="i-material-symbols:add" />
         </template>
         新建页面
       </NButton>

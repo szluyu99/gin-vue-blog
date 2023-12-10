@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { NLayout, NLayoutSider } from 'naive-ui'
 
@@ -11,14 +10,15 @@ import AppTags from './tags/index.vue'
 import { useTagStore, useThemeStore } from '@/store'
 import themes from '@/assets/themes'
 
-const { collapsed } = storeToRefs(useThemeStore())
-const { reloading, aliveKeys } = storeToRefs(useTagStore())
+const themeStore = useThemeStore()
+const tagStore = useTagStore()
 const router = useRouter()
 
 // 缓存的路由名
 const keepAliveRouteNames = computed(() => {
-  const allRoutes = router.getRoutes() // 所有路由
-  return allRoutes.filter(route => route.meta?.keepAlive).map(route => route.name)
+  const allRoutes = router.getRoutes()
+  const names = allRoutes.filter(route => route.meta?.keepAlive).map(route => route.name)
+  return names
 })
 </script>
 
@@ -31,7 +31,7 @@ const keepAliveRouteNames = computed(() => {
       :collapsed-width="64"
       :width="220"
       :native-scrollbar="false"
-      :collapsed="collapsed"
+      :collapsed="themeStore.collapsed"
     >
       <Sidebar />
     </NLayoutSider>
@@ -54,8 +54,8 @@ const keepAliveRouteNames = computed(() => {
           <KeepAlive :include="keepAliveRouteNames">
             <component
               :is="Component"
-              v-if="reloading"
-              :key="aliveKeys[route.name] || route.fullPath"
+              v-if="tagStore.reloading"
+              :key="tagStore.aliveKeys[route.name] || route.fullPath"
             />
           </keepalive>
         </RouterView>

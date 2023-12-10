@@ -5,12 +5,9 @@ import { NButton, NDatePicker, NForm, NFormItem, NInput, NRadio, NRadioGroup, NT
 import CommonPage from '@/components/common/CommonPage.vue'
 import UploadOne from '@/components//UploadOne.vue'
 
-import { useAppStore } from '@/store'
 import api from '@/api'
 
 defineOptions({ name: '网站管理' })
-
-const appStore = useAppStore()
 
 const formRef = ref(null)
 const form = ref({
@@ -38,9 +35,13 @@ const form = ref({
 })
 
 onMounted(async () => {
-  await appStore.getBlogInfo()
-  form.value = { ...appStore.blogConfig }
+  fetchData()
 })
+
+async function fetchData() {
+  const resp = await api.getBlogConfig()
+  form.value = resp.data
+}
 
 function handleSave() {
   formRef.value?.validate(async (err) => {
@@ -50,7 +51,8 @@ function handleSave() {
         await api.updateBlogConfig(form.value)
         $loadingBar?.finish()
         $message.success('博客信息更新成功')
-        appStore.getBlogInfo()
+        fetchData()
+        // appStore.getBlogInfo()
       }
       catch (err) {
         $loadingBar?.error()

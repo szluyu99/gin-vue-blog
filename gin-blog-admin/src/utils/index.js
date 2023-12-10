@@ -4,7 +4,6 @@ import { NIcon } from 'naive-ui'
 import dayjs from 'dayjs'
 
 export * from './http'
-export * from './token'
 export * from './local'
 export * from './naiveTool'
 
@@ -31,7 +30,7 @@ export function formatDate(date = undefined, format = 'YYYY-MM-DD') {
 }
 
 /**
- * 渲染图标
+ * 使用 NIcon 渲染图标
  */
 export function renderIcon(icon, props = { size: 12 }) {
   return () => h(NIcon, props, { default: () => h(Icon, { icon }) })

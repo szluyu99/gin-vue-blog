@@ -5,7 +5,7 @@ import { NButton, NImage, NPopconfirm } from 'naive-ui'
 import CommonPage from '@/components/common/CommonPage.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { convertImgUrl, formatDate, renderIcon } from '@/utils'
+import { convertImgUrl, formatDate } from '@/utils'
 import api from '@/api'
 
 defineOptions({ name: '在线用户' })
@@ -90,7 +90,7 @@ const columns = [
         { size: 'small', type: 'text', ghost: true },
         {
           default: () => formatDate(row.last_login_time),
-          icon: renderIcon('mdi:update', { size: 18 }),
+          icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )
     },
@@ -109,10 +109,10 @@ const columns = [
           trigger: () =>
             h(
               NButton,
-              { size: 'small', type: 'primary' },
+              { size: 'small', type: 'warning' },
               {
                 default: () => '下线',
-                icon: renderIcon('material-symbols:delete-outline', {}),
+                icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
               },
             ),
           default: () => h('div', {}, '确定强制该用户下线吗?'),

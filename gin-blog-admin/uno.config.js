@@ -6,6 +6,7 @@ export default defineConfig({
     presetUno(),
     presetRemToPx({ baseFontSize: 4 }),
     presetIcons({
+      prefix: ['i-'],
       scale: 1.2,
       extraProperties: {
         'display': 'inline-block',

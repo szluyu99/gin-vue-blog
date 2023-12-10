@@ -41,7 +41,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:queryItems', 'onChecked', 'onDataChange'])
+const emit = defineEmits(['update:queryItems', 'checked', 'dataChange', 'sorterChange'])
 
 const loading = ref(false) // 加载
 const selections = ref([]) // 多选的 rowKey
@@ -94,7 +94,7 @@ async function handleQuery() {
     pagination.itemCount = 0
   }
   finally {
-    emit('onDataChange', tableData.value)
+    emit('dataChange', tableData.value)
     loading.value = false
   }
 }
@@ -124,8 +124,12 @@ function onChecked(rowKeys) {
   selections.value = rowKeys
   // 包含 selection
   if (props.columns.some(item => item.type === 'selection')) {
-    emit('onChecked', rowKeys)
+    emit('checked', rowKeys)
   }
+}
+
+function onSorterChange(sorter) {
+  emit('sorterChange', sorter)
 }
 
 function handleExport(columns = props.columns, data = tableData.value) {
@@ -186,5 +190,6 @@ defineExpose({
     :checked-row-keys="selections"
     @update:checked-row-keys="onChecked"
     @update:page="onPageChange"
+    @update:sorter="onSorterChange"
   />
 </template>

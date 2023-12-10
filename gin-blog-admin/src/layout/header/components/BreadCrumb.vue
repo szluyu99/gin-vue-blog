@@ -13,8 +13,9 @@ function handleBreadClick(path) {
 }
 
 function getIcon(meta) {
-  if (meta?.icon)
+  if (meta?.icon) {
     return renderIcon(meta.icon, { size: 18 })
+  }
   return null
 }
 </script>

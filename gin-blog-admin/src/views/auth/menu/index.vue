@@ -9,7 +9,7 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 import IconPicker from '@/components/icon/IconPicker.vue'
 import TheIcon from '@/components/icon/TheIcon.vue'
 
-import { formatDate, renderIcon } from '@/utils'
+import { formatDate } from '@/utils'
 import { useCRUD } from '@/composables'
 import api from '@/api'
 
@@ -123,7 +123,7 @@ const columns = [
               handleAdd()
             },
           },
-          { default: () => '新增', icon: renderIcon('material-symbols:add', {}) },
+          { default: () => '新增', icon: () => h('i', { class: 'i-material-symbols:add' }) },
         ),
         h(
           NButton,
@@ -136,7 +136,7 @@ const columns = [
               handleEdit(row)
             },
           },
-          { default: () => '编辑', icon: renderIcon('material-symbols:edit-outline', {}) },
+          { default: () => '编辑', icon: () => h('i', { class: 'i-material-symbols:edit-outline' }) },
         ),
         h(
           NPopconfirm,
@@ -154,7 +154,7 @@ const columns = [
                 },
                 {
                   default: () => '删除',
-                  icon: renderIcon('material-symbols:delete-outline', {}),
+                  icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
                 },
               ),
             default: () => h('div', {}, '确定删除该菜单吗?'),
