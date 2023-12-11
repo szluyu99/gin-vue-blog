@@ -24,7 +24,7 @@ export default defineConfig((configEnv) => {
     ],
     server: {
       host: '0.0.0.0',
-      port: env.VITE_PORT,
+      port: 3333,
       open: false,
       proxy: {
         '/api/front': {
@@ -36,6 +36,9 @@ export default defineConfig((configEnv) => {
     // https://cn.vitejs.dev/guide/api-javascript.html#build
     build: {
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制 (单位 kb)
+    },
+    esbuild: {
+      drop: ['debugger', 'console'],
     },
   }
 })

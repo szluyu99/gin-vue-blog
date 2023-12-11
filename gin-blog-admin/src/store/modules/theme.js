@@ -4,7 +4,7 @@ import { useDark } from '@vueuse/core'
 const isDark = useDark()
 export const useThemeStore = defineStore('theme-store', {
   persist: {
-    key: 'gvb_theme',
+    key: 'gvb_admin_theme',
     paths: ['collapsed', 'watermarked'],
   },
   state: () => ({

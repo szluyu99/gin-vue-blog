@@ -19,17 +19,18 @@ const form = reactive({
   email: userStore.email,
 })
 
-onMounted(() => {
-  // 如果未登录, 退回首页
-  if (!userStore.userId)
+onMounted(async () => {
+  await userStore.getUserInfo()
+  if (!userStore.userId) {
     router.push('/')
+  }
 })
 
 async function updateUserInfo() {
   try {
     await api.updateUser(form)
     window.$message?.success('修改成功!')
-    userStore.getUserInfo() // 重新获取用户信息
+    userStore.getUserInfo()
   }
   catch (err) {
     console.error(err)

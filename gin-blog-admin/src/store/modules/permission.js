@@ -5,7 +5,9 @@ import Layout from '@/layout/index.vue'
 import api from '@/api'
 
 export const usePermissionStore = defineStore('permission', {
-  persist: true,
+  persist: {
+    key: 'gvb_admin_permission',
+  },
   state: () => ({
     accessRoutes: [], // 可访问的路由
   }),

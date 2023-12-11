@@ -27,6 +27,7 @@ const props = defineProps({
     default() { return {} },
   },
   /**
+   * TODO: 如果想要同时有 url 和 body, 怎么处理
    * ! 约定接口入参出参
    * 分页模式需约定分页接口入参
    *    @param {number} pageSize 分页参数: 一页展示多少条，默认 10

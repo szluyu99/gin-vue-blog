@@ -15,6 +15,7 @@ const title = import.meta.env.VITE_TITLE // 环境变量中读取
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
+
 const router = useRouter()
 const { query } = useRoute()
 

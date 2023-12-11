@@ -1,10 +1,24 @@
 import { defineStore } from 'pinia'
-import { convertImgUrl, getToken, removeToken } from '@/utils'
+import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 export const useUserStore = defineStore('user', {
+  persist: {
+    key: 'gvb_blog_user',
+    paths: ['token'],
+  },
   state: () => ({
-    userInfo: {},
+    userInfo: {
+      id: '',
+      nickname: '',
+      avatar: 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+      website: '',
+      intro: '',
+      email: '',
+      articleLikeSet: [],
+      commentLikeSet: [],
+    },
+    token: null,
   }),
   getters: {
     userId: state => state.userInfo.id ?? '',
@@ -17,35 +31,32 @@ export const useUserStore = defineStore('user', {
     commentLikeSet() { return this.userInfo.commentLikeSet || [] },
   },
   actions: {
+    setToken(token) {
+      this.token = token
+    },
+    resetLoginState() {
+      this.$reset()
+    },
     async getUserInfo() {
-      const token = getToken()
-      if (!token)
+      if (!this.token) {
         return
+      }
 
       try {
         const resp = await api.getUser()
         if (resp.code === 0) {
-          const {
-            id,
-            nickname,
-            avatar,
-            website,
-            intro,
-            email,
-            article_like_set,
-            comment_like_set,
-          } = resp.data
+          const data = resp.data
           this.userInfo = {
-            id,
-            nickname,
-            avatar,
-            website,
-            intro,
-            email,
-            articleLikeSet: article_like_set.map(e => +e),
-            commentLikeSet: comment_like_set.map(e => +e),
+            id: data.id,
+            nickname: data.nickname,
+            avatar: data.avatar ? convertImgUrl(data.avatar) : 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+            website: data.website,
+            intro: data.intro,
+            email: data.email,
+            articleLikeSet: data.article_like_set.map(e => +e),
+            commentLikeSet: data.comment_like_set.map(e => +e),
           }
-          this.userInfo.avatar = convertImgUrl(this.userInfo.avatar)
+
           return Promise.resolve(resp.data)
         }
         else {
@@ -55,10 +66,6 @@ export const useUserStore = defineStore('user', {
       catch (error) {
         return Promise.reject(error)
       }
-    },
-    async logout() {
-      removeToken()
-      this.$reset()
     },
     commentLike(commentId) {
       this.commentLikeSet.includes(commentId)

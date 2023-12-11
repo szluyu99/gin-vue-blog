@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   presets: [
     presetUno(),
-    presetIcons({ warn: true, autoInstall: true, cdn: 'https://esm.sh/' }),
+    presetIcons({ warn: true }),
     presetTypography(),
   ],
   transformers: [

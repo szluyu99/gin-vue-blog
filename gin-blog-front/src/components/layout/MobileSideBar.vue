@@ -24,7 +24,7 @@ const menuOptions = [
 ]
 
 function logout() {
-  userStore.logout()
+  userStore.resetLoginState()
   if (route.name === 'User') // 如果在个人信息页登出则回到首页
     router.push('/')
   window.$notify?.success('退出登录成功！')

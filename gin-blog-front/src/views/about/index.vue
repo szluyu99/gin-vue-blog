@@ -5,12 +5,10 @@ import { marked } from 'marked'
 import hljs from 'highlight.js/lib/core'
 
 import BannerPage from '@/components/BannerPage.vue'
+import { useAppStore } from '@/store'
 import api from '@/api'
 
-import { useAppStore } from '@/store'
-
 const { blogConfig } = storeToRefs(useAppStore())
-
 const content = ref('')
 
 onMounted(async () => {

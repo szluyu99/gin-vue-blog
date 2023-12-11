@@ -49,7 +49,7 @@ defineExpose({ current, setShow })
     <template v-if="pageTotal < 6">
       <a v-for="i of pageTotal" :key="i" class="mx-5" @click="changeCurrent(i)">
         <!-- 当前选中页数 -->
-        <span v-if="isActive(i)" class="font-bold color-#00a1d6">
+        <span v-if="isActive(i)" class="color-#00a1d6 font-bold">
           {{ i }}
         </span>
         <span v-else> {{ i }} </span>

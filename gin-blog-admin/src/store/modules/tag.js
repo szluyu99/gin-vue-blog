@@ -4,6 +4,7 @@ import { router } from '@/router'
 
 export const useTagStore = defineStore('tag', {
   persist: {
+    key: 'gvb_admin_tag',
     paths: ['tags'],
     storage: window.sessionStorage,
   },

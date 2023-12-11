@@ -5,8 +5,8 @@ import unocss from 'unocss/vite'
 import viteCompression from 'vite-plugin-compression'
 import { visualizer } from 'rollup-plugin-visualizer'
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd())
+export default defineConfig((configEnv) => {
+  const env = loadEnv(configEnv.mode, process.cwd())
 
   return {
     base: env.VITE_PUBLIC_PATH || '/',
@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       host: '0.0.0.0',
-      port: env.VITE_PORT,
+      port: 3000,
       open: false,
       proxy: {
         '/api': {

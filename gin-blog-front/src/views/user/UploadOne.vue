@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { convertImgUrl, getToken } from '@/utils'
+import { convertImgUrl } from '@/utils'
+import { useUserStore } from '@/store'
 
 const props = defineProps({
   preview: {
@@ -10,8 +11,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:preview'])
-
-const token = getToken() // 图片上传需要 Token
 const previewImg = ref(props.preview) // 图片预览
 
 // 判断是本地上传的图片或网络资源
@@ -25,6 +24,7 @@ async function handleFileChange() {
   const formData = new FormData()
   formData.append('file', file)
   try {
+    const { token } = useUserStore()
     const response = await fetch('/api/front/upload', {
       method: 'POST',
       headers: {
@@ -41,7 +41,8 @@ async function handleFileChange() {
 
     previewImg.value = responseJSON.data
     emit('update:preview', previewImg)
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     window.$message?.error('文件上传失败')
   }

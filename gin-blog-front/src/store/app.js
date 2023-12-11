@@ -3,14 +3,13 @@ import { convertImgUrl } from '@/utils'
 import api from '@/api'
 
 export const useAppStore = defineStore('app', {
-  persist: true,
   state: () => ({
     searchFlag: false,
     loginFlag: false,
     registerFlag: false,
-
     collapsed: false, // 侧边栏折叠（移动端）
 
+    // TODO: 优化
     blogInfo: {
       blog_config: {
         website_name: '阵、雨的个人博客',

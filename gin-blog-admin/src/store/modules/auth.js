@@ -5,7 +5,7 @@ import { resetRouter, router } from '@/router'
 
 export const useAuthStore = defineStore('auth', {
   persist: {
-    key: 'gvb_auth',
+    key: 'gvb_admin_auth',
   },
   state: () => ({
     accessToken: null,

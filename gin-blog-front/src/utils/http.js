@@ -1,6 +1,5 @@
-import axios, { AxiosError } from 'axios'
-import { getToken, removeToken } from './token'
-import { router } from '@/router'
+import axios from 'axios'
+import { useAppStore, useUserStore } from '@/store'
 
 export const request = axios.create(
   {
@@ -13,9 +12,9 @@ request.interceptors.request.use(
   // 请求成功拦截
   (config) => {
     if (config.needToken) {
-      const token = getToken()
+      const { token } = useUserStore()
       if (!token) {
-        return Promise.reject(new AxiosError('当前没有登录，请先登录！', 401))
+        return Promise.reject(new axios.AxiosError('当前没有登录，请先登录！', 401))
       }
       config.headers.Authorization = config.headers.Authorization || `Bearer ${token}`
     }
@@ -30,20 +29,30 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   // 响应成功拦截
   (response) => {
-    const { data } = response
-    if (data?.code !== 0) { // 与后端约定业务状态码
-      window.$message.error(data?.message)
-      return Promise.reject(data)
+    const responseData = response.data
+    const { code, message } = responseData
+    if (code !== 0) { // 与后端约定业务状态码
+      if (code === 1203) {
+        // 移除 token
+        const userStore = useUserStore()
+        userStore.resetLoginState()
+      }
+      window.$message.error(message)
+      return Promise.reject(responseData)
     }
-    return Promise.resolve(data)
+    return Promise.resolve(responseData)
   },
   // 响应失败拦截
   (error) => {
     const { code, message } = error
     if (code === 401) {
-      removeToken()
       window.$message.error(message)
-      router.push('/')
+      // 移除 token
+      const userStore = useUserStore()
+      userStore.resetLoginState()
+      // 登录弹框
+      const appStore = useAppStore()
+      appStore.setLoginFlag(true)
     }
     return Promise.reject(error)
   },

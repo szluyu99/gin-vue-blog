@@ -52,7 +52,7 @@ watchThrottled(y, () => {
 }, { throttle: 100 })
 
 function logout() {
-  userStore.logout()
+  userStore.resetLoginState()
   // 如果在个人信息页登出则回到首页
   if (route.name === 'User') {
     router.push('/')

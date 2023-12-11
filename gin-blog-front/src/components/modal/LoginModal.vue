@@ -2,14 +2,11 @@
 import { computed, ref } from 'vue'
 
 import UModal from '@/components/ui/UModal.vue'
-import config from '@/assets/config'
-
-import api from '@/api'
-import { setToken } from '@/utils'
-
 import { useAppStore, useUserStore } from '@/store'
+import api from '@/api'
 
-const [appStore, userStore] = [useAppStore(), useUserStore()]
+const userStore = useUserStore()
+const appStore = useAppStore()
 
 const registerFlag = computed({
   get: () => appStore.registerFlag,
@@ -22,8 +19,8 @@ const loginFlag = computed({
 })
 
 const form = ref({
-  username: '',
-  password: '',
+  username: 'test@qq.com',
+  password: '11111',
 })
 
 // 登录
@@ -35,26 +32,27 @@ async function handleLogin() {
   }
 
   const doLogin = async (username, password) => {
-    const result = await api.login({ username, password })
+    const resp = await api.login({ username, password })
     window.$notify?.success('登录成功!')
-    setToken(result.data.token) // 保存在本地
+    userStore.setToken(resp.data.token)
     // 加载用户信息, 更新 pinia 中信息, 刷新页面
     await userStore.getUserInfo()
     // 清空表单
-    form.value = { username: '', password: '' }
+    form.value = { username: 'test@qq.com', password: '11111' }
     loginFlag.value = false
   }
 
-  if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
-  // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-    const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
-      res.ret === 0 && doLogin(username, password)
-    })
-    captcha.show()
-  }
-  else {
-    doLogin(username, password)
-  }
+  doLogin(username, password)
+  // if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
+  // // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
+  //   const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
+  //     res.ret === 0 && doLogin(username, password)
+  //   })
+  //   captcha.show()
+  // }
+  // else {
+  // doLogin(username, password)
+  // }
 }
 
 // 立即注册
