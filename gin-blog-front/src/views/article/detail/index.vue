@@ -1,8 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
-
 import hljs from 'highlight.js/lib/core'
 
 import BannerInfo from './components/BannerInfo.vue'
@@ -19,6 +18,8 @@ import Comment from '@/components/comment/Comment.vue'
 
 import { convertImgUrl } from '@/utils'
 import api from '@/api'
+
+const route = useRoute()
 
 const data = ref({
   id: 0,
@@ -42,16 +43,24 @@ const data = ref({
 const previewRef = ref(null)
 const loading = ref(true)
 
-onMounted(() => {
-  api.getArticleDetail(+useRoute().params.id).then((res) => {
-    data.value = res.data
-  }).finally(() => {
-    loading.value = false
-  })
-
-  setTimeout(() => {
+onMounted(async () => {
+  try {
+    const resp = await api.getArticleDetail(route.params.id)
+    data.value = resp.data
+    // marked 解析 markdown 文本
+    data.value.content = await marked.parse(resp.data.content, { async: true })
+    await nextTick()
+    // higlight.js 代码高亮
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
-  }, 300)
+    // MathJax 渲染公式
+    window.MathJax.typeset()
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    loading.value = false
+  }
 })
 
 const styleVal = computed(() =>
@@ -75,7 +84,7 @@ const styleVal = computed(() =>
         <article
           ref="previewRef"
           class="max-w-none prose prose-truegray lg:mx-10"
-          v-html="marked(data.content)"
+          v-html="data.content"
         />
         <!-- 版权声明 -->
         <Copyright class="my-5 lg:mx-5" />
@@ -108,7 +117,7 @@ const styleVal = computed(() =>
         <div class="sticky top-5 hidden lg:block space-y-4">
           <!-- 目录 -->
           <!-- TODO: v-if 的方法不太好, 想办法解决父组件接口获取数据, 子组件渲染问题 -->
-          <Catalogue v-if="!loading" :preview="previewRef" />
+          <Catalogue v-if="!loading" :preview-ref="previewRef" />
           <!-- 最新文章 -->
           <LatestList :article-list="data.newest_articles" />
         </div>

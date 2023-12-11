@@ -2,20 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
 
-const { preview } = defineProps({
-  preview: {
-    type: Object,
-    required: true,
-  },
+const { previewRef } = defineProps({
+  previewRef: { type: Object, required: true, },
 })
 
 onMounted(() => {
-  preview && buildAnchors()
+  buildAnchors()
 })
 
 const selectAnchor = ref('')
 const anchors = ref([])
-const headings = Array.from(preview.querySelectorAll('h1,h2,h3,h4,h5,h6'))
+const headings = Array.from(previewRef.querySelectorAll('h1,h2,h3,h4,h5,h6'))
 
 function buildAnchors() {
   // 用于确认层级
@@ -69,9 +66,7 @@ watchThrottled(y, () => {
           <div
             class="cursor-pointer border-l-4 border-transparent rounded py-1 text-sm color-#666261 hover:bg-#00c4b6 hover:bg-opacity-30"
             :class="anchor.id === selectAnchor && 'bg-#00c4b6 text-white border-l-#009d92'"
-            :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }"
-            @click="handleClickAnchor(anchor.id)"
-          >
+            :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }" @click="handleClickAnchor(anchor.id)">
             {{ anchor.name }}
           </div>
         </li>

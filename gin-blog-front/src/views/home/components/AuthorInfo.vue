@@ -49,7 +49,7 @@ function addToFavorites() {
         class="h-9 w-7/8 f-c-c transform rounded bg-blue-600 text-white transition-200 ease-in-out hover:scale-105 hover:bg-orange-600"
         @click="addToFavorites"
       >
-        <span class="i-material-symbols:bookmark mr-1 text-xl" /> 加入书签
+        <span class="i-mdi:bookmark mr-1 text-xl" /> 加入书签
       </button>
     </div>
     <!-- 社交信息 -->
