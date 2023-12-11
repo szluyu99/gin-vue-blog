@@ -6,7 +6,7 @@ const themeStore = useThemeStore()
 </script>
 
 <template>
-  <NIcon class="mr-20 cursor-pointer" size="18" @click="themeStore.switchDarkMode">
+  <NIcon class="cursor-pointer" size="18" @click="themeStore.switchDarkMode">
     <span v-if="themeStore.darkMode" class="i-mdi-moon-waning-crescent" />
     <span v-else class="i-mdi-white-balance-sunny" />
   </NIcon>

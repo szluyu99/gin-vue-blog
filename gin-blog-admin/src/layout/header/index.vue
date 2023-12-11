@@ -9,13 +9,13 @@ import UserAvatar from './components/UserAvatar.vue'
 </script>
 
 <template>
-  <div class="flex items-center">
+  <div class="flex items-center space-x-3">
     <!-- 侧边栏折叠按钮 -->
     <MenuCollapse />
     <!-- 面包屑导航 -->
-    <BreadCrumb class="ml-15 mt-6" />
+    <BreadCrumb class="mt-1.5" />
   </div>
-  <div class="ml-auto flex items-center">
+  <div class="ml-auto flex items-center space-x-5">
     <!-- Github 网址图标 -->
     <GithubSite />
     <!-- 切换模式 -->

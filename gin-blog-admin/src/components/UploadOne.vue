@@ -52,7 +52,7 @@ defineExpose({ previewImg })
       <template v-if="previewImg">
         <img
           border-color="#d9d9d9"
-          class="cursor-pointer border-2 rounded-2rem border-dashed hover:border-color-lightblue"
+          class="cursor-pointer border-2 rounded-lg border-dashed hover:border-color-lightblue"
           :style="{ width: `${props.width}px` }"
           :src="imgUrl"
           alt="文章封面"
@@ -60,12 +60,12 @@ defineExpose({ previewImg })
       </template>
       <template v-else>
         <NUploadDragger>
-          <div class="mb-12">
-            <NIcon size="58" :depth="3">
+          <div class="mb-3">
+            <NIcon size="50" :depth="3">
               <span class="i-mdi:upload" />
             </NIcon>
           </div>
-          <NText class="text-14">
+          <NText>
             点击或者拖动文件到该区域来上传
           </NText>
         </NUploadDragger>

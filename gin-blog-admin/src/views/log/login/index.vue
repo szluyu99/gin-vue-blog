@@ -6,7 +6,7 @@ import CommonPage from '@/components/common/CommonPage.vue'
 <template>
   <CommonPage>
     <NResult
-      class="mt-120"
+      class="mt-30"
       status="404"
       title="该页面还在开发中..."
       description="稍安毋躁"

@@ -97,8 +97,8 @@ function validatePasswordSame(rule, value) {
   <CommonPage :show-header="false">
     <NTabs type="line" animated>
       <NTabPane name="website" tab="修改信息">
-        <div class="m-30 flex items-center">
-          <div class="mr-30 w-200">
+        <div class="m-7 flex items-center">
+          <div class="mr-7 w-50">
             <UploadOne
               v-model:preview="infoForm.avatar"
               :width="130"
@@ -111,7 +111,7 @@ function validatePasswordSame(rule, value) {
             label-width="100"
             :model="infoForm"
             :rules="infoFormRules"
-            class="w-400"
+            class="w-80"
           >
             <NFormItem label="昵称" path="nickname">
               <NInput

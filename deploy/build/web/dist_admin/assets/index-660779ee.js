@@ -1,1 +1,0 @@
-import{_ as t}from"./CommonPage-4f39ed42.js";import{o as e,f as s,w as a,j as r,i as o}from"./index-cfa27ed4.js";import{N as i}from"./Result-0717d8b5.js";import"./AppPage-a5c29498.js";const l={__name:"index",setup(c){return(_,m)=>(e(),s(t,null,{default:a(()=>[r(o(i),{class:"mt-120",status:"404",title:"该页面还在开发中...",description:"稍安毋躁",size:"huge"})]),_:1}))}};export{l as default};

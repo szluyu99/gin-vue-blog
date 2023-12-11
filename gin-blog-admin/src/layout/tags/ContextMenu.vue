@@ -22,33 +22,33 @@ const options = computed(() => [
     label: '重新加载',
     key: 'reload',
     disabled: props.currentPath !== tagStore.activeTag, // 只能重新加载当前标签
-    icon: () => h('i', { class: 'i-mdi:refresh text-14' }),
+    icon: () => h('i', { class: 'i-mdi:refresh' }),
   },
   {
     label: '关闭',
     key: 'close',
     disabled: tagStore.tags.length <= 1, // 只有一个标签时, 不能关闭
-    icon: () => h('i', { class: 'i-mdi:close text-14' }),
+    icon: () => h('i', { class: 'i-mdi:close' }),
   },
   {
     label: '关闭其他',
     key: 'close-other',
     disabled: tagStore.tags.length <= 1, // 只有一个标签时, 不能关闭其他
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-horizontal text-14' }),
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-horizontal' }),
   },
   {
     label: '关闭左侧',
     key: 'close-left',
     // 只有一个标签 或者 当前选中的是第一个标签, 不能关闭左侧
     disabled: tagStore.tags.length <= 1 || props.currentPath === tagStore.tags[0].path,
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-left text-14' }),
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-left' }),
   },
   {
     label: '关闭右侧',
     key: 'close-right',
     // 只有一个标签 或者 当前选中的是最后一个标签, 不能关闭右侧
     disabled: tagStore.tags.length <= 1 || props.currentPath === tagStore.tags[tagStore.tags.length - 1].path,
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-right text-14' }),
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-right' }),
   },
 ])
 

@@ -9,9 +9,9 @@ defineProps({
 
 <template>
   <Transition name="fade-slide" mode="out-in" appear>
-    <section class="cus-scroll-y h-full w-full flex flex-col bg-[#f5f6fb] p-15 dark:bg-[#121212]">
+    <section class="cus-scroll-y h-full w-full flex flex-col bg-[#f5f6fb] p-4 dark:bg-[#121212]">
       <slot />
-      <TheFooter v-if="showFooter" class="mt-15" />
+      <TheFooter v-if="showFooter" class="mt-5" />
       <NBackTop :bottom="20" />
     </section>
   </Transition>

@@ -7,7 +7,7 @@ const themeStore = useThemeStore()
 </script>
 
 <template>
-  <NIcon size="18" class="mr-20 cursor-pointer" @click="themeStore.switchWatermark">
+  <NIcon size="18" class="cursor-pointer" @click="themeStore.switchWatermark">
     <i v-if="themeStore.watermarked" class="i-ic:baseline-branding-watermark" />
     <i v-else class="i-ic:outline-branding-watermark" />
   </NIcon>

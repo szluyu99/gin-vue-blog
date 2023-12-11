@@ -271,22 +271,21 @@ git config --global core.autocrlf false
 
 ### 方式一：Docker Compose 一键运行
 
-> 2023-12-09：该部分最近在重新修正，可以参考方式二进行运行
+> 2023-12-09：该部分最近在重新修正（主要针对 Windows），可以参考方式二进行运行
 
 需要有 Docker 和 Docker Compose 的环境
 
 > 详细运行文档（包含环境搭建）参考：[deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
 
+Linux 下可以正常启动：（Windows TODO）
+
 ```bash
 # 拉取项目, 进入根目录
 git clone https://github.com/szluyu99/gin-vue-blog 
-cd gin-vue-blog
+cd gin-vue-blog/deploy
 
-# 进入 docker-compose 目录
-cd deploy/start
-
-# 一键运行
-docker-compose up -d
+# 一键部署
+./bootstrap_docker.sh
 ```
 
 本地前台访问 [localhost](http://localhost/)

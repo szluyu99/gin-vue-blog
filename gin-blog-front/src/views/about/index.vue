@@ -1,11 +1,22 @@
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
 import { marked } from 'marked'
+
 import hljs from 'highlight.js/lib/core'
+import 'highlight.js/styles/a11y-dark.css'
+import go from 'highlight.js/lib/languages/go'
+import json from 'highlight.js/lib/languages/json'
+import javascript from 'highlight.js/lib/languages/javascript'
+import bash from 'highlight.js/lib/languages/bash'
 
 import BannerPage from '@/components/BannerPage.vue'
 import { useAppStore } from '@/store'
 import api from '@/api'
+
+hljs.registerLanguage('go', go)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('javascript', javascript)
 
 const { blogConfig } = useAppStore()
 const html = ref('')

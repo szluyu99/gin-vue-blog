@@ -37,7 +37,7 @@ watchDebounced(choosed, () => {
           @update:value="filterIcons"
         >
           <template #prefix>
-            <span class="i-mdi:magnify text-18" />
+            <span class="i-mdi:magnify text-base" />
           </template>
           <template #suffix>
             <TheIcon :icon="choosed" :size="18" />
@@ -51,10 +51,10 @@ watchDebounced(choosed, () => {
         </a>
         查看
       </template>
-      <ul v-if="icons.length" class="h-150 w-300 overflow-y-scroll">
+      <ul v-if="icons.length" class="h-[150px] w-[300px] overflow-y-scroll">
         <li
           v-for="(icon, index) in icons" :key="index"
-          class="mx-5 inline-block cursor-pointer hover:text-cyan"
+          class="mx-1.5 inline-block cursor-pointer hover:text-cyan"
           @click="selectIcon(icon)"
         >
           <TheIcon :icon="icon" :size="18" />

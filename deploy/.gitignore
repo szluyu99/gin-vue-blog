@@ -1,2 +1,6 @@
 # 容器文件映射到本地, 不上传仓库
 start/gvb
+
+# dist
+build/web/dist_admin
+build/web/dist_blog

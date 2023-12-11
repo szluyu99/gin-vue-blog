@@ -72,7 +72,7 @@ function handleSave() {
           label-align="left"
           :label-width="120"
           :model="form"
-          class="mt-15 w-500"
+          class="mt-4 w-[500px]"
         >
           <NFormItem label="网站头像" path="website_avatar">
             <UploadOne
@@ -129,7 +129,7 @@ function handleSave() {
           label-align="left"
           :label-width="120"
           :model="form"
-          class="mt-15 w-500"
+          class="mt-4 w-[500px]"
         >
           <NFormItem label="QQ" path="qq">
             <NInput v-model:value="form.qq" placeholder="请输入 QQ" />
@@ -152,7 +152,7 @@ function handleSave() {
           label-align="left"
           :label-width="120"
           :model="form"
-          class="mt-15"
+          class="mt-4"
         >
           <NForm ref="formRef" label-align="left" :label-width="120" :model="form" inline>
             <NFormItem label="用户头像" path="user_avatar">

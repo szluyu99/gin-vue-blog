@@ -31,16 +31,12 @@ const show = computed({
   >
     <slot />
     <template v-if="showFooter" #footer>
-      <footer class="flex justify-end space-x-20">
+      <footer class="flex justify-end space-x-5">
         <slot name="footer">
           <NButton @click="show = false">
             {{ cancelText }}
           </NButton>
-          <NButton
-            :loading="loading"
-            type="primary"
-            @click="emit('save')"
-          >
+          <NButton :loading="loading" type="primary" @click="emit('save')">
             {{ okText }}
           </NButton>
         </slot>

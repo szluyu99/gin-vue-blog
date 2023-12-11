@@ -86,7 +86,7 @@ function handleScroll(x, width) {
 
 /**
  * @desc  函数防抖
- * @param {Function} func
+ * @param {Function} method
  * @param {number} wait
  * @param {boolean} immediate
  * @return {*}

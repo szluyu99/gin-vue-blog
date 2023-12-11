@@ -48,7 +48,7 @@ async function fetchData() {
 function refreshImg(img) {
   reloadFlag.value = true
   uploadOneRef.value.previewImg = img
-  setTimeout(() => reloadFlag.value = false, 1000)
+  setTimeout(() => reloadFlag.value = false, 600)
 }
 
 function handleSelect(key, page) {
@@ -87,11 +87,11 @@ const options = [
     <div class="flex flex-wrap justify-between">
       <div
         v-for="page of pageList" :key="page.id"
-        class="relative my-10 w-300 cursor-pointer text-center"
+        class="relative my-2 w-[300px] cursor-pointer text-center"
       >
-        <div class="absolute right-10 top-5 text-white">
+        <div class="absolute right-2 top-1 text-white">
           <NDropdown :options="options" @select="handleSelect($event, page)">
-            <span class="i-ion:ellipsis-horizontal h-20 w-20 text-white hover:text-blue" />
+            <span class="i-ion:ellipsis-horizontal h-5 w-5 text-white hover:text-blue" />
           </NDropdown>
         </div>
         <NImage
@@ -99,13 +99,13 @@ const options = [
           height="170" width="300"
           :img-props="{ style: { 'border-radius': '5px' } }"
         />
-        <p class="text-15">
+        <p class="text-base">
           {{ page.name }}
         </p>
       </div>
-      <div class="h-0 w-300" />
-      <div class="h-0 w-300" />
-      <div class="h-0 w-300" />
+      <div class="h-0 w-[300px]" />
+      <div class="h-0 w-[300px]" />
+      <div class="h-0 w-[300px]" />
     </div>
 
     <CrudModal
@@ -150,7 +150,7 @@ const options = [
             />
 
             <span
-              class="i-uiw:reload h-20 w-20 cursor-pointer"
+              class="i-uiw:reload h-5 w-5 cursor-pointer"
               :class="reloadFlag ? 'animate-spin' : ''"
               @click="refreshImg(modalForm.cover)"
             />

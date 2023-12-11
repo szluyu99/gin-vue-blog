@@ -74,7 +74,9 @@ services:
         ipv4_address: ${BACKEND_HOST}
 
   gvb-web:
-    build: ../build/web
+    # TODO: 区分不同的情况进行构建
+    # build: ../build/web
+    build: ../../
     container_name: gvb-web
     restart: always
     # 需要开启 https, 请提供证书, 并设置 USE_HTTPS=true

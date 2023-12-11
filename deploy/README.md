@@ -2,9 +2,10 @@
 - `build_web.sh`：打包 Web 项目并将静态资源移到容器构建目录
 - `docker_clear.sh`：清理本项目相关的旧 Docker 容器
 - `docker_start.sh`：启动本项目的 Docker 容器构建
-- `bootstrap.sh`：一键执行以上操作
+- `bootstrap_dev.sh`：使用本机的 pnpm 打包前端静态资源（暂不可用）
+- `bootstrap_docker.sh`：使用 docker node 打包静态资源
 
-一般来说，直接运行 `bootstrap.sh` 即可，每次自动清理旧容器，打包最新代码，并构建新容器
+一般来说，直接运行 `bootstrap_docker.sh` 即可，每次自动清理旧容器，打包最新代码，并构建新容器
 
 ----
 

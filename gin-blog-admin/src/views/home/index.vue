@@ -8,7 +8,12 @@ import api from '@/api'
 
 const { nickname, avatar } = useUserStore()
 
-const homeInfo = ref({})
+const homeInfo = ref({
+  view_count: 0,
+  user_count: 0,
+  article_count: 0,
+  message_count: 0,
+})
 onMounted(async () => {
   getOneSentence()
   const res = await api.getHomeInfo()
@@ -28,22 +33,17 @@ async function getOneSentence() {
 <template>
   <AppPage>
     <div class="flex-1">
-      <NCard class="rounded-10">
+      <NCard>
         <div class="flex items-center">
           <NAvatar round :size="60" :src="avatar" />
-          <div class="ml-20">
-            <p class="text-16">
-              Hello, {{ nickname }}
-            </p>
-            <NGradientText
-              class="mt-5 text-12 op-60"
-              gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)"
-            >
+          <div class="ml-5">
+            <p> Hello, {{ nickname }} </p>
+            <NGradientText class="mt-1 op-60" gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)">
               {{ sentence }}
             </NGradientText>
           </div>
           <div class="ml-auto flex items-center">
-            <NStatistic label="Stars" class="ml-80 w-80">
+            <NStatistic label="Stars" class="w-[80px]">
               <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
                 <img
                   alt="stars"
@@ -51,7 +51,7 @@ async function getOneSentence() {
                 >
               </a>
             </NStatistic>
-            <NStatistic label="Forks" class="ml-80 w-100">
+            <NStatistic label="Forks" class="ml-10 w-[100px]">
               <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
                 <img
                   alt="forks"
@@ -63,43 +63,31 @@ async function getOneSentence() {
         </div>
       </NCard>
 
-      <NGrid class="mt-15" x-gap="12" :cols="4">
-        <NGi>
-          <NCard>
-            <span class="i-fa6-solid:users text-60 text-#40C9C6" />
-            <NStatistic class="float-right" label="访问量">
-              {{ homeInfo.view_count ?? 'unknown' }}
-            </NStatistic>
-          </NCard>
-        </NGi>
-        <NGi>
-          <NCard>
-            <span class="i-heroicons:users-solid text-60 text-#34BFA3" />
-            <NStatistic class="float-right" label="用户量">
-              {{ homeInfo.user_count ?? 'unknown' }}
-            </NStatistic>
-          </NCard>
-        </NGi>
-        <NGi>
-          <NCard>
-            <span class="i-material-symbols:article text-60 text-#F4516C" />
-            <NStatistic class="float-right" label="文章量">
-              {{ homeInfo.article_count ?? 'unknown' }}
-            </NStatistic>
-          </NCard>
-        </NGi>
-        <NGi>
-          <NCard>
-            <span class="i-bxs:comment-dots text-60 text-#36A3F7" />
-            <NStatistic class="float-right" label="留言量">
-              {{ homeInfo.message_count ?? 'unknown' }}
-            </NStatistic>
-          </NCard>
-        </NGi>
+      <NGrid class="mt-4" x-gap="12" :cols="4">
+        <template
+          v-for="item of [
+            { icon: 'i-fa6-solid:users', color: 'text-[#40C9C6]', label: '访问量', key: 'view_count' },
+            { icon: 'i-heroicons:users-solid', color: 'text-[#34BFA3]', label: '用户量', key: 'user_count' },
+            { icon: 'i-material-symbols:article', color: 'text-[#F4516C]', label: '文章量', key: 'article_count' },
+            { icon: 'i-bxs:comment-dots', color: 'text-[#36A3F7]', label: '留言量', key: 'message_count' },
+          ]" :key="item.key"
+        >
+          <NGi>
+            <NCard>
+              <span
+                class="text-[60px]"
+                :class="[item.icon, item.color]"
+              />
+              <NStatistic class="float-right" :label="item.label">
+                {{ homeInfo[item.key] ?? 'unknown' }}
+              </NStatistic>
+            </NCard>
+          </NGi>
+        </template>
       </NGrid>
 
       <!-- TODO: 完善首页设计 -->
-      <NCard title="项目" size="small" class="mt-15 rounded-10">
+      <NCard title="项目" size="small" class="mt-4">
         <template #header-extra>
           <NButton text type="primary">
             更多
@@ -107,7 +95,7 @@ async function getOneSentence() {
         </template>
         <NCard
           v-for="i in 5" :key="i"
-          class="my-10 w-300 flex-shrink-0 cursor-pointer hover:shadow-lg"
+          class="my-2 w-[300px] flex-shrink-0 cursor-pointer hover:shadow-lg"
           title="Gin Blog Admin"
           size="small"
         >

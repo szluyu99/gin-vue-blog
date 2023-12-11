@@ -42,7 +42,7 @@ function handleSelect(key) {
 <template>
   <NDropdown :options="options" @select="handleSelect">
     <div class="flex cursor-pointer items-center">
-      <img :src="userStore.avatar" class="mr-10 h-[35px] w-[35px] rounded-full">
+      <img :src="userStore.avatar" class="mr-2 h-[35px] w-[35px] border-1 border-gray-300 rounded-full">
       <span>{{ userStore.nickname }}</span>
     </div>
   </NDropdown>

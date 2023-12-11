@@ -2,7 +2,7 @@
 import { h, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { NButton, NDynamicTags, NForm, NFormItem, NInput, NRadio, NRadioGroup, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
-import MdEditor from 'md-editor-v3'
+import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 
 import CommonPage from '@/components/common/CommonPage.vue'
@@ -151,11 +151,11 @@ function renderTag(tag, index) {
 
 <template>
   <CommonPage :show-header="false" title="写文章">
-    <div class="mb-15 flex items-center bg-white space-x-10">
+    <div class="mb-4 flex items-center bg-white space-x-2">
       <NInput
         v-model:value="formModel.title"
         type="text"
-        class="mr-20 flex-1 py-5 text-18 font-bold color-primary"
+        class="mr-5 flex-1 py-1 text-lg color-primary font-bold"
         placeholder="输入文章标题..."
       />
       <NButton ghost type="error" :loading="btnLoading" @click="handleDraft">
@@ -172,7 +172,8 @@ function renderTag(tag, index) {
       </NButton>
     </div>
 
-    <MdEditor v-model="formModel.content" style="height: calc(100vh - 305px)" />
+    <!-- TODO: 文件上传 -->
+    <MdEditor v-model="formModel.content" style="height: calc(100vh - 245px)" />
 
     <CrudModal
       v-model:visible="modalVisible"

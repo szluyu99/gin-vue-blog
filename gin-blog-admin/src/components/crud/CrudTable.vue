@@ -159,12 +159,12 @@ defineExpose({
 <template>
   <div
     v-if="$slots.queryBar"
-    class="mb-30 min-h-60 flex items-start justify-between border border-gray-200 border-gray-400 rounded-8 border-solid bg-gray-50 p-15 dark:bg-black"
+    class="mb-7 min-h-[60px] flex items-start justify-between border border-gray-200 border-gray-400 rounded-2 border-solid bg-gray-50 p-3.5 dark:bg-black dark:bg-opacity-5"
   >
     <NSpace wrap :size="[35, 15]">
       <slot name="queryBar" />
     </NSpace>
-    <div class="flex-shrink-0 space-x-20">
+    <div class="flex-shrink-0 space-x-4">
       <NButton ghost type="primary" @click="handleReset">
         <template #icon>
           <i class="i-lucide:rotate-ccw" />
@@ -177,6 +177,7 @@ defineExpose({
         </template>
         搜索
       </NButton>
+      <!-- TODO: 添加额外的插槽，让用户可以自定义按钮 -->
     </div>
   </div>
   <NDataTable

@@ -86,7 +86,7 @@ function handleRefresh(tag) {
     <NTag
       v-for="tag in tagStore.tags" :key="tag.path"
       ref="tabRefs"
-      class="mx-5 rounded-4 px-13 hover:border-blue hover:border-red hover:text-primary"
+      class="mx-1 hover:border-blue hover:border-red hover:text-primary"
       :type="tagStore.activeTag === tag.path ? 'primary' : 'default'"
       :closable="tagStore.tags.length > 1"
       @click="handleTagClick(tag.path)"
@@ -96,10 +96,10 @@ function handleRefresh(tag) {
       <template #icon>
         <div :class="{ 'cursor-pointer': $route.name === tag.name }" @click="handleRefresh(tag)">
           <TheIcon v-if="tag.icon" :icon="tag.icon" :size="16" />
-          <i v-else class="i-mdi:refresh text-17" />
+          <i v-else class="i-mdi:refresh" />
         </div>
       </template>
-      <div class="px-3">
+      <div class="px-0.5">
         {{ tag.title }}
       </div>
     </NTag>

@@ -3,6 +3,11 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import hljs from 'highlight.js/lib/core'
+import 'highlight.js/styles/a11y-dark.css'
+import go from 'highlight.js/lib/languages/go'
+import json from 'highlight.js/lib/languages/json'
+import javascript from 'highlight.js/lib/languages/javascript'
+import bash from 'highlight.js/lib/languages/bash'
 
 import BannerInfo from './components/BannerInfo.vue'
 import Copyright from './components/Copyright.vue'
@@ -18,6 +23,11 @@ import Comment from '@/components/comment/Comment.vue'
 
 import { convertImgUrl } from '@/utils'
 import api from '@/api'
+
+hljs.registerLanguage('go', go)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('javascript', javascript)
 
 const route = useRoute()
 

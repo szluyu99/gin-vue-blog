@@ -120,9 +120,9 @@ const columns = [
   },
 ]
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function handleSorterChange(sorter) {
   // TODO: 添加后端排序
-  console.log(sorter)
 }
 </script>
 

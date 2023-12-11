@@ -39,7 +39,7 @@ const keepAliveRouteNames = computed(() => {
     <article class="flex flex-1 flex-col overflow-hidden">
       <!-- 头部 -->
       <header
-        class="flex items-center border-b-1 border-gray-200 border-b-solid px-15"
+        class="flex items-center border-b-1 border-gray-200 border-b-solid px-4"
         :style="{ height: `${themes.header.height}px` }"
       >
         <AppHeader />

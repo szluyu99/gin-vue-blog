@@ -7,7 +7,7 @@ function handleLinkClick() {
 </script>
 
 <template>
-  <NIcon class="mr-20 cursor-pointer" size="18" @click="handleLinkClick">
+  <NIcon class="cursor-pointer" size="18" @click="handleLinkClick">
     <span class="i-mdi:github" />
   </NIcon>
 </template>

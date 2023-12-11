@@ -48,7 +48,6 @@ async function handleLogin() {
 
   const doLogin = async (username, password) => {
     loading.value = true
-    // $message.loading('正在验证...')
 
     // 登录接口
     try {
@@ -95,57 +94,45 @@ async function handleLogin() {
 
 <template>
   <AppPage class="bg-cover" :style="{ backgroundImage: 'url(/image/login_bg.webp)' }">
-    <div
-      style="transform: translateY(25px)"
-      class="m-auto max-w-700 min-w-345 flex items-center justify-center rounded-10 bg-white bg-opacity-60 p-15 shadow"
-    >
-      <div class="hidden w-380 px-20 py-35 md:block">
+    <div style="transform: translateY(25px)" class="m-auto max-w-[700px] min-w-[345px] flex items-center justify-center rounded-2 bg-white bg-opacity-60 p-4 shadow">
+      <div class="hidden w-[380px] px-5 py-9 md:block">
         <img src="/image/login_banner.webp" class="w-full" alt="login_banner">
       </div>
 
-      <div class="w-320 flex flex-col px-20 py-35">
-        <h5 class="flex items-center justify-center text-24 text-gray font-normal">
-          <img src="/image/logo.svg" alt="logo" class="mr-10 h-50 w-50">
-          {{ title }}
+      <div class="w-[320px] flex flex-col px-4 py-9 space-y-5.5">
+        <h5 class="flex items-center justify-center text-2xl text-gray font-normal">
+          <img src="/image/logo.svg" alt="logo" class="mr-2 h-[50px] w-[50px]">
+          <span> {{ title }} </span>
         </h5>
-        <div class="mt-30">
-          <NInput
-            v-model:value="loginForm.username"
-            class="autofocus h-50 items-center pl-10 text-16"
-            placeholder="test@qq.com"
-            :maxlength="20"
-          />
-        </div>
-        <div class="mt-30">
-          <NInput
-            v-model:value="loginForm.password"
-            class="h-50 items-center pl-10 text-16"
-            type="password"
-            show-password-on="mousedown"
-            placeholder="11111"
-            :maxlength="20"
-            @keydown.enter="handleLogin"
-          />
-        </div>
-
-        <div class="mt-20">
-          <NCheckbox
-            :checked="isRemember"
-            label="记住我"
-            :on-update:checked="(val) => (isRemember = val)"
-          />
-        </div>
-
-        <div class="mt-20">
-          <NButton
-            class="h-50 w-full rounded-5 text-16"
-            type="primary"
-            :loading="loading"
-            @click="handleLogin"
-          >
-            登录
-          </NButton>
-        </div>
+        <NInput
+          v-model:value="loginForm.username"
+          class="h-[50px] items-center pl-2"
+          autofocus
+          placeholder="test@qq.com"
+          :maxlength="20"
+        />
+        <NInput
+          v-model:value="loginForm.password"
+          class="h-[50px] items-center pl-2"
+          type="password"
+          show-password-on="mousedown"
+          placeholder="11111"
+          :maxlength="20"
+          @keydown.enter="handleLogin"
+        />
+        <NCheckbox
+          :checked="isRemember"
+          label="记住我"
+          :on-update:checked="(val) => (isRemember = val)"
+        />
+        <NButton
+          class="h-[50px] w-full rounded-5"
+          type="primary"
+          :loading="loading"
+          @click="handleLogin"
+        >
+          登录
+        </NButton>
       </div>
     </div>
   </AppPage>

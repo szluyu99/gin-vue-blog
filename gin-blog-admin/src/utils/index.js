@@ -36,7 +36,7 @@ export function renderIcon(icon, props = { size: 12 }) {
   return () => h(NIcon, props, { default: () => h(Icon, { icon }) })
 }
 
-// * 前端导出, 传入文件内容和文件名称
+// 前端导出, 传入文件内容和文件名称
 export function downloadFile(content, fileName) {
   const aEle = document.createElement('a') // 创建下载链接
   aEle.download = fileName // 设置下载的名称
