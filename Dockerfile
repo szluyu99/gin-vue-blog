@@ -1,5 +1,5 @@
 # 打包前后台静态资源
-FROM node:20-alpine3.17 AS BUILD
+FROM node:18-alpine3.19 AS BUILD
 WORKDIR /app/front
 COPY gin-blog-front/package*.json .
 RUN npm config set registry https://registry.npmmirror.com \
@@ -13,7 +13,7 @@ COPY gin-blog-admin .
 RUN pnpm install && pnpm build
 
 # 部署 Nginx
-FROM nginx:1.25.3-alpine
+FROM nginx:1.24.0-alpine
 
 # 从第一个阶段拷贝构建好的静态资源到容器
 COPY --from=BUILD /app/front/dist /usr/share/nginx/html
