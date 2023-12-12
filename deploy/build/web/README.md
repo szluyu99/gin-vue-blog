@@ -1,19 +1,10 @@
 # 二次开发指南
 
-修改 gin-blog-admin 和 gin-blog-front 源码后，用以下指令打包会生成 dist 目录
+## 方法一：不依赖本地 pnpm 环境进行打包
 
-```bash
-pnpm build
-```
+执行 `./bootstrap.sh`
 
-将 gin-blog-admin 打包生成的 dist 中文件, 移到当前目录 dist_admin 下
 
-将 gin-blog-front 打包生成的 dist 中文件, 移到当前目录 dist_blog 下
+## 方法二：依赖本地 pnpm 环境进行打包
 
-可以执行 `build_web.sh` 脚本自动执行以上操作
-
-然后在 start 目录重新用 docker-compose 构建运行
-
-```bash
-docker-compose up -d --build
-```
+执行 `./bootstrap.sh dev`

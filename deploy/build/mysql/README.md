@@ -1,13 +1,11 @@
 # 二次开发指南
 
-mysql 镜像的主要作用是初始化数据库中数据，核心在于 gvb.sql 文件
+mysql 镜像的主要作用是 **初始化数据库中数据**，核心在于 `gvb.sql` 文件
 
 这是启动 mysql 容器后会自动执行的 sql 文件
 
-如需更改数据库初始数据，修改 gvb.sql 文件
+如需更改数据库初始数据，修改 `gvb.sql` 文件
 
-然后在 start 目录重新用 docker-compose 构建运行
+> 如果已经运行过一次，需要删除原本的数据文件 `start/gvb` 目录（注意数据备份）
 
-```bash
-docker-compose up -d --build
-```
+然后重新一键运行脚本 `./bootstrap.sh`

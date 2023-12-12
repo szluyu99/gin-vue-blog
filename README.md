@@ -42,7 +42,7 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 
 测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
 
-在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)
+> 在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)，准备换成 Swagger
 
 以下放几张简单的预览图，强烈建议点击上面的[预览链接](#在线预览)进去体验下：
 
@@ -51,6 +51,16 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 ![前台首页文章列表](./images/前台文章列表.png)
 
 ![后台文章列表](./images/后台文章列表.png)
+
+## 有 Docker 环境可一键启动效果
+
+Linux/Mac 可直接运行，Windows 要使用 GitBash 运行（默认终端不能执行 shell）
+
+```bash
+git clone https://github.com/szluyu99/gin-vue-blog 
+cd gin-vue-blog/deploy
+./bootstrap.sh
+```
 
 ## 项目介绍
 
@@ -256,7 +266,7 @@ deploy
 
 ### 拉取项目前的准备 (Windows)
 
-如果是 Windows 系统，需要先执行以下指令，否则 Docker 构建过程会出 BUG。
+如果是 Windows 系统，需要先执行以下指令，否则 Docker 构建过程可能会出 BUG。
 
 或者直接下载 ZIP 而不是通过 git clone 克隆项目。
 
@@ -271,21 +281,16 @@ git config --global core.autocrlf false
 
 ### 方式一：Docker Compose 一键运行
 
-> 2023-12-09：该部分最近在重新修正（主要针对 Windows），可以参考方式二进行运行
-
 需要有 Docker 和 Docker Compose 的环境
 
 > 详细运行文档（包含环境搭建）参考：[deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
 
-Linux 下可以正常启动：（Windows TODO）
+Linux 下可以正常启动：（Windows 请使用 `GitBash` 进行操作）
 
 ```bash
-# 拉取项目, 进入根目录
 git clone https://github.com/szluyu99/gin-vue-blog 
 cd gin-vue-blog/deploy
-
-# 一键部署
-./bootstrap_docker.sh
+./bootstrap.sh
 ```
 
 本地前台访问 [localhost](http://localhost/)

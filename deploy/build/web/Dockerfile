@@ -1,4 +1,5 @@
 FROM nginx:1.25.3-alpine
+# 这份是用于从本地的静态资源构建镜像的 Dockerfile
 
 # 将 Nginx 配置文件模板拷到容器中
 COPY default.conf.template /etc/nginx/conf.d/default.conf.template

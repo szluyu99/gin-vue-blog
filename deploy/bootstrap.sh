@@ -9,7 +9,9 @@ else
   export WEB_BUILD_CONTEXT="../.."
 fi
 
+# 清理旧容器
 ./clean_docker.sh
 
+# 启动新容器
 cd start
 docker-compose up -d --build
