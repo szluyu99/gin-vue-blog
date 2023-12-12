@@ -4,8 +4,12 @@ import { useRoute } from 'vue-router'
 import dayjs from 'dayjs'
 
 // import EmojiList from '@/assets/emoji'
-import CommentField from './CommentField.vue' // 评论 / 回复 框
-import Paging from './Paging.vue' // 分页
+import CommentField from './CommentField.vue'
+
+// 评论 / 回复 框
+import Paging from './Paging.vue'
+
+// 分页
 import ULoading from '@/components/ui/ULoading.vue'
 
 import { convertImgUrl } from '@/utils'
@@ -88,7 +92,8 @@ const pageRefs = ref([]) // 分页
 const checkRefs = ref([]) // 查看
 async function reloadReplies(idx) {
   const { data } = await api.getCommentReplies(
-    commentList.value[idx].id, { page_size: 5, page_num: pageRefs.value[idx].current },
+    commentList.value[idx].id,
+    { page_size: 5, page_num: pageRefs.value[idx].current },
   )
   // * 局部更新某个评论的回复
   commentList.value[idx].reply_vo_list = data
@@ -103,7 +108,9 @@ async function reloadReplies(idx) {
 async function checkReplies(idx, obj) {
   // 查第一页 (5 条数据)
   const { data } = await api.getCommentReplies(
-    obj.id, { page_num: 1, page_size: 5 })
+    obj.id,
+    { page_num: 1, page_size: 5 },
+  )
   // 更新对应楼评论的回复列表
   obj.reply_vo_list = data
   // 超过 5 条数据显示分页
@@ -115,7 +122,9 @@ async function checkReplies(idx, obj) {
 // 修改回复分页中当前页数
 async function changeReplyCurrent(pageNum, idx, commentId) {
   const { data } = await api.getCommentReplies(
-    commentId, { page_num: pageNum, page_size: 5 })
+    commentId,
+    { page_num: pageNum, page_size: 5 },
+  )
   commentList[idx].reply_vo_list = data
 }
 
@@ -185,7 +194,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             </span>
             <a
               v-else :href="comment.website" target="_blank"
-              class="font-500 color-#1abc9c transition-300"
+              class="color-#1abc9c font-500 transition-300"
             >
               {{ comment.nickname }}
             </a>
@@ -227,7 +236,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
                 </span>
                 <a
                   v-else :href="reply.website" target="_blank"
-                  class="font-500 color-#1abc9c transition-300"
+                  class="color-#1abc9c font-500 transition-300"
                 >
                   {{ reply.nickname }}
                 </a>
@@ -275,7 +284,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           <div
             v-show="comment.reply_count > 3"
             ref="checkRefs"
-            class="mt-15 text-13 color-#6d757a"
+            class="mt-4 text-[13px] color-#6d757a"
           >
             共 <b> {{ comment.reply_count }} </b>  条回复
             <button class="color-#00a1d6" @click="checkReplies(idx, comment)">
