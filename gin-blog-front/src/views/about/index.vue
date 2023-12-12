@@ -1,7 +1,6 @@
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
 import { marked } from 'marked'
-
 import hljs from 'highlight.js/lib/core'
 import 'highlight.js/styles/a11y-dark.css'
 import go from 'highlight.js/lib/languages/go'

@@ -6,7 +6,7 @@ server {
     ######### 反向代理 start ########
     # 后台接口
     location /api {
-        proxy_pass http://${BACKEND_HOST}:${BACK_SERVER_PORT};
+        proxy_pass http://${BACKEND_HOST}:${ADMIN_SERVER_PORT};
         # 获取真实 IP 
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -17,7 +17,7 @@ server {
     }
     # 前台接口
     location /api/front {
-        proxy_pass http://${BACKEND_HOST}:${FRONT_SERVER_PORT};
+        proxy_pass http://${BACKEND_HOST}:${BLOG_SERVER_PORT};
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $remote_addr;
@@ -27,10 +27,10 @@ server {
     }
     # Gin 处理静态资源, Nginx 反向代理 Gin (本地文件上传才需要)
     location /public/uploaded {
-        proxy_pass http://${BACKEND_HOST}:${BACK_SERVER_PORT}/public/uploaded;
+        proxy_pass http://${BACKEND_HOST}:${ADMIN_SERVER_PORT}/public/uploaded;
     }
     location /admin/public/uploaded {
-        proxy_pass http://${BACKEND_HOST}:${BACK_SERVER_PORT}/public/uploaded;
+        proxy_pass http://${BACKEND_HOST}:${ADMIN_SERVER_PORT}/public/uploaded;
     }
     ######### 反向代理 end ########
 

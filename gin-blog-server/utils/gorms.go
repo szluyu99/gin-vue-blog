@@ -44,7 +44,8 @@ func InitMySQLDB() *gorm.DB {
 	db, err := gorm.Open(mysql.Open(dns), gormConfig())
 
 	if err != nil {
-		log.Fatal("MySQL 连接失败, 请检查参数")
+		fmt.Println("dns: ", dns)
+		log.Fatalln("MySQL 连接失败, 请检查参数", err)
 	}
 
 	log.Println("MySQL 连接成功")

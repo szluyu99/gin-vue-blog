@@ -1,9 +1,8 @@
 最新版：有以下几个脚本
 - `build_web.sh`：打包 Web 项目并将静态资源移到容器构建目录
-- `docker_clear.sh`：清理本项目相关的旧 Docker 容器
-- `docker_start.sh`：启动本项目的 Docker 容器构建
-- `bootstrap_dev.sh`：使用本机的 pnpm 打包前端静态资源（暂不可用）
-- `bootstrap_docker.sh`：使用 docker node 打包静态资源
+- `clearn_docker.sh`：清理本项目相关的旧 Docker 容器
+- `bootstrap.sh`：使用 docker node 打包静态资源
+- `bootstrap.sh dev`：使用本机的 pnpm 打包前端静态资源
 
 一般来说，直接运行 `bootstrap_docker.sh` 即可，每次自动清理旧容器，打包最新代码，并构建新容器
 
@@ -11,8 +10,8 @@
 
 一键运行分成两步：
 1. 环境准备: 需要 Docker 和 Docker Compose 环境
-2. 开始运行: 进入 start 目录执行指令
-3. 运行可能遇到的问题: 如果运行失败了，不如来这看看
+2. 开始运行: 执行 `bootstrap.sh` 脚本
+3. 运行可能遇到的问题: 如果运行失败了，可以来这看看
 
 # 1、环境准备
 
@@ -108,11 +107,10 @@ sudo chmod +x /usr/local/bin/docker-compose
 ```bash
 # 拉取项目
 git clone https://github.com/szluyu99/gin-vue-blog
+cd gin-vue-blog
 
-# 进入 docker-compose 目录
-cd deploy/start
-# 一键运行
-docker-compose up -d
+cd deploy
+./bootstrap.sh
 ```
 
 如果只是查看运行效果，可以直接按照以上操作进行，采用默认环境变量即可。
@@ -133,7 +131,7 @@ docker-compose up -d
 docker-compose up -d --build
 ```
 
-以上操作我放在 `build_start.sh` 中了，直接执行该脚本即可
+以上操作我放在 `build_web.sh` 中了，直接执行该脚本即可
 
 ## 线上部署的注意事项
 
@@ -147,7 +145,7 @@ docker-compose up -d --build
 - `REDIS_PASSWORD` Redis 连接密码 
 - `MYSQL_ROOT_PASSWORD` MySQL 连接密码
 
-其他根据需求修改，或者一般不用动。
+其他根据需求修改，一般不用动
 
 2、后端镜像的构建直接依赖于 gin-blog-server 中的源码，构建时加载的是 config/config.docker.toml 配置文件。
 
@@ -188,3 +186,7 @@ Linux 和 Mac 不需要进行该操作。
 # 防止 git 自动将换行符转换为 crlf
 git config --global core.autocrlf false
 ```
+
+## 如果已经运行过，又修改了 .env 中的数据库密码重新运行
+
+需要把原来的数据文件删除，即 `start/gvb` 目录

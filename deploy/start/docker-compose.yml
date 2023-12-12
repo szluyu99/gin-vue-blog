@@ -13,7 +13,7 @@ services:
     container_name: gvb-redis
     restart: always
     volumes:
-      - ${GVB_DATA_DIRECTORY}/data/redis/:/data
+      - ${DATA_DIRECTORY}/data/redis/:/data
     ports:
       - ${REDIS_PORT}:6379 # 自定义的是暴露出去的端口, Redis 容器内运行固定为 6379
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
@@ -26,9 +26,9 @@ services:
     container_name: gvb-mysql
     restart: always
     volumes:
-      - ${GVB_DATA_DIRECTORY}/data/mysql:/var/lib/mysql
+      - ${DATA_DIRECTORY}/data/mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} # root 账号的密码
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - TZ=Asia/Shanghai
     ports:
       - ${MYSQL_PORT}:3306 # 自定义的是暴露出去的端口, MySQL 容器内运行固定为 3306
@@ -40,23 +40,21 @@ services:
     build: ../../gin-blog-server
     container_name: gvb-server
     restart: always
+    # 后端服务依赖 MySQL 和 Redis
     depends_on:
       gvb-redis:
         condition: service_started
       gvb-mysql:
         condition: service_started
-    # 依赖 mysql 启动后再开启后端服务
-    # 注意如果注释掉下面这行需要在 gin-blog-server 的 Dockerfile 打开 ENTRYPOINT 那行注释
-    # command: ./wait-for ${MYSQL_HOST}:3306 -t 5 -- ./server -c config.docker.toml
     volumes:
-      - ${GVB_DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
-      # - ${GVB_DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
+      - ${DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
+      # - ${DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
     environment:
       # 以下环境变量会覆盖后端源码中 config.docker.toml 中的配置
       - TZ=Asia/Shanghai
       # SERVER
-      - SERVER_BACKPORT=:${BACK_SERVER_PORT} # 后台服务端口
-      - SERVER_FRONTPORT=:${FRONT_SERVER_PORT} # 前台服务端口
+      - SERVER_BACKPORT=:${ADMIN_SERVER_PORT} # 后台服务端口
+      - SERVER_FRONTPORT=:${BLOG_SERVER_PORT} # 前台服务端口
       # MySQL
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=3306
@@ -67,16 +65,15 @@ services:
       - REDIS_ADDR=${REDIS_HOST}:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
-      - ${BACK_SERVER_PORT}:${BACK_SERVER_PORT}
-      - ${FRONT_SERVER_PORT}:${FRONT_SERVER_PORT}
+      - ${ADMIN_SERVER_PORT}:${ADMIN_SERVER_PORT}
+      - ${BLOG_SERVER_PORT}:${BLOG_SERVER_PORT}
     networks:
       gvb-network:
         ipv4_address: ${BACKEND_HOST}
 
   gvb-web:
-    # TODO: 区分不同的情况进行构建
-    # build: ../build/web
-    build: ../../
+    # 根据不同环境变量找不同 Dockerfile, 执行操作不同
+    build: ${WEB_BUILD_CONTEXT}
     container_name: gvb-web
     restart: always
     # 需要开启 https, 请提供证书, 并设置 USE_HTTPS=true
@@ -87,8 +84,8 @@ services:
       - USE_HTTPS=${USE_HTTPS} # 使用 https 设置为 true
       - SERVER_NAME=${SERVER_NAME} # 域名 或 localhost
       - BACKEND_HOST=${BACKEND_HOST} # 后端服务地址
-      - BACK_SERVER_PORT=${BACK_SERVER_PORT} # 后台服务端口
-      - FRONT_SERVER_PORT=${FRONT_SERVER_PORT} # 前台服务端口
+      - ADMIN_SERVER_PORT=${ADMIN_SERVER_PORT} # 后台服务端口
+      - BLOG_SERVER_PORT=${BLOG_SERVER_PORT} # 前台服务端口
     ports:
       - "80:80"
       - "443:443"
