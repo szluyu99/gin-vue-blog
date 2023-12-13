@@ -10,5 +10,5 @@ type BlogInfo struct{}
 
 // 获取前台首页信息
 func (*BlogInfo) GetFrontHomeInfo(c *gin.Context) {
-	r.SuccessData(c, blogInfoService.GetFrontHomeInfo())
+	r.Success(c, blogInfoService.GetFrontHomeInfo())
 }

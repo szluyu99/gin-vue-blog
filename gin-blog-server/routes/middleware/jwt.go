@@ -16,7 +16,7 @@ func JWTAuth() gin.HandlerFunc {
 		token := c.Request.Header.Get("Authorization")
 		// token 为空
 		if token == "" {
-			r.SendCode(c, r.ERROR_TOKEN_NOT_EXIST)
+			r.Code(c, r.ERROR_TOKEN_NOT_EXIST)
 			c.Abort()
 			return
 		}
@@ -24,7 +24,7 @@ func JWTAuth() gin.HandlerFunc {
 		// token 的正确格式: `Bearer [tokenString]`
 		parts := strings.Split(token, " ")
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			r.SendCode(c, r.ERROR_TOKEN_TYPE_WRONG)
+			r.Code(c, r.ERROR_TOKEN_TYPE_WRONG)
 			c.Abort()
 			return
 		}
@@ -33,14 +33,14 @@ func JWTAuth() gin.HandlerFunc {
 		claims, err := utils.GetJWT().ParseToken(parts[1])
 		// token 解析失败
 		if err != nil {
-			r.SendData(c, r.ERROR_TOKEN_WRONG, err.Error())
+			r.Data(c, r.ERROR_TOKEN_WRONG, err.Error())
 			c.Abort()
 			return
 		}
 
 		// 判断 token 已过期
 		if time.Now().Unix() > claims.ExpiresAt.Unix() {
-			r.SendCode(c, r.ERROR_TOKEN_RUNTIME)
+			r.Code(c, r.ERROR_TOKEN_RUNTIME)
 			c.Abort()
 			return
 		}

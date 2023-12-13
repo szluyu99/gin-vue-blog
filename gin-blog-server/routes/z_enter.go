@@ -3,12 +3,13 @@ package routes
 import (
 	"gin-blog/api/front"
 	v1 "gin-blog/api/v1"
+	v2 "gin-blog/api/v2"
 )
 
 // 后台接口
 var (
-	categoryAPI     v1.Category     // 分类
-	tagAPI          v1.Tag          // 标签
+	categoryAPI     v2.Category     // 分类
+	tagAPI          v2.Tag          // 标签
 	articleAPI      v1.Article      // 文章
 	userAPI         v1.User         // 用户
 	userAuthAPI     v1.UserAuth     // 用户账号

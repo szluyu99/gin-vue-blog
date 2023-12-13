@@ -11,12 +11,12 @@ import (
 type Message struct{}
 
 func (*Message) Delete(c *gin.Context) {
-	r.SendCode(c, messageService.Delete(utils.BindJson[[]int](c)))
+	r.Code(c, messageService.Delete(utils.BindJson[[]int](c)))
 }
 
 // 修改审核
 func (*Message) UpdateReview(c *gin.Context) {
-	r.SendCode(c, messageService.UpdateReview(
+	r.Code(c, messageService.UpdateReview(
 		utils.BindValidJson[req.UpdateReview](c)))
 }
 
@@ -24,5 +24,5 @@ func (*Message) UpdateReview(c *gin.Context) {
 func (*Message) GetList(c *gin.Context) {
 	var req = utils.BindValidQuery[req.GetMessages](c)
 	utils.CheckQueryPage(&req.PageSize, &req.PageNum)
-	r.SuccessData(c, messageService.GetList(req))
+	r.Success(c, messageService.GetList(req))
 }

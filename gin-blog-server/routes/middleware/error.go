@@ -32,7 +32,7 @@ func ErrorRecovery(stack bool) gin.HandlerFunc {
 
 				// 处理 panic(xxx) 的操作
 				if code, ok := err.(int); ok { // panic(code) 根据错误码获取 msg
-					r.SendCode(c, code)
+					r.Code(c, code)
 				} else if msg, ok := err.(string); ok { // panic(string) 返回 string
 					r.ReturnJson(c, http.StatusOK, r.FAIL, msg, nil)
 				} else if e, ok := err.(error); ok { // panic(error) 发送消息

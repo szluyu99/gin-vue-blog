@@ -9,5 +9,5 @@ import (
 type Link struct{}
 
 func (*Link) GetFrontList(c *gin.Context) {
-	r.SuccessData(c, linkService.GetFrontList())
+	r.Success(c, linkService.GetFrontList())
 }

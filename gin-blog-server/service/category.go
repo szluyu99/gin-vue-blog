@@ -41,7 +41,7 @@ func (*Category) Delete(ids []int) (code int) {
 
 // 条件查询列表(后台)
 func (*Category) GetList(req req.PageQuery) resp.PageResult[[]resp.CategoryVo] {
-	data, total := categoryDao.GetList(req)
+	data, total := categoryDao.GetList(req.PageNum, req.PageSize, req.Keyword)
 	return resp.PageResult[[]resp.CategoryVo]{
 		Total:    total,
 		List:     data,
@@ -56,7 +56,7 @@ func (*Category) GetOption() []resp.OptionVo {
 
 // 查询列表(前台)
 func (*Category) GetFrontList() resp.ListResult[[]resp.CategoryVo] {
-	data, total := categoryDao.GetList(req.PageQuery{})
+	data, total := categoryDao.GetList(0, 0, "")
 	return resp.ListResult[[]resp.CategoryVo]{
 		Total: total,
 		List:  data,

@@ -9,5 +9,5 @@ import (
 type Category struct{}
 
 func (*Category) GetFrontList(c *gin.Context) {
-	r.SuccessData(c, categoryService.GetFrontList())
+	r.Success(c, categoryService.GetFrontList())
 }

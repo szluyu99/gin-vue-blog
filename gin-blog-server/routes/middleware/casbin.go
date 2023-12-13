@@ -18,7 +18,7 @@ func RBAC() gin.HandlerFunc {
 		isPass, err := utils.Casbin.Enforcer().Enforce(role, url, method)
 		// 权限验证未通过
 		if err != nil || !isPass {
-			r.SendCode(c, r.ERROR_PERMI_DENIED)
+			r.Code(c, r.ERROR_PERMI_DENIED)
 			c.Abort()
 			return
 		} else {

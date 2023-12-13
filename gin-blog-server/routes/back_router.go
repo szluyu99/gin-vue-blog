@@ -2,12 +2,15 @@ package routes
 
 import (
 	"gin-blog/config"
+	"gin-blog/docs"
 	"gin-blog/routes/middleware"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // 后台管理页面的接口路由
@@ -42,6 +45,10 @@ func BackRouter() http.Handler {
 	// session 存储时间跟 JWT 过期时间一致
 	store.Options(sessions.Options{MaxAge: int(config.Cfg.JWT.Expire) * 3600})
 	r.Use(sessions.Sessions(config.Cfg.Session.Name, store)) // Session 中间件
+
+	// Swagger 文档
+	docs.SwaggerInfo.BasePath = "/api"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 无需鉴权的接口
 	base := r.Group("/api")

@@ -29,6 +29,11 @@ export const basicRoutes = [
       title: '错误页',
     },
   },
+  {
+    name: 'test',
+    path: '/test',
+    component: () => import('@/views/test/index.vue'),
+  },
 ]
 
 // 前端控制路由: 加载 views 下每个模块的 routes.js 文件

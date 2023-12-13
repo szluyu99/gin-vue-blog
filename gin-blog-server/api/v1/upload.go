@@ -16,10 +16,10 @@ func (*Upload) UploadFile(c *gin.Context) {
 	if err != nil {
 		code := r.EEROR_FILE_RECEIVE
 		utils.Logger.Error(r.GetMsg(code), zap.Error(err))
-		r.SendCode(c, code)
+		r.Code(c, code)
 		return
 	}
 	// 上传文件, 获取文件路径
 	url, code := fileService.UploadFile(fileHeader)
-	r.SendData(c, code, url)
+	r.Data(c, code, url)
 }

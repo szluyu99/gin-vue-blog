@@ -1,0 +1,164 @@
+basePath: /api/v1
+definitions:
+  r.Response-any:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  r.Response-resp_OptionVo:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/resp.OptionVo'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  r.Response-resp_TagVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/resp.TagVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  req.AddOrEditTag:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  resp.OptionVo:
+    properties:
+      label:
+        type: string
+      value:
+        type: integer
+    type: object
+  resp.TagVO:
+    properties:
+      article_count:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        description: Articles     []*model.Article `json:"articles"`
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Gin-Vue-Blog 的 Swagger API 文档
+  title: Gin-Vue-Blog API 文档
+  version: 1.0 版本
+paths:
+  /tag:
+    delete:
+      consumes:
+      - application/json
+      description: 根据标签 ID 数组删除标签
+      parameters:
+      - description: 标签 ID 列表
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/r.Response-any'
+      summary: 删除标签
+      tags:
+      - Tag
+    post:
+      consumes:
+      - application/json
+      description: 添加或修改标签
+      parameters:
+      - description: 添加或修改标签
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/req.AddOrEditTag'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/r.Response-any'
+      summary: 添加或修改标签
+      tags:
+      - Tag
+  /tag/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据条件查询获取标签列表
+      parameters:
+      - description: 当前页数
+        in: query
+        name: page_size
+        type: integer
+      - description: 每页条数
+        in: query
+        name: page_num
+        type: integer
+      - description: 搜索关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/r.Response-resp_TagVO'
+      summary: 获取标签列表
+      tags:
+      - Tag
+  /tag/option:
+    get:
+      consumes:
+      - application/json
+      description: 获取标签选项列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/r.Response-resp_OptionVo'
+      summary: 获取标签选项列表
+      tags:
+      - Tag
+swagger: "2.0"

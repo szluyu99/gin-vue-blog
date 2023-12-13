@@ -10,9 +10,9 @@ import (
 type OperationLog struct{}
 
 func (*OperationLog) GetList(c *gin.Context) {
-	r.SuccessData(c, operationLogService.GetList(utils.BindPageQuery(c)))
+	r.Success(c, operationLogService.GetList(utils.BindPageQuery(c)))
 }
 
 func (*OperationLog) Delete(c *gin.Context) {
-	r.SendCode(c, operationLogService.Delete(utils.BindJson[[]int](c)))
+	r.Code(c, operationLogService.Delete(utils.BindJson[[]int](c)))
 }
