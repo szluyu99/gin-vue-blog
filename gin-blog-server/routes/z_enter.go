@@ -3,13 +3,12 @@ package routes
 import (
 	"gin-blog/api/front"
 	v1 "gin-blog/api/v1"
-	v2 "gin-blog/api/v2"
 )
 
 // 后台接口
 var (
-	categoryAPI     v2.Category     // 分类
-	tagAPI          v2.Tag          // 标签
+	categoryAPI     v1.Category     // 分类
+	tagAPI          v1.Tag          // 标签
 	articleAPI      v1.Article      // 文章
 	userAPI         v1.User         // 用户
 	userAuthAPI     v1.UserAuth     // 用户账号
@@ -22,7 +21,7 @@ var (
 	menuAPI         v1.Menu         // 菜单
 	blogInfoAPI     v1.BlogInfo     // 博客设置
 	operationLogAPI v1.OperationLog // 操作日志
-	pageAPI         v1.Page
+	pageAPI         v1.Page         // 页面
 
 	// store redis.Store // 使用 redis 作为 session 的存储引擎
 )

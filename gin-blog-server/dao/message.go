@@ -2,25 +2,24 @@ package dao
 
 import (
 	"gin-blog/model"
-	"gin-blog/model/req"
 )
 
 type Message struct{}
 
-func (*Message) GetList(req req.GetMessages) ([]model.Message, int64) {
+func (*Message) GetList(pageNum, pageSize int, nickname string, isReview *int8) ([]model.Message, int64) {
 	var list = make([]model.Message, 0)
 	var total int64
 
 	db := DB.Model(&Message{})
-	if req.Nickname != "" {
-		db = db.Where("nickname like ?", "%"+req.Nickname+"%")
+	if nickname != "" {
+		db = db.Where("nickname like ?", "%"+nickname+"%")
 	}
-	if req.IsReview != nil {
-		db = db.Where("is_review = ?", req.IsReview)
+	if isReview != nil {
+		db = db.Where("is_review = ?", isReview)
 	}
 	db.Count(&total)
 	db.Order("id DESC").
-		Limit(req.PageSize).Offset(req.PageSize * (req.PageNum - 1)).
+		Limit(pageSize).Offset(pageSize * (pageNum - 1)).
 		Find(&list)
 	return list, total
 }

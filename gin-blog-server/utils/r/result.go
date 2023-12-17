@@ -1,6 +1,7 @@
 package r
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,13 +50,20 @@ func SuccessNil(c *gin.Context) {
 }
 
 // 处理错误
-func Error(c *gin.Context, code int) {
+func Error(c *gin.Context, code int, err error) {
+	var msg string
+	if err != nil {
+		msg = err.Error()
+		slog.Error(msg)
+	} else {
+		msg = GetMsg(code)
+	}
 	c.AbortWithStatusJSON(
 		http.StatusOK,
 		Response[any]{
 			Code:    code,
 			Message: GetMsg(code),
-			Data:    nil,
+			Data:    msg,
 		},
 	)
 }

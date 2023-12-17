@@ -2,25 +2,24 @@ package dao
 
 import (
 	"gin-blog/model"
-	"gin-blog/model/req"
 	"gin-blog/model/resp"
 )
 
 type Tag struct{}
 
-func (*Tag) GetList(req req.PageQuery) ([]resp.TagVO, int64) {
+func (*Tag) GetList(pageNum, pageSize int, keyword string) ([]resp.TagVO, int64) {
 	var datas = make([]resp.TagVO, 0)
 	var total int64
 
 	db := DB.Table("tag t").
 		Select("t.id", "name", "COUNT(at.article_id) AS article_count", "t.created_at", "t.updated_at").
 		Joins("LEFT JOIN article_tag at ON t.id = at.tag_id")
-	if req.Keyword != "" {
-		db = db.Where("name LIKE ?", "%"+req.Keyword+"%")
+	if keyword != "" {
+		db = db.Where("name LIKE ?", "%"+keyword+"%")
 	}
 	db.Group("t.id").Order("t.id DESC").
 		Count(&total).
-		Limit(req.PageSize).Offset(req.PageSize * (req.PageNum - 1)).
+		Limit(pageSize).Offset(pageSize * (pageNum - 1)).
 		Find(&datas)
 	return datas, total
 }

@@ -7,8 +7,8 @@ import (
 
 type Category struct{}
 
-func (*Category) GetList(pageNum, pageSize int, keyword string) ([]resp.CategoryVo, int64) {
-	var datas = make([]resp.CategoryVo, 0)
+func (*Category) GetList(pageNum, pageSize int, keyword string) ([]resp.CategoryVO, int64) {
+	var datas = make([]resp.CategoryVO, 0)
 	var total int64
 
 	db := DB.

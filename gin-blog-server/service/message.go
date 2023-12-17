@@ -42,7 +42,7 @@ func (*Message) UpdateReview(req req.UpdateReview) (code int) {
 }
 
 func (*Message) GetList(req req.GetMessages) resp.PageResult[[]model.Message] {
-	list, total := messageDao.GetList(req)
+	list, total := messageDao.GetList(req.PageNum, req.PageSize, req.Nickname, req.IsReview)
 	return resp.PageResult[[]model.Message]{
 		PageSize: req.PageSize,
 		PageNum:  req.PageNum,

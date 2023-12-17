@@ -15,8 +15,354 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/category": {
+            "post": {
+                "description": "添加或修改分类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "添加或修改分类",
+                "parameters": [
+                    {
+                        "description": "添加或修改分类",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v2.AddOrEditCategoryForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "根据 ID 数组删除留言",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "删除留言（批量）",
+                "parameters": [
+                    {
+                        "description": "留言 ID 数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/list": {
+            "get": {
+                "description": "根据条件查询获取分类列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "获取分类列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "当前页数",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页条数",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-v2_PageResult-array_model_CategoryVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/option": {
+            "get": {
+                "description": "获取标签选项列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "获取分类选项列表",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-model_OptionVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/code": {
+            "get": {
+                "description": "发送邮箱验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserAuth"
+                ],
+                "summary": "发送邮箱验证码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "邮箱",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserAuth"
+                ],
+                "summary": "登录",
+                "parameters": [
+                    {
+                        "description": "登录",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v2.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-resp_LoginVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "退出登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserAuth"
+                ],
+                "summary": "退出登录",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/message/list": {
+            "get": {
+                "description": "根据条件查询留言列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Message"
+                ],
+                "summary": "条件查询留言列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "昵称",
+                        "name": "nickname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "审核状态",
+                        "name": "is_review",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "当前页数",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页条数",
+                        "name": "page_num",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-v2_PageResult-array_model_Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/message/review": {
+            "put": {
+                "description": "根据 ID 数组修改审核状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Message"
+                ],
+                "summary": "修改留言审核（批量）",
+                "parameters": [
+                    {
+                        "description": "修改审核状态",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v2.UpdateReviewForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "注册",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserAuth"
+                ],
+                "summary": "注册",
+                "parameters": [
+                    {
+                        "description": "注册",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v2.RegisterForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/tag": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "添加或修改标签",
                 "consumes": [
                     "application/json"
@@ -35,7 +381,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/req.AddOrEditTag"
+                            "$ref": "#/definitions/v2.AddOrEditTagForm"
                         }
                     }
                 ],
@@ -49,7 +395,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "根据标签 ID 数组删除标签",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除标签",
                 "consumes": [
                     "application/json"
                 ],
@@ -59,10 +410,10 @@ const docTemplate = `{
                 "tags": [
                     "Tag"
                 ],
-                "summary": "删除标签",
+                "summary": "删除标签（批量）",
                 "parameters": [
                     {
-                        "description": "标签 ID 列表",
+                        "description": "标签 ID 数组",
                         "name": "ids",
                         "in": "body",
                         "required": true,
@@ -75,8 +426,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "0": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/r.Response-any"
                         }
@@ -86,6 +437,11 @@ const docTemplate = `{
         },
         "/tag/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "根据条件查询获取标签列表",
                 "consumes": [
                     "application/json"
@@ -118,10 +474,10 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-resp_TagVO"
+                            "$ref": "#/definitions/r.Response-v2_PageResult-array_resp_TagVO"
                         }
                     }
                 }
@@ -129,6 +485,11 @@ const docTemplate = `{
         },
         "/tag/option": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "获取标签选项列表",
                 "consumes": [
                     "application/json"
@@ -141,8 +502,8 @@ const docTemplate = `{
                 ],
                 "summary": "获取标签选项列表",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "0": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/r.Response-resp_OptionVo"
                         }
@@ -152,6 +513,73 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.CategoryVO": {
+            "type": "object",
+            "properties": {
+                "article_count": {
+                    "description": "文章数量",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Message": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "ip_source": {
+                    "type": "string"
+                },
+                "is_review": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "speed": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OptionVO": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            }
+        },
         "r.Response-any": {
             "type": "object",
             "properties": {
@@ -161,6 +589,48 @@ const docTemplate = `{
                 },
                 "data": {
                     "description": "响应数据"
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "r.Response-model_OptionVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.OptionVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "r.Response-resp_LoginVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/resp.LoginVO"
+                        }
+                    ]
                 },
                 "message": {
                     "description": "响应消息",
@@ -189,7 +659,7 @@ const docTemplate = `{
                 }
             }
         },
-        "r.Response-resp_TagVO": {
+        "r.Response-v2_PageResult-array_model_CategoryVO": {
             "type": "object",
             "properties": {
                 "code": {
@@ -200,7 +670,7 @@ const docTemplate = `{
                     "description": "响应数据",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/resp.TagVO"
+                            "$ref": "#/definitions/v2.PageResult-array_model_CategoryVO"
                         }
                     ]
                 },
@@ -210,16 +680,101 @@ const docTemplate = `{
                 }
             }
         },
-        "req.AddOrEditTag": {
+        "r.Response-v2_PageResult-array_model_Message": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v2.PageResult-array_model_Message"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "r.Response-v2_PageResult-array_resp_TagVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v2.PageResult-array_resp_TagVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "resp.LoginVO": {
+            "type": "object",
+            "properties": {
+                "article_like_set": {
+                    "description": "点赞 Set: 用于记录用户点赞过的文章, 评论",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "comment_like_set": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
-                "name": {
+                "intro": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "ip_source": {
+                    "type": "string"
+                },
+                "last_login_time": {
+                    "type": "string"
+                },
+                "login_type": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user_info_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "website": {
                     "type": "string"
                 }
             }
@@ -255,6 +810,175 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "v2.AddOrEditCategoryForm": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "v2.AddOrEditTagForm": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "v2.LoginForm": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v2.PageResult-array_model_CategoryVO": {
+            "type": "object",
+            "properties": {
+                "pageData": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.CategoryVO"
+                    }
+                },
+                "pageNum": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v2.PageResult-array_model_Message": {
+            "type": "object",
+            "properties": {
+                "pageData": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Message"
+                    }
+                },
+                "pageNum": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v2.PageResult-array_resp_TagVO": {
+            "type": "object",
+            "properties": {
+                "pageData": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/resp.TagVO"
+                    }
+                },
+                "pageNum": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v2.RegisterForm": {
+            "type": "object",
+            "required": [
+                "code",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 4
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v2.UpdateReviewForm": {
+            "type": "object",
+            "required": [
+                "is_review"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "is_review": {
+                    "type": "integer",
+                    "maximum": 1,
+                    "minimum": 0
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -262,7 +986,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0 版本",
-	Host:             "",
+	Host:             "localhost:8765",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Gin-Vue-Blog API 文档",
