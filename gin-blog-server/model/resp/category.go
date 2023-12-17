@@ -3,7 +3,7 @@ package resp
 import "time"
 
 // 前后台通用
-type CategoryVo struct {
+type CategoryVO struct {
 	ID           int       `json:"id"`
 	Name         string    `json:"name"`
 	ArticleCount int       `json:"article_count"` // 文章数量

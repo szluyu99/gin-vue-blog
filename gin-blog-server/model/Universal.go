@@ -18,3 +18,8 @@ type Universal struct {
 	CreatedAt time.Time `json:"created_at" mapstructure:"-"`
 	UpdatedAt time.Time `json:"updated_at" mapstructure:"-"`
 }
+
+type OptionVO struct {
+	ID   int    `json:"value"`
+	Name string `json:"label"`
+}

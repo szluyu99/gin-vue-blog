@@ -42,7 +42,7 @@ func (*Tag) Delete(ids []int) (code int) {
 
 // 分页查询标签
 func (*Tag) GetList(req req.PageQuery) resp.PageResult[[]resp.TagVO] {
-	data, total := tagDao.GetList(req)
+	data, total := tagDao.GetList(req.PageNum, req.PageSize, req.Keyword)
 	return resp.PageResult[[]resp.TagVO]{
 		Total:    total,
 		List:     data,
@@ -57,7 +57,7 @@ func (*Tag) GetOption() []resp.OptionVo {
 
 // 查询标签列表(前台)
 func (*Tag) GetFrontList() resp.ListResult[[]resp.TagVO] {
-	data, total := tagDao.GetList(req.PageQuery{})
+	data, total := tagDao.GetList(0, 0, "")
 	return resp.ListResult[[]resp.TagVO]{
 		Total: total,
 		List:  data,

@@ -4,6 +4,8 @@ import (
 	"gin-blog/dao"
 )
 
+var db = dao.DB
+
 // redis key
 
 const (
