@@ -9,6 +9,8 @@ export default {
 
   /** 关于我 */
   about: () => request.get('/about'),
+  /** 获取页面 */
+  getPageList: () => request.get('/page'),
   /** 首页数据 */
   getHomeData: () => request.get('/home'),
   /** 首页文章列表 */

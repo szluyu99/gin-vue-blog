@@ -9,11 +9,11 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
+// TODO: 优化 API 路径格式
 var optMap = map[string]string{
 	"Article":      "文章",
 	"BlogInfo":     "博客信息",
@@ -28,8 +28,8 @@ var optMap = map[string]string{
 	"Tag":          "标签",
 	"User":         "用户",
 	"Page":         "页面",
-	// "Talk":         "说说",
 	// "Login":        "登录",
+
 	"POST":   "新增或修改",
 	"PUT":    "修改",
 	"DELETE": "删除",
@@ -66,32 +66,24 @@ func OperationLog() gin.HandlerFunc {
 				ResponseWriter: c.Writer,
 			}
 			c.Writer = blw
-			uuid := c.GetString("uuid")
 
-			// 从 session 中取用户的 SessionInfo
-			val := sessions.Default(c).Get(KEY_USER + uuid)
-			if val == nil {
-				// r.Send(c, http.StatusUnauthorized, r.ERROR_TOKEN_RUNTIME, nil)
-				handle.ReturnError(c, g.ERROR_TOKEN_RUNTIME, nil)
-				return
-			}
+			auth, _ := handle.CurrentUserAuth(c)
 
-			// var sessionInfo model.SessionInfo
-			// utils.Json.Unmarshal(val.(string), &sessionInfo) // 反序列化
+			body, _ := io.ReadAll(c.Request.Body)
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 
-			reqBody, _ := io.ReadAll(c.Request.Body) // 记录请求信息
-			c.Request.Body = io.NopCloser(bytes.NewBuffer(reqBody))
+			moduleName := getOptResource(getOptResource(c.HandlerName()))
 			operationLog := model.OperationLog{
-				OptModule:     GetOptString(getOptResource(c.HandlerName())), // FIXME:
+				OptModule:     moduleName, // TODO: 优化
 				OptType:       GetOptString(c.Request.Method),
 				OptUrl:        c.Request.RequestURI,
 				OptMethod:     c.HandlerName(),
-				OptDesc:       GetOptString(c.Request.Method) + GetOptString(getOptResource(c.HandlerName())), // TODO: 优化
-				RequestParam:  string(reqBody),
+				OptDesc:       GetOptString(c.Request.Method) + moduleName, // TODO: 优化
+				RequestParam:  string(body),
 				RequestMethod: c.Request.Method,
-				// TODO: 暂时不记录用户信息
-				// UserId:        sessionInfo.UserInfoId,
-				// Nickname:      sessionInfo.Nickname,
+				UserId:        auth.UserInfoId,
+				Nickname:      auth.UserInfo.Nickname,
+				// TODO: IP 地址获取
 				// IpAddress:     sessionInfo.IpAddress,
 				// IpSource:      sessionInfo.IpSource,
 			}
@@ -110,7 +102,7 @@ func OperationLog() gin.HandlerFunc {
 	}
 }
 
-// example: "gin-blog/api/v1.(*Resource).Delete-fm" => "Resource"
+// "gin-blog/api/v1.(*Resource).Delete-fm" => "Resource"
 func getOptResource(handlerName string) string {
 	s := strings.Split(handlerName, ".")[1]
 	return s[2 : len(s)-1]

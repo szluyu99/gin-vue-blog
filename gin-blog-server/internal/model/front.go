@@ -11,8 +11,8 @@ type FrontHomeVO struct {
 	CategoryCount int64             `json:"category_count"` // 分类数量
 	TagCount      int64             `json:"tag_count"`      // 标签数量
 	ViewCount     int64             `json:"view_count"`     // 访问量
-	BlogConfig    map[string]string `json:"blog_config"`    // 博客信息
-	PageList      []Page            `json:"page_list"`      // 页面列表
+	Config        map[string]string `json:"blog_config"`    // 博客信息
+	// PageList      []Page            `json:"page_list"`      // 页面列表
 }
 
 func GetFrontStatistics(db *gorm.DB) (data FrontHomeVO, err error) {
@@ -41,12 +41,7 @@ func GetFrontStatistics(db *gorm.DB) (data FrontHomeVO, err error) {
 		return data, result.Error
 	}
 
-	data.BlogConfig, err = GetConfigMap(db)
-	if err != nil {
-		return data, err
-	}
-
-	data.PageList, _, err = GetPageList(db)
+	data.Config, err = GetConfigMap(db)
 	if err != nil {
 		return data, err
 	}

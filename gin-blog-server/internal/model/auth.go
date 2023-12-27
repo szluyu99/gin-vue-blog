@@ -21,7 +21,7 @@ type UserAuth struct {
 
 	UserInfoId int       `json:"user_info_id"`
 	UserInfo   *UserInfo `json:"info"`
-	Roles      []*Role   `json:"roles" gorm:"many2many:user_role"`
+	Roles      []*Role   `json:"roles" gorm:"many2many:user_auth_role"`
 }
 
 type Role struct {
@@ -32,7 +32,7 @@ type Role struct {
 
 	Resources []*Resource `json:"resources" gorm:"many2many:role_resource"`
 	Menus     []*Menu     `json:"menus" gorm:"many2many:role_menu"`
-	Users     []*UserAuth `json:"users" gorm:"many2many:user_role"`
+	Users     []*UserAuth `json:"users" gorm:"many2many:user_auth_role"`
 }
 
 type Resource struct {

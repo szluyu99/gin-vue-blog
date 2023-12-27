@@ -1,13 +1,44 @@
 package handle
 
 import (
+	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 )
 
 type Page struct{}
+
+// 将页面列表缓存到 Redis 中
+func addPageCache(rdb *redis.Client, pages []model.Page) error {
+	data, err := json.Marshal(pages)
+	if err != nil {
+		return err
+	}
+	return rdb.Set(ctx(), g.PAGE, string(data), 0).Err()
+}
+
+// 删除 Redis 中页面列表缓存
+func removePageCache(rdb *redis.Client) error {
+	return rdb.Del(ctx(), g.PAGE).Err()
+}
+
+// 从 Redis 中获取页面列表缓存
+func getPageCache(rdb *redis.Client) (cache []model.Page, err error) {
+	s, err := rdb.Get(ctx(), g.PAGE).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal([]byte(s), &cache); err != nil {
+		return nil, err
+	}
+
+	return cache, nil
+}
 
 // @Summary 获取页面列表
 // @Description 根据条件查询获取页面列表
@@ -19,10 +50,31 @@ type Page struct{}
 // @Router /page/list [get]
 func (*Page) GetList(c *gin.Context) {
 	db := GetDB(c)
+	rdb := GetRDB(c)
+
+	cache, err := getPageCache(rdb)
+	if cache != nil && err == nil {
+		slog.Debug("[handle-page-GetList] get page list from cache")
+		ReturnSuccess(c, cache)
+		return
+	}
+
+	switch err {
+	case redis.Nil:
+		break
+	default:
+		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		return
+	}
 
 	data, _, err := model.GetPageList(db)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		return
+	}
+
+	if err := addPageCache(GetRDB(c), data); err != nil {
+		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
 		return
 	}
 
@@ -54,8 +106,7 @@ func (*Page) SaveOrUpdate(c *gin.Context) {
 		return
 	}
 
-	err = rdb.Del(ctx(), g.PAGE).Err()
-	if err != nil {
+	if err := removePageCache(rdb); err != nil {
 		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
 		return
 	}
@@ -85,8 +136,7 @@ func (*Page) Delete(c *gin.Context) {
 		return
 	}
 
-	err := GetRDB(c).Del(ctx(), g.PAGE).Err()
-	if err != nil {
+	if err := removePageCache(GetRDB(c)); err != nil {
 		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
 		return
 	}

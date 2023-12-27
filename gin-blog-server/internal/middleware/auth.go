@@ -82,7 +82,9 @@ func JWTAuth() gin.HandlerFunc {
 		if err != nil {
 			// 没有找到的资源, 直接跳过后续验证
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.Set("skip_check", true)
 				c.Next()
+				c.Set("skip_check", false)
 				return
 			}
 			handle.ReturnError(c, g.ERROR_DB_OPERATION, err)

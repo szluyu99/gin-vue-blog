@@ -9,15 +9,20 @@ export const useAppStore = defineStore('app', {
     registerFlag: false,
     collapsed: false, // 侧边栏折叠（移动端）
 
+    page_list: [], // 页面数据
     // TODO: 优化
     blogInfo: {
-      blog_config: {
-        website_name: '阵、雨的个人博客',
-        website_author: '阵、雨',
-        website_intro: '往事随风而去',
-        website_avatar: '',
-      },
-      pageList: [],
+      article_count: 0,
+      category_count: 0,
+      tag_count: 0,
+      view_count: 0,
+      user_count: 0,
+    },
+    blog_config: {
+      website_name: '阵、雨的个人博客',
+      website_author: '阵、雨',
+      website_intro: '往事随风而去',
+      website_avatar: '',
     },
   }),
   getters: {
@@ -26,8 +31,8 @@ export const useAppStore = defineStore('app', {
     categoryCount: state => state.blogInfo.category_count ?? 0,
     tagCount: state => state.blogInfo.tag_count ?? 0,
     viewCount: state => state.blogInfo.view_count ?? 0,
-    pageList: state => state.blogInfo.page_list ?? [],
-    blogConfig: state => state.blogInfo.blog_config,
+    pageList: state => state.page_list ?? [],
+    blogConfig: state => state.blog_config,
   },
   actions: {
     setCollapsed(flag) { this.collapsed = flag },
@@ -40,8 +45,8 @@ export const useAppStore = defineStore('app', {
         const resp = await api.getHomeData()
         if (resp.code === 0) {
           this.blogInfo = resp.data
-          this.blogInfo.page_list?.map(e => (e.cover = convertImgUrl(e.cover)))
-          this.blogInfo.blog_config.website_avatar = convertImgUrl(this.blogInfo.blog_config.website_avatar)
+          this.blog_config = resp.data.blog_config
+          this.blog_config.website_avatar = convertImgUrl(this.blog_config.website_avatar)
         }
         else {
           return Promise.reject(resp)
@@ -49,6 +54,14 @@ export const useAppStore = defineStore('app', {
       }
       catch (err) {
         return Promise.reject(err)
+      }
+    },
+
+    async getPageList() {
+      const resp = await api.getPageList()
+      if (resp.code === 0) {
+        this.page_list = resp.data
+        this.page_list?.forEach(e => (e.cover = convertImgUrl(e.cover)))
       }
     },
   },

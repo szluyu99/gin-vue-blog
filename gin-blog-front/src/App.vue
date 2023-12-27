@@ -15,6 +15,7 @@ const messageRef = ref(null)
 const notifyRef = ref(null)
 
 onMounted(() => {
+  appStore.getPageList()
   appStore.getBlogInfo()
   userStore.getUserInfo()
 
