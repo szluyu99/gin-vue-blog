@@ -69,8 +69,7 @@ func main() {
 
 	// 使用本地文件上传, 需要静态文件服务, 使用七牛云不需要
 	if conf.Upload.OssType == "local" {
-		r.Static("/public", "../public")
-		// r.StaticFS("/dir", http.Dir("../public"))
+		r.Static(conf.Upload.Path, conf.Upload.StorePath)
 	}
 
 	serverAddr := conf.Server.Port
@@ -251,7 +250,11 @@ func createSuperAdmin(db *gorm.DB, username, password string) {
 	log.Printf("创建超级管理员成功: %s, 密码: %s\n", username, password)
 }
 
+// TODO: 将初始化写成另外的可执行工具
 // 初始化博客配置
+// TODO: page 初始化
+// TODO: resource 初始化
+// TODO: role 初始化
 func generateConfigs(db *gorm.DB) {
 	configs := []model.Config{
 		{Key: "website_avatar", Value: "https://foruda.gitee.com/avatar/1677041571085433939/5221991_szluyu99_1614389421.png", Desc: "网站头像"},

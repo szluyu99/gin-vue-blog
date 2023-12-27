@@ -16,7 +16,7 @@ const form = ref({
   website_author: '阵、雨',
   website_intro: '往事随风而去',
   website_notice: '博客后端基于 gin、gorm 开发\n博客前端基于 Vue3、TS、NaiveUI 开发\n努力开发中...冲冲冲！加油！',
-  website_createtime: '2022-11-01',
+  website_createtime: '2023-12-27 22:40:22',
   website_record: '鲁ICP备2022040119号',
   qq: '123456789',
   github: 'https://github.com/szluyu99',
@@ -94,8 +94,8 @@ function handleSave() {
           <NFormItem label="网站创建日期" path="website_createtime">
             <NDatePicker
               v-model:formatted-value="form.website_createtime"
-              value-format="yyyy-MM-dd"
-              type="date"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              type="datetime"
             />
           </NFormItem>
           <NFormItem label="网站公告" path="website_notice">
@@ -184,20 +184,20 @@ function handleSave() {
           </NFormItem>
           <NFormItem label="评论默认审核" path="is_comment_review">
             <NRadioGroup v-model:value="form.is_comment_review" name="is_comment_review">
-              <NRadio value="0">
+              <NRadio value="true">
                 关闭
               </NRadio>
-              <NRadio value="1">
+              <NRadio value="false">
                 开启
               </NRadio>
             </NRadioGroup>
           </NFormItem>
           <NFormItem label="留言默认审核" path="is_message_review">
             <NRadioGroup v-model:value="form.is_message_review" name="is_message_review">
-              <NRadio value="0">
+              <NRadio value="true">
                 关闭
               </NRadio>
-              <NRadio value="1">
+              <NRadio value="false">
                 开启
               </NRadio>
             </NRadioGroup>

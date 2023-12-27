@@ -11,10 +11,10 @@ Mysql:
   Host: "127.0.0.1"
   Port: "3306"
   Config: "charset=utf8mb4&parseTime=True&loc=Local" # 其他配置, 例如时区
-  Dbname: "gvb"
+  Dbname: "ginblog"
   Username: "root"
   Password: "123456"
-  LogMode: "error"   # silent | error | warn | info
+  LogMode: "error" # silent | error | warn | info
 Sqlite:
   Dsn: "test.db"
 Redis:
@@ -39,11 +39,10 @@ Email:
 Captcha:
   SendEmail: true # 通过邮箱发送验证码
   ExpireTime: 15  # 过期时间 (分钟)
-# TODO: 重新
 Upload:
   OssType: "local" # local | qiniu
-  Path: "public/uploaded"      # 本地文件访问路径 (OssType="local" 才生效)
-  StorePath: "public/uploaded" # 本地文件上传路径 (OssType="local" 才生效)
+  Path: "public/uploaded"      # 本地文件访问路径: OssType="local" 生效 TODO: better
+  StorePath: "../public/uploaded" # 本地文件上传路径: 相对于 main.go, OssType="local" 生效
 Qiniu:
   ImgPath: ""          # 外链
   Zone: ""

@@ -7,13 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AddOrEditPageReq struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Label string `json:"label"`
-	Cover string `json:"cover"`
-}
-
 type Page struct{}
 
 // @Summary 获取页面列表
@@ -46,7 +39,7 @@ func (*Page) GetList(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /page [post]
 func (*Page) SaveOrUpdate(c *gin.Context) {
-	var req AddOrEditPageReq
+	var req model.Page
 	if err := c.ShouldBindJSON(&req); err != nil {
 		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
 		return
@@ -54,29 +47,6 @@ func (*Page) SaveOrUpdate(c *gin.Context) {
 
 	db := GetDB(c)
 	rdb := GetRDB(c)
-
-	// TODO: 有必要检查吗? 可以依靠 MySQL unique 约束来保证
-	// // 检查页面名称是否已经存在
-	// page, err := model.GetPageByName(db, req.Name)
-	// if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-	// 	Error(c, g.ERROR_DB_OPERATION, err)
-	// 	return
-	// }
-	// if page != nil && page.ID != 0 && page.ID != req.ID {
-	// 	Error(c, g.ERROR_PAGE_NAME_EXIST, nil)
-	// 	return
-	// }
-
-	// // 检查页面标签是否已经存在
-	// page, err = model.GetPageByLabel(db, req.Label)
-	// if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-	// 	Error(c, g.ERROR_DB_OPERATION, err)
-	// 	return
-	// }
-	// if page != nil && page.ID != 0 && page.ID != req.ID {
-	// 	Error(c, g.ERROR_PAGE_LABEL_EXIST, nil)
-	// 	return
-	// }
 
 	page, err := model.SaveOrUpdatePage(db, req.ID, req.Name, req.Label, req.Cover)
 	if err != nil {

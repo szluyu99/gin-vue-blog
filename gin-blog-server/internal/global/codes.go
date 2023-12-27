@@ -1,5 +1,7 @@
 package g
 
+// TODO: 重构成 error 类型
+
 // 错误码汇总
 
 const (

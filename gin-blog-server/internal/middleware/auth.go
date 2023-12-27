@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/handle"
@@ -18,8 +19,8 @@ import (
 // 资源访问权限验证
 func PermissionCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetBool("anonymous") {
-			slog.Debug("[middleware-PermissionCheck] anonymous resource, skip check!")
+		if c.GetBool("skip_check") {
+			slog.Debug("[middleware-PermissionCheck] skip check permission!")
 			c.Next()
 			return
 		}
@@ -75,17 +76,24 @@ func JWTAuth() gin.HandlerFunc {
 		slog.Debug("[middleware-JWTAuth] user auth not exist, do jwt auth")
 
 		db := c.MustGet(g.CTX_DB).(*gorm.DB)
+
+		// 系统管理的资源需要做验证, 没有加进来的不需要
 		resource, err := model.GetResource(db, c.FullPath()[4:], c.Request.Method)
 		if err != nil {
-			handle.ReturnError(c, g.ERROR_RESOURCE_NOT_EXIST, err)
+			// 没有找到的资源, 直接跳过后续验证
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.Next()
+				return
+			}
+			handle.ReturnError(c, g.ERROR_DB_OPERATION, err)
 			return
 		}
 
 		// 匿名资源, 直接跳过后续验证
 		if resource.Anonymous {
-			c.Set("anonymous", true)
+			c.Set("skip_check", true)
 			c.Next()
-			c.Set("anonymous", false)
+			c.Set("skip_check", false)
 			return
 		}
 
