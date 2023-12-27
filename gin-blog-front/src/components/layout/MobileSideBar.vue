@@ -6,6 +6,7 @@ import { Icon } from '@iconify/vue'
 import UDrawer from '@/components/ui/UDrawer.vue'
 
 import { useAppStore, useUserStore } from '@/store'
+import api from '@/api'
 
 const { collapsed, blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
 
@@ -23,10 +24,12 @@ const menuOptions = [
   { text: '留言', icon: 'mdi:forum', path: '/message' },
 ]
 
-function logout() {
+async function logout() {
+  await api.logout()
   userStore.resetLoginState()
-  if (route.name === 'User') // 如果在个人信息页登出则回到首页
+  if (route.name === 'User') { // 如果在个人信息页登出则回到首页
     router.push('/')
+  }
   window.$notify?.success('退出登录成功！')
 }
 </script>

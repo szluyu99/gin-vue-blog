@@ -48,8 +48,12 @@ async function fetchData() {
 
 const formRef = ref(null)
 const formModel = ref({
+  title: '',
   status: 1, // 发布形式: 默认公开
-  is_top: 0, // 默认不置顶
+  is_top: false, // 默认不置顶
+  type: 1, // 默认原创
+  tag_names: [],
+  category_name: '',
 })
 const btnLoading = ref(false)
 const modalVisible = ref(false)
@@ -66,7 +70,7 @@ async function getArticleInfo() {
 
   // 没有 id, 表示是新增文章
   if (!id) {
-    formModel.value = { status: 1, is_top: 0, title: '' }
+    formModel.value = { status: 1, is_top: false, title: '', type: 1 }
     return
   }
 
@@ -74,7 +78,10 @@ async function getArticleInfo() {
   window.$loadingBar?.start()
   try {
     const resp = await api.getArticleById(id)
+    const { category, tags } = resp.data
     formModel.value = resp.data
+    formModel.value.tag_names = tags.map(e => e.name)
+    formModel.value.category_name = category.name
     window.$loadingBar?.finish()
   }
   catch (err) {
@@ -257,7 +264,7 @@ function renderTag(tag, index) {
           />
         </NFormItem>
         <NFormItem label="置顶" path="is_top">
-          <NSwitch v-model:value="formModel.is_top" :checked-value="1" :unchecked-value="0" />
+          <NSwitch v-model:value="formModel.is_top" />
         </NFormItem>
         <NFormItem label="发布形式" path="status">
           <NRadioGroup v-model:value="formModel.status" name="radiogroup">

@@ -6,7 +6,7 @@ export default antfu({
     'no-console': 'warn',
     'curly': 'off',
     '@typescript-eslint/brace-style': 'off',
-    'unused-imports/no-unused-imports': 'warn',
+    'unused-imports/no-unused-imports': 'off',
     'node/prefer-global/process': 'off',
   },
 })

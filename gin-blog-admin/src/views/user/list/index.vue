@@ -16,8 +16,9 @@ defineOptions({ name: '用户列表' })
 
 const $table = ref(null)
 const queryItems = ref({
+  username: '',
   nickname: '',
-  login_type: '',
+  login_type: null,
 })
 
 const {
@@ -36,7 +37,7 @@ const {
 const roleOptions = ref([])
 
 onMounted(() => {
-  api.getRoleOption().then(res => roleOptions.value = res.data)
+  api.getRoleOption().then(resp => roleOptions.value = resp.data)
   $table.value?.handleSearch()
 })
 
@@ -44,13 +45,13 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 50,
+    width: 30,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 50,
+        'height': 30,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': convertImgUrl(row.avatar),
+        'src': convertImgUrl(row.info?.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -62,6 +63,9 @@ const columns = [
     width: 60,
     align: 'center',
     ellipsis: { tooltip: true },
+    render(row) {
+      return h('span', row.info?.nickname)
+    },
   },
   {
     title: '登录方式',
@@ -71,8 +75,8 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: loginTypeMap[row.login_type].tag },
-        { default: () => loginTypeMap[row.login_type].name },
+        { type: loginTypeMap[row.login_type]?.tag },
+        { default: () => loginTypeMap[row.login_type]?.name || '未知' },
       )
     },
   },
@@ -83,10 +87,11 @@ const columns = [
     align: 'center',
     render(row) {
       const roles = row.roles ?? []
-      const group = []
-      for (let i = 0; i < roles.length; i++)
-        group.push(h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => roles[i].name }))
-      return h('span', group)
+      const groups = []
+      for (let i = 0; i < roles.length; i++) {
+        groups.push(h(NTag, { type: 'info', style: { margin: '2px 3px' } }, { default: () => roles[i].name }))
+      }
+      return h('span', groups.length ? groups : '无')
     },
   },
   {
@@ -152,9 +157,7 @@ const columns = [
         size: 'small',
         rubberBand: false,
         value: row.is_disable,
-        loading: !!row.publishing, // 修改 ing 动画
-        checkedValue: 1,
-        uncheckedValue: 0,
+        loading: !!row.publishing,
         onUpdateValue: () => handleUpdateDisable(row),
       })
     },
@@ -173,6 +176,7 @@ const columns = [
             size: 'small',
             type: 'primary',
             onClick: () => {
+              row.nickname = row.info?.nickname
               // roles => role_ids
               row.role_ids = row.roles.map(e => e.id)
               handleEdit(row)
@@ -190,18 +194,19 @@ const columns = [
 
 // 修改用户禁用状态
 async function handleUpdateDisable(row) {
-  if (!row.id)
+  if (!row.id) {
     return
+  }
   row.publishing = true
-  row.is_disable = row.is_disable === 0 ? 1 : 0
+  row.is_disable = !row.is_disable
   try {
-    await api.updateUserDisable(row)
+    await api.updateUserDisable(row.id, row.is_disable)
     $message?.success(row.is_disable ? '已禁用该用户' : '已取消禁用该用户')
     $table.value?.handleSearch()
   }
   catch (err) {
-    // 有异常恢复原来的状态
-    row.is_disable = row.is_disable === 0 ? 1 : 0
+    row.is_disable = !row.is_disable
+    console.error(err)
   }
   finally {
     row.publishing = false
@@ -218,16 +223,25 @@ async function handleUpdateDisable(row) {
       :get-data="api.getUsers"
     >
       <template #queryBar>
-        <QueryItem label="昵称" :label-width="40">
+        <QueryItem label="昵称" :label-width="40" :content-width="160">
           <NInput
             v-model:value="queryItems.nickname"
             clearable
             type="text"
-            placeholder="请输入用户昵称"
+            placeholder="请输入昵称"
             @keydown.enter="$table?.handleSearch()"
           />
         </QueryItem>
-        <QueryItem label="登录方式" :label-width="70" :content-width="180">
+        <QueryItem label="用户名" :label-width="60" :content-width="160">
+          <NInput
+            v-model:value="queryItems.username"
+            clearable
+            type="text"
+            placeholder="请输入用户名"
+            @keydown.enter="$table?.handleSearch()"
+          />
+        </QueryItem>
+        <QueryItem label="登录方式" :label-width="70" :content-width="160">
           <NSelect
             v-model:value="queryItems.login_type"
             clearable

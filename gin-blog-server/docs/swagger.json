@@ -1,16 +1,68 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Gin-Vue-Blog 的 Swagger API 文档",
-        "title": "Gin-Vue-Blog API 文档",
-        "contact": {},
-        "version": "1.0 版本"
+        "contact": {}
     },
-    "host": "localhost:8765",
-    "basePath": "/api/v1",
     "paths": {
+        "/about": {
+            "get": {
+                "description": "获取关于",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blog_info"
+                ],
+                "summary": "获取关于",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "更新关于",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blog_info"
+                ],
+                "summary": "更新关于",
+                "parameters": [
+                    {
+                        "description": "关于",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-string"
+                        }
+                    }
+                }
+            }
+        },
         "/category": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "添加或修改分类",
                 "consumes": [
                     "application/json"
@@ -29,7 +81,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.AddOrEditCategoryForm"
+                            "$ref": "#/definitions/handler.AddOrEditCategoryReq"
                         }
                     }
                 ],
@@ -37,12 +89,17 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-any"
+                            "$ref": "#/definitions/handler.Response-model_Category"
                         }
                     }
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "根据 ID 数组删除留言",
                 "consumes": [
                     "application/json"
@@ -72,7 +129,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-any"
+                            "$ref": "#/definitions/handler.Response-int"
                         }
                     }
                 }
@@ -80,6 +137,11 @@
         },
         "/category/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "根据条件查询获取分类列表",
                 "consumes": [
                     "application/json"
@@ -113,9 +175,9 @@
                 ],
                 "responses": {
                     "0": {
-                        "description": "成功",
+                        "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-v2_PageResult-array_model_CategoryVO"
+                            "$ref": "#/definitions/handler.Response-handler_PageResult-model_CategoryVO"
                         }
                     }
                 }
@@ -123,6 +185,11 @@
         },
         "/category/option": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "获取标签选项列表",
                 "consumes": [
                     "application/json"
@@ -138,7 +205,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-model_OptionVO"
+                            "$ref": "#/definitions/handler.Response-array_model_OptionVO"
                         }
                     }
                 }
@@ -176,6 +243,292 @@
                 }
             }
         },
+        "/comment": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据条件查询评论列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "条件查询评论列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "昵称",
+                        "name": "nickname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "审核状态",
+                        "name": "is_review",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "评论类型",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-model_CommentVO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "删除评论（批量）",
+                "parameters": [
+                    {
+                        "description": "评论 ID 数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-int"
+                        }
+                    }
+                }
+            }
+        },
+        "/comment/review": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组修改审核状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "修改评论审核（批量）",
+                "parameters": [
+                    {
+                        "description": "修改审核状态",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.UpdateReviewReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/home": {
+            "get": {
+                "description": "获取博客首页信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blog_info"
+                ],
+                "summary": "获取博客首页信息",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-model_BlogHomeVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/link": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "添加或修改友链",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Link"
+                ],
+                "summary": "添加或修改友链",
+                "parameters": [
+                    {
+                        "description": "添加或修改友链",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.AddOrEditLinkReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-model_FriendLink"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除友链",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Link"
+                ],
+                "summary": "删除友链（批量）",
+                "parameters": [
+                    {
+                        "description": "友链ID数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-int64"
+                        }
+                    }
+                }
+            }
+        },
+        "/link/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据条件查询获取友链列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Link"
+                ],
+                "summary": "获取友链列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "当前页数",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页条数",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "搜索关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-handler_PageResult-model_FriendLink"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "登录",
@@ -196,7 +549,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.LoginForm"
+                            "$ref": "#/definitions/handler.LoginReq"
                         }
                     }
                 ],
@@ -204,7 +557,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-resp_LoginVO"
+                            "$ref": "#/definitions/handler.Response-model_LoginVO"
                         }
                     }
                 }
@@ -235,6 +588,11 @@
         },
         "/message/list": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "根据条件查询留言列表",
                 "consumes": [
                     "application/json"
@@ -276,7 +634,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-v2_PageResult-array_model_Message"
+                            "$ref": "#/definitions/handler.Response-handler_PageResult-model_Message"
                         }
                     }
                 }
@@ -284,6 +642,11 @@
         },
         "/message/review": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "根据 ID 数组修改审核状态",
                 "consumes": [
                     "application/json"
@@ -302,7 +665,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.UpdateReviewForm"
+                            "$ref": "#/definitions/handler.UpdateReviewReq"
                         }
                     }
                 ],
@@ -310,7 +673,204 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-any"
+                            "$ref": "#/definitions/handler.Response-int"
+                        }
+                    }
+                }
+            }
+        },
+        "/operation/log": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除操作日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OperationLog"
+                ],
+                "summary": "删除操作日志",
+                "parameters": [
+                    {
+                        "description": "操作日志ID列表",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-int"
+                        }
+                    }
+                }
+            }
+        },
+        "/operation/log/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据条件查询获取操作日志列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OperationLog"
+                ],
+                "summary": "获取操作日志列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-array_model_OperationLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/page": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "添加或修改页面",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Page"
+                ],
+                "summary": "添加或修改页面",
+                "parameters": [
+                    {
+                        "description": "添加或修改页面",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.AddOrEditPageReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-model_Page"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除页面",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Page"
+                ],
+                "summary": "删除页面",
+                "parameters": [
+                    {
+                        "description": "页面 ID 数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-int"
+                        }
+                    }
+                }
+            }
+        },
+        "/page/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据条件查询获取页面列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Page"
+                ],
+                "summary": "获取页面列表",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-array_model_Page"
                         }
                     }
                 }
@@ -336,7 +896,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.RegisterForm"
+                            "$ref": "#/definitions/handler.RegisterReq"
                         }
                     }
                 ],
@@ -345,6 +905,100 @@
                         "description": "",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/report": {
+            "post": {
+                "description": "用户登进后台时上报信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "blog_info"
+                ],
+                "summary": "上报用户信息",
+                "parameters": [
+                    {
+                        "description": "用户信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/role/list": {
+            "get": {
+                "description": "获取角色列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "获取角色列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "pageNum",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-handler_PageResult-model_RoleVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/role/option": {
+            "get": {
+                "description": "获取角色选项",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "role"
+                ],
+                "summary": "获取角色选项",
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-model_OptionVO"
                         }
                     }
                 }
@@ -375,7 +1029,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v2.AddOrEditTagForm"
+                            "$ref": "#/definitions/handler.AddOrEditTagReq"
                         }
                     }
                 ],
@@ -383,7 +1037,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-any"
+                            "$ref": "#/definitions/handler.Response-model_Tag"
                         }
                     }
                 }
@@ -423,7 +1077,7 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-any"
+                            "$ref": "#/definitions/handler.Response-int"
                         }
                     }
                 }
@@ -471,7 +1125,7 @@
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-v2_PageResult-array_resp_TagVO"
+                            "$ref": "#/definitions/handler.Response-handler_PageResult-model_TagVO"
                         }
                     }
                 }
@@ -499,7 +1153,39 @@
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/r.Response-resp_OptionVo"
+                            "$ref": "#/definitions/handler.Response-model_OptionVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload/file": {
+            "post": {
+                "description": "上传文件",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "upload"
+                ],
+                "summary": "上传文件",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response-string"
                         }
                     }
                 }
@@ -507,6 +1193,742 @@
         }
     },
     "definitions": {
+        "handler.AddOrEditCategoryReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.AddOrEditLinkReq": {
+            "type": "object",
+            "required": [
+                "address",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.AddOrEditPageReq": {
+            "type": "object",
+            "properties": {
+                "cover": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.AddOrEditTagReq": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.LoginReq": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.PageResult-model_CategoryVO": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.CategoryVO"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.PageResult-model_FriendLink": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FriendLink"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.PageResult-model_Message": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Message"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.PageResult-model_RoleVO": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RoleVO"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.PageResult-model_TagVO": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TagVO"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.RegisterReq": {
+            "type": "object",
+            "required": [
+                "code",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 4
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-any": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据"
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-array_model_OperationLog": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OperationLog"
+                    }
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-array_model_OptionVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OptionVO"
+                    }
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-array_model_Page": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Page"
+                    }
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-handler_PageResult-model_CategoryVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.PageResult-model_CategoryVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-handler_PageResult-model_FriendLink": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.PageResult-model_FriendLink"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-handler_PageResult-model_Message": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.PageResult-model_Message"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-handler_PageResult-model_RoleVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.PageResult-model_RoleVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-handler_PageResult-model_TagVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.PageResult-model_TagVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-int": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-int64": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_BlogHomeVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.BlogHomeVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_Category": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Category"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_CommentVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.CommentVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_FriendLink": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.FriendLink"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_LoginVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.LoginVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_OptionVO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.OptionVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_Page": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Page"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-model_Tag": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Tag"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.Response-string": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.UpdateReviewReq": {
+            "type": "object",
+            "required": [
+                "is_review"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "is_review": {
+                    "type": "integer",
+                    "maximum": 1,
+                    "minimum": 0
+                }
+            }
+        },
+        "model.Article": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "is_delete": {
+                    "type": "integer"
+                },
+                "is_top": {
+                    "type": "integer"
+                },
+                "original_url": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.BlogHomeVO": {
+            "type": "object",
+            "properties": {
+                "article_count": {
+                    "description": "文章数量",
+                    "type": "integer"
+                },
+                "message_count": {
+                    "description": "留言数量",
+                    "type": "integer"
+                },
+                "user_count": {
+                    "description": "用户数量",
+                    "type": "integer"
+                },
+                "view_count": {
+                    "description": "访问量",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Category": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "description": "重写外键",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Article"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "model.CategoryVO": {
             "type": "object",
             "properties": {
@@ -528,9 +1950,12 @@
                 }
             }
         },
-        "model.Message": {
+        "model.CommentVO": {
             "type": "object",
             "properties": {
+                "article_title": {
+                    "type": "string"
+                },
                 "avatar": {
                     "type": "string"
                 },
@@ -543,180 +1968,47 @@
                 "id": {
                     "type": "integer"
                 },
-                "ip_address": {
-                    "type": "string"
-                },
-                "ip_source": {
-                    "type": "string"
-                },
                 "is_review": {
                     "type": "integer"
                 },
                 "nickname": {
                     "type": "string"
                 },
-                "speed": {
+                "reply_nickname": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.FriendLink": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
                 }
             }
         },
-        "model.OptionVO": {
-            "type": "object",
-            "properties": {
-                "label": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "integer"
-                }
-            }
-        },
-        "r.Response-any": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据"
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-model_OptionVO": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/model.OptionVO"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-resp_LoginVO": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/resp.LoginVO"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-resp_OptionVo": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/resp.OptionVo"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-v2_PageResult-array_model_CategoryVO": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/v2.PageResult-array_model_CategoryVO"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-v2_PageResult-array_model_Message": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/v2.PageResult-array_model_Message"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "r.Response-v2_PageResult-array_resp_TagVO": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/v2.PageResult-array_resp_TagVO"
-                        }
-                    ]
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
-        "resp.LoginVO": {
+        "model.LoginVO": {
             "type": "object",
             "properties": {
                 "article_like_set": {
@@ -773,7 +2065,92 @@
                 }
             }
         },
-        "resp.OptionVo": {
+        "model.Message": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "ip_source": {
+                    "type": "string"
+                },
+                "is_review": {
+                    "type": "integer"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "speed": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OperationLog": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "ip_source": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "opt_desc": {
+                    "type": "string"
+                },
+                "opt_method": {
+                    "type": "string"
+                },
+                "opt_module": {
+                    "type": "string"
+                },
+                "opt_type": {
+                    "type": "string"
+                },
+                "opt_url": {
+                    "type": "string"
+                },
+                "request_method": {
+                    "type": "string"
+                },
+                "request_param": {
+                    "type": "string"
+                },
+                "response_data": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.OptionVO": {
             "type": "object",
             "properties": {
                 "label": {
@@ -784,7 +2161,85 @@
                 }
             }
         },
-        "resp.TagVO": {
+        "model.Page": {
+            "type": "object",
+            "properties": {
+                "cover": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RoleVO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_disable": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "menu_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "resource_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "model.Tag": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Article"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TagVO": {
             "type": "object",
             "properties": {
                 "article_count": {
@@ -797,182 +2252,12 @@
                     "type": "integer"
                 },
                 "name": {
-                    "description": "Articles     []*model.Article `json:\"articles\"`",
                     "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
                 }
             }
-        },
-        "v2.AddOrEditCategoryForm": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "v2.AddOrEditTagForm": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "v2.LoginForm": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "v2.PageResult-array_model_CategoryVO": {
-            "type": "object",
-            "properties": {
-                "pageData": {
-                    "description": "分页数据",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.CategoryVO"
-                    }
-                },
-                "pageNum": {
-                    "description": "每页条数",
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "description": "上次页数",
-                    "type": "integer"
-                },
-                "total": {
-                    "description": "总条数",
-                    "type": "integer"
-                }
-            }
-        },
-        "v2.PageResult-array_model_Message": {
-            "type": "object",
-            "properties": {
-                "pageData": {
-                    "description": "分页数据",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Message"
-                    }
-                },
-                "pageNum": {
-                    "description": "每页条数",
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "description": "上次页数",
-                    "type": "integer"
-                },
-                "total": {
-                    "description": "总条数",
-                    "type": "integer"
-                }
-            }
-        },
-        "v2.PageResult-array_resp_TagVO": {
-            "type": "object",
-            "properties": {
-                "pageData": {
-                    "description": "分页数据",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/resp.TagVO"
-                    }
-                },
-                "pageNum": {
-                    "description": "每页条数",
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "description": "上次页数",
-                    "type": "integer"
-                },
-                "total": {
-                    "description": "总条数",
-                    "type": "integer"
-                }
-            }
-        },
-        "v2.RegisterForm": {
-            "type": "object",
-            "required": [
-                "code",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 4
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "v2.UpdateReviewForm": {
-            "type": "object",
-            "required": [
-                "is_review"
-            ],
-            "properties": {
-                "ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "is_review": {
-                    "type": "integer",
-                    "maximum": 1,
-                    "minimum": 0
-                }
-            }
-        }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }

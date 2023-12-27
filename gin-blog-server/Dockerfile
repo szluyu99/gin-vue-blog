@@ -16,9 +16,6 @@ COPY --from=0 ${WORK_PATH}/server .
 COPY --from=0 ${WORK_PATH}/config/config.docker.toml .
 COPY --from=0 ${WORK_PATH}/assets/ip2region.xdb ./assets/ip2region.xdb
 
-# COPY --from=0 ${WORK_PATH}/assets/wait-for .
-# RUN chmod a+x ./wait-for
-
 # 后台接口
 EXPOSE 8765
 # 前台接口

@@ -18,8 +18,6 @@ const form = ref({
   website_notice: '博客后端基于 gin、gorm 开发\n博客前端基于 Vue3、TS、NaiveUI 开发\n努力开发中...冲冲冲！加油！',
   website_createtime: '2022-11-01',
   website_record: '鲁ICP备2022040119号',
-  social_login_list: [],
-  social_url_list: [],
   qq: '123456789',
   github: 'https://github.com/szluyu99',
   gitee: 'https://gitee.com/szluyu99',
@@ -28,10 +26,12 @@ const form = ref({
   article_cover: 'https://cdn.hahacode.cn/1679461519cc592408198d67faf1290ff8969dc614.png',
   is_comment_review: 1,
   is_message_review: 1,
-  is_email_notice: 0,
-  is_reward: 0,
-  wechat_qrcode: 'http://dummyimage.com/100x100',
-  alipay_ode: 'http://dummyimage.com/100x100',
+  // is_email_notice: 0,
+  // social_login_list: [],
+  // social_url_list: [],
+  // is_reward: 0,
+  // wechat_qrcode: 'http://dummyimage.com/100x100',
+  // alipay_ode: 'http://dummyimage.com/100x100',
 })
 
 onMounted(async () => {
@@ -39,8 +39,11 @@ onMounted(async () => {
 })
 
 async function fetchData() {
-  const resp = await api.getBlogConfig()
+  const resp = await api.getConfig()
   form.value = resp.data
+
+  // const resp = await api.getBlogConfig()
+  // form.value = resp.data
 }
 
 function handleSave() {
@@ -48,11 +51,10 @@ function handleSave() {
     if (!err) {
       try {
         $loadingBar?.start()
-        await api.updateBlogConfig(form.value)
+        await api.updateConfig(form.value)
         $loadingBar?.finish()
         $message.success('博客信息更新成功')
         fetchData()
-        // appStore.getBlogInfo()
       }
       catch (err) {
         $loadingBar?.error()
@@ -182,25 +184,25 @@ function handleSave() {
           </NFormItem>
           <NFormItem label="评论默认审核" path="is_comment_review">
             <NRadioGroup v-model:value="form.is_comment_review" name="is_comment_review">
-              <NRadio :value="0">
+              <NRadio value="0">
                 关闭
               </NRadio>
-              <NRadio :value="1">
+              <NRadio value="1">
                 开启
               </NRadio>
             </NRadioGroup>
           </NFormItem>
           <NFormItem label="留言默认审核" path="is_message_review">
             <NRadioGroup v-model:value="form.is_message_review" name="is_message_review">
-              <NRadio :value="0">
+              <NRadio value="0">
                 关闭
               </NRadio>
-              <NRadio :value="1">
+              <NRadio value="1">
                 开启
               </NRadio>
             </NRadioGroup>
           </NFormItem>
-          <NFormItem label="邮箱通知" path="is_email_notice">
+          <!-- <NFormItem label="邮箱通知" path="is_email_notice">
             <NRadioGroup v-model:value="form.is_email_notice" name="is_email_notice">
               <NRadio :value="0">
                 关闭
@@ -209,7 +211,7 @@ function handleSave() {
                 开启
               </NRadio>
             </NRadioGroup>
-          </NFormItem>
+          </NFormItem> -->
           <NButton type="primary" @click="handleSave">
             确认
           </NButton>

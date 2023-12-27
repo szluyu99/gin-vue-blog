@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NTabPane, NTabs } from 'naive-ui'
 
 import CommonPage from '@/components/common/CommonPage.vue'
@@ -17,12 +17,22 @@ const infoForm = ref({
   website: userStore.website,
 })
 
+onMounted(async () => {
+  await userStore.getUserInfo()
+  infoForm.value = {
+    avatar: userStore.avatar,
+    nickname: userStore.nickname,
+    intro: userStore.intro,
+    website: userStore.website,
+  }
+})
+
 async function updateProfile() {
   infoFormRef.value?.validate(async (err) => {
     if (!err) {
       await api.updateCurrent(infoForm.value)
       $message.success('更新成功!')
-      userStore.setUserInfo(infoForm.value)
+      userStore.getUserInfo()
     }
   })
 }
@@ -148,7 +158,7 @@ function validatePasswordSame(rule, value) {
           :model="passwordForm"
           label-width="100"
           :rules="passwordFormRules"
-          class="m-30 w-400"
+          class="m-[30px] w-[400px]"
         >
           <NFormItem label="旧密码" path="old_password">
             <NInput

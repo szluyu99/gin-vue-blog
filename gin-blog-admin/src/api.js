@@ -12,8 +12,8 @@ export default {
   getArticleById: id => request.get(`/article/${id}`),
   saveOrUpdateArticle: data => request.post('/article', data),
   deleteArticle: (data = []) => request.delete('/article', { data }), // 物理删除
-  softDeleteArticle: data => request.put('/article/soft-delete', data), // 软删除
-  updateArticleTop: data => request.put('/article/top', data), // 修改文章置顶
+  softDeleteArticle: (ids, is_delete) => request.put('/article/soft-delete', { ids, is_delete }), // 软删除
+  updateArticleTop: (id, is_top) => request.put('/article/top', { id, is_top }), // 修改文章置顶
   exportArticles: (data = []) => request.post('/article/export', data), // 导出文章
   importArticles: data => request.post('/article/import', data), // 导入文章
 
@@ -32,35 +32,39 @@ export default {
   // 留言相关接口
   getMessages: (params = {}) => request.get('/message/list', { params }),
   deleteMessages: (data = []) => request.delete('/message', { data }),
-  updateMessageReview: data => request.put('/message/review', data), // 修改评论审核
+  updateMessageReview: (ids, is_review) => request.put('/message/review', { ids, is_review }),
 
   // 评论相关接口
   getComments: (params = {}) => request.get('/comment/list', { params }),
   deleteComments: (data = []) => request.delete('/comment', { data }),
-  updateCommentReview: data => request.put('/comment/review', data), // 修改评论审核
+  updateCommentReview: (ids, is_review) => request.put('/comment/review', { ids, is_review }),
 
   // 友链相关接口
   getLinks: (params = {}) => request.get('/link/list', { params }),
   deleteLinks: (data = []) => request.delete('/link', { data }),
   saveOrUpdateLink: data => request.post('/link', data),
-
   // 日志相关接口
   getOperationLogs: (params = {}) => request.get('/operation/log/list', { params }),
   deleteOperationLogs: (data = []) => request.delete('/operation/log', { data }),
 
   // 用户相关接口
-  getUser: () => request.get('/user/info'),
+  getUserInfo: () => request.get('/user/info'),
   updateCurrent: data => request.put('/user/current', data), // 更新当前用户信息
   updateCurrentPassword: data => request.put('/user/current/password', data), // 修改当前用户密码
   getUsers: (params = {}) => request.get('/user/list', { params }),
   updateUser: data => request.put('/user', data),
-  updateUserDisable: data => request.put('/user/disable', data),
+  updateUserDisable: (id, is_disable) => request.put('/user/disable', {
+    id,
+    is_disable,
+  }),
   getOnlineUsers: () => request.get('/user/online'), // 在线用户列表
   forceOfflineUser: data => request.delete('/user/offline', { data }), // 强制离线
 
   // 博客设置相关接口
-  getBlogConfig: () => request.get('/setting/blog-config'),
-  updateBlogConfig: data => request.put('/setting/blog-config', data),
+  getConfig: () => request.get('/config'),
+  updateConfig: data => request.patch('/config', data),
+  // getBlogConfig: () => request.get('/setting/blog-config'),
+  // updateBlogConfig: data => request.put('/setting/blog-config', data),
   getAbout: () => request.get('/setting/about'),
   updateAbout: data => request.put('/setting/about', data),
 

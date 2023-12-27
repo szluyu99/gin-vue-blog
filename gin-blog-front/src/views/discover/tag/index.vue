@@ -4,11 +4,11 @@ import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
 
 const loading = ref(true)
-const tagList = ref({})
+const tagList = ref([])
 
 onMounted(() => {
   api.getTags().then((resp) => {
-    tagList.value = resp.data.list
+    tagList.value = resp.data || []
     loading.value = false
   })
 })
@@ -44,8 +44,8 @@ function randomColorHex() {
 </template>
 
 <style scoped>
+/* 实现截断文字效果, 即不会在结束处将一个词语拆开 */
 a {
-  /* 实现截断文字效果, 即不会在结束处将一个词语拆开 */
   display: inline-block;
 }
 </style>

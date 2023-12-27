@@ -31,7 +31,7 @@ const queryItems = ref({
 })
 
 const extraParams = ref({
-  is_delete: null, // 0-未删除, 1-回收站
+  is_delete: null, // 未删除 | 回收站
   status: null, // null-all, 1-公开, 2-私密, 3-草稿
 })
 
@@ -124,8 +124,8 @@ const columns = [
     render(row) {
       return h(
         NTag,
-        { type: articleTypeMap[row.type].tag },
-        { default: () => articleTypeMap[row.type].name },
+        { type: articleTypeMap[row.type]?.tag },
+        { default: () => articleTypeMap[row.type]?.name },
       )
     },
   },
@@ -157,8 +157,6 @@ const columns = [
         rubberBand: false,
         value: row.is_top,
         loading: !!row.publishing,
-        checkedValue: 1,
-        uncheckedValue: 0,
         onUpdateValue: () => handleUpdateTop(row),
       })
     },
@@ -179,8 +177,7 @@ const columns = [
               type: 'success',
               secondary: true,
               onClick: async () => {
-                // 软删除恢复
-                await api.softDeleteArticle({ ids: [row.id], is_delete: 0 })
+                await api.softDeleteArticle([row.id], false)
                 await $table.value?.handleSearch()
               },
             },
@@ -214,23 +211,30 @@ const columns = [
   },
 ]
 
-// extraParams 中的 is_delete 为 0 则软删除, is_delete 为 1 则物理删除
 function updateOrDeleteArticles(ids) {
-  extraParams.value.is_delete === 0
-    ? api.softDeleteArticle({ ids: JSON.parse(ids), is_delete: 1 })
-    : api.deleteArticle(ids)
+  extraParams.value.is_delete
+    ? api.deleteArticle(ids)
+    : api.softDeleteArticle(JSON.parse(ids), true)
 }
 
 // 修改文章置顶
 async function handleUpdateTop(row) {
-  if (!row.id)
+  if (!row.id) {
     return
+  }
   row.publishing = true
-  row.is_top = row.is_top === 0 ? 1 : 0
-  await api.updateArticleTop(row)
-  row.publishing = false
-  $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
-  $table.value?.handleSearch()
+  row.is_top = !row.is_top
+  try {
+    await api.updateArticleTop(row.id, row.is_top)
+    $message?.success(row.is_top ? '已成功置顶' : '已取消置顶')
+    $table.value?.handleSearch()
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    row.publishing = false
+  }
 }
 
 // 导出文章

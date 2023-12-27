@@ -32,16 +32,22 @@ request.interceptors.response.use(
   (response) => {
     // 业务信息
     const responseData = response.data
-    const { code, message } = responseData
+    const { code, message, data } = responseData
     if (code !== 0) { // ! 与后端约定业务状态码
-      window.$message.error(message)
+      if (data && message !== data) {
+        window.$message.error(`${message} ${data}`)
+      }
+      else {
+        window.$message.error(message)
+      }
+      console.error(responseData) // 控制台输出错误信息
       if (code === 1201) { // Token 存在问题
         const authStore = useAuthStore()
         authStore.toLogin()
-        window.$message.error(message)
         return
       }
-      if (code === 1203) { // 被强制退出
+      // 1202-Token 过期, 1203-被强退
+      if (code === 1202 || code === 1203) {
         const authStore = useAuthStore()
         authStore.forceOffline()
         return
@@ -53,12 +59,16 @@ request.interceptors.response.use(
   // 响应失败拦截
   (error) => {
     // 主要使用业务状态码决定状态, 一般不根据 HTTP 状态码进行操作
-    // const { code } = error
-    // if (code === 401) {
-    //   removeToken()
-    //   // window.$message.error(message)
-    //   router.push('/')
-    // }
+    const responseData = error.response?.data
+    const { message, data } = responseData
+    if (error.response.status === 500) {
+      if (message && data) {
+        window.$message.error(`${message} ${data}`)
+      }
+      else {
+        window.$message.error('服务端异常')
+      }
+    }
     return Promise.reject(error)
   },
 )

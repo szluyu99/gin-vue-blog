@@ -60,7 +60,7 @@ onMounted(async () => {
     // marked 解析 markdown 文本
     data.value.content = await marked.parse(resp.data.content, { async: true })
     await nextTick()
-    // higlight.js 代码高亮
+    // highlight.js 代码高亮
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
     // MathJax 渲染公式
     window.MathJax.typeset()

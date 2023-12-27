@@ -7,6 +7,7 @@ import { Icon } from '@iconify/vue'
 import MobileSideBar from './MobileSideBar.vue'
 import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
+import api from '@/api'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
@@ -51,7 +52,8 @@ watchThrottled(y, () => {
   }
 }, { throttle: 100 })
 
-function logout() {
+async function logout() {
+  await api.logout()
   userStore.resetLoginState()
   // 如果在个人信息页登出则回到首页
   if (route.name === 'User') {

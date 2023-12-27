@@ -17,7 +17,7 @@ import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
 
 const { type } = defineProps({
-  // 评论类型: 1-文章, 2-友链
+  // 评论类型: 1-文章, 2-友链, 3-说说
   type: Number,
 })
 
@@ -40,12 +40,15 @@ async function getComments() {
   listLoading.value = true
   try {
     const resp = await api.getComments(params)
+    console.log(resp.data.page_data)
+
     // * 全局加载更多, 0.8s 延时
     setTimeout(() => {
       params.page_num === 1
-        ? commentList.value = resp.data.pageData
-        : commentList.value.push(...resp.data.pageData)
+        ? commentList.value = resp.data.page_data
+        : commentList.value.push(...resp.data.page_data)
       commentCount.value = resp.data.total
+      console.log(commentCount.value)
       params.page_num++
       listLoading.value = false
     }, 800)
@@ -96,7 +99,7 @@ async function reloadReplies(idx) {
     { page_size: 5, page_num: pageRefs.value[idx].current },
   )
   // * 局部更新某个评论的回复
-  commentList.value[idx].reply_vo_list = data
+  commentList.value[idx].reply_list = data
   commentList.value[idx].reply_count++ // 数量 + 1
   // 回复大于 5 条展示评论分页
   commentList.value[idx].reply_count > 5 && (pageRefs.value[idx].setShow(true))
@@ -112,7 +115,7 @@ async function checkReplies(idx, obj) {
     { page_num: 1, page_size: 5 },
   )
   // 更新对应楼评论的回复列表
-  obj.reply_vo_list = data
+  obj.reply_list = data
   // 超过 5 条数据显示分页
   obj.reply_count > 5 && (pageRefs.value[idx].setShow(true))
   // 隐藏 "点击查看"
@@ -125,7 +128,7 @@ async function changeReplyCurrent(pageNum, idx, commentId) {
     commentId,
     { page_num: pageNum, page_size: 5 },
   )
-  commentList[idx].reply_vo_list = data
+  commentList.value[idx].reply_list = data
 }
 
 // TODO: 点赞
@@ -177,35 +180,28 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       <p class="mb-4 mt-7 flex items-center text-xl font-bold">
         <span> {{ commentCount }} 评论 </span>
         <span
-          class="i-uiw:reload ml-4 cursor-pointer text-xl"
+          class="i-uiw:reload ml-4 cursor-pointer text-base"
           :class="listLoading ? 'animate-spin' : ''"
           @click="reloadComments"
         />
       </p>
       <!-- 评论列表 -->
       <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-1 flex">
-        <img :src="convertImgUrl(comment.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+        <img :src="convertImgUrl(comment.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
         <div class="ml-3 flex flex-1 flex-col">
-          <!-- 评论人名称 -->
-          <p>
-            <!-- 根据是否有 website 显示不同效果 -->
-            <span v-if="!comment.website" class="text-sm">
-              {{ comment.nickname }}
+          <!-- 评论人名称: 根据是否有 website 显示不同效果 -->
+          <div>
+            <span v-if="!comment.user?.info?.website" class="text-sm">
+              {{ comment.user?.info?.nickname }}
             </span>
-            <a
-              v-else :href="comment.website" target="_blank"
-              class="color-#1abc9c font-500 transition-300"
-            >
-              {{ comment.nickname }}
+            <a v-else :href="comment.user?.info?.website" target="_blank" class="color-[#1abc9c] font-500 transition-300">
+              {{ comment.user?.info?.nickname }}
             </a>
-            <!-- 博主标记 -->
-            <span
-              v-if="comment.user_id === 10"
-              class="ml-2 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-xs color-#fff"
-            >
+            <!-- TODO: 博主标记 -->
+            <!-- <span v-if="comment.user_id === 10" class="ml-2 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-xs color-#fff">
               博主
-            </span>
-          </p>
+            </span> -->
+          </div>
           <!-- 楼层 + 时间 + 点赞 + 回复按钮 -->
           <div class="flex justify-between text-sm">
             <div class="flex items-center gap-2 py-1 color-#b3b3b3">
@@ -225,33 +221,27 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           <!-- 评论内容 -->
           <div class="my-1" v-html="comment.content" />
           <!-- 评论回复 start -->
-          <div v-for="reply of comment.reply_vo_list" :key="reply.id" class="mt-2 flex">
-            <img :src="convertImgUrl(reply.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+          <div v-for="reply of comment.reply_list" :key="reply.id" class="mt-2 flex">
+            <img :src="convertImgUrl(reply.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
             <div class="ml-2 flex flex-1 flex-col">
               <!-- 回复人名称 -->
               <div>
                 <!-- 根据是否有 website 显示不同效果 -->
-                <span v-if="!reply.website" class="text-sm">
-                  {{ reply.nickname }}
+                <span v-if="!reply.user?.info?.website" class="text-sm">
+                  {{ reply.user?.info.nickname }}
                 </span>
-                <a
-                  v-else :href="reply.website" target="_blank"
-                  class="color-#1abc9c font-500 transition-300"
-                >
-                  {{ reply.nickname }}
+                <a v-else :href="reply.user?.info?.website" target="_blank" class="color-#1abc9c font-500 transition-300">
+                  {{ reply.user?.info.nickname }}
                 </a>
-                <!-- 博主标记 -->
-                <span
-                  v-if="reply.user_id === 10"
-                  class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-sm color-#fff"
-                >
+                <!-- TODO: 博主标记 -->
+                <!-- <span v-if="reply.user_id === 10" class="ml-6 inline-block rounded-3 bg-#ffa51e px-6 py-1 text-sm color-#fff">
                   博主
-                </span>
+                </span> -->
               </div>
               <!-- 时间 + 点赞 + 回复按钮 -->
               <div class="flex justify-between text-sm">
-                <div class="flex items-center py-5 color-#b3b3b3">
-                  <span class="mr-10"> {{ dayjs(reply.created_at).format('YYYY-MM-DD') }} </span>
+                <div class="flex items-center gap-2 py-1 color-#b3b3b3">
+                  <span> {{ dayjs(reply.created_at).format('YYYY-MM-DD') }} </span>
                   <button
                     class="i-mdi:thumb-up hover-bg-red"
                     :class="isLike(reply.id) ? 'bg-red' : ''"
@@ -266,13 +256,13 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
               <!-- 回复内容 -->
               <div>
                 <!-- 回复用户名: 自己回复自己不显示 "@名称" -->
-                <template v-if="reply.reply_user_id !== comment.user_id">
-                  <span v-if="!reply.reply_website">
-                    @{{ reply.reply_nickname }}
-                  </span>
-                  <a v-else :href="reply.reply_website" target="_blank">
-                    @{{ reply.reply_nickname }}
-                  </a> ，
+                <template v-if="reply.user_id !== comment.user_id">
+                  <a v-if="reply.user?.info?.website" :href="reply.reply_website" target="_blank">
+                    @{{ reply.user?.info?.nickname }}
+                  </a>
+                  <span v-else>
+                    @{{ reply.user?.info?.nickname }}
+                  </span>，
                 </template>
                 <span class="my-3" v-html="reply.content" />
               </div>
@@ -308,7 +298,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             @after-submit="reloadReplies(idx)"
           />
           <!-- 分隔线: 注意最后一个评论没有线 -->
-          <div v-if="(idx + 1) !== commentCount" class="my-2 h-1 bg-light-500" />
+          <div v-if="(idx + 1) !== commentCount" class="my-2.5 h-0.5 bg-light-500" />
         </div>
       </div>
       <!-- 加载更多 -->

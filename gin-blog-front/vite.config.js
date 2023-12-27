@@ -27,7 +27,7 @@ export default defineConfig((configEnv) => {
       port: 3333,
       open: false,
       proxy: {
-        '/api/front': {
+        '/api': {
           target: env.VITE_BACKEND_URL,
           changeOrigin: true,
         },

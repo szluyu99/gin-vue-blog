@@ -21,7 +21,7 @@ const queryItems = ref({
   nickname: '',
 })
 const extraParams = ref({
-  is_review: null, // 评论状态: 0-审核中, 1-通过
+  is_review: null, // 评论状态: 审核中 | 通过
 })
 
 const { handleDelete } = useCRUD({
@@ -35,11 +35,11 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 50,
+    width: 40,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 50,
+        'height': 40,
         'imgProps': { style: { 'border-radius': '3px' } },
         'src': convertImgUrl(row.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
@@ -120,7 +120,7 @@ const columns = [
             {
               size: 'small',
               type: 'warning',
-              onClick: () => handleUpdateReview([row.id], 0),
+              onClick: () => handleUpdateReview([row.id], false),
             },
             {
               default: () => '撤下',
@@ -133,7 +133,7 @@ const columns = [
               size: 'small',
               type: 'success',
               style: 'margin-left: 15px;',
-              onClick: () => handleUpdateReview([row.id], 1),
+              onClick: () => handleUpdateReview([row.id], true),
             },
             {
               default: () => '通过',
@@ -158,13 +158,14 @@ const columns = [
   },
 ]
 
-// 修改留言审核: is_review 0-撤下审核, 1-通过审核
+// 修改留言审核
 async function handleUpdateReview(ids, is_review) {
   if (!ids.length) {
     $message.info('请选择要审核的数据')
     return
   }
-  await api.updateMessageReview({ ids, is_review })
+
+  await api.updateMessageReview(ids, is_review)
   $message?.success(is_review ? '审核成功' : '撤下成功')
   $table.value?.handleSearch()
 }
@@ -187,9 +188,7 @@ function handleChangeTab(value) {
 </script>
 
 <template>
-  <!-- 业务页面 -->
   <CommonPage title="留言管理">
-    <!-- 操作栏 -->
     <template #action>
       <NButton
         type="error"
@@ -204,7 +203,7 @@ function handleChangeTab(value) {
       <NButton
         type="success"
         :disabled="!$table?.selections.length"
-        @click="handleUpdateReview($table.selections, 1)"
+        @click="handleUpdateReview($table.selections, true)"
       >
         <template #icon>
           <span class="i-ic:outline-approval" />
@@ -212,7 +211,6 @@ function handleChangeTab(value) {
         批量通过
       </NButton>
     </template>
-    <!-- 标签栏 -->
     <NTabs
       type="line"
       animated
@@ -225,7 +223,6 @@ function handleChangeTab(value) {
       <NTabPane name="has_review" tab="通过" />
       <NTabPane name="not_review" tab="审核中" />
     </NTabs>
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"

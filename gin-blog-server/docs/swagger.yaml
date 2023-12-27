@@ -1,5 +1,492 @@
-basePath: /api/v1
 definitions:
+  handler.AddOrEditCategoryReq:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handler.AddOrEditLinkReq:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      name:
+        type: string
+    required:
+    - address
+    - name
+    type: object
+  handler.AddOrEditPageReq:
+    properties:
+      cover:
+        type: string
+      id:
+        type: integer
+      label:
+        type: string
+      name:
+        type: string
+    type: object
+  handler.AddOrEditTagReq:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handler.LoginReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.PageResult-model_CategoryVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.CategoryVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handler.PageResult-model_FriendLink:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.FriendLink'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handler.PageResult-model_Message:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.Message'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handler.PageResult-model_RoleVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.RoleVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handler.PageResult-model_TagVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.TagVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handler.RegisterReq:
+    properties:
+      code:
+        type: string
+      password:
+        maxLength: 20
+        minLength: 4
+        type: string
+      username:
+        type: string
+    required:
+    - code
+    - password
+    - username
+    type: object
+  handler.Response-any:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-array_model_OperationLog:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.OperationLog'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-array_model_OptionVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.OptionVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-array_model_Page:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.Page'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-handler_PageResult-model_CategoryVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handler.PageResult-model_CategoryVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-handler_PageResult-model_FriendLink:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handler.PageResult-model_FriendLink'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-handler_PageResult-model_Message:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handler.PageResult-model_Message'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-handler_PageResult-model_RoleVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handler.PageResult-model_RoleVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-handler_PageResult-model_TagVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handler.PageResult-model_TagVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-int:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        type: integer
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-int64:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        type: integer
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_BlogHomeVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.BlogHomeVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_Category:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.Category'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_CommentVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.CommentVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_FriendLink:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.FriendLink'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_LoginVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.LoginVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_OptionVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.OptionVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_Page:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.Page'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-model_Tag:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.Tag'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.Response-string:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        type: string
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handler.UpdateReviewReq:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+      is_review:
+        maximum: 1
+        minimum: 0
+        type: integer
+    required:
+    - is_review
+    type: object
+  model.Article:
+    properties:
+      category_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      is_delete:
+        type: integer
+      is_top:
+        type: integer
+      original_url:
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.BlogHomeVO:
+    properties:
+      article_count:
+        description: 文章数量
+        type: integer
+      message_count:
+        description: 留言数量
+        type: integer
+      user_count:
+        description: 用户数量
+        type: integer
+      view_count:
+        description: 访问量
+        type: integer
+    type: object
+  model.Category:
+    properties:
+      articles:
+        description: 重写外键
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   model.CategoryVO:
     properties:
       article_count:
@@ -14,8 +501,10 @@ definitions:
       updated_at:
         type: string
     type: object
-  model.Message:
+  model.CommentVO:
     properties:
+      article_title:
+        type: string
       avatar:
         type: string
       content:
@@ -24,116 +513,33 @@ definitions:
         type: string
       id:
         type: integer
-      ip_address:
-        type: string
-      ip_source:
-        type: string
       is_review:
         type: integer
       nickname:
         type: string
-      speed:
+      reply_nickname:
+        type: string
+      type:
         type: integer
+    type: object
+  model.FriendLink:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      name:
+        type: string
       updated_at:
         type: string
     type: object
-  model.OptionVO:
-    properties:
-      label:
-        type: string
-      value:
-        type: integer
-    type: object
-  r.Response-any:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-model_OptionVO:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/model.OptionVO'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-resp_LoginVO:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/resp.LoginVO'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-resp_OptionVo:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/resp.OptionVo'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-v2_PageResult-array_model_CategoryVO:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/v2.PageResult-array_model_CategoryVO'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-v2_PageResult-array_model_Message:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/v2.PageResult-array_model_Message'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  r.Response-v2_PageResult-array_resp_TagVO:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        allOf:
-        - $ref: '#/definitions/v2.PageResult-array_resp_TagVO'
-        description: 响应数据
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  resp.LoginVO:
+  model.LoginVO:
     properties:
       article_like_set:
         description: '点赞 Set: 用于记录用户点赞过的文章, 评论'
@@ -171,14 +577,121 @@ definitions:
       website:
         type: string
     type: object
-  resp.OptionVo:
+  model.Message:
+    properties:
+      avatar:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      ip_address:
+        type: string
+      ip_source:
+        type: string
+      is_review:
+        type: integer
+      nickname:
+        type: string
+      speed:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.OperationLog:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ip_address:
+        type: string
+      ip_source:
+        type: string
+      nickname:
+        type: string
+      opt_desc:
+        type: string
+      opt_method:
+        type: string
+      opt_module:
+        type: string
+      opt_type:
+        type: string
+      opt_url:
+        type: string
+      request_method:
+        type: string
+      request_param:
+        type: string
+      response_data:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.OptionVO:
     properties:
       label:
         type: string
       value:
         type: integer
     type: object
-  resp.TagVO:
+  model.Page:
+    properties:
+      cover:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      label:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.RoleVO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_disable:
+        type: boolean
+      label:
+        type: string
+      menu_ids:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      resource_ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  model.Tag:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.TagVO:
     properties:
       article_count:
         type: integer
@@ -187,130 +700,47 @@ definitions:
       id:
         type: integer
       name:
-        description: Articles     []*model.Article `json:"articles"`
         type: string
       updated_at:
         type: string
     type: object
-  v2.AddOrEditCategoryForm:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        minLength: 1
-        type: string
-      updated_at:
-        type: string
-    required:
-    - name
-    type: object
-  v2.AddOrEditTagForm:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - name
-    type: object
-  v2.LoginForm:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  v2.PageResult-array_model_CategoryVO:
-    properties:
-      pageData:
-        description: 分页数据
-        items:
-          $ref: '#/definitions/model.CategoryVO'
-        type: array
-      pageNum:
-        description: 每页条数
-        type: integer
-      pageSize:
-        description: 上次页数
-        type: integer
-      total:
-        description: 总条数
-        type: integer
-    type: object
-  v2.PageResult-array_model_Message:
-    properties:
-      pageData:
-        description: 分页数据
-        items:
-          $ref: '#/definitions/model.Message'
-        type: array
-      pageNum:
-        description: 每页条数
-        type: integer
-      pageSize:
-        description: 上次页数
-        type: integer
-      total:
-        description: 总条数
-        type: integer
-    type: object
-  v2.PageResult-array_resp_TagVO:
-    properties:
-      pageData:
-        description: 分页数据
-        items:
-          $ref: '#/definitions/resp.TagVO'
-        type: array
-      pageNum:
-        description: 每页条数
-        type: integer
-      pageSize:
-        description: 上次页数
-        type: integer
-      total:
-        description: 总条数
-        type: integer
-    type: object
-  v2.RegisterForm:
-    properties:
-      code:
-        type: string
-      password:
-        maxLength: 20
-        minLength: 4
-        type: string
-      username:
-        type: string
-    required:
-    - code
-    - password
-    - username
-    type: object
-  v2.UpdateReviewForm:
-    properties:
-      ids:
-        items:
-          type: integer
-        type: array
-      is_review:
-        maximum: 1
-        minimum: 0
-        type: integer
-    required:
-    - is_review
-    type: object
-host: localhost:8765
 info:
   contact: {}
-  description: Gin-Vue-Blog 的 Swagger API 文档
-  title: Gin-Vue-Blog API 文档
-  version: 1.0 版本
 paths:
+  /about:
+    get:
+      description: 获取关于
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-string'
+      summary: 获取关于
+      tags:
+      - blog_info
+    put:
+      consumes:
+      - application/json
+      description: 更新关于
+      parameters:
+      - description: 关于
+        in: body
+        name: data
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-string'
+      summary: 更新关于
+      tags:
+      - blog_info
   /category:
     delete:
       consumes:
@@ -331,7 +761,9 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-any'
+            $ref: '#/definitions/handler.Response-int'
+      security:
+      - ApiKeyAuth: []
       summary: 删除留言（批量）
       tags:
       - Category
@@ -345,14 +777,16 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/v2.AddOrEditCategoryForm'
+          $ref: '#/definitions/handler.AddOrEditCategoryReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-any'
+            $ref: '#/definitions/handler.Response-model_Category'
+      security:
+      - ApiKeyAuth: []
       summary: 添加或修改分类
       tags:
       - Category
@@ -378,9 +812,11 @@ paths:
       - application/json
       responses:
         "0":
-          description: 成功
+          description: ""
           schema:
-            $ref: '#/definitions/r.Response-v2_PageResult-array_model_CategoryVO'
+            $ref: '#/definitions/handler.Response-handler_PageResult-model_CategoryVO'
+      security:
+      - ApiKeyAuth: []
       summary: 获取分类列表
       tags:
       - Category
@@ -395,7 +831,9 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-model_OptionVO'
+            $ref: '#/definitions/handler.Response-array_model_OptionVO'
+      security:
+      - ApiKeyAuth: []
       summary: 获取分类选项列表
       tags:
       - Category
@@ -420,6 +858,185 @@ paths:
       summary: 发送邮箱验证码
       tags:
       - UserAuth
+  /comment:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除评论
+      parameters:
+      - description: 评论 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-int'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除评论（批量）
+      tags:
+      - Comment
+    get:
+      consumes:
+      - application/json
+      description: 根据条件查询评论列表
+      parameters:
+      - description: 昵称
+        in: query
+        name: nickname
+        type: string
+      - description: 审核状态
+        in: query
+        name: is_review
+        type: integer
+      - description: 评论类型
+        in: query
+        name: type
+        type: integer
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-model_CommentVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询评论列表
+      tags:
+      - Comment
+  /comment/review:
+    put:
+      consumes:
+      - application/json
+      description: 根据 ID 数组修改审核状态
+      parameters:
+      - description: 修改审核状态
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateReviewReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改评论审核（批量）
+      tags:
+      - Comment
+  /home:
+    get:
+      description: 获取博客首页信息
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-model_BlogHomeVO'
+      summary: 获取博客首页信息
+      tags:
+      - blog_info
+  /link:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除友链
+      parameters:
+      - description: 友链ID数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除友链（批量）
+      tags:
+      - Link
+    post:
+      consumes:
+      - application/json
+      description: 添加或修改友链
+      parameters:
+      - description: 添加或修改友链
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handler.AddOrEditLinkReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-model_FriendLink'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加或修改友链
+      tags:
+      - Link
+  /link/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据条件查询获取友链列表
+      parameters:
+      - description: 当前页数
+        in: query
+        name: page_size
+        type: integer
+      - description: 每页条数
+        in: query
+        name: page_num
+        type: integer
+      - description: 搜索关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-handler_PageResult-model_FriendLink'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取友链列表
+      tags:
+      - Link
   /login:
     post:
       consumes:
@@ -431,14 +1048,14 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/v2.LoginForm'
+          $ref: '#/definitions/handler.LoginReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-resp_LoginVO'
+            $ref: '#/definitions/handler.Response-model_LoginVO'
       summary: 登录
       tags:
       - UserAuth
@@ -485,7 +1102,9 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-v2_PageResult-array_model_Message'
+            $ref: '#/definitions/handler.Response-handler_PageResult-model_Message'
+      security:
+      - ApiKeyAuth: []
       summary: 条件查询留言列表
       tags:
       - Message
@@ -500,17 +1119,141 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/v2.UpdateReviewForm'
+          $ref: '#/definitions/handler.UpdateReviewReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-any'
+            $ref: '#/definitions/handler.Response-int'
+      security:
+      - ApiKeyAuth: []
       summary: 修改留言审核（批量）
       tags:
       - Message
+  /operation/log:
+    delete:
+      consumes:
+      - application/json
+      description: 删除操作日志
+      parameters:
+      - description: 操作日志ID列表
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-int'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除操作日志
+      tags:
+      - OperationLog
+  /operation/log/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据条件查询获取操作日志列表
+      parameters:
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-array_model_OperationLog'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取操作日志列表
+      tags:
+      - OperationLog
+  /page:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除页面
+      parameters:
+      - description: 页面 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-int'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除页面
+      tags:
+      - Page
+    post:
+      consumes:
+      - application/json
+      description: 添加或修改页面
+      parameters:
+      - description: 添加或修改页面
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handler.AddOrEditPageReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-model_Page'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加或修改页面
+      tags:
+      - Page
+  /page/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据条件查询获取页面列表
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-array_model_Page'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取页面列表
+      tags:
+      - Page
   /register:
     post:
       consumes:
@@ -522,7 +1265,7 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/v2.RegisterForm'
+          $ref: '#/definitions/handler.RegisterReq'
       produces:
       - application/json
       responses:
@@ -533,6 +1276,67 @@ paths:
       summary: 注册
       tags:
       - UserAuth
+  /report:
+    post:
+      consumes:
+      - application/json
+      description: 用户登进后台时上报信息
+      parameters:
+      - description: 用户信息
+        in: body
+        name: data
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-any'
+      summary: 上报用户信息
+      tags:
+      - blog_info
+  /role/list:
+    get:
+      description: 获取角色列表
+      parameters:
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      - description: 页码
+        in: query
+        name: pageNum
+        type: integer
+      - description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-handler_PageResult-model_RoleVO'
+      summary: 获取角色列表
+      tags:
+      - role
+  /role/option:
+    get:
+      description: 获取角色选项
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-model_OptionVO'
+      summary: 获取角色选项
+      tags:
+      - role
   /tag:
     delete:
       consumes:
@@ -553,7 +1357,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-any'
+            $ref: '#/definitions/handler.Response-int'
       security:
       - ApiKeyAuth: []
       summary: 删除标签（批量）
@@ -569,14 +1373,14 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/v2.AddOrEditTagForm'
+          $ref: '#/definitions/handler.AddOrEditTagReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-any'
+            $ref: '#/definitions/handler.Response-model_Tag'
       security:
       - ApiKeyAuth: []
       summary: 添加或修改标签
@@ -606,7 +1410,7 @@ paths:
         "0":
           description: 成功
           schema:
-            $ref: '#/definitions/r.Response-v2_PageResult-array_resp_TagVO'
+            $ref: '#/definitions/handler.Response-handler_PageResult-model_TagVO'
       security:
       - ApiKeyAuth: []
       summary: 获取标签列表
@@ -623,15 +1427,31 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/r.Response-resp_OptionVo'
+            $ref: '#/definitions/handler.Response-model_OptionVO'
       security:
       - ApiKeyAuth: []
       summary: 获取标签选项列表
       tags:
       - Tag
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+  /upload/file:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传文件
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.Response-string'
+      summary: 上传文件
+      tags:
+      - upload
 swagger: "2.0"

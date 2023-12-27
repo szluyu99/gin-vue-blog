@@ -25,7 +25,7 @@ onMounted(async () => {
 
 <template>
   <BannerPage :loading="loading" :title="`${route.meta?.title} - ${name}`" label="article_list">
-    <div class="grid grid-cols-12 gap-x-4 gap-y-2">
+    <div class="grid grid-cols-12 gap-4">
       <div v-for="article of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
         <!-- 卡片 -->
         <div class="animate-zoom-in animate-duration-650 rounded-xl bg-white pb-2 shadow-md transition-300 hover:shadow-2xl">
@@ -51,10 +51,10 @@ onMounted(async () => {
                   <span> {{ dayjs(article.created_at).format('YYYY-MM-DD') }} </span>
                 </span>
                 <!-- 分类 -->
-                <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`">
+                <RouterLink :to="`/categories/${article.category_id}?name=${article.category?.name}`">
                   <div class="flex items-center text-#4c4948 transition-300 hover:color-violet">
                     <span class="i-ic:outline-bookmark mr-1" />
-                    <span> {{ article.category.name }} </span>
+                    <span> {{ article.category?.name }} </span>
                   </div>
                 </RouterLink>
               </div>

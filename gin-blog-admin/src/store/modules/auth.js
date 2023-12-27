@@ -2,6 +2,7 @@ import { unref } from 'vue'
 import { defineStore } from 'pinia'
 import { usePermissionStore, useTagStore, useUserStore } from '@/store'
 import { resetRouter, router } from '@/router'
+import api from '@/api'
 
 export const useAuthStore = defineStore('auth', {
   persist: {
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
      * 主动退出登录
      */
     async logout() {
-      // await api.logout()
+      await api.logout()
       this.resetLoginState()
       this.toLogin()
       window.$message.success('您已经退出登录！')

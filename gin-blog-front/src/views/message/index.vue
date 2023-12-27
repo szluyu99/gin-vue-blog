@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import vueDanmaku from 'vue3-danmaku'
 
@@ -26,6 +26,7 @@ const danmus = ref([{
 
 onMounted(async () => {
   const resp = await api.getMessages()
+  await nextTick()
   danmus.value = [...danmus.value, ...resp.data]
 })
 

@@ -41,8 +41,8 @@ function formatDate(date) {
       <span class="px-2">|</span>
       <span class="i-mdi:update mr-1 text-lg" /> 更新于 {{ formatDate(article.updated_at) }}
       <span class="px-2">|</span>
-      <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`" class="f-c-c">
-        <span class="i-material-symbols:menu mr-1 text-lg" /> {{ article.category.name }}
+      <RouterLink :to="`/categories/${article.category?.id}?name=${article.category?.name}`" class="f-c-c">
+        <span class="i-material-symbols:menu mr-1 text-lg" /> {{ article.category?.name }}
       </RouterLink>
     </p>
     <div class="f-c-c">
@@ -67,8 +67,8 @@ function formatDate(date) {
     </div>
     <div class="flex gap-2">
       <div class="f-c-c">
-        <RouterLink :to="`/categories/${article.category.id}?name=${article.category.name}`">
-          <span class="i-material-symbols:menu mr-1" /> {{ article.category.name }}
+        <RouterLink :to="`/categories/${article.category?.id}?name=${article.category?.name}`">
+          <span class="i-material-symbols:menu mr-1" /> {{ article.category?.name }}
         </RouterLink>
       </div>
       <RouterLink v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">

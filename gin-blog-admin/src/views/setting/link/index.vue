@@ -16,7 +16,7 @@ defineOptions({ name: '友链管理' })
 
 const $table = ref(null)
 const queryItems = ref({
-  keyword: '',
+  keyword: '', // 友链名称 | 地址 | 介绍
 })
 
 const {
@@ -175,12 +175,12 @@ const columns = [
       :get-data="api.getLinks"
     >
       <template #queryBar>
-        <QueryItem label="友链名" :label-width="50">
+        <QueryItem label="友链名称 | 地址 | 介绍" :label-width="150">
           <NInput
             v-model:value="queryItems.keyword"
             clearable
             type="text"
-            placeholder="请输入友链名"
+            placeholder="搜索关键字"
             @keydown.enter="$table?.handleSearch()"
           />
         </QueryItem>

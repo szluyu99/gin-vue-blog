@@ -61,8 +61,21 @@ function tagType(type) {
 }
 
 const columns = [
-  { title: '资源名称', key: 'name', width: 80, ellipsis: { tooltip: true } },
-  { title: '资源路径', key: 'url', width: 100, ellipsis: { tooltip: true } },
+  {
+    title: '资源名称',
+    key: 'name',
+    width: 80,
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: '资源路径',
+    key: 'url',
+    width: 80,
+    ellipsis: { tooltip: true },
+    render(row) {
+      return row.children ? '-' : h('span', { class: 'color-[#1890ff]' }, row.url)
+    },
+  },
   {
     title: '请求方式',
     key: 'request_method',
@@ -70,7 +83,7 @@ const columns = [
     align: 'center',
     render(row) {
       return row.children
-        ? ''
+        ? '-'
         : h(
           NTag,
           { type: tagType(row.request_method) }, // 注意这里使用计算属性
@@ -86,14 +99,12 @@ const columns = [
     fixed: 'left',
     render(row) {
       return row.children
-        ? ''
+        ? '-'
         : h(NSwitch, {
           size: 'small',
           rubberBand: false,
           value: row.is_anonymous,
           loading: !!row.publishing, // 修改 ing 动画
-          checkedValue: 1,
-          uncheckedValue: 0,
           onUpdateValue: () => handleUpdateAnonymous(row),
         })
     },
@@ -162,13 +173,22 @@ const columns = [
 
 // 修改是否允许匿名访问
 async function handleUpdateAnonymous(row) {
-  if (!row.id)
+  if (!row.id) {
     return
+  }
   row.publishing = true
-  row.is_anonymous = row.is_anonymous === 0 ? 1 : 0
-  await api.updateResourceAnonymous(row)
-  row.publishing = false
-  $message?.success(row.is_anonymous ? '已允许匿名访问' : '已禁止匿名访问')
+  row.is_anonymous = !row.is_anonymous
+  try {
+    await api.updateResourceAnonymous(row)
+    $message?.success(row.is_anonymous ? '已允许匿名访问' : '已禁止匿名访问')
+  }
+  catch (err) {
+    row.is_anonymous = !row.is_anonymous
+    console.error(err)
+  }
+  finally {
+    row.publishing = false
+  }
 }
 
 // 模块相关

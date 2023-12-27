@@ -9,7 +9,7 @@ const categoryList = ref([])
 
 onMounted(async () => {
   const resp = await api.getCategorys()
-  categoryList.value = resp.data.list
+  categoryList.value = resp.data
   loading.value = false
 })
 </script>

@@ -53,15 +53,12 @@ async function handleLogin() {
     try {
       const resp = await api.login({ username, password })
       authStore.setToken(resp.data.token)
-      $message.success('登录成功')
 
-      await userStore.getUserInfo() // 获取用户信息
-
-      // "记住我" 功能
-      isRemember ? setLocal('loginInfo', { username, password }) : removeLocal('loginInfo')
-
-      // 动态添加路由
+      await userStore.getUserInfo()
       await addDynamicRoutes()
+
+      isRemember ? setLocal('loginInfo', { username, password }) : removeLocal('loginInfo')
+      $message.success('登录成功')
 
       // 页面跳转: 根据 URL 中的 redirect 进行跳转
       if (query.redirect) {

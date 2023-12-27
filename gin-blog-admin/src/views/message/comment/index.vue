@@ -18,19 +18,15 @@ onMounted(() => {
 })
 
 const $table = ref(null)
-// 条件查询参数
 const queryItems = ref({
   nickname: '',
   type: '',
 })
-// 额外参数
 const extraParams = ref({
-  is_review: null, // 评论状态: 0-审核中, 1-通过
+  is_review: null, // 评论状态: 审核中 | 通过
 })
 
-const {
-  handleDelete,
-} = useCRUD({
+const { handleDelete } = useCRUD({
   name: '评论',
   doDelete: api.deleteComments,
   refresh: () => $table.value?.handleSearch(),
@@ -41,26 +37,52 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 50,
+    width: 40,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 50,
+        'height': 40,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': convertImgUrl(row.avatar),
+        'src': convertImgUrl(row.user?.info?.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
     },
   },
-  { title: '评论人', key: 'nickname', width: 50, align: 'center', ellipsis: { tooltip: true } },
+  {
+    title: '评论人',
+    key: 'nickname',
+    width: 50,
+    align: 'center',
+    ellipsis: { tooltip: true },
+    render(row) {
+      return h('span', row.user?.info?.nickname || '无')
+    },
+  },
+  // TODO: 合理的显示评论的文章信息
+  {
+    title: '评论类型',
+    key: '',
+    width: 50,
+    align: 'center',
+    render(row) {
+      if (row.type === 1) { // 文章
+        return [
+          h(NTag, { type: 'info' }, { default: () => '文章' }),
+        ]
+      }
+      if (row.type === 2) { // 友链
+        return h(NTag, { type: 'success' }, { default: () => '友链' })
+      }
+    },
+  },
   {
     title: '回复对象',
     key: 'reply_nick_name',
     width: 50,
     align: 'center',
     render(row) {
-      return h('span', row.reply_nickname || '无')
+      return h('span', row.reply_user?.info?.nickname || '-')
     },
   },
   {
@@ -127,7 +149,7 @@ const columns = [
               size: 'small',
               type: 'warning',
               style: 'margin-left: 15px;',
-              onClick: () => handleUpdateReview([row.id], 0),
+              onClick: () => handleUpdateReview([row.id], false),
             },
             {
               default: () => '撤下',
@@ -140,7 +162,7 @@ const columns = [
               size: 'small',
               type: 'success',
               style: 'margin-left: 15px;',
-              onClick: () => handleUpdateReview([row.id], 1),
+              onClick: () => handleUpdateReview([row.id], true),
             },
             {
               default: () => '通过',
@@ -165,13 +187,13 @@ const columns = [
   },
 ]
 
-// 修改评论审核: is_review 0-撤下审核, 1-通过审核
+// 修改评论审核
 async function handleUpdateReview(ids, is_review) {
   if (!ids.length) {
     window.$message.info('请选择要审核的数据')
     return
   }
-  await api.updateCommentReview({ ids, is_review })
+  await api.updateCommentReview(ids, is_review)
   window.$message?.success(is_review ? '审核成功' : '撤下成功')
   $table.value?.handleSearch()
 }
@@ -183,10 +205,10 @@ function handleChangeTab(value) {
       extraParams.value.is_review = null
       break
     case 'has_review': // 通过
-      extraParams.value.is_review = 1
+      extraParams.value.is_review = true
       break
     case 'not_review': // 审核中
-      extraParams.value.is_review = 0
+      extraParams.value.is_review = false
       break
   }
   $table.value?.handleSearch()
@@ -209,7 +231,7 @@ function handleChangeTab(value) {
       <NButton
         type="success"
         :disabled="!$table?.selections.length"
-        @click="handleUpdateReview($table.selections, 1)"
+        @click="handleUpdateReview($table.selections, true)"
       >
         <template #icon>
           <span class="i-ic:outline-approval" />
@@ -217,7 +239,6 @@ function handleChangeTab(value) {
         批量通过
       </NButton>
     </template>
-    <!-- 标签栏 -->
     <NTabs
       type="line"
       animated
@@ -230,7 +251,6 @@ function handleChangeTab(value) {
       <NTabPane name="has_review" tab="通过" />
       <NTabPane name="not_review" tab="审核中" />
     </NTabs>
-    <!-- 表格 -->
     <CrudTable
       ref="$table"
       v-model:query-items="queryItems"
@@ -252,7 +272,7 @@ function handleChangeTab(value) {
           <NSelect
             v-model:value="queryItems.type"
             clearable
-            filterable
+            filterablec
             placeholder="请选择评论来源"
             :options="commentTypeOptions"
             @update:value="$table?.handleSearch()"

@@ -1,6 +1,6 @@
 <script setup>
 import { h, onMounted, ref } from 'vue'
-import { NButton, NForm, NFormItem, NInput, NInputNumber, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch } from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NInputNumber, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch, NTag } from 'naive-ui'
 
 import CommonPage from '@/components/common/CommonPage.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
@@ -20,10 +20,19 @@ const queryItems = ref({
   keyword: '',
 })
 
-// 表单初始化内容
 const initForm = {
   order_num: 1,
-  is_hidden: 0,
+  is_hidden: false, // 是否隐藏
+  is_catalogue: false, // 是否目录
+  is_external: false, // 是否外链
+  keep_alive: false,
+  icon: 'mdi-account',
+  order_num: 1,
+  name: '',
+  path: '',
+  redirect: '',
+  component: '',
+  parent_id: 0,
 }
 
 const {
@@ -49,11 +58,47 @@ onMounted(() => {
   $table.value?.handleSearch()
 })
 
-// 是否展示 "菜单类型"
-const showMenuType = ref(false)
-
 const columns = [
-  { title: '菜单名称', key: 'name', width: 80, ellipsis: { tooltip: true } },
+  {
+    title: '菜单名称',
+    key: 'name',
+    width: 100,
+    render: (row) => {
+      const groups = []
+      groups.push(h('span', row.name))
+
+      if (row.parent_id === 0) {
+        groups.push(
+          h(
+            NTag,
+            { type: row.is_catalogue ? 'info' : 'success', class: 'ml-1.5' },
+            { default: () => row.is_catalogue ? '目录' : '一级菜单' },
+          ),
+        )
+      }
+      else {
+        groups.push(
+          h(
+            NTag,
+            { type: 'default', class: 'ml-1.5' },
+            { default: () => '子菜单' },
+          ),
+        )
+      }
+
+      if (row.is_external) {
+        groups.push(
+          h(
+            NTag,
+            { type: 'warning', class: 'ml-1.5' },
+            { default: () => '外链' },
+          ),
+        )
+      }
+
+      return groups
+    },
+  },
   {
     title: '图标',
     key: 'icon',
@@ -64,15 +109,41 @@ const columns = [
   },
   { title: '排序', key: 'order_num', width: 30, ellipsis: { tooltip: true } },
   { title: '访问路径', key: 'path', width: 60, ellipsis: { tooltip: true } },
-  { title: '跳转路径', key: 'redirect', width: 80, ellipsis: { tooltip: true } },
-  { title: '组件路径', key: 'component', width: 80, ellipsis: { tooltip: true } },
+  {
+    title: '跳转路径',
+    key: 'redirect',
+    width: 80,
+    render(row) {
+      if (row.parent_id === 0 && !row.is_catalogue) {
+        return h('span', row.redirect)
+      }
+      return h('span', '-')
+    },
+  },
+  {
+    title: '组件路径',
+    key: 'component',
+    width: 80,
+    render(row) {
+      if (!row.is_catalogue) {
+        return h('span', row.component)
+      }
+      return h('span', '-')
+    },
+  },
   {
     title: '保活',
     key: 'keep_alive',
     width: 30,
     fixed: 'left',
     render(row) {
-      return h('span', row.keep_alive === 1)
+      return h(NSwitch, {
+        size: 'small',
+        rubberBand: false,
+        value: row.keep_alive,
+        loading: !!row.publishing,
+        onUpdateValue: () => handleUpdateKeepAlive(row),
+      })
     },
   },
   {
@@ -85,19 +156,17 @@ const columns = [
         size: 'small',
         rubberBand: false,
         value: row.is_hidden,
-        loading: !!row.publishing, // 修改 ing 动画
-        checkedValue: 1,
-        uncheckedValue: 0,
+        loading: !!row.publishing,
         onUpdateValue: () => handleUpdateHidden(row),
       })
     },
   },
   {
-    title: '创建日期',
-    key: 'created_at',
+    title: '更新日期',
+    key: 'updated_at',
     width: 70,
     render(row) {
-      return h('span', formatDate(row.created_at))
+      return h('span', formatDate(row.updated_at))
     },
   },
   {
@@ -114,12 +183,10 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'primary',
-            style: `display: ${row.children ? '' : 'none'};`,
+            style: `display: ${!row.is_catalogue ? '' : 'none'};`,
             onClick: () => {
-              initForm.is_catalogue = false // 设置非目录(显示组件路径)
               initForm.component = '' // 手动清空组件路径
               initForm.parent_id = row.id // 设置父菜单id
-              showMenuType.value = false
               handleAdd()
             },
           },
@@ -132,7 +199,6 @@ const columns = [
             quaternary: true,
             type: 'info',
             onClick: () => {
-              showMenuType.value = false
               handleEdit(row)
             },
           },
@@ -147,11 +213,7 @@ const columns = [
             trigger: () =>
               h(
                 NButton,
-                {
-                  size: 'tiny',
-                  quaternary: true,
-                  type: 'error',
-                },
+                { size: 'tiny', quaternary: true, type: 'error' },
                 {
                   default: () => '删除',
                   icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
@@ -165,20 +227,46 @@ const columns = [
   },
 ]
 
-// 修改是否隐藏
-async function handleUpdateHidden(row) {
-  if (row.id) {
-    row.publishing = true
-    row.is_hidden = (row.is_hidden === 0 ? 1 : 0)
+async function handleUpdateKeepAlive(row) {
+  if (!row.id) {
+    return
+  }
+  row.publishing = true
+  row.keep_alive = !row.keep_alive
+  try {
     await api.saveOrUpdateMenu(row)
+    $message?.success(row.keep_alive ? '已保活' : '已取消保活')
+  }
+  catch (err) {
+    row.keep_alive = !row.keep_alive
+    console.error(err)
+  }
+  finally {
     row.publishing = false
+  }
+}
+
+async function handleUpdateHidden(row) {
+  if (!row.id) {
+    return
+  }
+  row.publishing = true
+  row.is_hidden = !row.is_hidden
+  try {
+    await api.saveOrUpdateMenu(row)
     $message?.success(row.is_hidden ? '已隐藏' : '已取消隐藏')
+  }
+  catch (err) {
+    row.is_hidden = !row.is_hidden
+    console.error(err)
+  }
+  finally {
+    row.publishing = false
   }
 }
 
 // 新增菜单(可选目录)
 function handleClickAdd() {
-  showMenuType.value = true
   initForm.is_catalogue = true // 默认选中"目录"
   initForm.component = 'Layout' // 目录必须是 "Layout", 一级菜单可以是 "Layout"
   initForm.parent_id = 0 // 目录和一级菜单的父id是 0
@@ -231,7 +319,7 @@ function handleClickAdd() {
         :label-width="80"
         :model="modalForm"
       >
-        <NFormItem v-if="showMenuType" label="菜单类型" path="type">
+        <NFormItem v-if="modalForm.parent_id === 0" label="菜单类型" path="type">
           <NRadioGroup v-model:value="modalForm.is_catalogue" name="radiogroup">
             <NSpace>
               <NRadio :value="true">
@@ -255,7 +343,7 @@ function handleClickAdd() {
         <NFormItem label="访问路径" path="path">
           <NInput v-model:value="modalForm.path" placeholder="请输入访问路径" />
         </NFormItem>
-        <NFormItem label="跳转路径" path="redirect">
+        <NFormItem v-if="!modalForm.is_catalogue" label="跳转路径" path="redirect">
           <NInput
             v-model:value="modalForm.redirect"
             :disabled="modalForm.parent_id !== 0"
@@ -266,10 +354,13 @@ function handleClickAdd() {
           <NInputNumber v-model:value="modalForm.order_num" />
         </NFormItem>
         <NFormItem label="是否隐藏" path="is_hidden">
-          <NSwitch v-model:value="modalForm.is_hidden" :checked-value="1" :unchecked-value="0" />
+          <NSwitch v-model:value="modalForm.is_hidden" />
+        </NFormItem>
+        <NFormItem label="是否外链" path="is_external">
+          <NSwitch v-model:value="modalForm.is_external" />
         </NFormItem>
         <NFormItem label="KeepAlive" path="keep_alive">
-          <NSwitch v-model:value="modalForm.keep_alive" :checked-value="1" :unchecked-value="0" />
+          <NSwitch v-model:value="modalForm.keep_alive" />
         </NFormItem>
       </NForm>
     </CrudModal>

@@ -1,14 +1,14 @@
-import { request } from '@/utils/http'
+import { baseRequest, request } from '@/utils/http'
 
 export default {
-  login: (data = {}) => request.post('/login', data),
-  register: (data = {}) => request.post('/register', data),
-  logout: () => request.get('/logout'),
-  about: () => request.get('/about'),
-
+  login: (data = {}) => baseRequest.post('/login', data),
+  register: (data = {}) => baseRequest.post('/register', data),
+  logout: () => baseRequest.get('/logout'),
   /** 发送验证码 */
-  sendCode: params => request.get('/code', { params }),
+  sendCode: params => baseRequest.get('/code', { params }),
 
+  /** 关于我 */
+  about: () => request.get('/about'),
   /** 首页数据 */
   getHomeData: () => request.get('/home'),
   /** 首页文章列表 */

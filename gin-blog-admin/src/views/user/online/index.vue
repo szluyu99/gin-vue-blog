@@ -89,7 +89,7 @@ const columns = [
         NButton,
         { size: 'small', type: 'text', ghost: true },
         {
-          default: () => formatDate(row.last_login_time),
+          default: () => formatDate(row.last_login_time, 'YYYY-MM-DD HH:mm:ss'),
           icon: () => h('i', { class: 'i-mdi:update' }),
         },
       )

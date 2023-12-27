@@ -18,24 +18,27 @@ const isActive = computed(() => i => (i === current.value))
 // 上一页
 function prePage() {
   current.value -= 1
-  emit('changeCurrent', current, index, commentId)
+  emit('changeCurrent', current.value, index, commentId)
 }
 // 下一页
 function nextPage() {
   current.value += 1
-  emit('changeCurrent', current, index, commentId)
+  emit('changeCurrent', current.value, index, commentId)
 }
 // 跳转指定页数
 function changeCurrent(i) {
   current.value = i
-  emit('changeCurrent', current, index, commentId)
+  emit('changeCurrent', current.value, index, commentId)
 }
 
 function setShow(flag) {
   show.value = flag
 }
 
-defineExpose({ current, setShow })
+defineExpose({
+  current,
+  setShow,
+})
 </script>
 
 <template>

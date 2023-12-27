@@ -42,8 +42,8 @@ const isRightClass = computed(() => props.idx % 2 === 0
         </span>
         <span class="mx-1.5">|</span>
         <!-- 分类 -->
-        <RouterLink :to="`/categories/${article.category_id}?name=${article.category.name}`" class="flex items-center">
-          <span class="i-mdi-inbox-full mr-1" /> {{ article.category.name }}
+        <RouterLink :to="`/categories/${article.category_id}?name=${article.category?.name}`" class="flex items-center">
+          <span class="i-mdi-inbox-full mr-1" /> {{ article.category?.name }}
         </RouterLink>
         <span class="mx-1.5">|</span>
         <!-- 标签 -->

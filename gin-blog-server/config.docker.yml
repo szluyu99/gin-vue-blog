@@ -1,0 +1,52 @@
+Server:
+  Mode: release # debug | release
+  Port: :8765
+  DbType: "mysql" # mysql | sqlite
+JWT:
+  Secret: "abc123321"
+  Expire: 24 # hour
+  Issuer: "gin-vue-blog"
+Mysql:
+  Host: "127.0.0.1"
+  Port: "3306"
+  Config: ""         # 其他配置, 例如时区
+  Dbname: "gvb"      # 数据库名称
+  Username: "root"
+  Password: "123456" # 数据库密码
+  LogMode: "error"   # 日志级别 silent, error, warn, info, 默认 info
+Sqlite:
+  Dsn: "test.db"
+Redis:
+  DB: 7
+  Addr: '127.0.0.1:6379'
+  Password: ''
+Session:
+  Name: "mysession"
+  Salt: "salt"
+  MaxAge: 600 # second
+Log:
+  Level: "error" # debug | info | warn | error
+  Format: "text" # text | json
+  Directory: "log"
+Email:
+  Host: "smtp.163.com"       # 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
+  Port: 465                  # 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
+  From: ""                   # 发件人 (邮箱)
+  IsSSL: true                # 是否开启 SSL
+  Secret: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
+  Nickname: ""           # 发件人昵称, 通常为自己的邮箱名
+Captcha:
+  SendEmail: true # 通过邮箱发送验证码
+  ExpireTime: 15  # 过期时间 (分钟)
+Upload:
+  OssType: "local" # local | qiniu
+  Path: "public/uploaded"      # 本地文件访问路径 (OssType="local" 才生效)
+  StorePath: "public/uploaded" # 本地文件上传路径 (OssType="local" 才生效)
+Qiniu:
+  ImgPath: ""          # 外链
+  Zone: ""
+  Bucket: ""
+  AccessKey: ""
+  SecretKey: ""
+  UseHttps: false      # 是否使用 https 加速
+  UseCdnDomains: false # 上传是否使用 CDN 上传加速

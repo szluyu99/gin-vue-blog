@@ -28,13 +28,7 @@ const props = defineProps({
   },
   /**
    * TODO: 如果想要同时有 url 和 body, 怎么处理
-   * ! 约定接口入参出参
-   * 分页模式需约定分页接口入参
-   *    @param {number} pageSize 分页参数: 一页展示多少条，默认 10
-   *    @param {number} pageNum  分页参数: 页码，默认 1
-   * 需约定接口出参
-   *    @param {number} pageData 分页模式必须, 非分页模式如果没有 pageData 则取上一层 data
-   *    @param {number} total    分页模式必须，非分页模式如果没有 total 则取上一层 data.length
+   * 获取数据的请求 API
    */
   getData: {
     type: Function,
@@ -87,7 +81,7 @@ async function handleQuery() {
       ...props.extraParams,
       ...paginationParams,
     })
-    tableData.value = data?.pageData || data
+    tableData.value = data?.page_data || data
     pagination.itemCount = data?.total ?? data.length
   }
   catch (error) {
@@ -148,6 +142,7 @@ function handleExport(columns = props.columns, data = tableData.value) {
 }
 
 defineExpose({
+  handleQuery,
   handleSearch,
   handleReset,
   handleExport,

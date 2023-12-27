@@ -45,8 +45,8 @@ const menuOption = ref([]) // 菜单选项
 
 onMounted(() => {
   $table.value?.handleSearch()
-  api.getResourceOption().then(res => (resourceOption.value = res.data))
-  api.getMenuOption().then(res => (menuOption.value = res.data))
+  // api.getResourceOption().then(res => (resourceOption.value = res.data))
+  // api.getMenuOption().then(res => (menuOption.value = res.data))
 })
 
 const columns = [
@@ -112,9 +112,9 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'info',
-            onClick: () => {
+            onClick: async () => {
               showMenu.value = true
-              api.getMenuOption().then(res => (menuOption.value = res.data))
+              await api.getMenuOption().then(resp => (menuOption.value = resp.data))
               handleEdit(row)
             },
           },
@@ -129,9 +129,9 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'info',
-            onClick: () => {
+            onClick: async () => {
               showMenu.value = false
-              api.getResourceOption().then(res => (resourceOption.value = res.data))
+              await api.getResourceOption().then(resp => (resourceOption.value = resp.data))
               handleEdit(row)
             },
           },
@@ -229,24 +229,27 @@ const columns = [
         <NFormItem label="角色标签" path="name">
           <NInput v-model:value="modalForm.label" placeholder="请输入角色标签" />
         </NFormItem>
-        <NFormItem v-if="showMenu" label="菜单权限" path="menu_ids">
-          <NTree
-            :data="menuOption"
-            :checked-keys="modalForm.menu_ids"
+        <!-- TODO: 新增时可以选择菜单和资源权限 -->
+        <template v-if="modalAction === 'edit'">
+          <NFormItem v-if="showMenu" label="菜单权限" path="menu_ids">
+            <NTree
+              :data="menuOption"
+              :checked-keys="modalForm.menu_ids"
 
-            checkable expand-on-click block-line
-            @update:checked-keys="(v) => (modalForm.menu_ids = v)"
-          />
-        </NFormItem>
-        <NFormItem v-else label="资源权限" path="resource_ids">
-          <NTree
-            :data="resourceOption"
-            :checked-keys="modalForm.resource_ids"
+              checkable expand-on-click block-line
+              @update:checked-keys="(v) => (modalForm.menu_ids = v)"
+            />
+          </NFormItem>
+          <NFormItem v-else label="资源权限" path="resource_ids">
+            <NTree
+              :data="resourceOption"
+              :checked-keys="modalForm.resource_ids"
 
-            block-line checkable expand-on-click cascade accordion
-            @update:checked-keys="(v) => (modalForm.resource_ids = v)"
-          />
-        </NFormItem>
+              block-line checkable expand-on-click cascade accordion
+              @update:checked-keys="(v) => (modalForm.resource_ids = v)"
+            />
+          </NFormItem>
+        </template>
       </NForm>
     </CrudModal>
   </CommonPage>
