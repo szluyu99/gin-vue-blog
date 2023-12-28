@@ -16,50 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// 资源访问权限验证
-func PermissionCheck() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.GetBool("skip_check") {
-			slog.Debug("[middleware-PermissionCheck] skip check permission!")
-			c.Next()
-			return
-		}
-
-		db := c.MustGet(g.CTX_DB).(*gorm.DB)
-
-		auth, err := handle.CurrentUserAuth(c)
-		if err != nil {
-			handle.ReturnError(c, g.ERROR_USER_NOT_EXIST, err)
-			return
-		}
-
-		if auth.IsSuper {
-			slog.Debug("[middleware-PermissionCheck]: super admin no need to check, pass!")
-			c.Next()
-			return
-		}
-
-		url := c.FullPath()[4:]
-		method := c.Request.Method
-
-		slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v, %v, %v\n", auth.Username, url, method))
-		for _, role := range auth.Roles {
-			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
-			if err != nil {
-				handle.ReturnError(c, g.ERROR_DB_OPERATION, err)
-				return
-			}
-			if !pass {
-				handle.ReturnError(c, g.ERROR_PERMISSION_DENIED, nil)
-				return
-			}
-		}
-
-		slog.Debug("[middleware-PermissionCheck]: pass")
-		c.Next()
-	}
-}
-
 // 基于 JWT 的授权
 // 如果存在 session, 则直接从 session 中获取用户信息
 // 如果不存在 session, 则从 Authorization 中获取 token, 并解析 token 获取用户信息, 并设置到 session 中
@@ -78,10 +34,12 @@ func JWTAuth() gin.HandlerFunc {
 		db := c.MustGet(g.CTX_DB).(*gorm.DB)
 
 		// 系统管理的资源需要做验证, 没有加进来的不需要
-		resource, err := model.GetResource(db, c.FullPath()[4:], c.Request.Method)
+		url, method := c.FullPath()[4:], c.Request.Method
+		resource, err := model.GetResource(db, url, method)
 		if err != nil {
 			// 没有找到的资源, 直接跳过后续验证
 			if errors.Is(err, gorm.ErrRecordNotFound) {
+				slog.Debug("[middleware-JWTAuth] resource not exist, skip jwt auth")
 				c.Set("skip_check", true)
 				c.Next()
 				c.Set("skip_check", false)
@@ -93,6 +51,7 @@ func JWTAuth() gin.HandlerFunc {
 
 		// 匿名资源, 直接跳过后续验证
 		if resource.Anonymous {
+			slog.Debug(fmt.Sprintf("[middleware-JWTAuth] resource: %s %s is anonymous, skip jwt auth!", url, method))
 			c.Set("skip_check", true)
 			c.Next()
 			c.Set("skip_check", false)
@@ -137,5 +96,47 @@ func JWTAuth() gin.HandlerFunc {
 
 		// gin context
 		c.Set(g.CTX_USER_AUTH, user)
+	}
+}
+
+// 资源访问权限验证
+func PermissionCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.GetBool("skip_check") {
+			c.Next()
+			return
+		}
+
+		db := c.MustGet(g.CTX_DB).(*gorm.DB)
+		auth, err := handle.CurrentUserAuth(c)
+		if err != nil {
+			handle.ReturnError(c, g.ERROR_USER_NOT_EXIST, err)
+			return
+		}
+
+		if auth.IsSuper {
+			slog.Debug("[middleware-PermissionCheck]: super admin no need to check, pass!")
+			c.Next()
+			return
+		}
+
+		url := c.FullPath()[4:]
+		method := c.Request.Method
+
+		slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v, %v, %v\n", auth.Username, url, method))
+		for _, role := range auth.Roles {
+			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
+			if err != nil {
+				handle.ReturnError(c, g.ERROR_DB_OPERATION, err)
+				return
+			}
+			if !pass {
+				handle.ReturnError(c, g.ERROR_PERMISSION_DENIED, nil)
+				return
+			}
+		}
+
+		slog.Debug("[middleware-PermissionCheck]: pass")
+		c.Next()
 	}
 }

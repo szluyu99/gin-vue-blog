@@ -59,9 +59,12 @@ type User struct{}
 func (*User) GetInfo(c *gin.Context) {
 	rdb := GetRDB(c)
 
-	user, _ := CurrentUserAuth(c)
+	user, err := CurrentUserAuth(c)
+	if err != nil {
+		ReturnError(c, g.ERROR_TOKEN_RUNTIME, err)
+		return
+	}
 
-	var err error
 	userInfoVO := model.UserInfoVO{UserInfo: *user.UserInfo}
 	userInfoVO.ArticleLikeSet, err = rdb.SMembers(ctx(), g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
 	if err != nil {

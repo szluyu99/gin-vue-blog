@@ -79,7 +79,6 @@ func main() {
 		log.Printf("Serving HTTP on (http://%s/) ... \n", serverAddr)
 	}
 	r.Run(serverAddr)
-
 }
 
 // 根据配置文件初始化 slog 日志
@@ -267,9 +266,9 @@ func generateConfigs(db *gorm.DB) {
 		{Key: "qq", Value: "123456789", Desc: "QQ"},
 		{Key: "github", Value: "https://github.com/szluyu99", Desc: "github"},
 		{Key: "gitee", Value: "https://gitee.com/szluyu99", Desc: "gitee"},
-		{Key: "tourist_avatar", Value: "https://cdn.hahacode.cn/16815451239215dc82548dcadcd578a5bbc8d5deaa.jpg", Desc: "默认游客头像"},
-		{Key: "user_avatar", Value: "https://cdn.hahacode.cn/2299fc4d14c94e6183b082973b35855d.png", Desc: "默认用户头像"},
-		{Key: "article_cover", Value: "https://cdn.hahacode.cn/1679461519cc592408198d67faf1290ff8969dc614.png", Desc: "默认文章封面"},
+		{Key: "tourist_avatar", Value: "https://cdn.hahacode.cn/config/tourist_avatar.png", Desc: "默认游客头像"},
+		{Key: "user_avatar", Value: "https://cdn.hahacode.cn/config/user_avatar.png", Desc: "默认用户头像"},
+		{Key: "article_cover", Value: "https://cdn.hahacode.cn/config/default_article_cover.png", Desc: "默认文章封面"},
 		{Key: "is_comment_review", Value: "true", Desc: "评论默认审核"},
 		{Key: "is_message_review", Value: "true", Desc: "留言默认审核"},
 	}
