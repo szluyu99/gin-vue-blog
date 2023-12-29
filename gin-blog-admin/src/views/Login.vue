@@ -90,7 +90,8 @@ async function handleLogin() {
 </script>
 
 <template>
-  <AppPage class="bg-cover" :style="{ backgroundImage: 'url(/image/login_bg.webp)' }">
+  <!-- FIXME: 使用 style="background-image: url(/image/login_bg.webp);" 不生效, 需要写到 style 里的 class 中 -->
+  <AppPage class="backgroundImg bg-cover">
     <div style="transform: translateY(25px)" class="m-auto max-w-[700px] min-w-[345px] flex items-center justify-center rounded-2 bg-white bg-opacity-60 p-4 shadow">
       <div class="hidden w-[380px] px-5 py-9 md:block">
         <img src="/image/login_banner.webp" class="w-full" alt="login_banner">
@@ -134,3 +135,9 @@ async function handleLogin() {
     </div>
   </AppPage>
 </template>
+
+<style scoped>
+.backgroundImg{
+  background-image: url(/image/login_bg.webp);
+}
+</style>

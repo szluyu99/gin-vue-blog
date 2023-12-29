@@ -53,9 +53,7 @@ watchThrottled(y, () => {
 }, { throttle: 100 })
 
 async function logout() {
-  await api.logout()
-  userStore.resetLoginState()
-  // 如果在个人信息页登出则回到首页
+  await userStore.logout()
   if (route.name === 'User') {
     router.push('/')
   }

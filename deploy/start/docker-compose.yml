@@ -48,7 +48,6 @@ services:
         condition: service_started
     volumes:
       - ${DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
-      # - ${DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
     environment:
       # 以下环境变量会覆盖后端源码中 config.docker.yml 中的配置
       - TZ=Asia/Shanghai

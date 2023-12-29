@@ -11,7 +11,7 @@
  Target Server Version : 80031
  File Encoding         : 65001
 
- Date: 28/12/2023 17:10:22
+ Date: 29/12/2023 23:17:19
 */
 
 SET NAMES utf8mb4;
@@ -40,7 +40,7 @@ CREATE TABLE `article`  (
   `category_id` bigint NULL DEFAULT NULL,
   `user_id` bigint NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of article
@@ -79,7 +79,7 @@ CREATE TABLE `category`  (
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of category
@@ -105,7 +105,7 @@ CREATE TABLE `comment`  (
   `type` tinyint(1) NOT NULL COMMENT '评论类型(1.文章 2.友链 3.说说)',
   `is_review` tinyint(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of comment
@@ -125,7 +125,7 @@ CREATE TABLE `config`  (
   `desc` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `key`(`key` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of config
@@ -160,7 +160,7 @@ CREATE TABLE `friend_link`  (
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `intro` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of friend_link
@@ -187,7 +187,7 @@ CREATE TABLE `menu`  (
   `external` tinyint(1) NULL DEFAULT NULL,
   `external_link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 49 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of menu
@@ -237,7 +237,7 @@ CREATE TABLE `message`  (
   `speed` tinyint(1) NULL DEFAULT NULL COMMENT '弹幕速度',
   `is_review` tinyint(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -264,7 +264,7 @@ CREATE TABLE `operation_log`  (
   `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '操作IP',
   `ip_source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '操作地址',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of operation_log
@@ -284,7 +284,7 @@ CREATE TABLE `page`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name` ASC) USING BTREE,
   UNIQUE INDEX `label`(`label` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of page
@@ -315,7 +315,7 @@ CREATE TABLE `resource`  (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `anonymous` tinyint(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 117 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of resource
@@ -407,13 +407,13 @@ CREATE TABLE `role`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name` ASC) USING BTREE,
   UNIQUE INDEX `label`(`label` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of role
 -- ----------------------------
 INSERT INTO `role` VALUES (1, '2023-12-27 23:16:38.105', '2023-12-27 23:34:10.830', '管理员', 'admin', 0);
-INSERT INTO `role` VALUES (2, '2023-12-27 23:16:50.687', '2023-12-27 23:36:03.065', '普通用户', 'user', 0);
+INSERT INTO `role` VALUES (2, '2023-12-27 23:16:50.687', '2023-12-29 23:13:46.460', '普通用户', 'user', 0);
 INSERT INTO `role` VALUES (3, '2023-12-27 23:17:00.263', '2023-12-27 23:38:15.697', 'test', '测试用户', 0);
 
 -- ----------------------------
@@ -631,6 +631,7 @@ INSERT INTO `role_resource` VALUES (92, 2);
 INSERT INTO `role_resource` VALUES (92, 3);
 INSERT INTO `role_resource` VALUES (93, 1);
 INSERT INTO `role_resource` VALUES (95, 1);
+INSERT INTO `role_resource` VALUES (95, 2);
 INSERT INTO `role_resource` VALUES (95, 3);
 INSERT INTO `role_resource` VALUES (98, 1);
 INSERT INTO `role_resource` VALUES (99, 1);
@@ -660,7 +661,7 @@ CREATE TABLE `tag`  (
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of tag
@@ -688,14 +689,14 @@ CREATE TABLE `user_auth`  (
   `user_info_id` bigint NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_auth
 -- ----------------------------
-INSERT INTO `user_auth` VALUES (1, '2023-12-27 22:40:42.565', '2023-12-28 17:00:26.917', 'superadmin', '$2a$10$R1kus4SbUJ5QzAgcUuxrbOhv10j.CaVtUdmRbZ17C2552frAj7opW', 1, '172.18.45.12', '内网IP', '2023-12-28 17:00:26.917', 0, 1, 1);
+INSERT INTO `user_auth` VALUES (1, '2023-12-27 22:40:42.565', '2023-12-29 23:13:11.500', 'superadmin', '$2a$10$R1kus4SbUJ5QzAgcUuxrbOhv10j.CaVtUdmRbZ17C2552frAj7opW', 1, '172.18.45.12', '内网IP', '2023-12-29 23:13:11.500', 0, 1, 1);
 INSERT INTO `user_auth` VALUES (2, '2022-10-31 21:54:11.040', '2023-12-27 23:44:06.416', 'admin', '$2a$10$urGRaFQoLoblBUUdgi1NCei3oGnCHJwtHFmVcIfC94135KdNffy4.', 1, '172.18.45.12', '内网IP', '2023-12-27 23:44:06.416', 0, 0, 2);
-INSERT INTO `user_auth` VALUES (3, '2022-11-01 10:41:13.300', '2023-12-28 00:01:37.721', 'test@qq.com', '$2a$10$FmU4jxwDlibSL9pdt.AsuODkbB4gLp3IyyXeoMmW/XALtT/HdwTsi', 1, '172.18.45.12', '内网IP', '2023-12-28 00:01:37.721', 0, 0, 3);
+INSERT INTO `user_auth` VALUES (3, '2022-11-01 10:41:13.300', '2023-12-29 23:04:48.284', 'test@qq.com', '$2a$10$FmU4jxwDlibSL9pdt.AsuODkbB4gLp3IyyXeoMmW/XALtT/HdwTsi', 1, '172.18.45.12', '内网IP', '2023-12-29 23:04:48.284', 0, 0, 3);
 INSERT INTO `user_auth` VALUES (4, '2022-10-19 22:31:26.805', '2023-12-26 21:10:35.334', 'user', '$2a$10$9vHpoeT7sF4j9beiZfPsOe0jJ67gOceO2WKJzJtHRZCjNJajl7Fhq', 1, '172.12.0.6:48716', '', '2022-12-24 12:13:52.494', 0, 0, 4);
 
 -- ----------------------------
@@ -730,7 +731,7 @@ CREATE TABLE `user_info`  (
   `website` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `nickname`(`nickname` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_info

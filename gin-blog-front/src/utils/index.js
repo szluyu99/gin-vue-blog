@@ -1,7 +1,7 @@
 // 相对图片地址 => 完整的图片路径, 用于本地文件上传
 // - 如果包含 http 说明是 Web 图片资源
 // - 否则是服务器上的图片，需要拼接服务器路径
-const SERVER_URL = import.meta.env.VITE_SERVER_URL
+const SERVER_URL = import.meta.env.VITE_BACKEND_URL
 
 /**
  * 将相对地址转换为完整的图片路径

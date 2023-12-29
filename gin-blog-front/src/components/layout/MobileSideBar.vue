@@ -25,8 +25,7 @@ const menuOptions = [
 ]
 
 async function logout() {
-  await api.logout()
-  userStore.resetLoginState()
+  await userStore.logout()
   if (route.name === 'User') { // 如果在个人信息页登出则回到首页
     router.push('/')
   }

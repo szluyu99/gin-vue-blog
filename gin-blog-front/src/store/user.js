@@ -37,11 +37,14 @@ export const useUserStore = defineStore('user', {
     resetLoginState() {
       this.$reset()
     },
+    async logout() {
+      await api.logout()
+      this.$reset()
+    },
     async getUserInfo() {
       if (!this.token) {
         return
       }
-
       try {
         const resp = await api.getUser()
         if (resp.code === 0) {
@@ -56,7 +59,6 @@ export const useUserStore = defineStore('user', {
             articleLikeSet: data.article_like_set.map(e => +e),
             commentLikeSet: data.comment_like_set.map(e => +e),
           }
-
           return Promise.resolve(resp.data)
         }
         else {

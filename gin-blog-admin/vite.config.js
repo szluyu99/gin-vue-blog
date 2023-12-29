@@ -37,8 +37,8 @@ export default defineConfig((configEnv) => {
     build: {
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
     },
-    // esbuild: {
-    //   drop: ['console', 'debugger'],
-    // },
+    esbuild: {
+      drop: ['debugger'], // console
+    },
   }
 })
