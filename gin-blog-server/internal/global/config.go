@@ -11,9 +11,11 @@ import (
 
 type Config struct {
 	Server struct {
-		Mode   string // debug | release
-		Port   string
-		DbType string // mysql | sqlite
+		Mode          string // debug | release
+		Port          string
+		DbType        string // mysql | sqlite
+		DbAutoMigrate bool   // 是否自动迁移数据库表结构
+		DbLogMode     string // silent | error | warn | info
 	}
 	Log struct {
 		Level     string // debug | info | warn | error
@@ -33,7 +35,6 @@ type Config struct {
 		Dbname   string // 数据库名
 		Username string // 数据库用户名
 		Password string // 数据库密码
-		LogMode  string // 日志级别
 	}
 	SQLite struct {
 		Dsn string // Data Source Name

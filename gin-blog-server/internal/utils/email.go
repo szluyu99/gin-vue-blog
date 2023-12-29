@@ -21,7 +21,6 @@ func Email(to, subject, body string) error {
 // subject: 邮件标题
 // body: 邮件内容 (HTML)
 func send(to []string, subject string, body string) error {
-	// 从配置文件中读取
 	from := g.GetConfig().Email.From
 	nickname := g.GetConfig().Email.Nickname
 	secret := g.GetConfig().Email.Secret

@@ -20,8 +20,8 @@ const router = useRouter()
 const { query } = useRoute()
 
 const loginForm = reactive({
-  username: 'test@qq.com',
-  password: '11111',
+  username: 'guest',
+  password: '123456',
 })
 
 initLoginInfo()

@@ -19,6 +19,3 @@ COPY --from=0 ${WORK_PATH}/assets/ip2region.xdb ./assets/ip2region.xdb
 EXPOSE 8765
 
 ENTRYPOINT ./server -c config.docker.yml
-
-###############################################
-# CMD sleep 5 && ./server -c config.docker.toml
