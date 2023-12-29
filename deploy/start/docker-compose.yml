@@ -50,11 +50,10 @@ services:
       - ${DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
       # - ${DATA_DIRECTORY}/file/markdown:/gvb/public/markdown # 目前是前端导出
     environment:
-      # 以下环境变量会覆盖后端源码中 config.docker.toml 中的配置
+      # 以下环境变量会覆盖后端源码中 config.docker.yml 中的配置
       - TZ=Asia/Shanghai
       # SERVER
-      - SERVER_BACKPORT=:${ADMIN_SERVER_PORT} # 后台服务端口
-      - SERVER_FRONTPORT=:${BLOG_SERVER_PORT} # 前台服务端口
+      - SERVER_PORT=:${SERVER_PORT} # 服务端口
       # MySQL
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=3306
@@ -65,8 +64,7 @@ services:
       - REDIS_ADDR=${REDIS_HOST}:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
-      - ${ADMIN_SERVER_PORT}:${ADMIN_SERVER_PORT}
-      - ${BLOG_SERVER_PORT}:${BLOG_SERVER_PORT}
+      - ${SERVER_PORT}:${SERVER_PORT}
     networks:
       gvb-network:
         ipv4_address: ${BACKEND_HOST}
@@ -84,8 +82,7 @@ services:
       - USE_HTTPS=${USE_HTTPS} # 使用 https 设置为 true
       - SERVER_NAME=${SERVER_NAME} # 域名 或 localhost
       - BACKEND_HOST=${BACKEND_HOST} # 后端服务地址
-      - ADMIN_SERVER_PORT=${ADMIN_SERVER_PORT} # 后台服务端口
-      - BLOG_SERVER_PORT=${BLOG_SERVER_PORT} # 前台服务端口
+      - SERVER_PORT=${SERVER_PORT} # 服务端口
     ports:
       - "80:80"
       - "443:443"

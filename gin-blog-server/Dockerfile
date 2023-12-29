@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine as BUILDER
+FROM golang:1.21-alpine as BUILDER
 WORKDIR /gvb
 
 COPY go.mod go.mod
@@ -7,21 +7,18 @@ RUN go env -w GO111MODULE=on \
     && go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download
 COPY . .
-RUN go build -o server . 
+RUN cd cmd && go build -o server . 
 
 FROM alpine:3.19
 ENV WORK_PATH /gvb
 WORKDIR ${WORK_PATH}
-COPY --from=0 ${WORK_PATH}/server .
-COPY --from=0 ${WORK_PATH}/config/config.docker.toml .
+COPY --from=0 ${WORK_PATH}/cmd/server .
+COPY --from=0 ${WORK_PATH}/config.docker.yml .
 COPY --from=0 ${WORK_PATH}/assets/ip2region.xdb ./assets/ip2region.xdb
 
-# 后台接口
 EXPOSE 8765
-# 前台接口
-EXPOSE 5678
 
-ENTRYPOINT ./server -c config.docker.toml
+ENTRYPOINT ./server -c config.docker.yml
 
 ###############################################
 # CMD sleep 5 && ./server -c config.docker.toml

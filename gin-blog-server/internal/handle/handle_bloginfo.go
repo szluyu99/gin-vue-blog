@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 )
 
 type BlogInfo struct{}
@@ -86,9 +87,8 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 		return
 	}
 
-	ctx := context.Background()
-	viewCount, err := rdb.Get(ctx, g.VIEW_COUNT).Int()
-	if err != nil {
+	viewCount, err := rdb.Get(ctx(), g.VIEW_COUNT).Int()
+	if err != nil && err != redis.Nil {
 		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
 		return
 	}

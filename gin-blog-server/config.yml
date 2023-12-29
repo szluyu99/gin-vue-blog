@@ -14,7 +14,7 @@ Mysql:
   Dbname: "ginblog"
   Username: "root"
   Password: "123456"
-  LogMode: "error" # silent | error | warn | info
+  LogMode: "error" # 日志级别 silent, error, warn, info, 默认 info
 Sqlite:
   Dsn: "test.db"
 Redis:
