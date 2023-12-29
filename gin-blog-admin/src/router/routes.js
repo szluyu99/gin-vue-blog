@@ -1,16 +1,16 @@
-const Layout = () => import('@/layout/index.vue')
+// const Layout = () => import('@/layout/index.vue')
 
 // 基础路由, 无需权限, 总是会注册到最终路由中
 export const basicRoutes = [
   // TODO: 如何去除这个代码？
-  {
-    name: '',
-    path: '/',
-    component: Layout,
-    redirect: '/home', // 默认跳转首页
-    isHidden: true,
-    meta: { order: 0 },
-  },
+  // {
+  //   name: '',
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/home', // 默认跳转首页
+  //   isHidden: true,
+  //   meta: { order: 0 },
+  // },
   {
     name: 'Login',
     path: '/login',
@@ -28,11 +28,6 @@ export const basicRoutes = [
     meta: {
       title: '错误页',
     },
-  },
-  {
-    name: 'test',
-    path: '/test',
-    component: () => import('@/views/test/index.vue'),
   },
 ]
 
