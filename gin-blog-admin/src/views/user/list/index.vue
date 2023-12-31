@@ -86,6 +86,9 @@ const columns = [
     width: 80,
     align: 'center',
     render(row) {
+      if (row.is_super) {
+        return h(NTag, { type: 'error' }, { default: () => '超级管理员' })
+      }
       const roles = row.roles ?? []
       const groups = []
       for (let i = 0; i < roles.length; i++) {

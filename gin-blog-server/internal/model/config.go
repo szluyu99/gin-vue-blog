@@ -8,10 +8,9 @@ import (
 
 type Config struct {
 	Universal
-	Config string `gorm:"type:varchar(2000)" json:"config"`
-	Key    string `gorm:"unique;type:varchar(256)" json:"key"`
-	Value  string `gorm:"type:varchar(256)" json:"value"`
-	Desc   string `gorm:"type:varchar(256)" json:"desc"`
+	Key   string `gorm:"unique;type:varchar(256)" json:"key"`
+	Value string `gorm:"type:varchar(256)" json:"value"`
+	Desc  string `gorm:"type:varchar(256)" json:"desc"`
 }
 
 func GetConfigMap(db *gorm.DB) (map[string]string, error) {

@@ -163,10 +163,11 @@ func UpdateUserDisable(db *gorm.DB, id int, isDisable bool) error {
 
 // 更新用户登录信息
 func UpdateUserLoginInfo(db *gorm.DB, id int, ipAddress, ipSource string) error {
+	now := time.Now()
 	userAuth := UserAuth{
 		IpAddress:     ipAddress,
 		IpSource:      ipSource,
-		LastLoginTime: time.Now(),
+		LastLoginTime: &now,
 	}
 
 	result := db.Where("id", id).Updates(userAuth)

@@ -11,7 +11,6 @@ import (
 	"log"
 	"log/slog"
 	"os"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -30,6 +29,7 @@ func main() {
 
 	//! 处理 sqlite3 数据库路径
 	conf.SQLite.Dsn = "../" + conf.SQLite.Dsn
+	conf.Server.DbLogMode = "silent"
 
 	db := ginblog.InitDatabase(conf)
 
@@ -50,7 +50,7 @@ func createSuperAdmin(db *gorm.DB, username, password string) {
 		}
 
 		if userAuth.ID != 0 {
-			return errors.New("账户已存在")
+			return errors.New(userAuth.Username + " 账户已存在")
 		}
 
 		slog.Info("开始创建超级管理员")
@@ -60,11 +60,11 @@ func createSuperAdmin(db *gorm.DB, username, password string) {
 		if err != nil {
 			return errors.New("密码生成失败: " + err.Error())
 		}
+
 		userAuth = model.UserAuth{
-			Username:      username,
-			Password:      hashPassword,
-			IsSuper:       true,
-			LastLoginTime: time.Now(),
+			Username: username,
+			Password: hashPassword,
+			IsSuper:  true,
 			UserInfo: &model.UserInfo{
 				Nickname: username,
 				Avatar:   "https://www.z4a.net/images/2023/12/30/20210723220736_af8f5.jpg", // TODO: 换成自己的图床

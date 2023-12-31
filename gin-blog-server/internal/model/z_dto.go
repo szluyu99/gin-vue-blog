@@ -42,10 +42,10 @@ type LoginVO struct {
 	Intro    string `json:"intro"`
 	Website  string `json:"website"`
 
-	IpAddress     string    `json:"ip_address"`
-	IpSource      string    `json:"ip_source"`
-	LastLoginTime time.Time `json:"last_login_time"`
-	LoginType     int       `json:"login_type"`
+	IpAddress     string     `json:"ip_address"`
+	IpSource      string     `json:"ip_source"`
+	LastLoginTime *time.Time `json:"last_login_time"`
+	LoginType     int        `json:"login_type"`
 
 	// 点赞 Set: 用于记录用户点赞过的文章, 评论
 	ArticleLikeSet []string `json:"article_like_set"`

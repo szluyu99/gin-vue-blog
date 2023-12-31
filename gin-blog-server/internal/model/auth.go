@@ -10,14 +10,14 @@ import (
 
 type UserAuth struct {
 	Universal
-	Username      string    `gorm:"unique;type:varchar(50)" json:"username"`
-	Password      string    `gorm:"type:varchar(100)" json:"-"`
-	LoginType     int       `gorm:"type:tinyint(1);comment:登录类型" json:"login_type"`
-	IpAddress     string    `gorm:"type:varchar(20);comment:登录IP地址" json:"ip_address"`
-	IpSource      string    `gorm:"type:varchar(50);comment:IP来源" json:"ip_source"`
-	LastLoginTime time.Time `json:"last_login_time"`
-	IsDisable     bool      `json:"is_disable"`
-	IsSuper       bool      `json:"-"` // 超级管理员只能后台设置
+	Username      string     `gorm:"unique;type:varchar(50)" json:"username"`
+	Password      string     `gorm:"type:varchar(100)" json:"-"`
+	LoginType     int        `gorm:"type:tinyint(1);comment:登录类型" json:"login_type"`
+	IpAddress     string     `gorm:"type:varchar(20);comment:登录IP地址" json:"ip_address"`
+	IpSource      string     `gorm:"type:varchar(50);comment:IP来源" json:"ip_source"`
+	LastLoginTime *time.Time `json:"last_login_time"`
+	IsDisable     bool       `json:"is_disable"`
+	IsSuper       bool       `json:"is_super"` // 超级管理员只能后台设置
 
 	UserInfoId int       `json:"user_info_id"`
 	UserInfo   *UserInfo `json:"info"`
@@ -37,10 +37,10 @@ type Role struct {
 
 type Resource struct {
 	Universal
+	Name      string `gorm:"unique;type:varchar(50)" json:"name"`
 	ParentId  int    `json:"parent_id"`
 	Url       string `gorm:"type:varchar(255)" json:"url"`
 	Method    string `gorm:"type:varchar(10)" json:"request_method"`
-	Name      string `gorm:"type:varchar(50)" json:"name"`
 	Anonymous bool   `json:"is_anonymous"`
 
 	Roles []*Role `json:"roles" gorm:"many2many:role_resource"`
@@ -63,34 +63,34 @@ type Resource struct {
 type Menu struct {
 	Universal
 	ParentId     int    `json:"parent_id"`
-	Name         string `gorm:"type:varchar(20)" json:"name"`           // 菜单名称
-	Path         string `gorm:"type:varchar(50)" json:"path"`           // 路由地址
-	Component    string `gorm:"type:varchar(50)" json:"component"`      // 组件路径
-	Icon         string `gorm:"type:varchar(50)" json:"icon"`           // 图标
-	OrderNum     int8   `json:"order_num"`                              // 排序
-	Redirect     string `gorm:"type:varchar(50)" json:"redirect"`       // 重定向地址
-	Catalogue    bool   `json:"is_catalogue"`                           // 是否为目录
-	Hidden       bool   `json:"is_hidden"`                              // 是否隐藏
-	KeepAlive    bool   `json:"keep_alive"`                             // 是否缓存
-	External     bool   `json:"is_external"`                            // 是否外链
-	ExternalLink string `gorm:"type:varchar(255)" json:"external_link"` // 外链地址
+	Name         string `gorm:"uniqueIndex:idx_name_and_path;type:varchar(20)" json:"name"` // 菜单名称
+	Path         string `gorm:"uniqueIndex:idx_name_and_path;type:varchar(50)" json:"path"` // 路由地址
+	Component    string `gorm:"type:varchar(50)" json:"component"`                          // 组件路径
+	Icon         string `gorm:"type:varchar(50)" json:"icon"`                               // 图标
+	OrderNum     int8   `json:"order_num"`                                                  // 排序
+	Redirect     string `gorm:"type:varchar(50)" json:"redirect"`                           // 重定向地址
+	Catalogue    bool   `json:"is_catalogue"`                                               // 是否为目录
+	Hidden       bool   `json:"is_hidden"`                                                  // 是否隐藏
+	KeepAlive    bool   `json:"keep_alive"`                                                 // 是否缓存
+	External     bool   `json:"is_external"`                                                // 是否外链
+	ExternalLink string `gorm:"type:varchar(255)" json:"external_link"`                     // 外链地址
 
 	Roles []*Role `json:"roles" gorm:"many2many:role_menu"`
 }
 
 type RoleResource struct {
-	RoleId     int `json:"-" gorm:"primaryKey"`
-	ResourceId int `json:"-" gorm:"primaryKey"`
+	RoleId     int `json:"-" gorm:"primaryKey;uniqueIndex:idx_role_resource"`
+	ResourceId int `json:"-" gorm:"primaryKey;uniqueIndex:idx_role_resource"`
 }
 
 type UserAuthRole struct {
-	UserAuthId int `gorm:"primaryKey"`
-	RoleId     int `gorm:"primaryKey"`
+	UserAuthId int `gorm:"primaryKey;uniqueIndex:idx_user_auth_role"`
+	RoleId     int `gorm:"primaryKey;uniqueIndex:idx_user_auth_role"`
 }
 
 type RoleMenu struct {
-	RoleId int `json:"-" gorm:"primaryKey"`
-	MenuId int `json:"-" gorm:"primaryKey"`
+	RoleId int `json:"-" gorm:"primaryKey;uniqueIndex:idx_role_menu"`
+	MenuId int `json:"-" gorm:"primaryKey;uniqueIndex:idx_role_menu"`
 }
 
 type RoleVO struct {
