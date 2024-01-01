@@ -47,14 +47,14 @@ function getMenuItem(route, basePath = '') {
     order: route.meta?.order || 0,
   }
 
-  const visibleChildren = route.children
-    ?.filter(item => item.name && !item.isHidden) ?? []
+  const visibleChildren = route.children?.filter(e => e.name && !e.isHidden) ?? []
 
-  if (!visibleChildren.length)
+  if (!visibleChildren.length) {
     return menuItem
+  }
 
-  if (visibleChildren.length === 1) {
-    // 单个子路由处理
+  // 目录不展示子菜单
+  if (route.isCatalogue) {
     const singleRoute = visibleChildren[0]
     menuItem = {
       label: singleRoute.meta?.title || singleRoute.name,
@@ -97,7 +97,6 @@ function handleMenuSelect(_, item) {
   }
 
   if (item.path === curRoute.path) {
-    // tagStore.reloadTag(curRoute.path)
     return
   }
 

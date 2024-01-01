@@ -288,6 +288,9 @@ func generateDefaultResources(db *gorm.DB) {
 		}
 	}
 
+	// 加载所有资源
+	db.Find(&resources)
+
 	// 给 admin 角色添加所有资源访问权限
 	var adminRole model.Role
 	if err := db.Where("name", "admin").First(&adminRole).Error; err == nil {
@@ -328,7 +331,7 @@ func generateDefaultMenus(db *gorm.DB) {
 	slog.Info("-----初始化菜单 start-----")
 
 	parents := []model.Menu{
-		{Name: "首页", Path: "/home", Icon: "ic:sharp-home", OrderNum: 0, Component: "Layout", Redirect: "/home", Catalogue: true}, // catalogue
+		{Name: "首页", Path: "/home", Icon: "ic:sharp-home", OrderNum: 0, Component: "/home", Redirect: "/home", Catalogue: true}, // catalogue
 		{Name: "文章管理", Path: "/article", Icon: "ic:twotone-article", OrderNum: 1, Component: "Layout", Redirect: "/article/list"},
 		{Name: "权限管理", Path: "/auth", Icon: "cib:adguard", OrderNum: 3, Component: "Layout", Redirect: "/auth/menu"},
 		{Name: "消息管理", Path: "/message", Icon: "ic:twotone-email", OrderNum: 2, Component: "Layout", Redirect: "/message/comment"},
@@ -354,9 +357,9 @@ func generateDefaultMenus(db *gorm.DB) {
 		{Name: "文章列表", Path: "list", Component: "/article/list", Icon: "material-symbols:format-list-bulleted", OrderNum: 2, ParentId: parents[1].ID},
 		{Name: "分类管理", Path: "category", Component: "/article/category", Icon: "tabler:category", OrderNum: 3, ParentId: parents[1].ID},
 		{Name: "标签管理", Path: "tag", Component: "/article/tag", Icon: "tabler:tag", OrderNum: 4, ParentId: parents[1].ID},
-		{Name: "修改文章", Path: "write/:id", Component: "/article/write", Icon: "icon-park-outline:write", OrderNum: 1, ParentId: parents[1].ID},
+		{Name: "修改文章", Path: "write/:id", Component: "/article/write", Icon: "icon-park-outline:write", OrderNum: 1, ParentId: parents[1].ID, Hidden: true},
 		// 权限管理
-		{Name: "菜单管理", Path: "menu", Component: "/aut/menu", Icon: "ic:twotone-menu-book", OrderNum: 1, ParentId: parents[2].ID},
+		{Name: "菜单管理", Path: "menu", Component: "/auth/menu", Icon: "ic:twotone-menu-book", OrderNum: 1, ParentId: parents[2].ID},
 		{Name: "接口管理", Path: "resource", Component: "/auth/resource", Icon: "mdi:api", OrderNum: 2, ParentId: parents[2].ID},
 		{Name: "角色管理", Path: "role", Component: "/auth/role", Icon: "carbon:user-role", OrderNum: 3, ParentId: parents[2].ID},
 		// 消息管理

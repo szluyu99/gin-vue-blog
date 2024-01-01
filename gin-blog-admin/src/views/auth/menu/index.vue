@@ -183,10 +183,11 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'primary',
-            style: `display: ${!row.is_catalogue ? '' : 'none'};`,
+            style: `display: ${!row.is_catalogue && row.parent_id === 0 ? '' : 'none'};`,
             onClick: () => {
               initForm.component = '' // 手动清空组件路径
               initForm.parent_id = row.id // 设置父菜单id
+              initForm.is_catalogue = false
               handleAdd()
             },
           },

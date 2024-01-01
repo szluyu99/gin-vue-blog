@@ -12,16 +12,16 @@ export const usePermissionStore = defineStore('permission', {
     accessRoutes: [], // 可访问的路由
   }),
   getters: {
-    // 最终可访问路由 =  基础路由 + 可访问的路由
+    // 最终可访问路由 = 基础路由 + 可访问的路由
     routes: state => basicRoutes.concat(state.accessRoutes),
-    // 过滤掉 isHidden 的路由作为左侧菜单显示
+    // 过滤掉 hidden 的路由作为左侧菜单显示
     menus: state => state.routes.filter(route => route.name && !route.isHidden),
   },
   actions: {
     // ! 后端生成路由: 后端返回的就是最终路由, 处理成前端格式
     async generateRoutesBack() {
-      const res = await api.getUserMenus() // 调用接口获取后端传来的路由
-      this.accessRoutes = buildRoutes(res.data) // 处理成前端路由格式
+      const resp = await api.getUserMenus() // 调用接口获取后端传来的路由
+      this.accessRoutes = buildRoutes(resp.data) // 处理成前端路由格式
       return this.accessRoutes
     },
     // ! 前端控制路由权限: 根据角色过滤路由
@@ -77,30 +77,61 @@ function hasPermission(route, role) {
 // ! 后端路由相关函数
 // 根据后端传来数据构建出前端路由
 function buildRoutes(routes = []) {
-  return routes.map(e => ({
-    name: e.name,
-    path: e.component !== 'Layout' ? '/' : e.path, // 处理目录是一级菜单的情况
-    component: shallowRef(Layout), // ? 不使用 shallowRef 控制台会有 warning
-    isHidden: e.is_hidden,
-    redirect: e.redirect,
-    meta: {
-      title: e.name,
-      icon: e.icon,
-      order: e.order_num,
-      keepAlive: e.keep_alive,
-    },
-    children: e.children.map(ee => ({
-      name: ee.name,
-      path: ee.path, // 父路径 + 当前菜单路径
-      // ! 读取动态加载的路由模块
-      component: vueModules[`/src/views${ee.component}/index.vue`],
-      isHidden: ee.is_hidden,
-      meta: {
-        title: ee.name,
-        icon: ee.icon,
-        order: ee.order_num,
-        keepAlive: ee.keep_alive,
-      },
-    })),
-  }))
+  const result = []
+
+  for (const e of routes) {
+    if (e.is_catalogue) {
+      result.push({
+        name: e.name,
+        path: '/', // *
+        component: shallowRef(Layout),
+        isHidden: e.is_hidden,
+        isCatalogue: true, // *
+        redirect: e.redirect,
+        meta: {
+          order: e.order_num,
+        },
+        children: [{
+          name: e.name,
+          path: e.path,
+          component: vueModules[`/src/views${e.component}/index.vue`],
+          meta: {
+            title: e.name,
+            icon: e.icon,
+            keepAlive: e.keep_alive, // TODO:
+            order: 0,
+          },
+        }],
+      })
+    }
+    else {
+      result.push({
+        name: e.name,
+        path: e.path,
+        component: shallowRef(Layout),
+        isHidden: e.is_hidden,
+        redirect: e.redirect,
+        meta: {
+          title: e.name,
+          icon: e.icon,
+          keepAlive: e.keep_alive, // TODO:
+          order: e.order_num,
+        },
+        children: e.children?.map(ee => ({
+          name: ee.name,
+          path: ee.path, // 父路径 + 当前菜单路径
+          component: vueModules[`/src/views${ee.component}/index.vue`],
+          isHidden: ee.is_hidden,
+          meta: {
+            title: ee.name,
+            icon: ee.icon,
+            order: ee.order_num,
+            keepAlive: ee.keep_alive,
+          },
+        })),
+      })
+    }
+  }
+
+  return result
 }

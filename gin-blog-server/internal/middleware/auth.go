@@ -125,6 +125,7 @@ func PermissionCheck() gin.HandlerFunc {
 
 		slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v, %v, %v\n", auth.Username, url, method))
 		for _, role := range auth.Roles {
+			slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v\n", role.Name))
 			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
 			if err != nil {
 				handle.ReturnError(c, g.ERROR_DB_OPERATION, err)

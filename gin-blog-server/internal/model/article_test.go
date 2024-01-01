@@ -8,6 +8,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func createRole(t *testing.T, db *gorm.DB, name, label string) *Role {
+	role := Role{
+		Name:  name,
+		Label: label,
+	}
+	err := db.Create(&role).Error
+	assert.Nil(t, err)
+	return &role
+}
+
 func createUser(t *testing.T, db *gorm.DB, username, nickname string) *UserAuth {
 	userAuth := UserAuth{
 		Username: username,

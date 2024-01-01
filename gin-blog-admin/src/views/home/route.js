@@ -8,6 +8,7 @@ export default {
   meta: {
     order: 0,
   },
+  isCatalogue: true,
   children: [
     {
       name: 'Home',

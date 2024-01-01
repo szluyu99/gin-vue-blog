@@ -1,7 +1,7 @@
 Server:
   Mode: debug # debug | release
   Port: :8765
-  DbType: "mysql" # mysql | sqlite
+  DbType: "sqlite" # mysql | sqlite
   DbAutoMigrate: true # 是否自动迁移数据库表结构 (表结构没变可以不迁移, 提高启动速度)
   DbLogMode: "error" # 日志级别 silent, error, warn, info, 默认 info
 JWT:

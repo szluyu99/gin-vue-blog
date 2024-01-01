@@ -15,8 +15,8 @@ export const router = createRouter({
  * 初始化路由
  */
 export async function setupRouter(app) {
-  await addDynamicRoutes() // 每次刷新时都添加动态路由
-  setupRouterGuard(router) // 路由守卫
+  await addDynamicRoutes()
+  setupRouterGuard(router)
   app.use(router)
 }
 
@@ -26,7 +26,7 @@ export async function setupRouter(app) {
 export async function addDynamicRoutes() {
   const authStore = useAuthStore()
 
-  if (!authStore.accessToken) {
+  if (!authStore.token) {
     authStore.toLogin()
     return
   }
@@ -45,6 +45,7 @@ export async function addDynamicRoutes() {
     const accessRoutes = JSON.parse(import.meta.env.VITE_BACK_ROUTER)
       ? await permissionStore.generateRoutesBack() // ! 后端生成路由
       : permissionStore.generateRoutesFront(['admin']) // ! 前端生成路由 (根据角色), 待完善
+    console.log(accessRoutes)
 
     // 将当前没有的路由添加进去
     accessRoutes.forEach(route => !router.hasRoute(route.name) && router.addRoute(route))

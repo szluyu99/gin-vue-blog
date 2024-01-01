@@ -27,8 +27,8 @@ export const useUserStore = defineStore('user', {
     website: state => state.userInfo.website ?? '',
     intro: state => state.userInfo.intro ?? '',
     email: state => state.userInfo.email ?? '',
-    articleLikeSet() { return this.userInfo.articleLikeSet || [] },
-    commentLikeSet() { return this.userInfo.commentLikeSet || [] },
+    articleLikeSet: state => state.userInfo.articleLikeSet || [],
+    commentLikeSet: state => state.userInfo.commentLikeSet || [],
   },
   actions: {
     setToken(token) {

@@ -20,17 +20,24 @@ type MenuTreeVO struct {
 
 // 获取当前用户菜单: 生成后台管理界面的菜单
 func (*Menu) GetUserMenu(c *gin.Context) {
-	// userId := c.GetInt(USER_INFO_ID)
+	db := GetDB(c)
+	auth, _ := CurrentUserAuth(c)
 
-	// menuList, err := model.GetMenuListByUserId(getDB(c), userId)
-	// if err != nil {
-	// 	Error(c, g,ERROR_DB_OPERATION, err)
-	// 	return
-	// }
+	var menus []model.Menu
+	var err error
 
-	// Success(c, menus2UserMenuVos(menuList))
+	if auth.IsSuper {
+		menus, err = model.GetAllMenuList(db)
+	} else {
+		menus, err = model.GetMenuListByUserId(GetDB(c), auth.ID)
+	}
 
-	ReturnSuccess(c, nil)
+	if err != nil {
+		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		return
+	}
+
+	ReturnSuccess(c, menus2MenuVos(menus))
 }
 
 func (*Menu) GetTreeList(c *gin.Context) {

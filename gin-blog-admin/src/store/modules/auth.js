@@ -7,13 +7,14 @@ import api from '@/api'
 export const useAuthStore = defineStore('auth', {
   persist: {
     key: 'gvb_admin_auth',
+    paths: ['token'],
   },
   state: () => ({
-    accessToken: null,
+    token: null,
   }),
   actions: {
     setToken(token) {
-      this.accessToken = token
+      this.token = token
     },
     toLogin() {
       const currentRoute = unref(router.currentRoute)

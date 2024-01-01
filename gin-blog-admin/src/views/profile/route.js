@@ -8,10 +8,11 @@ export default {
   meta: {
     order: 8,
   },
+  isCatalogue: true,
   children: [
     {
       name: 'Profile',
-      path: 'profile',
+      path: '/profile',
       component: () => import('./index.vue'),
       meta: {
         title: '个人中心',

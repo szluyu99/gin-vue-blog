@@ -8,10 +8,10 @@ export const useUserStore = defineStore('user', {
     userInfo: {
       id: null,
       nickname: '',
+      avatar: '',
       intro: '',
       website: '',
-      avatar: '',
-      roles: [],
+      // roles: [], // TODO: 后端返回 roles
     },
   }),
   getters: {
@@ -20,40 +20,18 @@ export const useUserStore = defineStore('user', {
     intro: state => state.userInfo.intro,
     website: state => state.userInfo.website,
     avatar: state => convertImgUrl(state.userInfo.avatar),
-    roles: state => state.userInfo.roles,
+    // roles: state => state.userInfo.roles,
   },
   actions: {
     async getUserInfo() {
       try {
         const resp = await api.getUserInfo()
-        const { id, nickname, avatar, intro, website } = resp.data
-        this.userInfo = { id, nickname, avatar, intro, website }
+        this.userInfo = resp.data
         return Promise.resolve(resp.data)
       }
       catch (err) {
         return Promise.reject(err)
       }
     },
-    setUserInfo(user) {
-      Object.keys(user).forEach((key) => {
-        this.userInfo[key] = user[key]
-      })
-    },
-    resetUser() {
-      this.$reset()
-    },
   },
 })
-
-/**
- * 携带参数跳转到登录页面
- */
-// function toLoginWithQuery() {
-//   const currentRoute = unref(router.currentRoute)
-// 跳转回去时记录 redirect 到 query 上
-//   const needRedirect = !currentRoute.meta.requireAuth && !['/404', '/login'].includes(currentRoute.path)
-//   router.replace({
-//     path: '/login',
-//     query: needRedirect ? { ...currentRoute.query, redirect: currentRoute.path } : {},
-//   })
-// }

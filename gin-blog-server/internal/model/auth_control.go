@@ -62,7 +62,7 @@ func CheckResourceHasChild(db *gorm.DB, id int) (bool, error) {
 	return count > 0, nil
 }
 
-func GetResourcesByRole(db *gorm.DB, rid int) (list []*Resource, err error) {
+func GetResourcesByRole(db *gorm.DB, rid int) (resources []Resource, err error) {
 	var role Role
 	result := db.Model(&Role{}).Preload("Resources").Take(&role, rid)
 	if result.Error != nil {

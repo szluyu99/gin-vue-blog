@@ -17,7 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:preview'])
 
-const { accessToken } = useAuthStore()
+const { token } = useAuthStore()
 const previewImg = ref(props.preview)
 
 watch(() => props.preview, val => previewImg.value = val)
@@ -45,7 +45,7 @@ defineExpose({ previewImg })
   <div>
     <NUpload
       action="/api/upload"
-      :headers="{ Authorization: `Bearer ${accessToken}` }"
+      :headers="{ Authorization: `Bearer ${token}` }"
       :show-file-list="false"
       @finish="handleImgUpload"
     >

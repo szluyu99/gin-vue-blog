@@ -30,9 +30,9 @@ type Role struct {
 	Label     string `gorm:"unique" json:"label"`
 	IsDisable bool   `json:"is_disable"`
 
-	Resources []*Resource `json:"resources" gorm:"many2many:role_resource"`
-	Menus     []*Menu     `json:"menus" gorm:"many2many:role_menu"`
-	Users     []*UserAuth `json:"users" gorm:"many2many:user_auth_role"`
+	Resources []Resource `json:"resources" gorm:"many2many:role_resource"`
+	Menus     []Menu     `json:"menus" gorm:"many2many:role_menu"`
+	Users     []UserAuth `json:"users" gorm:"many2many:user_auth_role"`
 }
 
 type Resource struct {
@@ -115,29 +115,17 @@ func SaveOrUpdateMenu(db *gorm.DB, menu *Menu) error {
 	} else {
 		result = db.Create(menu)
 	}
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return result.Error
 }
 
 func GetMenuIdsByRoleId(db *gorm.DB, roleId int) (ids []int, err error) {
-	result := db.Model(&RoleMenu{}).
-		Where("role_id = ?", roleId).
-		Pluck("menu_id", &ids)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return ids, nil
+	result := db.Model(&RoleMenu{}).Where("role_id = ?", roleId).Pluck("menu_id", &ids)
+	return ids, result.Error
 }
 
-func GetMenuById(db *gorm.DB, id int) (menu Menu, err error) {
+func GetMenuById(db *gorm.DB, id int) (menu *Menu, err error) {
 	result := db.First(&menu, id)
-	if result.Error != nil {
-		return menu, result.Error
-	}
-	return menu, nil
+	return menu, result.Error
 }
 
 func CheckMenuInUse(db *gorm.DB, id int) (bool, error) {
@@ -158,18 +146,35 @@ func CheckMenuHasChild(db *gorm.DB, id int) (bool, error) {
 	return count > 0, nil
 }
 
-// 根据 user_id 获取菜单列表: 关联 user_role, role_menu, menu
-func GetMenuListByUserId(db *gorm.DB, id int) (list []Menu, err error) {
-	result := db.Table("user_role ur").
-		Distinct("m.id", "name", "path", "component", "icon", "is_hidden", "keep_alive", "redirect", "parent_id", "order_num").
-		Where("user_id = ?", id).
-		Joins("JOIN role_menu rm ON ur.role_id = rm.role_id").
-		Joins("JOIN menu m ON rm.menu_id = m.id").
-		Find(&list)
+// 获取所有菜单列表（超级管理员用）
+func GetAllMenuList(db *gorm.DB) (menu []Menu, err error) {
+	result := db.Find(&menu)
+	return menu, result.Error
+}
+
+// 根据 user_id 获取菜单列表
+func GetMenuListByUserId(db *gorm.DB, id int) (menus []Menu, err error) {
+	var userAuth UserAuth
+	result := db.Where(&UserAuth{Universal: Universal{ID: id}}).
+		Preload("Roles").Preload("Roles.Menus").
+		First(&userAuth)
+
 	if result.Error != nil {
-		return list, result.Error
+		return nil, result.Error
 	}
-	return list, nil
+
+	set := make(map[int]Menu)
+	for _, role := range userAuth.Roles {
+		for _, menu := range role.Menus {
+			set[menu.ID] = menu
+		}
+	}
+
+	for _, menu := range set {
+		menus = append(menus, menu)
+	}
+
+	return menus, nil
 }
 
 func GetMenuList(db *gorm.DB, keyword string) (list []Menu, total int64, err error) {
@@ -383,4 +388,19 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 		return nil, result.Error
 	}
 	return &userAuth, nil
+}
+
+// 元素去重
+func removeDuplicates(nums []int) []int {
+	uniqueMap := make(map[int]struct{})
+	result := make([]int, 0)
+
+	for _, num := range nums {
+		if _, ok := uniqueMap[num]; !ok {
+			uniqueMap[num] = struct{}{}
+			result = append(result, num)
+		}
+	}
+
+	return result
 }

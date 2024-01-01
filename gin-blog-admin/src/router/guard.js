@@ -16,8 +16,6 @@ function createPageLoadingGuard(router) {
   router.onError(() => window.$loadingBar?.error())
 }
 
-// 无需 Token 也能访问的页面
-const WHITE_LIST = ['/login', '/404']
 /**
  * 根据有无 Token 判断能否访问页面
  */
@@ -25,11 +23,12 @@ function createPermissionGuard(router) {
   // const base = import.meta.env.VITE_BASE_URL
   // 路由前置守卫: 根据有没有 Token 判断前往哪个页面
   router.beforeEach(async (to) => {
-    const { accessToken } = useAuthStore()
+    const { token } = useAuthStore()
 
     // 没有 Token
-    if (!accessToken) {
-      if (WHITE_LIST.includes(to.path)) {
+    if (!token) {
+      // login 和 404 不需要 token 即可访问
+      if (['/login', '/404'].includes(to.path)) {
         return true
       }
 
