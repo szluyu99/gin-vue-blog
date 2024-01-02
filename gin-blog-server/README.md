@@ -7,6 +7,7 @@
 - 修改 utils 包架构, 精简项目架构
 - 开发环境使用 sqlite 进行单元测试, 线上支持 MySQL 环境
 - 移除 Casbin，自己实现基于 RBAC 的权限控制
+- 之前版本错误码使用 panic 机制, 使用 gin 中间件全局捕获 panic
 - TODO: 使用 errors 机制来统一错误码机制
 
 新版本项目运行：运行/初始化数据 相关文件都在 cmd 下

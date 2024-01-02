@@ -62,13 +62,13 @@ func generateDefaultPages(db *gorm.DB) {
 		{Label: "归档", Name: "archive", Cover: "https://cdn.hahacode.cn/page/archive.png"},
 		{Label: "分类", Name: "category", Cover: "https://cdn.hahacode.cn/page/category.png"},
 		{Label: "标签", Name: "tag", Cover: "https://cdn.hahacode.cn/page/tag.png"},
-		{Label: "友链", Name: "link", Cover: "https://cdn.hahacode.cn/page/link.png"},
-		{Label: "关于", Name: "about", Cover: "https://cdn.hahacode.cn/page/about.png"},
-		{Label: "留言", Name: "message", Cover: "https://cdn.hahacode.cn/page/message.png"},
-		{Label: "个人中心", Name: "user", Cover: "https://cdn.hahacode.cn/page/user.png"},
+		{Label: "友链", Name: "link", Cover: "https://cdn.hahacode.cn/page/link.jpg"},
+		{Label: "关于", Name: "about", Cover: "https://cdn.hahacode.cn/page/about.jpg"},
+		{Label: "留言", Name: "message", Cover: "https://cdn.hahacode.cn/page/message.jpeg"},
+		{Label: "个人中心", Name: "user", Cover: "https://cdn.hahacode.cn/page/user.jpg"},
 		{Label: "相册", Name: "album", Cover: "https://cdn.hahacode.cn/page/album.png"},
-		{Label: "错误页面", Name: "404", Cover: "https://cdn.hahacode.cn/page/404.png"},
-		{Label: "文章列表", Name: "article_list", Cover: "https://cdn.hahacode.cn/page/article_list.png"},
+		{Label: "错误页面", Name: "404", Cover: "https://cdn.hahacode.cn/page/404.jpg"},
+		{Label: "文章列表", Name: "article_list", Cover: "https://cdn.hahacode.cn/page/article_list.jpg"},
 	}
 
 	for _, page := range pages {
