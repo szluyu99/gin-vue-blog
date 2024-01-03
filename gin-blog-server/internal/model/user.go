@@ -7,7 +7,7 @@ import (
 )
 
 type UserInfo struct {
-	Universal
+	Model
 	Email    string `json:"email" gorm:"type:varchar(30)"`
 	Nickname string `json:"nickname" gorm:"unique;type:varchar(30);not null"`
 	Avatar   string `json:"avatar" gorm:"type:varchar(1024);not null"`
@@ -70,7 +70,7 @@ func GetUserList(db *gorm.DB, page, size int, loginType int8, nickname, username
 		Preload("UserInfo").
 		Preload("Roles").
 		Count(&total).
-		Limit(size).Offset(size * (page - 1)).
+		Scopes(Paginate(page, size)).
 		Find(&list)
 
 	if result.Error != nil {
@@ -88,8 +88,8 @@ func UpdateUserNicknameAndRole(db *gorm.DB, authId int, nickname string, roleIds
 	}
 
 	userInfo := UserInfo{
-		Universal: Universal{ID: userAuth.UserInfoId},
-		Nickname:  nickname,
+		Model:    Model{ID: userAuth.UserInfoId},
+		Nickname: nickname,
 	}
 	result := db.Model(&userInfo).Updates(userInfo)
 	if result.Error != nil {
@@ -124,8 +124,8 @@ func UpdateUserNicknameAndRole(db *gorm.DB, authId int, nickname string, roleIds
 
 func UpdateUserPassword(db *gorm.DB, id int, password string) error {
 	userAuth := UserAuth{
-		Universal: Universal{ID: id},
-		Password:  password,
+		Model:    Model{ID: id},
+		Password: password,
 	}
 	result := db.Model(&userAuth).Updates(userAuth)
 	if result.Error != nil {
@@ -136,11 +136,11 @@ func UpdateUserPassword(db *gorm.DB, id int, password string) error {
 
 func UpdateUserInfo(db *gorm.DB, id int, nickname, avatar, intro, website string) error {
 	userInfo := UserInfo{
-		Universal: Universal{ID: id},
-		Nickname:  nickname,
-		Avatar:    avatar,
-		Intro:     intro,
-		Website:   website,
+		Model:    Model{ID: id},
+		Nickname: nickname,
+		Avatar:   avatar,
+		Intro:    intro,
+		Website:  website,
 	}
 
 	result := db.
@@ -151,7 +151,7 @@ func UpdateUserInfo(db *gorm.DB, id int, nickname, avatar, intro, website string
 
 func UpdateUserDisable(db *gorm.DB, id int, isDisable bool) error {
 	userAuth := UserAuth{
-		Universal: Universal{ID: id},
+		Model:     Model{ID: id},
 		IsDisable: isDisable,
 	}
 	result := db.Model(&userAuth).Select("is_disable").Updates(&userAuth)

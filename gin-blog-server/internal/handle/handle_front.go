@@ -103,7 +103,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 
 // 获取友链列表
 func (*Front) GetLinkList(c *gin.Context) {
-	list, _, err := model.GetLinkList(GetDB(c), 0, 1000, "")
+	list, _, err := model.GetLinkList(GetDB(c), 1, 1000, "")
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -185,8 +185,7 @@ func (*Front) GetCommentList(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
 
-	page, num := checkQueryPage(query.Page, query.Size)
-	data, total, err := model.GetCommentVOList(db, page, num, query.TopicId, query.Type)
+	data, total, err := model.GetCommentVOList(db, query.Page, query.Size, query.TopicId, query.Type)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -225,8 +224,7 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	replyList, err := model.GetCommentReplyList(db.Debug(), id, page, size)
+	replyList, err := model.GetCommentReplyList(db, id, query.Page, query.Size)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -283,8 +281,7 @@ func (*Front) GetArticleList(c *gin.Context) {
 		return
 	}
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	list, _, err := model.GetBlogArticleList(GetDB(c), page, size, query.CategoryId, query.TagId)
+	list, _, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -370,8 +367,7 @@ func (*Front) GetArchiveList(c *gin.Context) {
 		return
 	}
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	list, total, err := model.GetBlogArticleList(GetDB(c), page, size, query.CategoryId, query.TagId)
+	list, total, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return

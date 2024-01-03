@@ -123,8 +123,7 @@ func (*User) GetList(c *gin.Context) {
 		return
 	}
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	list, count, err := model.GetUserList(GetDB(c), page, size, query.LoginType, query.Nickname, query.Username)
+	list, count, err := model.GetUserList(GetDB(c), query.Page, query.Size, query.LoginType, query.Nickname, query.Username)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return

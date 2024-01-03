@@ -32,8 +32,7 @@ func (*Tag) GetList(c *gin.Context) {
 		return
 	}
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	data, total, err := model.GetTagList(GetDB(c), page, size, query.Keyword)
+	data, total, err := model.GetTagList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -42,8 +41,8 @@ func (*Tag) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.TagVO]{
 		Total: total,
 		List:  data,
-		Size:  size,
-		Page:  page,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 }
 

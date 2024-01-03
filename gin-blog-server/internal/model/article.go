@@ -22,7 +22,7 @@ const (
 // belongTo: 一个文章 属于 一个用户
 // many2many: 一个文章 可以拥有 多个标签, 多个文章 可以使用 一个标签
 type Article struct {
-	Universal
+	Model
 
 	Title       string `gorm:"type:varchar(100);not null" json:"title"`
 	Desc        string `json:"desc"`
@@ -75,7 +75,7 @@ type RecommendArticleVO struct {
 
 func GetArticle(db *gorm.DB, id int) (data *Article, err error) {
 	result := db.Preload("Category").Preload("Tags").
-		Where(Article{Universal: Universal{ID: id}}).
+		Where(Article{Model: Model{ID: id}}).
 		First(&data)
 	return data, result.Error
 }
@@ -83,7 +83,7 @@ func GetArticle(db *gorm.DB, id int) (data *Article, err error) {
 // 前台文章详情（不在回收站并且状态为公开）
 func GetBlogArticle(db *gorm.DB, id int) (data *Article, err error) {
 	result := db.Preload("Category").Preload("Tags").
-		Where(Article{Universal: Universal{ID: id}}).
+		Where(Article{Model: Model{ID: id}}).
 		Where("is_delete = 0 AND status = 1"). // *
 		First(&data)
 	return data, result.Error
@@ -104,7 +104,7 @@ func GetBlogArticleList(db *gorm.DB, page, size, categoryId, tagId int) (data []
 	db = db.Count(&total)
 	result := db.Preload("Tags").Preload("Category").
 		Order("is_top DESC, id DESC").
-		Limit(size).Offset(size * (page - 1)).
+		Scopes(Paginate(page, size)).
 		Find(&data)
 
 	return data, total, result.Error
@@ -137,7 +137,7 @@ func GetArticleList(db *gorm.DB, page, size int, title string, isDelete *bool, s
 	}
 
 	result := db.Count(&total).
-		Limit(size).Offset((page - 1) * size).
+		Scopes(Paginate(page, size)).
 		Order("is_top DESC, article.id DESC").
 		Find(&list)
 	return list, total, result.Error

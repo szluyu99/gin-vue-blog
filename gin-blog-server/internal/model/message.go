@@ -5,7 +5,7 @@ import (
 )
 
 type Message struct {
-	Universal
+	Model
 	Nickname  string `gorm:"type:varchar(50);comment:昵称" json:"nickname"`
 	Avatar    string `gorm:"type:varchar(255);comment:头像地址" json:"avatar"`
 	Content   string `gorm:"type:varchar(255);comment:留言内容" json:"content"`
@@ -27,7 +27,7 @@ func GetMessageList(db *gorm.DB, num, size int, nickname string, isReview *bool)
 	}
 
 	db.Count(&total)
-	result := db.Order("created_at DESC").Offset((num - 1) * size).Limit(size).Find(&list)
+	result := db.Order("created_at DESC").Scopes(Paginate(num, size)).Find(&list)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}

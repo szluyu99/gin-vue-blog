@@ -76,7 +76,7 @@ func (*Article) SaveOrUpdate(c *gin.Context) {
 	}
 
 	article := model.Article{
-		Universal:   model.Universal{ID: req.ID},
+		Model:       model.Model{ID: req.ID},
 		Title:       req.Title,
 		Desc:        req.Desc,
 		Content:     req.Content,
@@ -139,8 +139,7 @@ func (*Article) GetList(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
 
-	page, size := checkQueryPage(query.Page, query.Size)
-	list, total, err := model.GetArticleList(db, page, size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
+	list, total, err := model.GetArticleList(db, query.Page, query.Size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return

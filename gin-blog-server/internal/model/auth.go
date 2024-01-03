@@ -9,7 +9,7 @@ import (
 // 权限控制: 7 张表（4 模型 + 3 关联）
 
 type UserAuth struct {
-	Universal
+	Model
 	Username      string     `gorm:"unique;type:varchar(50)" json:"username"`
 	Password      string     `gorm:"type:varchar(100)" json:"-"`
 	LoginType     int        `gorm:"type:tinyint(1);comment:登录类型" json:"login_type"`
@@ -25,7 +25,7 @@ type UserAuth struct {
 }
 
 type Role struct {
-	Universal
+	Model
 	Name      string `gorm:"unique" json:"name"`
 	Label     string `gorm:"unique" json:"label"`
 	IsDisable bool   `json:"is_disable"`
@@ -36,7 +36,7 @@ type Role struct {
 }
 
 type Resource struct {
-	Universal
+	Model
 	Name      string `gorm:"unique;type:varchar(50)" json:"name"`
 	ParentId  int    `json:"parent_id"`
 	Url       string `gorm:"type:varchar(255)" json:"url"`
@@ -61,7 +61,7 @@ type Resource struct {
   - 如果是外链, 如果设置为外链, 则点击后会在新窗口打开
 */
 type Menu struct {
-	Universal
+	Model
 	ParentId     int    `json:"parent_id"`
 	Name         string `gorm:"uniqueIndex:idx_name_and_path;type:varchar(20)" json:"name"` // 菜单名称
 	Path         string `gorm:"uniqueIndex:idx_name_and_path;type:varchar(50)" json:"path"` // 路由地址
@@ -155,7 +155,7 @@ func GetAllMenuList(db *gorm.DB) (menu []Menu, err error) {
 // 根据 user_id 获取菜单列表
 func GetMenuListByUserId(db *gorm.DB, id int) (menus []Menu, err error) {
 	var userAuth UserAuth
-	result := db.Where(&UserAuth{Universal: Universal{ID: id}}).
+	result := db.Where(&UserAuth{Model: Model{ID: id}}).
 		Preload("Roles").Preload("Roles.Menus").
 		First(&userAuth)
 
@@ -202,11 +202,11 @@ func DeleteMenu(db *gorm.DB, id int) error {
 
 func SaveOrUpdateResource(db *gorm.DB, id, pid int, name, url, method string) error {
 	resource := Resource{
-		Universal: Universal{ID: id},
-		Name:      name,
-		Url:       url,
-		Method:    method,
-		ParentId:  pid,
+		Model:    Model{ID: id},
+		Name:     name,
+		Url:      url,
+		Method:   method,
+		ParentId: pid,
 	}
 
 	var result *gorm.DB
@@ -261,7 +261,7 @@ func GetResourceListByIds(db *gorm.DB, ids []int) (list []Resource, err error) {
 
 func SaveOrUpdateRole(db *gorm.DB, id int, name, label string, isDisable bool) error {
 	role := Role{
-		Universal: Universal{ID: id},
+		Model:     Model{ID: id},
 		Name:      name,
 		Label:     label,
 		IsDisable: isDisable,
@@ -291,13 +291,10 @@ func GetRoleList(db *gorm.DB, num, size int, keyword string) (list []RoleVO, tot
 		db = db.Where("name like ?", "%"+keyword+"%")
 	}
 	db.Count(&total)
-	result := db.Limit(size).Offset((num-1)*size).
-		Select("id", "name", "label", "created_at", "is_disable").
+	result := db.Select("id", "name", "label", "created_at", "is_disable").
+		Scopes(Paginate(num, size)).
 		Find(&list)
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-	return list, total, nil
+	return list, total, result.Error
 }
 
 func GetRoleIdsByUserId(db *gorm.DB, userAuthId int) (ids []int, err error) {
@@ -320,7 +317,7 @@ func SaveRole(db *gorm.DB, name, label string) error {
 
 func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourceIds, menuIds []int) error {
 	role := Role{
-		Universal: Universal{ID: id},
+		Model:     Model{ID: id},
 		Name:      name,
 		Label:     label,
 		IsDisable: isDisable,
@@ -380,7 +377,7 @@ func DeleteRoles(db *gorm.DB, ids []int) error {
 // UserAuth
 
 func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
-	var userAuth = UserAuth{Universal: Universal{ID: id}}
+	var userAuth = UserAuth{Model: Model{ID: id}}
 	result := db.Model(&userAuth).
 		Preload("Roles").Preload("UserInfo").
 		First(&userAuth)

@@ -91,8 +91,7 @@ func (*Message) GetList(c *gin.Context) {
 		return
 	}
 
-	num, size := checkQueryPage(query.Page, query.Size)
-	data, total, err := model.GetMessageList(GetDB(c), num, size, query.Nickname, query.IsReview)
+	data, total, err := model.GetMessageList(GetDB(c), query.Page, query.Size, query.Nickname, query.IsReview)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -100,7 +99,7 @@ func (*Message) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.Message]{
 		Total: total,
 		List:  data,
-		Size:  size,
-		Page:  num,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 }

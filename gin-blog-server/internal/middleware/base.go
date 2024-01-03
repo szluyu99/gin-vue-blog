@@ -23,6 +23,7 @@ import (
 )
 
 // WithRedisDB 将 redis.Client 注入到 gin.Context
+// handler 中通过 c.MustGet(g.CTX_RDB).(*redis.Client) 来使用
 func WithRedisDB(rdb *redis.Client) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Set(g.CTX_RDB, rdb)
@@ -31,6 +32,7 @@ func WithRedisDB(rdb *redis.Client) gin.HandlerFunc {
 }
 
 // WithGormDB 将 gorm.DB 注入到 gin.Context
+// handler 中通过 c.MustGet(g.CTX_DB).(*gorm.DB) 来使用
 func WithGormDB(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Set(g.CTX_DB, db)
@@ -109,7 +111,7 @@ func Recovery(stack bool) gin.HandlerFunc {
 				}
 
 				// 发生 panic, 返回错误信息
-				handle.ReturnResponse(c, http.StatusInternalServerError, g.FAIL, g.GetMsg(g.FAIL), err)
+				handle.ReturnHttpResponse(c, http.StatusInternalServerError, g.FAIL, g.GetMsg(g.FAIL), err)
 
 				// 处理 panic(xxx) 的操作
 				// if code, ok := err.(int); ok { // panic(code) 根据错误码获取 msg

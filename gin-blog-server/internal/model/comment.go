@@ -16,7 +16,7 @@ const (
 */
 
 type Comment struct {
-	Universal
+	Model
 	UserId      int    `json:"user_id"`       // 评论者
 	ReplyUserId int    `json:"reply_user_id"` // 被回复者
 	TopicId     int    `json:"topic_id"`      // 评论的文章
@@ -90,7 +90,7 @@ func GetCommentList(db *gorm.DB, page, size, typ int, isReview *bool, nickname s
 		Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Preload("Article").
 		Order("id DESC").
-		Limit(size).Offset(size * (page - 1)).
+		Scopes(Paginate(page, size)).
 		Find(&data)
 
 	return data, total, result.Error
@@ -114,7 +114,7 @@ func GetCommentVOList(db *gorm.DB, page, size, topic, typ int) (data []CommentVO
 		Preload("User").Preload("User.UserInfo").
 		// Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Order("id DESC").
-		Limit(size).Offset(size * (page - 1))
+		Scopes(Paginate(page, size))
 	if err := tx.Find(&list).Error; err != nil {
 		return nil, 0, err
 	}
@@ -148,7 +148,7 @@ func GetCommentReplyList(db *gorm.DB, id, page, size int) (data []Comment, err e
 		Where(&Comment{ParentId: id}).
 		Preload("User").Preload("User.UserInfo").
 		Order("id DESC").
-		Limit(size).Offset(size * (page - 1)).
+		Scopes(Paginate(page, size)).
 		Find(&data)
 	return data, result.Error
 }

@@ -8,7 +8,7 @@ import (
 
 // hasMany: 一个分类下可以有多篇文章
 type Category struct {
-	Universal
+	Model
 	Name     string    `gorm:"unique;type:varchar(20);not null" json:"name"`
 	Articles []Article `gorm:"foreignKey:CategoryId"` // 重写外键
 }
@@ -36,7 +36,7 @@ func GetCategoryList(db *gorm.DB, num, size int, keyword string) ([]CategoryVO, 
 	result := db.Group("c.id").
 		Order("c.updated_at DESC").
 		Count(&total).
-		Limit(size).Offset(size * (num - 1)).
+		Scopes(Paginate(num, size)).
 		Find(&list)
 	if result.Error != nil {
 		return list, 0, result.Error
@@ -82,8 +82,8 @@ func DeleteCategory(db *gorm.DB, ids []int) (int64, error) {
 
 func SaveOrUpdateCategory(db *gorm.DB, id int, name string) (*Category, error) {
 	category := Category{
-		Universal: Universal{ID: id},
-		Name:      name,
+		Model: Model{ID: id},
+		Name:  name,
 	}
 
 	var result *gorm.DB

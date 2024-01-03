@@ -5,7 +5,7 @@ import (
 )
 
 type Page struct {
-	Universal
+	Model
 	Name  string `gorm:"unique;type:varchar(20)" json:"name"`
 	Label string `gorm:"unique;type:varchar(30)" json:"label"`
 	Cover string `gorm:"type:varchar(255)" json:"cover"`
@@ -21,10 +21,10 @@ func GetPageList(db *gorm.DB) ([]Page, int64, error) {
 
 func SaveOrUpdatePage(db *gorm.DB, id int, name, label, cover string) (*Page, error) {
 	page := Page{
-		Universal: Universal{ID: id},
-		Name:      name,
-		Label:     label,
-		Cover:     cover,
+		Model: Model{ID: id},
+		Name:  name,
+		Label: label,
+		Cover: cover,
 	}
 
 	var result *gorm.DB

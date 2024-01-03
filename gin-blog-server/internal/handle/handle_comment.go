@@ -85,8 +85,7 @@ func (*Comment) GetList(c *gin.Context) {
 		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
 		return
 	}
-	num, size := checkQueryPage(query.Page, query.Size)
-	list, total, err := model.GetCommentList(GetDB(c), num, size, query.Type, query.IsReview, query.Nickname)
+	list, total, err := model.GetCommentList(GetDB(c), query.Page, query.Size, query.Type, query.IsReview, query.Nickname)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -95,8 +94,8 @@ func (*Comment) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.Comment]{
 		Total: total,
 		List:  list,
-		Size:  size,
-		Page:  num,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 
 }

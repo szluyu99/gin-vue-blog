@@ -107,9 +107,9 @@ func AddRoleWithResources(db *gorm.DB, name, label string, rs []int) (*Role, err
 
 func UpdateRoleWithResources(db *gorm.DB, id int, name, label string, rs []int) (*Role, error) {
 	role := Role{
-		Universal: Universal{ID: id},
-		Name:      name,
-		Label:     label,
+		Model: Model{ID: id},
+		Name:  name,
+		Label: label,
 	}
 
 	result := db.Model(&role).Select("name", "label").Updates(&role)

@@ -5,7 +5,7 @@ import (
 )
 
 type FriendLink struct {
-	Universal
+	Model
 	Name    string `gorm:"type:varchar(50)" json:"name"`
 	Avatar  string `gorm:"type:varchar(255)" json:"avatar"`
 	Address string `gorm:"type:varchar(255)" json:"address"`
@@ -20,7 +20,7 @@ func GetLinkList(db *gorm.DB, num, size int, keyword string) (list []FriendLink,
 		db = db.Or("intro LIKE ?", "%"+keyword+"%")
 	}
 	db.Count(&total)
-	result := db.Order("created_at DESC").Limit(size).Offset(size * (num - 1)).Find(&list)
+	result := db.Order("created_at DESC").Scopes(Paginate(num, size)).Find(&list)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}

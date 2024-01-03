@@ -36,12 +36,11 @@ func MakeMigrate(db *gorm.DB) error {
 		&RoleResource{}, // 角色-资源 关联
 		&UserAuthRole{}, // 用户-角色 关联
 	)
-
 }
 
 // 通用模型
 
-type Universal struct {
+type Model struct {
 	ID        int       `gorm:"primary_key;auto_increment" json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -50,6 +49,26 @@ type Universal struct {
 type OptionVO struct {
 	ID   int    `json:"value"`
 	Name string `json:"label"`
+}
+
+// Gorm Scopes
+
+// 分页
+func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page <= 0 {
+			page = 1
+		}
+		switch {
+		case size > 100:
+			size = 100
+		case size <= 0:
+			size = 10
+		}
+
+		offset := (page - 1) * size
+		return db.Offset(offset).Limit(size)
+	}
 }
 
 // 通用 CRUD

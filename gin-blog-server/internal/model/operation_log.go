@@ -3,7 +3,7 @@ package model
 import "gorm.io/gorm"
 
 type OperationLog struct {
-	Universal
+	Model
 
 	OptModule string `gorm:"type:varchar(50);comment:操作模块" json:"opt_module"`
 	OptType   string `gorm:"type:varchar(50);comment:操作类型" json:"opt_type"`
@@ -27,7 +27,7 @@ func GetOperationLogList(db *gorm.DB, num, size int, keyword string) (list []Ope
 		db = db.Where("opt_module LIKE ?", "%"+keyword+"%").Or("opt_desc LIKE ?", "%"+keyword+"%")
 	}
 	db.Count(&total)
-	result := db.Order("id DESC").Limit(size).Offset(size * (num - 1)).Find(&list)
+	result := db.Order("id DESC").Scopes(Paginate(num, size)).Find(&list)
 	if result.Error != nil {
 		return nil, 0, result.Error
 	}

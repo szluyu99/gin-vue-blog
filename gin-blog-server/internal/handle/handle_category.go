@@ -33,8 +33,7 @@ func (*Category) GetList(c *gin.Context) {
 		return
 	}
 
-	num, size := checkQueryPage(query.Page, query.Size)
-	data, total, err := model.GetCategoryList(GetDB(c), num, size, query.Keyword)
+	data, total, err := model.GetCategoryList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -43,8 +42,8 @@ func (*Category) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.CategoryVO]{
 		Total: total,
 		List:  data,
-		Size:  size,
-		Page:  num,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 }
 

@@ -36,8 +36,7 @@ func (*Link) GetList(c *gin.Context) {
 		return
 	}
 
-	num, size := checkQueryPage(query.Page, query.Size)
-	data, total, err := model.GetLinkList(GetDB(c), num, size, query.Keyword)
+	data, total, err := model.GetLinkList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -46,8 +45,8 @@ func (*Link) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.FriendLink]{
 		Total: total,
 		List:  data,
-		Size:  size,
-		Page:  num,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 }
 

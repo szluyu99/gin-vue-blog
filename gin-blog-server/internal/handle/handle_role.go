@@ -56,8 +56,8 @@ func (*Role) GetTreeList(c *gin.Context) {
 	db := GetDB(c)
 
 	result := make([]model.RoleVO, 0)
-	num, size := checkQueryPage(query.Page, query.Size)
-	list, total, err := model.GetRoleList(db, num, size, query.Keyword)
+
+	list, total, err := model.GetRoleList(db, query.Page, query.Size, query.Keyword)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return

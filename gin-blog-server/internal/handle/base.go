@@ -14,12 +14,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// 通用请求/响应
-
 /*
 响应设计方案：不使用 HTTP 码来表示业务状态, 采用业务状态码的方式
 - 只要能到达后端的请求, HTTP 状态码都为 200
 - 业务状态码为 0 表示成功, 其他都表示失败
+- 当后端发生 panic 并且被 gin 中间件捕获时, 才会返回 HTTP 500 状态码
 */
 
 // 响应结构体
@@ -30,7 +29,7 @@ type Response[T any] struct {
 }
 
 // HTTP 码 + 业务码 + 消息 + 数据
-func ReturnResponse(c *gin.Context, httpCode, code int, msg string, data any) {
+func ReturnHttpResponse(c *gin.Context, httpCode, code int, msg string, data any) {
 	c.JSON(httpCode, Response[any]{
 		Code:    code,
 		Message: msg,
@@ -39,13 +38,13 @@ func ReturnResponse(c *gin.Context, httpCode, code int, msg string, data any) {
 }
 
 // 业务码 + 数据
-func ReturnCodeData(c *gin.Context, code int, data any) {
-	ReturnResponse(c, http.StatusOK, code, g.GetMsg(code), data)
+func ReturnResponse(c *gin.Context, code int, data any) {
+	ReturnHttpResponse(c, http.StatusOK, code, g.GetMsg(code), data)
 }
 
 // 成功业务码 + 数据
 func ReturnSuccess(c *gin.Context, data any) {
-	ReturnCodeData(c, g.SUCCESS, data)
+	ReturnResponse(c, g.SUCCESS, data)
 }
 
 // 处理错误
@@ -82,20 +81,6 @@ type PageResult[T any] struct {
 	Size  int   `json:"page_size"` // 上次页数
 	Total int64 `json:"total"`     // 总条数
 	List  []T   `json:"page_data"` // 分页数据
-}
-
-// 检查分页参数
-func checkQueryPage(page, size int) (int, int) {
-	switch {
-	case size >= 100:
-		size = 100
-	case size <= 0:
-		size = 10
-	}
-	if page <= 0 {
-		page = 1
-	}
-	return page, size
 }
 
 // 获取 *gorm.DB

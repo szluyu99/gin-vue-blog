@@ -27,8 +27,7 @@ func (*OperationLog) GetList(c *gin.Context) {
 		return
 	}
 
-	num, size := checkQueryPage(query.Page, query.Size)
-	list, total, err := model.GetOperationLogList(GetDB(c), num, size, query.Keyword)
+	list, total, err := model.GetOperationLogList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
@@ -37,8 +36,8 @@ func (*OperationLog) GetList(c *gin.Context) {
 	ReturnSuccess(c, PageResult[model.OperationLog]{
 		Total: total,
 		List:  list,
-		Size:  size,
-		Page:  num,
+		Size:  query.Size,
+		Page:  query.Page,
 	})
 }
 

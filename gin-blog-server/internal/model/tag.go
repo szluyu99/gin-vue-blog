@@ -7,7 +7,7 @@ import (
 )
 
 type Tag struct {
-	Universal
+	Model
 	Name string `gorm:"unique;type:varchar(20);not null" json:"name"`
 
 	Articles []*Article `gorm:"many2many:article_tag;" json:"articles,omitempty"`
@@ -34,7 +34,7 @@ func GetTagList(db *gorm.DB, page, size int, keyword string) (list []TagVO, tota
 	result := db.
 		Group("t.id").Order("t.updated_at DESC").
 		Count(&total).
-		Limit(size).Offset(size * (page - 1)).
+		Scopes(Paginate(page, size)).
 		Find(&list)
 
 	if result.Error != nil {

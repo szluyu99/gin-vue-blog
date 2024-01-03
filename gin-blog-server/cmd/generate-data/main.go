@@ -58,17 +58,17 @@ func generateDefaultPages(db *gorm.DB) {
 	slog.Info("-----初始化博客页面 start-----")
 
 	pages := []model.Page{
-		{Label: "首页", Name: "home", Cover: "https://cdn.hahacode.cn/page/home.jpg"},
-		{Label: "归档", Name: "archive", Cover: "https://cdn.hahacode.cn/page/archive.png"},
-		{Label: "分类", Name: "category", Cover: "https://cdn.hahacode.cn/page/category.png"},
-		{Label: "标签", Name: "tag", Cover: "https://cdn.hahacode.cn/page/tag.png"},
-		{Label: "友链", Name: "link", Cover: "https://cdn.hahacode.cn/page/link.jpg"},
-		{Label: "关于", Name: "about", Cover: "https://cdn.hahacode.cn/page/about.jpg"},
-		{Label: "留言", Name: "message", Cover: "https://cdn.hahacode.cn/page/message.jpeg"},
-		{Label: "个人中心", Name: "user", Cover: "https://cdn.hahacode.cn/page/user.jpg"},
-		{Label: "相册", Name: "album", Cover: "https://cdn.hahacode.cn/page/album.png"},
-		{Label: "错误页面", Name: "404", Cover: "https://cdn.hahacode.cn/page/404.jpg"},
-		{Label: "文章列表", Name: "article_list", Cover: "https://cdn.hahacode.cn/page/article_list.jpg"},
+		{Name: "首页", Label: "home", Cover: "https://cdn.hahacode.cn/page/home.jpg"},
+		{Name: "归档", Label: "archive", Cover: "https://cdn.hahacode.cn/page/archive.png"},
+		{Name: "分类", Label: "category", Cover: "https://cdn.hahacode.cn/page/category.png"},
+		{Name: "标签", Label: "tag", Cover: "https://cdn.hahacode.cn/page/tag.png"},
+		{Name: "友链", Label: "link", Cover: "https://cdn.hahacode.cn/page/link.jpg"},
+		{Name: "关于", Label: "about", Cover: "https://cdn.hahacode.cn/page/about.jpg"},
+		{Name: "留言", Label: "message", Cover: "https://cdn.hahacode.cn/page/message.jpeg"},
+		{Name: "个人中心", Label: "user", Cover: "https://cdn.hahacode.cn/page/user.jpg"},
+		{Name: "相册", Label: "album", Cover: "https://cdn.hahacode.cn/page/album.png"},
+		{Name: "错误页面", Label: "404", Cover: "https://cdn.hahacode.cn/page/404.jpg"},
+		{Name: "文章列表", Label: "article_list", Cover: "https://cdn.hahacode.cn/page/article_list.jpg"},
 	}
 
 	for _, page := range pages {
