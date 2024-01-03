@@ -103,7 +103,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 
 // 获取友链列表
 func (*Front) GetLinkList(c *gin.Context) {
-	list, _, err := model.GetLinkList(GetDB(c), 0, 0, "")
+	list, _, err := model.GetLinkList(GetDB(c), 0, 1000, "")
 	if err != nil {
 		ReturnError(c, g.ERROR_DB_OPERATION, err)
 		return
