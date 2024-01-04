@@ -7,13 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Category struct{}
+
 // 添加/编辑分类对象
 type AddOrEditCategoryReq struct {
 	ID   int    `json:"id"`
 	Name string `json:"name" binding:"required"`
 }
-
-type Category struct{}
 
 // @Summary 获取分类列表
 // @Description 根据条件查询获取分类列表
@@ -29,13 +29,13 @@ type Category struct{}
 func (*Category) GetList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	data, total, err := model.GetCategoryList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -59,13 +59,13 @@ func (*Category) GetList(c *gin.Context) {
 func (*Category) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditCategoryReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	category, err := model.SaveOrUpdateCategory(GetDB(c), req.ID, req.Name)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (*Category) SaveOrUpdate(c *gin.Context) {
 func (*Category) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -93,17 +93,18 @@ func (*Category) Delete(c *gin.Context) {
 	// 检查分类下是否存在文章
 	count, err := model.Count(db, &model.Article{}, "category_id in ?", ids)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
+
 	if count > 0 {
-		ReturnError(c, g.ERROR_CATE_ART_EXIST, nil)
+		ReturnError(c, g.ErrCateHasArt, nil)
 		return
 	}
 
 	rows, err := model.DeleteCategory(db, ids)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, rows)
@@ -120,7 +121,7 @@ func (*Category) Delete(c *gin.Context) {
 func (*Category) GetOption(c *gin.Context) {
 	list, err := model.GetCategoryOption(GetDB(c))
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, list)

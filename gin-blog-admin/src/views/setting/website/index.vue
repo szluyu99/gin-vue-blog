@@ -41,9 +41,6 @@ onMounted(async () => {
 async function fetchData() {
   const resp = await api.getConfig()
   form.value = resp.data
-
-  // const resp = await api.getBlogConfig()
-  // form.value = resp.data
 }
 
 function handleSave() {
@@ -54,7 +51,7 @@ function handleSave() {
         await api.updateConfig(form.value)
         $loadingBar?.finish()
         $message.success('博客信息更新成功')
-        fetchData()
+        // fetchData()
       }
       catch (err) {
         $loadingBar?.error()

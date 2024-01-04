@@ -49,7 +49,7 @@ func (*Resource) GetTreeList(c *gin.Context) {
 
 	resourceList, err := model.GetResourceList(GetDB(c), keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (*Resource) GetOption(c *gin.Context) {
 	db := GetDB(c)
 	resources, err := model.GetResourceList(db, "")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -91,14 +91,14 @@ func (*Resource) GetOption(c *gin.Context) {
 func (*Resource) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	db := GetDB(c)
 	err := model.SaveOrUpdateResource(db, req.ID, req.ParentId, req.Name, req.Url, req.Method)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -109,13 +109,13 @@ func (*Resource) SaveOrUpdate(c *gin.Context) {
 func (*Resource) UpdateAnonymous(c *gin.Context) {
 	var req EditAnonymousReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	err := model.UpdateResourceAnonymous(GetDB(c), req.ID, req.Anonymous)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -127,7 +127,7 @@ func (*Resource) UpdateAnonymous(c *gin.Context) {
 func (*Resource) Delete(c *gin.Context) {
 	resourceId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (*Resource) Delete(c *gin.Context) {
 	// 检查该资源是否被角色使用
 	use, _ := model.CheckResourceInUse(db, resourceId)
 	if use {
-		ReturnError(c, g.ERROR_RESOURCE_USED_BY_ROLE, nil)
+		ReturnError(c, g.ErrResourceUsedByRole, nil)
 		return
 	}
 
@@ -144,10 +144,10 @@ func (*Resource) Delete(c *gin.Context) {
 	resource, err := model.GetResourceById(db, resourceId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ReturnError(c, g.ERROR_RESOURCE_NOT_EXIST, nil)
+			ReturnError(c, g.ErrResourceNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -155,14 +155,14 @@ func (*Resource) Delete(c *gin.Context) {
 	if resource.ParentId == 0 {
 		hasChild, _ := model.CheckResourceHasChild(db, resourceId)
 		if hasChild {
-			ReturnError(c, g.ERROR_RESOURCE_HAS_CHILDREN, nil)
+			ReturnError(c, g.ErrResourceHasChildren, nil)
 			return
 		}
 	}
 
 	rows, err := model.DeleteResource(db, resourceId)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

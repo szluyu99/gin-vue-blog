@@ -35,7 +35,7 @@ var (
 )
 
 // TODO: 前端修改 PUT 和 PATCH 请求
-func RegisterHandlers(r *gin.Engine) error {
+func RegisterHandlers(r *gin.Engine) {
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/api"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -43,7 +43,6 @@ func RegisterHandlers(r *gin.Engine) error {
 	registerBaseHandler(r)
 	registerAdminHandler(r)
 	registerBlogHandler(r)
-	return nil
 }
 
 // 通用接口: 全部不需要 登录 + 鉴权
@@ -66,11 +65,10 @@ func registerAdminHandler(r *gin.Engine) {
 	// !注意使用中间件的顺序
 	auth.Use(middleware.JWTAuth())
 	auth.Use(middleware.PermissionCheck())
+	auth.Use(middleware.OperationLog())
 	// auth.Use(middleware.ListenOnline()) // 监听在线用户
-	// auth.Use(middleware.OperationLog()) // 记录操作日志
 
 	auth.GET("/home", blogInfoAPI.GetHomeInfo) // 后台首页信息
-	// auth.GET("/logout", userAuthAPI.Logout)    // 退出登录
 	auth.POST("/upload", uploadAPI.UploadFile) // 文件上传
 
 	// 博客设置

@@ -158,8 +158,5 @@ func GetArticleCommentCount(db *gorm.DB, articleId int) (count int64, err error)
 	result := db.Model(&Comment{}).
 		Where("topic_id = ? AND type = 1 AND is_review = 1", articleId).
 		Count(&count)
-	if result.Error != nil {
-		return 0, result.Error
-	}
-	return count, nil
+	return count, result.Error
 }

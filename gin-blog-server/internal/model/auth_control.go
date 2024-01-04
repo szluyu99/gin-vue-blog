@@ -22,61 +22,40 @@ func AddResource(db *gorm.DB, name, uri, method string, anonymous bool) (*Resour
 		Anonymous: anonymous,
 	}
 	result := db.Save(&resource)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &resource, nil
+	return &resource, result.Error
 }
 
 func GetResource(db *gorm.DB, uri, method string) (resource Resource, err error) {
 	result := db.Where(&Resource{Url: uri, Method: method}).First(&resource)
-	if result.Error != nil {
-		return resource, result.Error
-	}
-	return resource, nil
+	return resource, result.Error
 }
 
 func GetResourceById(db *gorm.DB, id int) (resource Resource, err error) {
 	result := db.First(&resource, id)
-	if result.Error != nil {
-		return resource, result.Error
-	}
-	return resource, nil
+	return resource, result.Error
 }
 
 func CheckResourceInUse(db *gorm.DB, id int) (bool, error) {
 	var count int64
 	result := db.Model(&RoleResource{}).Where("resource_id = ?", id).Count(&count)
-	if result.Error != nil {
-		return false, result.Error
-	}
-	return count > 0, nil
+	return count > 0, result.Error
 }
 
 func CheckResourceHasChild(db *gorm.DB, id int) (bool, error) {
 	var count int64
 	result := db.Model(&Resource{}).Where("parent_id = ?", id).Count(&count)
-	if result.Error != nil {
-		return false, result.Error
-	}
-	return count > 0, nil
+	return count > 0, result.Error
 }
 
 func GetResourcesByRole(db *gorm.DB, rid int) (resources []Resource, err error) {
 	var role Role
 	result := db.Model(&Role{}).Preload("Resources").Take(&role, rid)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return role.Resources, nil
+	return role.Resources, result.Error
 }
 
 func UpdateResourceAnonymous(db *gorm.DB, id int, anonymous bool) error {
 	result := db.Model(&Resource{}).Where("id = ?", id).Update("anonymous", anonymous)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 // role

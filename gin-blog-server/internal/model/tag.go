@@ -37,20 +37,13 @@ func GetTagList(db *gorm.DB, page, size int, keyword string) (list []TagVO, tota
 		Scopes(Paginate(page, size)).
 		Find(&list)
 
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-
-	return list, total, nil
+	return list, total, result.Error
 }
 
 func GetTagOption(db *gorm.DB) ([]OptionVO, error) {
 	list := make([]OptionVO, 0)
 	result := db.Model(&Tag{}).Select("id", "name").Find(&list)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return list, nil
+	return list, result.Error
 }
 
 // 根据 [文章id] 获取 [标签名称列表]
@@ -60,24 +53,21 @@ func GetTagNamesByArticleId(db *gorm.DB, id int) ([]string, error) {
 		Joins("LEFT JOIN article_tag ON tag.id = article_tag.tag_id").
 		Where("article_id", id).
 		Pluck("name", &list)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return list, nil
+	return list, result.Error
 }
 
 func SaveOrUpdateTag(db *gorm.DB, id int, name string) (*Tag, error) {
-	tag := Tag{Name: name}
+	tag := Tag{
+		Model: Model{ID: id},
+		Name:  name,
+	}
 
 	var result *gorm.DB
 	if id > 0 {
-		result = db.Model(&tag).Where("id", id).Updates(tag)
+		result = db.Updates(tag)
 	} else {
 		result = db.Create(&tag)
 	}
 
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &tag, nil
+	return &tag, result.Error
 }

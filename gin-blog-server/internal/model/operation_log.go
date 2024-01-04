@@ -21,15 +21,15 @@ type OperationLog struct {
 	IpSource  string `gorm:"type:varchar(255);comment:操作地址" json:"ip_source"`
 }
 
-func GetOperationLogList(db *gorm.DB, num, size int, keyword string) (list []OperationLog, total int64, err error) {
+func GetOperationLogList(db *gorm.DB, num, size int, keyword string) (data []OperationLog, total int64, err error) {
 	db = db.Model(&OperationLog{})
 	if keyword != "" {
-		db = db.Where("opt_module LIKE ?", "%"+keyword+"%").Or("opt_desc LIKE ?", "%"+keyword+"%")
+		db = db.Where("opt_module LIKE ?", "%"+keyword+"%").
+			Or("opt_desc LIKE ?", "%"+keyword+"%")
 	}
 	db.Count(&total)
-	result := db.Order("id DESC").Scopes(Paginate(num, size)).Find(&list)
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-	return list, total, nil
+	result := db.Order("created_at DESC").
+		Scopes(Paginate(num, size)).
+		Find(&data)
+	return data, total, result.Error
 }

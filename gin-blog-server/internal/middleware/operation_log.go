@@ -5,6 +5,7 @@ import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/handle"
 	"gin-blog/internal/model"
+	"gin-blog/internal/utils"
 	"io"
 	"log/slog"
 	"strings"
@@ -58,7 +59,7 @@ func (w CustomResponseWriter) WriteString(s string) (int, error) {
 // 记录操作日志中间件
 func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// TODO: 优化记录文件上传
+		// TODO: 记录文件上传
 		// 不记录 GET 请求操作记录 (太多了) 和 文件上传操作记录 (请求体太长)
 		if c.Request.Method != "GET" && !strings.Contains(c.Request.RequestURI, "upload") {
 			blw := &CustomResponseWriter{
@@ -72,7 +73,10 @@ func OperationLog() gin.HandlerFunc {
 			body, _ := io.ReadAll(c.Request.Body)
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 
-			moduleName := getOptResource(getOptResource(c.HandlerName()))
+			ipAddress := utils.IP.GetIpAddress(c)
+			ipSource := utils.IP.GetIpSource(ipAddress)
+
+			moduleName := getOptResource(c.HandlerName())
 			operationLog := model.OperationLog{
 				OptModule:     moduleName, // TODO: 优化
 				OptType:       GetOptString(c.Request.Method),
@@ -83,17 +87,16 @@ func OperationLog() gin.HandlerFunc {
 				RequestMethod: c.Request.Method,
 				UserId:        auth.UserInfoId,
 				Nickname:      auth.UserInfo.Nickname,
-				// TODO: IP 地址获取
-				// IpAddress:     sessionInfo.IpAddress,
-				// IpSource:      sessionInfo.IpSource,
+				IpAddress:     ipAddress,
+				IpSource:      ipSource,
 			}
 			c.Next()
 			operationLog.ResponseData = blw.body.String() // 从缓存中获取响应体内容
-			// fmt.Println("操作日志记录: ", operationLog)
+
 			db := c.MustGet(g.CTX_DB).(*gorm.DB)
 			if err := db.Create(&operationLog).Error; err != nil {
 				slog.Error("操作日志记录失败: ", err)
-				handle.ReturnError(c, g.ERROR_DB_OPERATION, nil)
+				handle.ReturnError(c, g.ErrDbOpt, err)
 				return
 			}
 		} else {

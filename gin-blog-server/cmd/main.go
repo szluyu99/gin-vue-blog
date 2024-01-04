@@ -29,9 +29,11 @@ func main() {
 	gin.SetMode(conf.Server.Mode)
 	r := gin.New()
 	r.SetTrustedProxies([]string{"*"})
-	r.Use(gin.Recovery())
-	// r.Use(middleware.Recovery(true)) // TODO: 自定义错误处理中间件
-	r.Use(middleware.Logger())
+	if conf.Server.Mode == "debug" {
+		r.Use(gin.Logger(), gin.Recovery())
+	} else {
+		r.Use(middleware.Recovery(true), middleware.Logger())
+	}
 	r.Use(middleware.CORS())
 	r.Use(middleware.WithGormDB(db))
 	r.Use(middleware.WithRedisDB(rdb))

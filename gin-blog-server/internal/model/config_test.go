@@ -65,3 +65,21 @@ func TestConfigSetGet(t *testing.T) {
 	m, _ := GetConfigMap(db)
 	assert.Len(t, m, 1)
 }
+
+func TestCheckConfig(t *testing.T) {
+	db := initDB()
+	db.AutoMigrate(&Config{})
+
+	{
+		CheckConfig(db, "name", "AAA")
+		val := GetConfig(db, "name")
+		assert.Equal(t, "AAA", val)
+	}
+
+	{
+		CheckConfig(db, "name", "BBB")
+		val := GetConfig(db, "name")
+		assert.Equal(t, "BBB", val)
+	}
+
+}

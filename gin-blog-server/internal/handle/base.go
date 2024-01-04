@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"context"
 	"errors"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
@@ -47,23 +46,30 @@ func ReturnSuccess(c *gin.Context, data any) {
 	ReturnResponse(c, g.SUCCESS, data)
 }
 
-// 处理错误
-func ReturnError(c *gin.Context, code int, err error) {
-	var msg string
+// 所有可预料的错误 = 业务错误 + 系统错误, 在业务层面处理, 返回 HTTP 200 状态码
+// 对于不可预料的错误, 会触发 panic, 由 gin 中间件捕获, 并返回 HTTP 500 状态码
+// err 是业务错误, data 是错误数据 (可以是 error 或 string)
+func ReturnError(c *gin.Context, result g.Result, data any) {
+	slog.Info("[Func-ReturnError] " + result.Msg())
 
-	if err == nil {
-		msg = g.GetMsg(code)
-	} else {
-		msg = err.Error()
+	var val string = result.Msg()
+
+	if data != nil {
+		switch v := data.(type) {
+		case error:
+			val = v.Error()
+		case string:
+			val = v
+		}
+		slog.Error(val) // 错误日志
 	}
-	slog.Error(msg) // 记录错误日志
 
 	c.AbortWithStatusJSON(
 		http.StatusOK,
-		Response[string]{
-			Code:    code,
-			Message: msg,
-			Data:    msg,
+		Response[any]{
+			Code:    result.Code(),
+			Message: result.Msg(),
+			Data:    val,
 		},
 	)
 }
@@ -91,11 +97,6 @@ func GetDB(c *gin.Context) *gorm.DB {
 // 获取 *redis.Client
 func GetRDB(c *gin.Context) *redis.Client {
 	return c.MustGet(g.CTX_RDB).(*redis.Client)
-}
-
-// 获取 context.Context
-func ctx() context.Context {
-	return context.Background()
 }
 
 /*

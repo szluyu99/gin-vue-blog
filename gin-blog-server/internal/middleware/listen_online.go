@@ -1,10 +1,5 @@
 package middleware
 
-const (
-	KEY_USER   = "user:"
-	KEY_DELETE = "delete:"
-)
-
 // 监听在线状态中间件
 // func ListenOnline() gin.HandlerFunc {
 // 	return func(c *gin.Context) {

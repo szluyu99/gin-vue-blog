@@ -20,15 +20,15 @@ func GetLinkList(db *gorm.DB, num, size int, keyword string) (list []FriendLink,
 		db = db.Or("intro LIKE ?", "%"+keyword+"%")
 	}
 	db.Count(&total)
-	result := db.Order("created_at DESC").Scopes(Paginate(num, size)).Find(&list)
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-	return list, total, nil
+	result := db.Order("created_at DESC").
+		Scopes(Paginate(num, size)).
+		Find(&list)
+	return list, total, result.Error
 }
 
 func SaveOrUpdateLink(db *gorm.DB, id int, name, avatar, address, intro string) (*FriendLink, error) {
 	link := FriendLink{
+		Model:   Model{ID: id},
 		Name:    name,
 		Avatar:  avatar,
 		Address: address,
@@ -37,13 +37,10 @@ func SaveOrUpdateLink(db *gorm.DB, id int, name, avatar, address, intro string) 
 
 	var result *gorm.DB
 	if id > 0 {
-		result = db.Model(&link).Where("id", id).Updates(link)
+		result = db.Updates(&link)
 	} else {
 		result = db.Create(&link)
 	}
-	if result.Error != nil {
-		return nil, result.Error
-	}
 
-	return &link, nil
+	return &link, result.Error
 }

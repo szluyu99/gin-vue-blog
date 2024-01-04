@@ -28,7 +28,10 @@ type product struct {
 }
 
 func initDB() *gorm.DB {
-	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{SkipDefaultTransaction: true})
+	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
+
 	db.AutoMigrate(user{}, product{})
 	return db
 }

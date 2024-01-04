@@ -28,26 +28,17 @@ func GetMessageList(db *gorm.DB, num, size int, nickname string, isReview *bool)
 
 	db.Count(&total)
 	result := db.Order("created_at DESC").Scopes(Paginate(num, size)).Find(&list)
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-	return list, total, nil
+	return list, total, result.Error
 }
 
 func DeleteMessages(db *gorm.DB, ids []int) (int64, error) {
 	result := db.Where("id in ?", ids).Delete(&Message{})
-	if result.Error != nil {
-		return 0, result.Error
-	}
-	return result.RowsAffected, nil
+	return result.RowsAffected, result.Error
 }
 
 func UpdateMessagesReview(db *gorm.DB, ids []int, isReview bool) (int64, error) {
 	result := db.Model(&Message{}).Where("id in ?", ids).Update("is_review", isReview)
-	if result.Error != nil {
-		return 0, result.Error
-	}
-	return result.RowsAffected, nil
+	return result.RowsAffected, result.Error
 }
 
 func SaveMessage(db *gorm.DB, nickname, avatar, content, address, source string, speed int, isReview bool) (*Message, error) {
@@ -62,8 +53,5 @@ func SaveMessage(db *gorm.DB, nickname, avatar, content, address, source string,
 	}
 
 	result := db.Create(&message)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &message, nil
+	return &message, result.Error
 }

@@ -30,7 +30,7 @@ type AddOrEditRoleReq struct {
 func (*Role) GetOption(c *gin.Context) {
 	list, err := model.GetRoleOption(GetDB(c))
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (*Role) GetOption(c *gin.Context) {
 func (*Role) GetTreeList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (*Role) GetTreeList(c *gin.Context) {
 
 	list, total, err := model.GetRoleList(db, query.Page, query.Size, query.Keyword)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (*Role) GetTreeList(c *gin.Context) {
 func (*Role) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditRoleReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -89,13 +89,13 @@ func (*Role) SaveOrUpdate(c *gin.Context) {
 	if req.ID == 0 {
 		err := model.SaveRole(db, req.Name, req.Label)
 		if err != nil {
-			ReturnError(c, g.ERROR_DB_OPERATION, err)
+			ReturnError(c, g.ErrDbOpt, err)
 			return
 		}
 	} else {
 		err := model.UpdateRole(db, req.ID, req.Name, req.Label, req.IsDisable, req.ResourceIds, req.MenuIds)
 		if err != nil {
-			ReturnError(c, g.ERROR_DB_OPERATION, err)
+			ReturnError(c, g.ErrDbOpt, err)
 			return
 		}
 	}
@@ -106,13 +106,13 @@ func (*Role) SaveOrUpdate(c *gin.Context) {
 func (*Role) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	err := model.DeleteRoles(GetDB(c), ids)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

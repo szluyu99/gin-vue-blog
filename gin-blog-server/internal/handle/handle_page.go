@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"log/slog"
@@ -11,34 +10,6 @@ import (
 )
 
 type Page struct{}
-
-// 将页面列表缓存到 Redis 中
-func addPageCache(rdb *redis.Client, pages []model.Page) error {
-	data, err := json.Marshal(pages)
-	if err != nil {
-		return err
-	}
-	return rdb.Set(ctx(), g.PAGE, string(data), 0).Err()
-}
-
-// 删除 Redis 中页面列表缓存
-func removePageCache(rdb *redis.Client) error {
-	return rdb.Del(ctx(), g.PAGE).Err()
-}
-
-// 从 Redis 中获取页面列表缓存
-func getPageCache(rdb *redis.Client) (cache []model.Page, err error) {
-	s, err := rdb.Get(ctx(), g.PAGE).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := json.Unmarshal([]byte(s), &cache); err != nil {
-		return nil, err
-	}
-
-	return cache, nil
-}
 
 // @Summary 获取页面列表
 // @Description 根据条件查询获取页面列表
@@ -52,6 +23,7 @@ func (*Page) GetList(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
 
+	// get from cache
 	cache, err := getPageCache(rdb)
 	if cache != nil && err == nil {
 		slog.Debug("[handle-page-GetList] get page list from cache")
@@ -63,18 +35,20 @@ func (*Page) GetList(c *gin.Context) {
 	case redis.Nil:
 		break
 	default:
-		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 
+	// get from db
 	data, _, err := model.GetPageList(db)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
+	// add to cache
 	if err := addPageCache(GetRDB(c), data); err != nil {
-		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 
@@ -93,7 +67,7 @@ func (*Page) GetList(c *gin.Context) {
 func (*Page) SaveOrUpdate(c *gin.Context) {
 	var req model.Page
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -102,12 +76,13 @@ func (*Page) SaveOrUpdate(c *gin.Context) {
 
 	page, err := model.SaveOrUpdatePage(db, req.ID, req.Name, req.Label, req.Cover)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
+	// delete cache
 	if err := removePageCache(rdb); err != nil {
-		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 
@@ -126,18 +101,19 @@ func (*Page) SaveOrUpdate(c *gin.Context) {
 func (*Page) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	result := GetDB(c).Delete(model.Page{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 
+	// delete cache
 	if err := removePageCache(GetRDB(c)); err != nil {
-		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 

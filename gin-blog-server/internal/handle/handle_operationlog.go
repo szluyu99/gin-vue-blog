@@ -23,13 +23,13 @@ type OperationLog struct{}
 func (*OperationLog) GetList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	list, total, err := model.GetOperationLogList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -53,13 +53,13 @@ func (*OperationLog) GetList(c *gin.Context) {
 func (*OperationLog) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	result := GetDB(c).Delete(&model.OperationLog{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 

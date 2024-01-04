@@ -60,7 +60,7 @@ type ArticleVO struct {
 func (*Article) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditArticleReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (*Article) SaveOrUpdate(c *gin.Context) {
 
 	err := model.SaveOrUpdateArticle(db, &article, req.CategoryName, req.TagNames)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -100,13 +100,13 @@ func (*Article) SaveOrUpdate(c *gin.Context) {
 func (*Article) UpdateSoftDelete(c *gin.Context) {
 	var req SoftDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	rows, err := model.UpdateArticleSoftDelete(GetDB(c), req.Ids, req.IsDelete)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -116,13 +116,13 @@ func (*Article) UpdateSoftDelete(c *gin.Context) {
 func (*Article) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	rows, err := model.DeleteArticle(GetDB(c), ids)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -132,7 +132,7 @@ func (*Article) Delete(c *gin.Context) {
 func (*Article) GetList(c *gin.Context) {
 	var query ArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -141,12 +141,12 @@ func (*Article) GetList(c *gin.Context) {
 
 	list, total, err := model.GetArticleList(db, query.Page, query.Size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	likeCountMap := rdb.HGetAll(ctx(), g.ARTICLE_LIKE_COUNT).Val()
-	viewCountZ := rdb.ZRangeWithScores(ctx(), g.ARTICLE_VIEW_COUNT, 0, -1).Val()
+	likeCountMap := rdb.HGetAll(rctx, g.ARTICLE_LIKE_COUNT).Val()
+	viewCountZ := rdb.ZRangeWithScores(rctx, g.ARTICLE_VIEW_COUNT, 0, -1).Val()
 
 	viewCountMap := make(map[int]int)
 	for _, article := range viewCountZ {
@@ -177,13 +177,13 @@ func (*Article) GetList(c *gin.Context) {
 func (*Article) GetDetail(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	article, err := model.GetArticle(GetDB(c), id)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -194,13 +194,13 @@ func (*Article) GetDetail(c *gin.Context) {
 func (*Article) UpdateTop(c *gin.Context) {
 	var req UpdateArticleTopReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	err := model.UpdateArticleTop(GetDB(c), req.ID, req.IsTop)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -220,7 +220,7 @@ func (*Article) Import(c *gin.Context) {
 
 	_, fileHeader, err := c.Request.FormFile("file")
 	if err != nil {
-		ReturnError(c, g.ERROR_FILE_RECEIVE, err)
+		ReturnError(c, g.ErrFileReceive, err)
 		return
 	}
 
@@ -228,14 +228,14 @@ func (*Article) Import(c *gin.Context) {
 	title := fileName[:len(fileName)-3]
 	content, err := readFromFileHeader(fileHeader)
 	if err != nil {
-		ReturnError(c, g.ERROR_FILE_RECEIVE, err)
+		ReturnError(c, g.ErrFileReceive, err)
 		return
 	}
 
 	defaultImg := model.GetConfig(db, g.CONFIG_ARTICLE_COVER)
 	err = model.ImportArticle(db, auth.ID, title, content, defaultImg)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

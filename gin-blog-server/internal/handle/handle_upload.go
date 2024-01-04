@@ -20,14 +20,14 @@ type Upload struct{}
 func (*Upload) UploadFile(c *gin.Context) {
 	_, fileHeader, err := c.Request.FormFile("file")
 	if err != nil {
-		ReturnError(c, g.ERROR_FILE_RECEIVE, err)
+		ReturnError(c, g.ErrFileReceive, err)
 		return
 	}
 
 	oss := upload.NewOSS()
 	filePath, _, err := oss.UploadFile(fileHeader)
 	if err != nil {
-		ReturnError(c, g.ERROR_FILE_UPLOAD, err)
+		ReturnError(c, g.ErrFileUpload, err)
 		return
 	}
 

@@ -61,19 +61,19 @@ func (*User) GetInfo(c *gin.Context) {
 
 	user, err := CurrentUserAuth(c)
 	if err != nil {
-		ReturnError(c, g.ERROR_TOKEN_RUNTIME, err)
+		ReturnError(c, g.ErrTokenRuntime, err)
 		return
 	}
 
 	userInfoVO := model.UserInfoVO{UserInfo: *user.UserInfo}
-	userInfoVO.ArticleLikeSet, err = rdb.SMembers(ctx(), g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
+	userInfoVO.ArticleLikeSet, err = rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
-	userInfoVO.CommentLikeSet, err = rdb.SMembers(ctx(), g.COMMENT_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
+	userInfoVO.CommentLikeSet, err = rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -85,14 +85,14 @@ func (*User) GetInfo(c *gin.Context) {
 func (*User) UpdateCurrent(c *gin.Context) {
 	var req UpdateCurrentUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	auth, _ := CurrentUserAuth(c)
 	err := model.UpdateUserInfo(GetDB(c), auth.UserInfoId, req.Nickname, req.Avatar, req.Intro, req.Website)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -103,12 +103,12 @@ func (*User) UpdateCurrent(c *gin.Context) {
 func (*User) Update(c *gin.Context) {
 	var req UpdateUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	if err := model.UpdateUserNicknameAndRole(GetDB(c), req.UserAuthId, req.Nickname, req.RoleIds); err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -119,13 +119,13 @@ func (*User) Update(c *gin.Context) {
 func (*User) GetList(c *gin.Context) {
 	var query UserQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	list, count, err := model.GetUserList(GetDB(c), query.Page, query.Size, query.LoginType, query.Nickname, query.Username)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -142,13 +142,13 @@ func (*User) UpdateDisable(c *gin.Context) {
 	var req UpdateUserDisableReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	err := model.UpdateUserDisable(GetDB(c), req.UserAuthId, req.IsDisable)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -159,21 +159,21 @@ func (*User) UpdateDisable(c *gin.Context) {
 func (*User) UpdateCurrentPassword(c *gin.Context) {
 	var req UpdateCurrentPasswordReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	auth, _ := CurrentUserAuth(c)
 
 	if !utils.BcryptCheck(req.OldPassword, auth.Password) {
-		ReturnError(c, g.ERROR_OLD_PASSWORD, nil)
+		ReturnError(c, g.ErrOldPassword, nil)
 		return
 	}
 
 	hashPassword, _ := utils.BcryptHash(req.NewPassword)
 	err := model.UpdateUserPassword(GetDB(c), auth.ID, hashPassword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -191,7 +191,7 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 
 // 	var form UpdatePasswordForm
 // 	if err := c.ShouldBindJSON(&form); err != nil {
-// 		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+// 		ReturnError(c, g.ErrRequestParam, err)
 // 		return
 // 	}
 
@@ -202,7 +202,7 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 // 	}
 // 	err = model.UpdateUserPassword(GetDB(c), form.Username, hashPassword)
 // 	if err != nil {
-// 		ReturnError(c, g.ERROR_DB_OPERATION, err)
+// 		ReturnError(c, g.ErrDbOperatioin, err)
 // 		return
 // 	}
 
@@ -217,7 +217,7 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 func (*User) GetOnlineList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -264,7 +264,7 @@ func (*User) ForceOffline(c *gin.Context) {
 
 	var req ForceOfflineReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 

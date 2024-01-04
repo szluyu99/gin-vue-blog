@@ -62,10 +62,10 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 
 	data, err := model.GetFrontStatistics(db)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
-	data.ViewCount, _ = rdb.Get(ctx(), g.VIEW_COUNT).Int64()
+	data.ViewCount, _ = rdb.Get(rctx, g.VIEW_COUNT).Int64()
 
 	ReturnSuccess(c, data)
 }
@@ -74,7 +74,7 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 func (*Front) GetTagList(c *gin.Context) {
 	list, _, err := model.GetTagList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -84,7 +84,7 @@ func (*Front) GetTagList(c *gin.Context) {
 func (*Front) GetCategoryList(c *gin.Context) {
 	list, _, err := model.GetCategoryList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -95,7 +95,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 	isReview := true
 	list, _, err := model.GetMessageList(GetDB(c), 1, 1000, "", &isReview)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -105,7 +105,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 func (*Front) GetLinkList(c *gin.Context) {
 	list, _, err := model.GetLinkList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (*Front) GetLinkList(c *gin.Context) {
 func (*Front) SaveMessage(c *gin.Context) {
 	var req FAddMessageReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -135,7 +135,7 @@ func (*Front) SaveMessage(c *gin.Context) {
 	info := auth.UserInfo
 	message, err := model.SaveMessage(db, info.Nickname, info.Nickname, req.Content, ipAddress, ipSource, req.Speed, isReview)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -149,7 +149,7 @@ func (*Front) SaveMessage(c *gin.Context) {
 func (*Front) SaveComment(c *gin.Context) {
 	var req FAddCommentReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -167,7 +167,7 @@ func (*Front) SaveComment(c *gin.Context) {
 	}
 
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -178,7 +178,7 @@ func (*Front) SaveComment(c *gin.Context) {
 func (*Front) GetCommentList(c *gin.Context) {
 	var query FCommentQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -187,11 +187,11 @@ func (*Front) GetCommentList(c *gin.Context) {
 
 	data, total, err := model.GetCommentVOList(db, query.Page, query.Size, query.TopicId, query.Type)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	likeCountMap := rdb.HGetAll(ctx(), g.COMMENT_LIKE_COUNT).Val()
+	likeCountMap := rdb.HGetAll(rctx, g.COMMENT_LIKE_COUNT).Val()
 	for i, comment := range data {
 		if len(data[i].ReplyList) > 3 {
 			data[i].ReplyList = data[i].ReplyList[:3] // 只显示 3 条回复
@@ -211,13 +211,13 @@ func (*Front) GetCommentList(c *gin.Context) {
 func (*Front) GetReplyListByCommentId(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("comment_id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -226,11 +226,11 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 
 	replyList, err := model.GetCommentReplyList(db, id, query.Page, query.Size)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	likeCountMap := rdb.HGetAll(ctx(), g.COMMENT_LIKE_COUNT).Val()
+	likeCountMap := rdb.HGetAll(rctx, g.COMMENT_LIKE_COUNT).Val()
 
 	data := make([]model.CommentVO, 0)
 	for _, reply := range replyList {
@@ -248,7 +248,7 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 func (*Front) LikeComment(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("comment_id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -258,12 +258,12 @@ func (*Front) LikeComment(c *gin.Context) {
 	// 记录某个用户已经对某个评论点过赞
 	commentLikeUserKey := g.COMMENT_USER_LIKE_SET + strconv.Itoa(auth.ID)
 	// 该评论已经被记录过, 再点赞就是取消点赞
-	if rdb.SIsMember(ctx(), commentLikeUserKey, id).Val() {
-		rdb.SRem(ctx(), commentLikeUserKey, id)
-		rdb.HIncrBy(ctx(), g.COMMENT_LIKE_COUNT, strconv.Itoa(id), -1)
+	if rdb.SIsMember(rctx, commentLikeUserKey, id).Val() {
+		rdb.SRem(rctx, commentLikeUserKey, id)
+		rdb.HIncrBy(rctx, g.COMMENT_LIKE_COUNT, strconv.Itoa(id), -1)
 	} else { // 未被记录过, 则是增加点赞
-		rdb.SAdd(ctx(), commentLikeUserKey, id)
-		rdb.HIncrBy(ctx(), g.COMMENT_LIKE_COUNT, strconv.Itoa(id), 1)
+		rdb.SAdd(rctx, commentLikeUserKey, id)
+		rdb.HIncrBy(rctx, g.COMMENT_LIKE_COUNT, strconv.Itoa(id), 1)
 	}
 
 	ReturnSuccess(c, nil)
@@ -277,13 +277,13 @@ func (*Front) LikeComment(c *gin.Context) {
 func (*Front) GetArticleList(c *gin.Context) {
 	var query FArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	list, _, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -294,7 +294,7 @@ func (*Front) GetArticleList(c *gin.Context) {
 func (*Front) GetArticleInfo(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -304,7 +304,7 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 文章详情
 	val, err := model.GetBlogArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -313,14 +313,14 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 推荐文章（6篇）
 	article.RecommendArticles, err = model.GetRecommendList(db, id, 6)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
 	// 最新文章（5篇）
 	article.NewestArticles, err = model.GetNewestList(db, 5)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -329,30 +329,30 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 
 	// TODO: 更新访问量
 	// * 目前请求一次就会增加访问量, 即刷新可以刷访问量
-	rdb.ZIncrBy(ctx(), g.ARTICLE_VIEW_COUNT, 1, strconv.Itoa(id))
+	rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 1, strconv.Itoa(id))
 
 	// 上一篇文章
 	article.LastArticle, err = model.GetLastArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
 	// 下一篇文章
 	article.NextArticle, err = model.GetNextArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
 	// 点赞量, 浏览量
-	article.ViewCount = int64(rdb.ZScore(ctx(), g.ARTICLE_VIEW_COUNT, strconv.Itoa(id)).Val())
-	article.LikeCount = int64(rdb.ZScore(ctx(), g.ARTICLE_LIKE_COUNT, strconv.Itoa(id)).Val())
+	article.ViewCount = int64(rdb.ZScore(rctx, g.ARTICLE_VIEW_COUNT, strconv.Itoa(id)).Val())
+	article.LikeCount = int64(rdb.ZScore(rctx, g.ARTICLE_LIKE_COUNT, strconv.Itoa(id)).Val())
 
 	// 评论数量
 	article.CommentCount, err = model.GetArticleCommentCount(db, id)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -363,13 +363,13 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 func (*Front) GetArchiveList(c *gin.Context) {
 	var query FArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	list, total, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -397,7 +397,7 @@ func (*Front) LikeArticle(c *gin.Context) {
 
 	articleId, err := strconv.Atoi(c.Param("article_id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -406,12 +406,12 @@ func (*Front) LikeArticle(c *gin.Context) {
 	// 记录某个用户已经对某个文章点过赞
 	articleLikeUserKey := g.ARTICLE_USER_LIKE_SET + strconv.Itoa(auth.ID)
 	// 该文章已经被记录过, 再点赞就是取消点赞
-	if rdb.SIsMember(ctx(), articleLikeUserKey, articleId).Val() {
-		rdb.SRem(ctx(), articleLikeUserKey, articleId)
-		rdb.HIncrBy(ctx(), g.ARTICLE_LIKE_COUNT, strconv.Itoa(articleId), -1)
+	if rdb.SIsMember(rctx, articleLikeUserKey, articleId).Val() {
+		rdb.SRem(rctx, articleLikeUserKey, articleId)
+		rdb.HIncrBy(rctx, g.ARTICLE_LIKE_COUNT, strconv.Itoa(articleId), -1)
 	} else { // 未被记录过, 则是增加点赞
-		rdb.SAdd(ctx(), articleLikeUserKey, articleId)
-		rdb.HIncrBy(ctx(), g.ARTICLE_LIKE_COUNT, strconv.Itoa(articleId), 1)
+		rdb.SAdd(rctx, articleLikeUserKey, articleId)
+		rdb.HIncrBy(rctx, g.ARTICLE_LIKE_COUNT, strconv.Itoa(articleId), 1)
 	}
 
 	ReturnSuccess(c, nil)
@@ -433,7 +433,7 @@ func (*Front) SearchArticle(c *gin.Context) {
 		"is_delete = 0 AND status = 1 AND (title LIKE ? OR content LIKE ?)",
 		"%"+keyword+"%", "%"+keyword+"%")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

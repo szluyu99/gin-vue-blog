@@ -18,7 +18,8 @@ const (
 	COMMENT_USER_LIKE_SET = "comment_user_like:" // 评论点赞 Set
 	COMMENT_LIKE_COUNT    = "comment_like_count" // 评论点赞数
 
-	PAGE = "page" // 页面封面
+	PAGE   = "page"   // 页面封面
+	CONFIG = "config" // 博客配置
 )
 
 // Gin Context Key | Session Key

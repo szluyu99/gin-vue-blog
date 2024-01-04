@@ -9,26 +9,26 @@ import (
 )
 
 // test associate create
-// func TestAssociateCreate(t *testing.T) {
-// 	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-// 	MakeMigrate(db)
+func TestAssociateCreate(t *testing.T) {
+	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	MakeMigrate(db)
 
-// 	userAuth := UserAuth{
-// 		Username: "test",
-// 		Password: "test",
-// 		UserInfo: &UserInfo{
-// 			Nickname: "test",
-// 		},
-// 	}
+	userAuth := UserAuth{
+		Username: "test",
+		Password: "test",
+		UserInfo: &UserInfo{
+			Nickname: "test",
+		},
+	}
 
-// 	db.Create(&userAuth)
-// 	assert.Equal(t, 1, userAuth.ID)
-// 	assert.Equal(t, userAuth.UserInfo.ID,A userAuth.UserInfoId)
-// 	assert.Equal(t, "test", userAuth.Username)
-// }
+	db.Create(&userAuth)
+	assert.Equal(t, 1, userAuth.ID)
+	assert.Equal(t, userAuth.UserInfo.ID, userAuth.UserInfoId)
+	assert.Equal(t, "test", userAuth.Username)
+}
 
 func TestGetCommentList(t *testing.T) {
-	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
 	MakeMigrate(db)
 
 	user := UserAuth{

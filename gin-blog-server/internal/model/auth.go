@@ -115,6 +115,7 @@ func SaveOrUpdateMenu(db *gorm.DB, menu *Menu) error {
 	} else {
 		result = db.Create(menu)
 	}
+
 	return result.Error
 }
 
@@ -131,19 +132,13 @@ func GetMenuById(db *gorm.DB, id int) (menu *Menu, err error) {
 func CheckMenuInUse(db *gorm.DB, id int) (bool, error) {
 	var count int64
 	result := db.Model(&RoleMenu{}).Where("menu_id = ?", id).Count(&count)
-	if result.Error != nil {
-		return false, result.Error
-	}
-	return count > 0, nil
+	return count > 0, result.Error
 }
 
 func CheckMenuHasChild(db *gorm.DB, id int) (bool, error) {
 	var count int64
 	result := db.Model(&Menu{}).Where("parent_id = ?", id).Count(&count)
-	if result.Error != nil {
-		return false, result.Error
-	}
-	return count > 0, nil
+	return count > 0, result.Error
 }
 
 // 获取所有菜单列表（超级管理员用）
@@ -182,20 +177,13 @@ func GetMenuList(db *gorm.DB, keyword string) (list []Menu, total int64, err err
 	if keyword != "" {
 		db = db.Where("name like ?", "%"+keyword+"%")
 	}
-	db.Count(&total)
-	result := db.Find(&list)
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-	return list, total, nil
+	result := db.Count(&total).Find(&list)
+	return list, total, result.Error
 }
 
 func DeleteMenu(db *gorm.DB, id int) error {
 	result := db.Delete(&Menu{}, id)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 // Resource
@@ -211,7 +199,7 @@ func SaveOrUpdateResource(db *gorm.DB, id, pid int, name, url, method string) er
 
 	var result *gorm.DB
 	if id > 0 {
-		result = db.Model(&resource).Updates(resource)
+		result = db.Updates(&resource)
 	} else {
 		result = db.Create(&resource)
 		// TODO: ????
@@ -219,21 +207,14 @@ func SaveOrUpdateResource(db *gorm.DB, id, pid int, name, url, method string) er
 		// * 解决方案: 新增子节点后, 删除该节点对应的父节点与角色的关联关系
 		// dao.Delete(model.RoleResource{}, "resource_id", data.ParentId)
 	}
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return result.Error
 }
 
 func GetResourceIdsByRoleId(db *gorm.DB, roleId int) (ids []int, err error) {
 	result := db.Model(&RoleResource{}).
 		Where("role_id = ?", roleId).
 		Pluck("resource_id", &ids)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return ids, nil
+	return ids, result.Error
 }
 
 func GetResourceList(db *gorm.DB, keyword string) (list []Resource, err error) {
@@ -242,19 +223,12 @@ func GetResourceList(db *gorm.DB, keyword string) (list []Resource, err error) {
 	}
 
 	result := db.Find(&list)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return list, nil
+	return list, result.Error
 }
 
 func GetResourceListByIds(db *gorm.DB, ids []int) (list []Resource, err error) {
 	result := db.Where("id in ?", ids).Find(&list)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return list, nil
+	return list, result.Error
 }
 
 // Role
@@ -269,7 +243,7 @@ func SaveOrUpdateRole(db *gorm.DB, id int, name, label string, isDisable bool) e
 
 	var result *gorm.DB
 	if id > 0 {
-		result = db.Model(&role).Updates(role)
+		result = db.Updates(&role)
 	} else {
 		result = db.Create(&role)
 	}
@@ -301,10 +275,7 @@ func GetRoleIdsByUserId(db *gorm.DB, userAuthId int) (ids []int, err error) {
 	result := db.
 		Model(&UserAuthRole{UserAuthId: userAuthId}).
 		Pluck("role_id", &ids)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return ids, nil
+	return ids, result.Error
 }
 
 func SaveRole(db *gorm.DB, name, label string) error {
@@ -312,7 +283,8 @@ func SaveRole(db *gorm.DB, name, label string) error {
 		Name:  name,
 		Label: label,
 	}
-	return db.Create(&role).Error
+	result := db.Create(&role)
+	return result.Error
 }
 
 func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourceIds, menuIds []int) error {
@@ -381,23 +353,5 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 	result := db.Model(&userAuth).
 		Preload("Roles").Preload("UserInfo").
 		First(&userAuth)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &userAuth, nil
-}
-
-// 元素去重
-func removeDuplicates(nums []int) []int {
-	uniqueMap := make(map[int]struct{})
-	result := make([]int, 0)
-
-	for _, num := range nums {
-		if _, ok := uniqueMap[num]; !ok {
-			uniqueMap[num] = struct{}{}
-			result = append(result, num)
-		}
-	}
-
-	return result
+	return &userAuth, result.Error
 }

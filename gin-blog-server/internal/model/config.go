@@ -42,6 +42,7 @@ func CheckConfigMap(db *gorm.DB, m map[string]string) error {
 
 func CheckConfig(db *gorm.DB, key, value string) error {
 	var config Config
+
 	result := db.Where("key", key).FirstOrCreate(&config)
 	if result.Error != nil {
 		return result.Error
@@ -49,11 +50,8 @@ func CheckConfig(db *gorm.DB, key, value string) error {
 
 	config.Value = value
 	result = db.Save(&config)
-	if result.Error != nil {
-		return result.Error
-	}
 
-	return nil
+	return result.Error
 }
 
 func GetConfig(db *gorm.DB, key string) string {

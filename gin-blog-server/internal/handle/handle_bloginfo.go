@@ -5,6 +5,7 @@ import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"gin-blog/internal/utils"
+	"log/slog"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -28,37 +29,58 @@ type AboutReq struct {
 	Content string `json:"content"`
 }
 
-// TODO: 添加 Redis 缓存
 func (*BlogInfo) GetConfigMap(c *gin.Context) {
 	db := GetDB(c)
-	data, err := model.GetConfigMap(db)
+	rdb := GetRDB(c)
+
+	// get from redis cache
+	cache, err := getConfigCache(rdb)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
+
+	if len(cache) > 0 {
+		slog.Debug("get config from redis cache")
+		ReturnSuccess(c, cache)
+		return
+	}
+
+	// get from db
+	data, err := model.GetConfigMap(db)
+	if err != nil {
+		ReturnError(c, g.ErrDbOpt, err)
+		return
+	}
+
+	// add to redis cache
+	if err := addConfigCache(rdb, data); err != nil {
+		ReturnError(c, g.ErrRedisOpt, err)
+		return
+	}
+
 	ReturnSuccess(c, data)
 }
 
 func (*BlogInfo) UpdateConfig(c *gin.Context) {
 	var m map[string]string
 	if err := c.ShouldBindJSON(&m); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
-	err := model.CheckConfigMap(GetDB(c), m)
-	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+	if err := model.CheckConfigMap(GetDB(c), m); err != nil {
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	data, err := model.GetConfigMap(GetDB(c))
-	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+	// delete cache
+	if err := removeConfigCache(GetRDB(c)); err != nil {
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 
-	ReturnSuccess(c, data)
+	ReturnSuccess(c, nil)
 }
 
 // @Summary 获取博客首页信息
@@ -73,23 +95,23 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 
 	articleCount, err := model.Count(db, &model.Article{}, "status = ? AND is_delete = ?", 1, 0)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	userCount, err := model.Count(db, &model.UserInfo{})
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	messageCount, err := model.Count(db, &model.Message{})
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	viewCount, err := rdb.Get(ctx(), g.VIEW_COUNT).Int()
+	viewCount, err := rdb.Get(rctx, g.VIEW_COUNT).Int()
 	if err != nil && err != redis.Nil {
-		ReturnError(c, g.ERROR_REDIS_OPERATION, err)
+		ReturnError(c, g.ErrRedisOpt, err)
 		return
 	}
 
@@ -122,13 +144,13 @@ func (*BlogInfo) GetAbout(c *gin.Context) {
 func (*BlogInfo) UpdateAbout(c *gin.Context) {
 	var req AboutReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	err := model.CheckConfig(GetDB(c), g.CONFIG_ABOUT, req.Content)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

@@ -270,20 +270,13 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 			})
 		}
 		result = db.Create(&articleTags)
-		if result.Error != nil {
-			return result.Error
-		}
-
-		return nil
+		return result.Error
 	})
 }
 
 func UpdateArticleTop(db *gorm.DB, id int, isTop bool) error {
-	result := db.Model(&Article{}).Where("id", id).Update("is_top", isTop)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	result := db.Model(&Article{Model: Model{ID: id}}).Update("is_top", isTop)
+	return result.Error
 }
 
 func ImportArticle(db *gorm.DB, userAuthId int, title, content, img string) error {
@@ -297,9 +290,5 @@ func ImportArticle(db *gorm.DB, userAuthId int, title, content, img string) erro
 	}
 
 	result := db.Create(&article)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return result.Error
 }

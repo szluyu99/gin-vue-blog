@@ -21,38 +21,16 @@ type UserInfoVO struct {
 	CommentLikeSet []string `json:"comment_like_set"`
 }
 
-// FIXME: 组合 UserInfo, UserAuth
-type UserVO struct {
-	ID            int       `json:"id"`
-	UserInfoId    int       `json:"user_info_id"`
-	Avatar        string    `json:"avatar"`
-	Nickname      string    `json:"nickname"`
-	LoginType     int       `json:"login_type"`
-	IpAddress     string    `json:"ip_address"`
-	IpSource      string    `json:"ip_source"`
-	CreatedAt     time.Time `json:"created_at"`
-	LastLoginTime time.Time `json:"last_login_time"`
-	IsDisable     bool      `json:"is_disable"`
-
-	Roles []Role `json:"roles" gorm:"many2many:user_role;foreignKey:UserInfoId;joinForeignKey:UserId;"`
-}
-
 func GetUserInfoById(db *gorm.DB, id int) (*UserInfo, error) {
 	var userInfo UserInfo
 	result := db.Model(&userInfo).Where("id", id).First(&userInfo)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &userInfo, nil
+	return &userInfo, result.Error
 }
 
 func GetUserAuthInfoByName(db *gorm.DB, name string) (*UserAuth, error) {
 	var userAuth UserAuth
 	result := db.Where(&UserAuth{Username: name}).First(&userAuth)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &userAuth, nil
+	return &userAuth, result.Error
 }
 
 func GetUserList(db *gorm.DB, page, size int, loginType int8, nickname, username string) (list []UserAuth, total int64, err error) {
@@ -73,11 +51,7 @@ func GetUserList(db *gorm.DB, page, size int, loginType int8, nickname, username
 		Scopes(Paginate(page, size)).
 		Find(&list)
 
-	if result.Error != nil {
-		return nil, 0, result.Error
-	}
-
-	return list, total, nil
+	return list, total, result.Error
 }
 
 // 更新用户昵称及角色信息
@@ -115,11 +89,8 @@ func UpdateUserNicknameAndRole(db *gorm.DB, authId int, nickname string, roleIds
 		})
 	}
 	result = db.Create(&userRoles)
-	if result.Error != nil {
-		return result.Error
-	}
 
-	return nil
+	return result.Error
 }
 
 func UpdateUserPassword(db *gorm.DB, id int, password string) error {
@@ -128,10 +99,7 @@ func UpdateUserPassword(db *gorm.DB, id int, password string) error {
 		Password: password,
 	}
 	result := db.Model(&userAuth).Updates(userAuth)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 func UpdateUserInfo(db *gorm.DB, id int, nickname, avatar, intro, website string) error {
@@ -155,10 +123,7 @@ func UpdateUserDisable(db *gorm.DB, id int, isDisable bool) error {
 		IsDisable: isDisable,
 	}
 	result := db.Model(&userAuth).Select("is_disable").Updates(&userAuth)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 // 更新用户登录信息
@@ -171,9 +136,5 @@ func UpdateUserLoginInfo(db *gorm.DB, id int, ipAddress, ipSource string) error 
 	}
 
 	result := db.Where("id", id).Updates(userAuth)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
+	return result.Error
 }

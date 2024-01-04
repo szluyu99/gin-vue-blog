@@ -32,13 +32,13 @@ type AddOrEditLinkReq struct {
 func (*Link) GetList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	data, total, err := model.GetLinkList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -62,13 +62,13 @@ func (*Link) GetList(c *gin.Context) {
 func (*Link) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditLinkReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	link, err := model.SaveOrUpdateLink(GetDB(c), req.ID, req.Name, req.Avatar, req.Address, req.Intro)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -87,13 +87,13 @@ func (*Link) SaveOrUpdate(c *gin.Context) {
 func (*Link) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	result := GetDB(c).Delete(&model.FriendLink{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 

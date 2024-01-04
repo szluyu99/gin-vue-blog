@@ -37,7 +37,7 @@ func createUser(t *testing.T, db *gorm.DB, username, nickname string) *UserAuth 
 }
 
 func TestArticlePreload(t *testing.T) {
-	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	db, _ := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
 	MakeMigrate(db)
 
 	u1 := createUser(t, db, "u1", "n1")

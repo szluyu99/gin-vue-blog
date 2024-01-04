@@ -27,6 +27,15 @@ type RegisterReq struct {
 	Code     string `json:"code" binding:"required"`
 }
 
+type LoginVO struct {
+	model.UserInfo
+
+	// 点赞 Set: 用于记录用户点赞过的文章, 评论
+	ArticleLikeSet []string `json:"article_like_set"`
+	CommentLikeSet []string `json:"comment_like_set"`
+	Token          string   `json:"token"`
+}
+
 // @Summary 登录
 // @Description 登录
 // @Tags UserAuth
@@ -38,7 +47,7 @@ type RegisterReq struct {
 func (*UserAuth) Login(c *gin.Context) {
 	var req LoginReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -48,16 +57,16 @@ func (*UserAuth) Login(c *gin.Context) {
 	userAuth, err := model.GetUserAuthInfoByName(db, req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ReturnError(c, g.ERROR_USER_NOT_EXIST, nil)
+			ReturnError(c, g.ErrUserNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
 	// 检查密码是否正确
 	if !utils.BcryptCheck(req.Password, userAuth.Password) {
-		ReturnError(c, g.ERROR_PASSWORD_WRONG, nil)
+		ReturnError(c, g.ErrPassword, nil)
 		return
 	}
 
@@ -74,27 +83,27 @@ func (*UserAuth) Login(c *gin.Context) {
 	userInfo, err := model.GetUserInfoById(db, userAuth.UserInfoId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ReturnError(c, g.ERROR_USER_NOT_EXIST, nil)
+			ReturnError(c, g.ErrUserNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
 	roleIds, err := model.GetRoleIdsByUserId(db, userAuth.ID)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
-	articleLikeSet, err := rdb.SMembers(ctx(), g.ARTICLE_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
+	articleLikeSet, err := rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
-	commentLikeSet, err := rdb.SMembers(ctx(), g.COMMENT_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
+	commentLikeSet, err := rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -105,14 +114,14 @@ func (*UserAuth) Login(c *gin.Context) {
 	conf := g.Conf.JWT
 	token, err := jwt.GenToken(conf.Secret, conf.Issuer, int(conf.Expire), userAuth.ID, roleIds)
 	if err != nil {
-		ReturnError(c, g.ERROR_TOKEN_CREATE, err)
+		ReturnError(c, g.ErrTokenCreate, err)
 		return
 	}
 
 	// 更新用户验证信息: ip 信息 + 上次登录时间
 	err = model.UpdateUserLoginInfo(db, userAuth.ID, ipAddress, ipSource)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -122,23 +131,9 @@ func (*UserAuth) Login(c *gin.Context) {
 	session.Set(g.CTX_USER_AUTH, userAuth.ID)
 	session.Save()
 
-	ReturnSuccess(c, model.LoginVO{
-		// user info
-		UserInfoId: userInfo.ID,
-		Nickname:   userInfo.Nickname,
-		Email:      userInfo.Email,
-		Avatar:     userInfo.Avatar,
-		Intro:      userInfo.Intro,
-		Website:    userInfo.Website,
+	ReturnSuccess(c, LoginVO{
+		UserInfo: *userInfo,
 
-		// user auth
-		UserAuthId:    userAuth.ID,
-		Username:      userAuth.Username,
-		LastLoginTime: userAuth.LastLoginTime,
-		LoginType:     userAuth.LoginType,
-
-		IpAddress:      ipAddress,
-		IpSource:       ipSource,
 		ArticleLikeSet: articleLikeSet,
 		CommentLikeSet: commentLikeSet,
 		Token:          token,

@@ -45,7 +45,7 @@ func JWTAuth() gin.HandlerFunc {
 				c.Set("skip_check", false)
 				return
 			}
-			handle.ReturnError(c, g.ERROR_DB_OPERATION, err)
+			handle.ReturnError(c, g.ErrDbOpt, err)
 			return
 		}
 
@@ -60,32 +60,32 @@ func JWTAuth() gin.HandlerFunc {
 
 		authorization := c.Request.Header.Get("Authorization")
 		if authorization == "" {
-			handle.ReturnError(c, g.ERROR_TOKEN_NOT_EXIST, nil)
+			handle.ReturnError(c, g.ErrTokenNotExist, nil)
 			return
 		}
 
 		// token 的正确格式: `Bearer [tokenString]`
 		parts := strings.Split(authorization, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			handle.ReturnError(c, g.ERROR_TOKEN_TYPE_WRONG, nil)
+			handle.ReturnError(c, g.ErrTokenType, nil)
 			return
 		}
 
 		claims, err := jwt.ParseToken(g.Conf.JWT.Secret, parts[1])
 		if err != nil {
-			handle.ReturnError(c, g.ERROR_TOKEN_WRONG, err)
+			handle.ReturnError(c, g.ErrTokenWrong, err)
 			return
 		}
 
 		// 判断 token 已过期
 		if time.Now().Unix() > claims.ExpiresAt.Unix() {
-			handle.ReturnError(c, g.ERROR_TOKEN_RUNTIME, nil)
+			handle.ReturnError(c, g.ErrTokenRuntime, nil)
 			return
 		}
 
 		user, err := model.GetUserAuthInfoById(db, claims.UserId)
 		if err != nil {
-			handle.ReturnError(c, g.ERROR_USER_NOT_EXIST, err)
+			handle.ReturnError(c, g.ErrUserNotExist, err)
 			return
 		}
 
@@ -110,7 +110,7 @@ func PermissionCheck() gin.HandlerFunc {
 		db := c.MustGet(g.CTX_DB).(*gorm.DB)
 		auth, err := handle.CurrentUserAuth(c)
 		if err != nil {
-			handle.ReturnError(c, g.ERROR_USER_NOT_EXIST, err)
+			handle.ReturnError(c, g.ErrUserNotExist, err)
 			return
 		}
 
@@ -128,11 +128,11 @@ func PermissionCheck() gin.HandlerFunc {
 			slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v\n", role.Name))
 			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
 			if err != nil {
-				handle.ReturnError(c, g.ERROR_DB_OPERATION, err)
+				handle.ReturnError(c, g.ErrDbOpt, err)
 				return
 			}
 			if !pass {
-				handle.ReturnError(c, g.ERROR_PERMISSION_DENIED, nil)
+				handle.ReturnError(c, g.ErrPermission, nil)
 				return
 			}
 		}

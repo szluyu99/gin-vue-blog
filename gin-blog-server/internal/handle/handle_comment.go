@@ -28,13 +28,13 @@ type Comment struct{}
 func (*Comment) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	result := GetDB(c).Delete(model.Comment{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 
@@ -53,13 +53,13 @@ func (*Comment) Delete(c *gin.Context) {
 func (*Comment) UpdateReview(c *gin.Context) {
 	var req UpdateReviewReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 	maps := map[string]any{"is_review": req.IsReview}
 	result := GetDB(c).Model(model.Comment{}).Where("id in ?", req.Ids).Updates(maps)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 
@@ -82,12 +82,12 @@ func (*Comment) UpdateReview(c *gin.Context) {
 func (*Comment) GetList(c *gin.Context) {
 	var query CommentQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 	list, total, err := model.GetCommentList(GetDB(c), query.Page, query.Size, query.Type, query.IsReview, query.Nickname)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

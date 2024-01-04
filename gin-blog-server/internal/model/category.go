@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -10,15 +8,12 @@ import (
 type Category struct {
 	Model
 	Name     string    `gorm:"unique;type:varchar(20);not null" json:"name"`
-	Articles []Article `gorm:"foreignKey:CategoryId"` // 重写外键
+	Articles []Article `gorm:"foreignKey:CategoryId"`
 }
 
 type CategoryVO struct {
-	ID           int       `json:"id"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	Name         string    `json:"name"`
-	ArticleCount int       `json:"article_count"` // 文章数量
+	Category
+	ArticleCount int `json:"article_count"`
 }
 
 func GetCategoryList(db *gorm.DB, num, size int, keyword string) ([]CategoryVO, int64, error) {
@@ -38,38 +33,26 @@ func GetCategoryList(db *gorm.DB, num, size int, keyword string) ([]CategoryVO, 
 		Count(&total).
 		Scopes(Paginate(num, size)).
 		Find(&list)
-	if result.Error != nil {
-		return list, 0, result.Error
-	}
 
-	return list, total, nil
+	return list, total, result.Error
 }
 
 func GetCategoryOption(db *gorm.DB) ([]OptionVO, error) {
 	var list = make([]OptionVO, 0)
 	result := db.Model(&Category{}).Select("id", "name").Find(&list)
-	if result.Error != nil {
-		return list, result.Error
-	}
-	return list, nil
+	return list, result.Error
 }
 
 func GetCategoryById(db *gorm.DB, id int) (*Category, error) {
 	var category Category
 	result := db.Where("id", id).First(&category)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &category, nil
+	return &category, result.Error
 }
 
 func GetCategoryByName(db *gorm.DB, name string) (*Category, error) {
 	var category Category
 	result := db.Where("name", name).First(&category)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &category, nil
+	return &category, result.Error
 }
 
 func DeleteCategory(db *gorm.DB, ids []int) (int64, error) {
@@ -88,12 +71,10 @@ func SaveOrUpdateCategory(db *gorm.DB, id int, name string) (*Category, error) {
 
 	var result *gorm.DB
 	if id > 0 {
-		result = db.Model(&category).Updates(category)
+		result = db.Updates(category)
 	} else {
 		result = db.Create(&category)
 	}
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &category, nil
+
+	return &category, result.Error
 }

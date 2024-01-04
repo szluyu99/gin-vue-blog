@@ -28,13 +28,13 @@ type AddOrEditTagReq struct {
 func (*Tag) GetList(c *gin.Context) {
 	var query PageQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	data, total, err := model.GetTagList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -58,13 +58,13 @@ func (*Tag) GetList(c *gin.Context) {
 func (*Tag) SaveOrUpdate(c *gin.Context) {
 	var form AddOrEditTagReq
 	if err := c.ShouldBindJSON(&form); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	tag, err := model.SaveOrUpdateTag(GetDB(c), form.ID, form.Name)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (*Tag) SaveOrUpdate(c *gin.Context) {
 func (*Tag) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
-		ReturnError(c, g.ERROR_REQUEST_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 	db := GetDB(c)
@@ -92,17 +92,18 @@ func (*Tag) Delete(c *gin.Context) {
 	// 检查标签下面有没有文章
 	count, err := model.Count(db, &model.ArticleTag{}, "tag_id in ?", ids)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	if count > 0 {
-		ReturnError(c, g.ERROR_TAG_ART_EXIST, nil)
+		// ReturnError(c, g.ERROR_TAG_ART_EXIST, nil)
+		ReturnError(c, g.ErrTagHasArt, nil)
 		return
 	}
 
 	result := db.Delete(model.Tag{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, result.Error)
+		ReturnError(c, g.ErrDbOpt, result.Error)
 		return
 	}
 
@@ -120,7 +121,7 @@ func (*Tag) Delete(c *gin.Context) {
 func (*Tag) GetOption(c *gin.Context) {
 	list, err := model.GetTagOption(GetDB(c))
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 	ReturnSuccess(c, list)

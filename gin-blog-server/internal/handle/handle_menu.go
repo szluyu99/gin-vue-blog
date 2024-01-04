@@ -33,7 +33,7 @@ func (*Menu) GetUserMenu(c *gin.Context) {
 	}
 
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (*Menu) GetTreeList(c *gin.Context) {
 
 	menuList, _, err := model.GetMenuList(GetDB(c), keyword)
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -55,12 +55,12 @@ func (*Menu) GetTreeList(c *gin.Context) {
 func (*Menu) SaveOrUpdate(c *gin.Context) {
 	var req model.Menu
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ReturnError(c, g.ERROR_INVALID_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
 	if err := model.SaveOrUpdateMenu(GetDB(c), &req); err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (*Menu) SaveOrUpdate(c *gin.Context) {
 func (*Menu) Delete(c *gin.Context) {
 	menuId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ReturnError(c, g.ERROR_INVALID_PARAM, err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func (*Menu) Delete(c *gin.Context) {
 	// 检查要删除的菜单是否被角色使用
 	use, _ := model.CheckMenuInUse(db, menuId)
 	if use {
-		ReturnError(c, g.ERROR_MENU_USED_BY_ROLE, nil)
+		ReturnError(c, g.ErrMenuUsedByRole, nil)
 		return
 	}
 
@@ -87,10 +87,10 @@ func (*Menu) Delete(c *gin.Context) {
 	menu, err := model.GetMenuById(db, menuId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ReturnError(c, g.ERROR_MENU_NOT_EXIST, nil)
+			ReturnError(c, g.ErrMenuNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -98,13 +98,13 @@ func (*Menu) Delete(c *gin.Context) {
 	if menu.ParentId == 0 {
 		has, _ := model.CheckMenuHasChild(db, menuId)
 		if has {
-			ReturnError(c, g.ERROR_MENU_HAS_CHILDREN, nil)
+			ReturnError(c, g.ErrMenuHasChildren, nil)
 			return
 		}
 	}
 
 	if err = model.DeleteMenu(db, menuId); err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (*Menu) Delete(c *gin.Context) {
 func (*Menu) GetOption(c *gin.Context) {
 	menus, _, err := model.GetMenuList(GetDB(c), "")
 	if err != nil {
-		ReturnError(c, g.ERROR_DB_OPERATION, err)
+		ReturnError(c, g.ErrDbOpt, err)
 		return
 	}
 

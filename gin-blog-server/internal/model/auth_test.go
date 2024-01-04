@@ -7,8 +7,7 @@ import (
 )
 
 func TestUserAuth(t *testing.T) {
-	db := initAuthDB()
-	MakeMigrate(db)
+	db, _ := initModelDB()
 
 	// 添加用户认证信息
 	userAuth := UserAuth{
@@ -30,8 +29,7 @@ func TestUserAuth(t *testing.T) {
 }
 
 func TestGetMenuListByUserId(t *testing.T) {
-	db := initAuthDB()
-	MakeMigrate(db)
+	db, _ := initModelDB()
 
 	user := UserAuth{
 		Username: "user",
@@ -83,8 +81,7 @@ func TestGetMenuListByUserId(t *testing.T) {
 }
 
 func TestAssociateDelete(t *testing.T) {
-	db := initAuthDB()
-	MakeMigrate(db)
+	db, _ := initModelDB()
 
 	user := UserAuth{
 		Username: "user",
