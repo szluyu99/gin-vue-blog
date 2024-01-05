@@ -4,10 +4,11 @@ package g
 
 const (
 	// MAIL_CODE = "mail_code:" // 验证码
-	// USER         = "user:"        // 记录用户
 	// DELETE       = "delete:"      //? 记录强制下线用户?
-	VISITOR_AREA = "visitor_area" // 地域统计
-	VIEW_COUNT   = "view_count"   // 访问数量
+	ONLINE_USER  = "online_user:"  // 在线用户
+	OFFLINE_USER = "offline_user:" // 强制下线用户
+	VISITOR_AREA = "visitor_area"  // 地域统计
+	VIEW_COUNT   = "view_count"    // 访问数量
 
 	KEY_UNIQUE_VISITOR_SET = "unique_visitor" // 唯一用户记录 set
 

@@ -35,7 +35,7 @@ func (*Category) GetList(c *gin.Context) {
 
 	data, total, err := model.GetCategoryList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (*Category) SaveOrUpdate(c *gin.Context) {
 
 	category, err := model.SaveOrUpdateCategory(GetDB(c), req.ID, req.Name)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (*Category) Delete(c *gin.Context) {
 	// 检查分类下是否存在文章
 	count, err := model.Count(db, &model.Article{}, "category_id in ?", ids)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (*Category) Delete(c *gin.Context) {
 
 	rows, err := model.DeleteCategory(db, ids)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, rows)
@@ -121,7 +121,7 @@ func (*Category) Delete(c *gin.Context) {
 func (*Category) GetOption(c *gin.Context) {
 	list, err := model.GetCategoryOption(GetDB(c))
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, list)

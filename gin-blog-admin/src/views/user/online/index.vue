@@ -1,8 +1,9 @@
 <script setup>
 import { h, onMounted, ref } from 'vue'
-import { NButton, NImage, NPopconfirm } from 'naive-ui'
+import { NButton, NImage, NInput, NPopconfirm } from 'naive-ui'
 
 import CommonPage from '@/components/common/CommonPage.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
 import { convertImgUrl, formatDate } from '@/utils'
@@ -11,6 +12,9 @@ import api from '@/api'
 defineOptions({ name: '在线用户' })
 
 const $table = ref(null)
+const queryItems = ref({
+  keyword: '', // 用户名 | 昵称
+})
 
 onMounted(() => {
   $table.value?.handleSearch()
@@ -20,13 +24,12 @@ const columns = [
   {
     title: '头像',
     key: 'avatar',
-    width: 40,
+    width: 30,
     align: 'center',
     render(row) {
       return h(NImage, {
-        'height': 40,
-        'imgProps': { style: { 'border-radius': '1px' } },
-        'src': convertImgUrl(row.avatar),
+        'height': 30,
+        'src': convertImgUrl(row.info.avatar),
         'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -38,6 +41,9 @@ const columns = [
     width: 60,
     align: 'center',
     ellipsis: { tooltip: true },
+    render(row) {
+      return h('span', row.info.nickname || '未知')
+    },
   },
   {
     title: '登录 IP',
@@ -85,14 +91,7 @@ const columns = [
     align: 'center',
     width: 70,
     render(row) {
-      return h(
-        NButton,
-        { size: 'small', type: 'text', ghost: true },
-        {
-          default: () => formatDate(row.last_login_time, 'YYYY-MM-DD HH:mm:ss'),
-          icon: () => h('i', { class: 'i-mdi:update' }),
-        },
-      )
+      return h('span', formatDate(row.last_login_time, 'YYYY-MM-DD HH:mm:ss'))
     },
   },
   {
@@ -122,16 +121,15 @@ const columns = [
   },
 ]
 
-// FIXME: 无法强制下线
 // 强制用户下线
 async function handleForceOffline(row) {
   try {
-    await api.forceOfflineUser(row)
+    await api.forceOfflineUser(row.id)
     window.$message.success('该用户已被强制下线!')
     $table.value?.handleSearch()
   }
   catch (err) {
-    window.$message.error('强制下线失败!')
+    console.error(err)
   }
 }
 </script>
@@ -140,8 +138,22 @@ async function handleForceOffline(row) {
   <CommonPage title="在线用户">
     <CrudTable
       ref="$table"
+      v-model:query-items="queryItems"
       :columns="columns"
       :get-data="api.getOnlineUsers"
-    />
+      :is-pagination="false"
+    >
+      <template #queryBar>
+        <QueryItem label="用户名 | 昵称" :label-width="100" :content-width="200">
+          <NInput
+            v-model:value="queryItems.keyword"
+            clearable
+            type="text"
+            placeholder="搜索关键字"
+            @keydown.enter="$table?.handleSearch()"
+          />
+        </QueryItem>
+      </template>
+    </CrudTable>
   </CommonPage>
 </template>

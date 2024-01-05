@@ -62,7 +62,7 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 
 	data, err := model.GetFrontStatistics(db)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	data.ViewCount, _ = rdb.Get(rctx, g.VIEW_COUNT).Int64()
@@ -74,7 +74,7 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 func (*Front) GetTagList(c *gin.Context) {
 	list, _, err := model.GetTagList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -84,7 +84,7 @@ func (*Front) GetTagList(c *gin.Context) {
 func (*Front) GetCategoryList(c *gin.Context) {
 	list, _, err := model.GetCategoryList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -95,7 +95,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 	isReview := true
 	list, _, err := model.GetMessageList(GetDB(c), 1, 1000, "", &isReview)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, list)
@@ -105,7 +105,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 func (*Front) GetLinkList(c *gin.Context) {
 	list, _, err := model.GetLinkList(GetDB(c), 1, 1000, "")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -135,7 +135,7 @@ func (*Front) SaveMessage(c *gin.Context) {
 	info := auth.UserInfo
 	message, err := model.SaveMessage(db, info.Nickname, info.Nickname, req.Content, ipAddress, ipSource, req.Speed, isReview)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -167,7 +167,7 @@ func (*Front) SaveComment(c *gin.Context) {
 	}
 
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -187,7 +187,7 @@ func (*Front) GetCommentList(c *gin.Context) {
 
 	data, total, err := model.GetCommentVOList(db, query.Page, query.Size, query.TopicId, query.Type)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -226,7 +226,7 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 
 	replyList, err := model.GetCommentReplyList(db, id, query.Page, query.Size)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -283,7 +283,7 @@ func (*Front) GetArticleList(c *gin.Context) {
 
 	list, _, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -304,7 +304,7 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 文章详情
 	val, err := model.GetBlogArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -313,14 +313,14 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 推荐文章（6篇）
 	article.RecommendArticles, err = model.GetRecommendList(db, id, 6)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// 最新文章（5篇）
 	article.NewestArticles, err = model.GetNewestList(db, 5)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -334,14 +334,14 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 上一篇文章
 	article.LastArticle, err = model.GetLastArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// 下一篇文章
 	article.NextArticle, err = model.GetNextArticle(db, id)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -352,7 +352,7 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	// 评论数量
 	article.CommentCount, err = model.GetArticleCommentCount(db, id)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -369,7 +369,7 @@ func (*Front) GetArchiveList(c *gin.Context) {
 
 	list, total, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -433,7 +433,7 @@ func (*Front) SearchArticle(c *gin.Context) {
 		"is_delete = 0 AND status = 1 AND (title LIKE ? OR content LIKE ?)",
 		"%"+keyword+"%", "%"+keyword+"%")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

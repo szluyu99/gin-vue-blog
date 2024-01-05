@@ -49,7 +49,7 @@ func (*Resource) GetTreeList(c *gin.Context) {
 
 	resourceList, err := model.GetResourceList(GetDB(c), keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (*Resource) GetOption(c *gin.Context) {
 	db := GetDB(c)
 	resources, err := model.GetResourceList(db, "")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (*Resource) SaveOrUpdate(c *gin.Context) {
 	db := GetDB(c)
 	err := model.SaveOrUpdateResource(db, req.ID, req.ParentId, req.Name, req.Url, req.Method)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -115,7 +115,7 @@ func (*Resource) UpdateAnonymous(c *gin.Context) {
 
 	err := model.UpdateResourceAnonymous(GetDB(c), req.ID, req.Anonymous)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -147,7 +147,7 @@ func (*Resource) Delete(c *gin.Context) {
 			ReturnError(c, g.ErrResourceNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -162,7 +162,7 @@ func (*Resource) Delete(c *gin.Context) {
 
 	rows, err := model.DeleteResource(db, resourceId)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

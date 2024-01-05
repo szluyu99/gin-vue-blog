@@ -45,7 +45,7 @@ func JWTAuth() gin.HandlerFunc {
 				c.Set("skip_check", false)
 				return
 			}
-			handle.ReturnError(c, g.ErrDbOpt, err)
+			handle.ReturnError(c, g.ErrDbOp, err)
 			return
 		}
 
@@ -128,7 +128,7 @@ func PermissionCheck() gin.HandlerFunc {
 			slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v\n", role.Name))
 			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
 			if err != nil {
-				handle.ReturnError(c, g.ErrDbOpt, err)
+				handle.ReturnError(c, g.ErrDbOp, err)
 				return
 			}
 			if !pass {

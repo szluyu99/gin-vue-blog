@@ -57,8 +57,8 @@ export default {
     id,
     is_disable,
   }),
-  getOnlineUsers: () => request.get('/user/online'), // 在线用户列表
-  forceOfflineUser: data => request.delete('/user/offline', { data }), // 强制离线
+  getOnlineUsers: (params = { keyword: '' }) => request.get('/user/online', { params }), // 在线用户列表
+  forceOfflineUser: id => request.post(`/user/offline/${id}`), // 强制离线
 
   // 博客设置相关接口
   getConfig: () => request.get('/config'),

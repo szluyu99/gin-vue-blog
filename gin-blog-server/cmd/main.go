@@ -16,10 +16,7 @@ func main() {
 	flag.Parse()
 
 	// 根据命令行参数读取配置文件, 其他变量的初始化依赖于配置文件对象
-	conf, err := g.ReadConfig(*configPath)
-	if err != nil {
-		panic(err)
-	}
+	conf := g.ReadConfig(*configPath)
 
 	_ = ginblog.InitLogger(conf)
 	db := ginblog.InitDatabase(conf)
@@ -29,8 +26,9 @@ func main() {
 	gin.SetMode(conf.Server.Mode)
 	r := gin.New()
 	r.SetTrustedProxies([]string{"*"})
+	// 开发模式使用 gin 自带的日志和恢复中间件, 生产模式使用自定义的中间件
 	if conf.Server.Mode == "debug" {
-		r.Use(gin.Logger(), gin.Recovery())
+		r.Use(gin.Logger(), gin.Recovery()) // gin 自带的日志和恢复中间件, 挺好用的
 	} else {
 		r.Use(middleware.Recovery(true), middleware.Logger())
 	}

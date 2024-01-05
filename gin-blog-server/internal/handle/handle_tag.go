@@ -34,7 +34,7 @@ func (*Tag) GetList(c *gin.Context) {
 
 	data, total, err := model.GetTagList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (*Tag) SaveOrUpdate(c *gin.Context) {
 
 	tag, err := model.SaveOrUpdateTag(GetDB(c), form.ID, form.Name)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (*Tag) Delete(c *gin.Context) {
 	// 检查标签下面有没有文章
 	count, err := model.Count(db, &model.ArticleTag{}, "tag_id in ?", ids)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	if count > 0 {
@@ -103,7 +103,7 @@ func (*Tag) Delete(c *gin.Context) {
 
 	result := db.Delete(model.Tag{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (*Tag) Delete(c *gin.Context) {
 func (*Tag) GetOption(c *gin.Context) {
 	list, err := model.GetTagOption(GetDB(c))
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, list)

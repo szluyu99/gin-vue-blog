@@ -52,26 +52,28 @@ func GetMsg(code int) string {
 }
 
 var (
-	ResultOk   = RegisterResult(SUCCESS, "OK")
-	ResultFail = RegisterResult(FAIL, "FAIL")
+	OkResult   = RegisterResult(SUCCESS, "OK")
+	FailResult = RegisterResult(FAIL, "FAIL")
 )
 
 var (
 	ErrRequest  = RegisterResult(9001, "请求参数格式错误")
-	ErrDbOpt    = RegisterResult(9004, "数据库操作异常")
-	ErrRedisOpt = RegisterResult(9005, "Redis 操作异常")
+	ErrDbOp     = RegisterResult(9004, "数据库操作异常")
+	ErrRedisOp  = RegisterResult(9005, "Redis 操作异常")
+	ErrUserAuth = RegisterResult(9006, "用户认证异常")
 
 	ErrPassword     = RegisterResult(1002, "密码错误")
 	ErrUserNotExist = RegisterResult(1003, "该用户不存在")
 	ErrOldPassword  = RegisterResult(1010, "旧密码不正确")
 
-	ErrTokenNotExist = RegisterResult(1201, "TOKEN 不存在，请重新登陆")
-	ErrTokenRuntime  = RegisterResult(1202, "TOKEN 已过期，请重新登陆")
-	ErrTokenWrong    = RegisterResult(1203, "TOKEN 不正确，请重新登陆")
-	ErrTokenType     = RegisterResult(1204, "TOKEN 格式错误，请重新登陆")
-	ErrTokenCreate   = RegisterResult(1205, "TOKEN 生成失败")
-	ErrPermission    = RegisterResult(1206, "权限不足")
-	ErrForceOffline  = RegisterResult(1207, "您已被强制下线")
+	ErrTokenNotExist    = RegisterResult(1201, "TOKEN 不存在，请重新登陆")
+	ErrTokenRuntime     = RegisterResult(1202, "TOKEN 已过期，请重新登陆")
+	ErrTokenWrong       = RegisterResult(1203, "TOKEN 不正确，请重新登陆")
+	ErrTokenType        = RegisterResult(1204, "TOKEN 格式错误，请重新登陆")
+	ErrTokenCreate      = RegisterResult(1205, "TOKEN 生成失败")
+	ErrPermission       = RegisterResult(1206, "权限不足")
+	ErrForceOffline     = RegisterResult(1207, "您已被强制下线")
+	ErrForceOfflineSelf = RegisterResult(1208, "不能强制下线自己")
 
 	ErrFileUpload  = RegisterResult(9100, "文件上传失败")
 	ErrFileReceive = RegisterResult(9101, "文件接收失败")

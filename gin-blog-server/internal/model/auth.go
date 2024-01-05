@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"gorm.io/gorm"
@@ -22,6 +23,10 @@ type UserAuth struct {
 	UserInfoId int       `json:"user_info_id"`
 	UserInfo   *UserInfo `json:"info"`
 	Roles      []*Role   `json:"roles" gorm:"many2many:user_auth_role"`
+}
+
+func (u *UserAuth) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(u)
 }
 
 type Role struct {

@@ -40,7 +40,7 @@ func (*Message) Delete(c *gin.Context) {
 
 	rows, err := model.DeleteMessages(GetDB(c), ids)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (*Message) UpdateReview(c *gin.Context) {
 
 	rows, err := model.UpdateMessagesReview(GetDB(c), req.Ids, req.IsReview)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (*Message) GetList(c *gin.Context) {
 
 	data, total, err := model.GetMessageList(GetDB(c), query.Page, query.Size, query.Nickname, query.IsReview)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	ReturnSuccess(c, PageResult[model.Message]{

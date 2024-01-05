@@ -34,7 +34,7 @@ func (*Comment) Delete(c *gin.Context) {
 
 	result := GetDB(c).Delete(model.Comment{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (*Comment) UpdateReview(c *gin.Context) {
 	maps := map[string]any{"is_review": req.IsReview}
 	result := GetDB(c).Model(model.Comment{}).Where("id in ?", req.Ids).Updates(maps)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (*Comment) GetList(c *gin.Context) {
 	}
 	list, total, err := model.GetCommentList(GetDB(c), query.Page, query.Size, query.Type, query.IsReview, query.Nickname)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

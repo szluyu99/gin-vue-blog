@@ -37,22 +37,22 @@ func ReturnHttpResponse(c *gin.Context, httpCode, code int, msg string, data any
 }
 
 // 业务码 + 数据
-func ReturnResponse(c *gin.Context, code int, data any) {
-	ReturnHttpResponse(c, http.StatusOK, code, g.GetMsg(code), data)
+func ReturnResponse(c *gin.Context, r g.Result, data any) {
+	ReturnHttpResponse(c, http.StatusOK, r.Code(), r.Msg(), data)
 }
 
 // 成功业务码 + 数据
 func ReturnSuccess(c *gin.Context, data any) {
-	ReturnResponse(c, g.SUCCESS, data)
+	ReturnResponse(c, g.OkResult, data)
 }
 
 // 所有可预料的错误 = 业务错误 + 系统错误, 在业务层面处理, 返回 HTTP 200 状态码
 // 对于不可预料的错误, 会触发 panic, 由 gin 中间件捕获, 并返回 HTTP 500 状态码
 // err 是业务错误, data 是错误数据 (可以是 error 或 string)
-func ReturnError(c *gin.Context, result g.Result, data any) {
-	slog.Info("[Func-ReturnError] " + result.Msg())
+func ReturnError(c *gin.Context, r g.Result, data any) {
+	slog.Info("[Func-ReturnError] " + r.Msg())
 
-	var val string = result.Msg()
+	var val string = r.Msg()
 
 	if data != nil {
 		switch v := data.(type) {
@@ -67,8 +67,8 @@ func ReturnError(c *gin.Context, result g.Result, data any) {
 	c.AbortWithStatusJSON(
 		http.StatusOK,
 		Response[any]{
-			Code:    result.Code(),
-			Message: result.Msg(),
+			Code:    r.Code(),
+			Message: r.Msg(),
 			Data:    val,
 		},
 	)
@@ -109,7 +109,7 @@ func CurrentUserAuth(c *gin.Context) (*model.UserAuth, error) {
 	key := g.CTX_USER_AUTH
 
 	// 1
-	if cache, exist := c.Get(key); exist {
+	if cache, exist := c.Get(key); exist && cache != nil {
 		slog.Debug("[Func-CurrentUserAuth] get from cache: " + cache.(*model.UserAuth).Username)
 		return cache.(*model.UserAuth), nil
 	}

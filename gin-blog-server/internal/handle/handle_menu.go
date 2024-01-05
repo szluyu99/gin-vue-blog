@@ -33,7 +33,7 @@ func (*Menu) GetUserMenu(c *gin.Context) {
 	}
 
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (*Menu) GetTreeList(c *gin.Context) {
 
 	menuList, _, err := model.GetMenuList(GetDB(c), keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (*Menu) SaveOrUpdate(c *gin.Context) {
 	}
 
 	if err := model.SaveOrUpdateMenu(GetDB(c), &req); err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (*Menu) Delete(c *gin.Context) {
 			ReturnError(c, g.ErrMenuNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (*Menu) Delete(c *gin.Context) {
 	}
 
 	if err = model.DeleteMenu(db, menuId); err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (*Menu) Delete(c *gin.Context) {
 func (*Menu) GetOption(c *gin.Context) {
 	menus, _, err := model.GetMenuList(GetDB(c), "")
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

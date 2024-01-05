@@ -60,7 +60,7 @@ func (*UserAuth) Login(c *gin.Context) {
 			ReturnError(c, g.ErrUserNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -86,24 +86,24 @@ func (*UserAuth) Login(c *gin.Context) {
 			ReturnError(c, g.ErrUserNotExist, nil)
 			return
 		}
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	roleIds, err := model.GetRoleIdsByUserId(db, userAuth.ID)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	articleLikeSet, err := rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	commentLikeSet, err := rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (*UserAuth) Login(c *gin.Context) {
 	// 更新用户验证信息: ip 信息 + 上次登录时间
 	err = model.UpdateUserLoginInfo(db, userAuth.ID, ipAddress, ipSource)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -130,6 +130,10 @@ func (*UserAuth) Login(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set(g.CTX_USER_AUTH, userAuth.ID)
 	session.Save()
+
+	// 删除 Redis 中的离线状态
+	offlineKey := g.OFFLINE_USER + strconv.Itoa(userAuth.ID)
+	rdb.Del(rctx, offlineKey).Result()
 
 	ReturnSuccess(c, LoginVO{
 		UserInfo: *userInfo,
@@ -162,9 +166,21 @@ func (*UserAuth) Register(c *gin.Context) {
 func (*UserAuth) Logout(c *gin.Context) {
 	c.Set(g.CTX_USER_AUTH, nil)
 
+	// 已经退出登录
+	auth, _ := CurrentUserAuth(c)
+	if auth == nil {
+		ReturnSuccess(c, nil)
+		return
+	}
+
 	session := sessions.Default(c)
 	session.Delete(g.CTX_USER_AUTH)
 	session.Save()
+
+	// 删除 Redis 中的在线状态
+	rdb := GetRDB(c)
+	onlineKey := g.ONLINE_USER + strconv.Itoa(auth.ID)
+	rdb.Del(rctx, onlineKey)
 
 	ReturnSuccess(c, nil)
 }

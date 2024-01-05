@@ -35,20 +35,20 @@ func (*Page) GetList(c *gin.Context) {
 	case redis.Nil:
 		break
 	default:
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
 	// get from db
 	data, _, err := model.GetPageList(db)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// add to cache
 	if err := addPageCache(GetRDB(c), data); err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -76,13 +76,13 @@ func (*Page) SaveOrUpdate(c *gin.Context) {
 
 	page, err := model.SaveOrUpdatePage(db, req.ID, req.Name, req.Label, req.Cover)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// delete cache
 	if err := removePageCache(rdb); err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -107,13 +107,13 @@ func (*Page) Delete(c *gin.Context) {
 
 	result := GetDB(c).Delete(model.Page{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 
 	// delete cache
 	if err := removePageCache(GetRDB(c)); err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 

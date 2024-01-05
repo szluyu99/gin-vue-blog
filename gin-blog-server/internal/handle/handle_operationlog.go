@@ -29,7 +29,7 @@ func (*OperationLog) GetList(c *gin.Context) {
 
 	list, total, err := model.GetOperationLogList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (*OperationLog) Delete(c *gin.Context) {
 
 	result := GetDB(c).Delete(&model.OperationLog{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 

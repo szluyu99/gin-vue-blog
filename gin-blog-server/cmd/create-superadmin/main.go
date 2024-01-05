@@ -22,10 +22,7 @@ func main() {
 	flag.Parse()
 
 	// 根据命令行参数读取配置文件, 其他变量的初始化依赖于配置文件对象
-	conf, err := g.ReadConfig(*configPath)
-	if err != nil {
-		panic(err)
-	}
+	conf := g.ReadConfig(*configPath)
 
 	//! 处理 sqlite3 数据库路径
 	conf.SQLite.Dsn = "../" + conf.SQLite.Dsn

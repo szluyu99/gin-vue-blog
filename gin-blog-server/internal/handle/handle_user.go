@@ -1,15 +1,19 @@
 package handle
 
 import (
+	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"gin-blog/internal/utils"
-	"net/http"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+type User struct{}
 
 type UpdateCurrentUserReq struct {
 	Nickname string `json:"nickname" binding:"required"`
@@ -42,18 +46,9 @@ type UserQuery struct {
 	Nickname  string `form:"nickname"`
 }
 
-type OnlineUserVO struct {
-	UserInfoId    int       `json:"g.CTX_USER_INFO_ID"`
-	Nickname      string    `json:"nickname"`
-	Avatar        string    `json:"avatar"`
-	IpAddress     string    `json:"ip_address"`
-	IpSource      string    `json:"ip_source"`
-	Browser       string    `json:"browser"`
-	OS            string    `json:"os"`
-	LastLoginTime time.Time `json:"last_login_time"`
+type ForceOfflineReq struct {
+	UserInfoId int `json:"user_info_id"`
 }
-
-type User struct{}
 
 // 根据 Token 获取用户信息
 func (*User) GetInfo(c *gin.Context) {
@@ -68,12 +63,12 @@ func (*User) GetInfo(c *gin.Context) {
 	userInfoVO := model.UserInfoVO{UserInfo: *user.UserInfo}
 	userInfoVO.ArticleLikeSet, err = rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	userInfoVO.CommentLikeSet, err = rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -92,7 +87,7 @@ func (*User) UpdateCurrent(c *gin.Context) {
 	auth, _ := CurrentUserAuth(c)
 	err := model.UpdateUserInfo(GetDB(c), auth.UserInfoId, req.Nickname, req.Avatar, req.Intro, req.Website)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -108,7 +103,7 @@ func (*User) Update(c *gin.Context) {
 	}
 
 	if err := model.UpdateUserNicknameAndRole(GetDB(c), req.UserAuthId, req.Nickname, req.RoleIds); err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -125,7 +120,7 @@ func (*User) GetList(c *gin.Context) {
 
 	list, count, err := model.GetUserList(GetDB(c), query.Page, query.Size, query.LoginType, query.Nickname, query.Username)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -148,7 +143,7 @@ func (*User) UpdateDisable(c *gin.Context) {
 
 	err := model.UpdateUserDisable(GetDB(c), req.UserAuthId, req.IsDisable)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -173,7 +168,7 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 	hashPassword, _ := utils.BcryptHash(req.NewPassword)
 	err := model.UpdateUserPassword(GetDB(c), auth.ID, hashPassword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -212,72 +207,63 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 // }
 
 // 查询当前在线用户
-// FIXME: 需要修复
-// TODO: 分页 + 条件搜索
 func (*User) GetOnlineList(c *gin.Context) {
-	var query PageQuery
-	if err := c.ShouldBindQuery(&query); err != nil {
-		ReturnError(c, g.ErrRequest, err)
-		return
+	keyword := c.Query("keyword")
+
+	rdb := GetRDB(c)
+
+	onlineList := make([]model.UserAuth, 0)
+	keys := rdb.Keys(rctx, g.ONLINE_USER+"*").Val()
+
+	for _, key := range keys {
+		var auth model.UserAuth
+		val := rdb.Get(rctx, key).Val()
+		json.Unmarshal([]byte(val), &auth)
+
+		if keyword != "" &&
+			!strings.Contains(auth.Username, keyword) &&
+			!strings.Contains(auth.UserInfo.Nickname, keyword) {
+			continue
+		}
+
+		onlineList = append(onlineList, auth)
 	}
 
-	// onlineList := make([]OnlineUserVO, 0)
-	// keys := utils.Redis.Keys(KEY_USER + "*")
-	// for _, key := range keys {
-	// 	var sessionInfo model.SessionInfo
-	// 	utils.Json.Unmarshal(utils.Redis.GetVal(key), &sessionInfo)
-
-	// 	// 查询关键字不为空, 且不满足查询条件
-	// 	if query.Keyword != "" && !strings.Contains(sessionInfo.Nickname, query.Keyword) {
-	// 		continue
-	// 	}
-
-	// 	onlineUser := utils.CopyProperties[OnlineUserVO](sessionInfo)
-	// 	onlineUser.UserInfoId = sessionInfo.UserInfoId // *
-	// 	onlineList = append(onlineList, onlineUser)
-	// }
-
-	// // 根据上次登录时间进行排序
-	// sort.Slice(onlineList, func(i, j int) bool {
-	// 	return onlineList[i].LastLoginTime.Unix() > onlineList[j].LastLoginTime.Unix()
-	// })
-
-	// Success(c, PageResult[[]OnlineUserVO]{
-	// 	Total: int64(len(keys)),
-	// 	List:  onlineList,
-	// })
-
-	ReturnSuccess(c, PageResult[OnlineUserVO]{
-		Total: 0,
-		List:  make([]OnlineUserVO, 0),
+	// 根据上次登录时间进行排序
+	sort.Slice(onlineList, func(i, j int) bool {
+		return onlineList[i].LastLoginTime.Unix() > onlineList[j].LastLoginTime.Unix()
 	})
+
+	ReturnSuccess(c, onlineList)
 }
 
-// FIXME: 强制离线
+// 强制离线
 func (*User) ForceOffline(c *gin.Context) {
-	type ForceOfflineReq struct {
-		UserInfoId int    `json:"g.CTX_USER_INFO_ID"`
-		IpAddress  string `json:"ip_address"`
-		Browser    string `json:"browser"`
-		OS         string `json:"os"`
-	}
-
-	var req ForceOfflineReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	id := c.Param("id")
+	uid, err := strconv.Atoi(id)
+	if err != nil {
 		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 
-	// TODO: 自己不能离线自己
+	auth, err := CurrentUserAuth(c)
+	if err != nil {
+		ReturnError(c, g.ErrUserAuth, err)
+		return
+	}
 
-	// uuid := utils.Encrypt.MD5(form.IpAddress + form.Browser + form.OS)
-	// var sessionInfo model.SessionInfo
-	// utils.Json.Unmarshal(utils.Redis.GetVal(KEY_USER+uuid), &sessionInfo)
-	// sessionInfo.IsOffline = 1 // *
-	// utils.Redis.Del(KEY_USER + uuid)
-	// // ? 这里设置强制离线后 redis 中存储的 delete:xxx 时间和 Token 过期时间一致
-	// utils.Redis.Set(KEY_DELETE+uuid, utils.Json.Marshal(sessionInfo), time.Duration(g.GetConfig().JWT.Expire)*time.Hour)
+	// 不能离线自己
+	if auth.ID == uid {
+		ReturnError(c, g.ErrForceOfflineSelf, nil)
+		return
+	}
 
-	// Success(c, nil)
-	c.JSON(http.StatusNotImplemented, nil)
+	rdb := GetRDB(c)
+	onlineKey := g.ONLINE_USER + strconv.Itoa(uid)
+	offlineKey := g.OFFLINE_USER + strconv.Itoa(uid)
+
+	rdb.Del(rctx, onlineKey)
+	rdb.Set(rctx, offlineKey, auth, time.Hour)
+
+	ReturnSuccess(c, "强制离线成功")
 }

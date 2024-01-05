@@ -36,7 +36,7 @@ func (*BlogInfo) GetConfigMap(c *gin.Context) {
 	// get from redis cache
 	cache, err := getConfigCache(rdb)
 	if err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -49,13 +49,13 @@ func (*BlogInfo) GetConfigMap(c *gin.Context) {
 	// get from db
 	data, err := model.GetConfigMap(db)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// add to redis cache
 	if err := addConfigCache(rdb, data); err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -70,13 +70,13 @@ func (*BlogInfo) UpdateConfig(c *gin.Context) {
 	}
 
 	if err := model.CheckConfigMap(GetDB(c), m); err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	// delete cache
 	if err := removeConfigCache(GetRDB(c)); err != nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -95,23 +95,23 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 
 	articleCount, err := model.Count(db, &model.Article{}, "status = ? AND is_delete = ?", 1, 0)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	userCount, err := model.Count(db, &model.UserInfo{})
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 	messageCount, err := model.Count(db, &model.Message{})
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	viewCount, err := rdb.Get(rctx, g.VIEW_COUNT).Int()
 	if err != nil && err != redis.Nil {
-		ReturnError(c, g.ErrRedisOpt, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
@@ -150,7 +150,7 @@ func (*BlogInfo) UpdateAbout(c *gin.Context) {
 
 	err := model.CheckConfig(GetDB(c), g.CONFIG_ABOUT, req.Content)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

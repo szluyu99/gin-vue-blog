@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
     async forceOffline() {
       this.resetLoginState()
       this.toLogin()
-      window.$message.error('您已经被强制下线！')
+      // window.$message.error('您已经被强制下线！')
     },
   },
 })

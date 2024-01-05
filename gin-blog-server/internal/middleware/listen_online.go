@@ -1,57 +1,44 @@
 package middleware
 
+import (
+	"context"
+	"fmt"
+	g "gin-blog/internal/global"
+	"gin-blog/internal/handle"
+	"strconv"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
+)
+
 // 监听在线状态中间件
-// func ListenOnline() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		// uuid := utils.GetFromContext[string](c, "uuid")
-// 		uuid := c.GetString("uuid")
-// 		userKey := KEY_USER + uuid
+// 登录时: 移除用户的强制下线标记
+// 退出登录时: 添加用户的在线标记
+func ListenOnline() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.Background()
+		rdb := c.MustGet(g.CTX_RDB).(*redis.Client)
 
-// 		session := sessions.Default(c)
-// 		var sessionInfo model.SessionInfo
-// 		// 尝试从 redis 中取用户的 SessionInfo, 取不到则从 session 中获取
-// 		if s, err := utils.Redis.GetResult(userKey); err == nil {
-// 			utils.Json.Unmarshal(s, &sessionInfo)
-// 		} else if s, err := utils.Redis.GetResult(KEY_DELETE + uuid); err == nil { // 被强制离线
-// 			utils.Json.Unmarshal(s, &sessionInfo)
-// 		} else { // * session 中还是取不到, 就返回 401 让前端退回登录界面
-// 			// ! 考虑一下
-// 			val := session.Get(userKey)
-// 			if val == nil {
-// 				// r.Send(c, http.StatusUnauthorized, r.ERROR_TOKEN_RUNTIME, nil)
-// 				v2.Return(c, g.ERROR_TOKEN_RUNTIME, nil)
-// 				c.Abort()
-// 				return
-// 			}
-// 			utils.Json.Unmarshal(val.(string), &sessionInfo)
-// 		}
+		auth, err := handle.CurrentUserAuth(c)
+		if err != nil {
+			handle.ReturnError(c, g.ErrUserAuth, err)
+			return
+		}
 
-// 		// 判断当前是否是退出登录请求
-// 		// if strings.Contains(c.FullPath(), "logout") {
-// 		// 	fmt.Println("logout: ", userKey)
-// 		// 	utils.Redis.Del(userKey) // 删除 redis 中缓存
-// 		// 	session.Delete(userKey)  //? FIXME: 删除后 redis 还会有一条记录?
-// 		// 	session.Save()
-// 		// 	c.Abort()
-// 		// 	return
-// 		// }
+		onlineKey := g.ONLINE_USER + strconv.Itoa(auth.ID)
+		offlineKey := g.OFFLINE_USER + strconv.Itoa(auth.ID)
 
-// 		// 已经是强制下线状态
-// 		if sessionInfo.IsOffline == 1 { // 被强制下线
-// 			utils.Redis.Del(userKey) // 删除 redis 中缓存
-// 			session.Delete(userKey)
-// 			session.Save()
-// 			// utils.Redis.Del(KEY_DELETE + uuid) // 删除 redis 中缓存
-// 			// r.Send(c, http.StatusUnauthorized, r.FORCE_OFFLINE, nil)
-// 			v2.Return(c, g.FORCE_OFFLINE, nil)
-// 			c.Abort()
-// 			return
-// 		}
+		// 判断当前用户是否被强制下线
+		if rdb.Exists(ctx, offlineKey).Val() == 1 {
+			fmt.Println("用户被强制下线")
+			handle.ReturnError(c, g.ErrForceOffline, nil)
+			c.Abort()
+			return
+		}
 
-// 		// * 每次发送请求会更新 Redis 中的在线状态: 重新计算 10 分钟
-// 		// TODO:
-// 		// utils.Redis.Set(KEY_USER+uuid, utils.Json.Marshal(sessionInfo), 10*time.Minute)
-
-// 		c.Next()
-// 	}
-// }
+		// 每次发送请求会更新 Redis 中的在线状态: 重新计算 10 分钟
+		rdb.Set(ctx, onlineKey, auth, 10*time.Minute)
+		c.Next()
+	}
+}

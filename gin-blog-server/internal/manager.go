@@ -62,11 +62,12 @@ func registerBaseHandler(r *gin.Engine) {
 // 后台管理系统的接口: 全部需要 登录 + 鉴权
 func registerAdminHandler(r *gin.Engine) {
 	auth := r.Group("/api")
+
 	// !注意使用中间件的顺序
 	auth.Use(middleware.JWTAuth())
 	auth.Use(middleware.PermissionCheck())
 	auth.Use(middleware.OperationLog())
-	// auth.Use(middleware.ListenOnline()) // 监听在线用户
+	auth.Use(middleware.ListenOnline())
 
 	auth.GET("/home", blogInfoAPI.GetHomeInfo) // 后台首页信息
 	auth.POST("/upload", uploadAPI.UploadFile) // 文件上传
@@ -88,7 +89,7 @@ func registerAdminHandler(r *gin.Engine) {
 		user.GET("/info", userAPI.GetInfo)                           // 获取当前用户信息
 		user.PUT("/current", userAPI.UpdateCurrent)                  // 修改当前用户信息
 		user.GET("/online", userAPI.GetOnlineList)                   // 获取在线用户
-		user.DELETE("/offline", userAPI.ForceOffline)                // 强制用户下线
+		user.POST("/offline/:id", userAPI.ForceOffline)              // 强制用户下线
 	}
 	// 分类模块
 	category := auth.Group("/category")

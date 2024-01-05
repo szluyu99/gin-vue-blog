@@ -90,7 +90,7 @@ func (*Article) SaveOrUpdate(c *gin.Context) {
 
 	err := model.SaveOrUpdateArticle(db, &article, req.CategoryName, req.TagNames)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (*Article) UpdateSoftDelete(c *gin.Context) {
 
 	rows, err := model.UpdateArticleSoftDelete(GetDB(c), req.Ids, req.IsDelete)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -122,7 +122,7 @@ func (*Article) Delete(c *gin.Context) {
 
 	rows, err := model.DeleteArticle(GetDB(c), ids)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (*Article) GetList(c *gin.Context) {
 
 	list, total, err := model.GetArticleList(db, query.Page, query.Size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -183,7 +183,7 @@ func (*Article) GetDetail(c *gin.Context) {
 
 	article, err := model.GetArticle(GetDB(c), id)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -200,7 +200,7 @@ func (*Article) UpdateTop(c *gin.Context) {
 
 	err := model.UpdateArticleTop(GetDB(c), req.ID, req.IsTop)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -235,7 +235,7 @@ func (*Article) Import(c *gin.Context) {
 	defaultImg := model.GetConfig(db, g.CONFIG_ARTICLE_COVER)
 	err = model.ImportArticle(db, auth.ID, title, content, defaultImg)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 

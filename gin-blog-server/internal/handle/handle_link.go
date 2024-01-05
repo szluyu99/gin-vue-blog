@@ -38,7 +38,7 @@ func (*Link) GetList(c *gin.Context) {
 
 	data, total, err := model.GetLinkList(GetDB(c), query.Page, query.Size, query.Keyword)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (*Link) SaveOrUpdate(c *gin.Context) {
 
 	link, err := model.SaveOrUpdateLink(GetDB(c), req.ID, req.Name, req.Avatar, req.Address, req.Intro)
 	if err != nil {
-		ReturnError(c, g.ErrDbOpt, err)
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (*Link) Delete(c *gin.Context) {
 
 	result := GetDB(c).Delete(&model.FriendLink{}, "id in ?", ids)
 	if result.Error != nil {
-		ReturnError(c, g.ErrDbOpt, result.Error)
+		ReturnError(c, g.ErrDbOp, result.Error)
 		return
 	}
 

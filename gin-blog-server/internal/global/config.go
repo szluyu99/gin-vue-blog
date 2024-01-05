@@ -1,7 +1,6 @@
 package g
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -90,22 +89,22 @@ func GetConfig() *Config {
 }
 
 // 从指定路径读取配置文件
-func ReadConfig(path string) (*Config, error) {
+func ReadConfig(path string) *Config {
 	v := viper.New()
 	v.SetConfigFile(path)
 	v.AutomaticEnv()                                   // 允许使用环境变量
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // SERVER_APPMODE => SERVER.APPMODE
 
 	if err := v.ReadInConfig(); err != nil {
-		return nil, errors.Join(errors.New("配置文件读取失败"), err)
+		panic("配置文件读取失败: " + err.Error())
 	}
 
 	if err := v.Unmarshal(&Conf); err != nil {
-		return nil, errors.Join(errors.New("配置文件内容加载失败"), err)
+		panic("配置文件反序列化失败: " + err.Error())
 	}
 
 	log.Println("配置文件内容加载成功: ", path)
-	return Conf, nil
+	return Conf
 }
 
 // 数据库类型

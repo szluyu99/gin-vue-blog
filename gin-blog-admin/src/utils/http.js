@@ -41,14 +41,14 @@ request.interceptors.response.use(
         window.$message.error(message)
       }
       console.error(responseData) // 控制台输出错误信息
+
+      const authStore = useAuthStore()
       if (code === 1201) { // Token 存在问题
-        const authStore = useAuthStore()
         authStore.toLogin()
         return
       }
-      // 1202-Token 过期, 1203-被强退
-      if (code === 1202 || code === 1203) {
-        const authStore = useAuthStore()
+      // 1202-Token 过期
+      if (code === 1202 || code === 1203 || code === 1207) {
         authStore.forceOffline()
         return
       }
