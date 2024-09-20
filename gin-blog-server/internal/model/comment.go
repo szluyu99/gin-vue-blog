@@ -20,7 +20,7 @@ type Comment struct {
 	UserId      int    `json:"user_id"`       // 评论者
 	ReplyUserId int    `json:"reply_user_id"` // 被回复者
 	TopicId     int    `json:"topic_id"`      // 评论的文章
-	ParentId    int    `json:"parent_id"`     // 父评论
+	ParentId    int    `json:"parent_id"`     // 父评论 被回复的评论
 	Content     string `gorm:"type:varchar(500);not null" json:"content"`
 	Type        int    `gorm:"type:tinyint(1);not null;comment:评论类型(1.文章 2.友链 3.说说)" json:"type"` // 评论类型 1.文章 2.友链 3.说说
 	IsReview    bool   `json:"is_review"`
@@ -74,14 +74,22 @@ func ReplyComment(db *gorm.DB, userId, replyUserId, parentId int, content string
 
 // 获取后台评论列表
 func GetCommentList(db *gorm.DB, page, size, typ int, isReview *bool, nickname string) (data []Comment, total int64, err error) {
+	
+	// SELECT UID FROM user_info WHERE nikename LIKE nickname
+	var uid int
+	if nickname != "" {
+		result := db.Model(&UserInfo{}).Where("nickname LIKE ?",nickname).Pluck("id",&uid)
+		if result.Error != nil{
+			return nil,0,result.Error
+		}
+		db = db.Where("user_id = ?",uid)
+	}
+
 	if typ != 0 {
 		db = db.Where("type = ?", typ)
 	}
 	if isReview != nil {
 		db = db.Where("is_review = ?", *isReview)
-	}
-	if nickname != "" {
-		db = db.Where("nickname LIKE ?", "%"+nickname+"%")
 	}
 
 	result := db.Model(&Comment{}).
