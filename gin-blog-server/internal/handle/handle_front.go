@@ -347,7 +347,8 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 
 	// 点赞量, 浏览量
 	article.ViewCount = int64(rdb.ZScore(rctx, g.ARTICLE_VIEW_COUNT, strconv.Itoa(id)).Val())
-	article.LikeCount = int64(rdb.ZScore(rctx, g.ARTICLE_LIKE_COUNT, strconv.Itoa(id)).Val())
+	likeCount, _ := strconv.Atoi(rdb.HGet(rctx, g.ARTICLE_LIKE_COUNT, strconv.Itoa(id)).Val())
+	article.LikeCount = int64(likeCount)
 
 	// 评论数量
 	article.CommentCount, err = model.GetArticleCommentCount(db, id)
