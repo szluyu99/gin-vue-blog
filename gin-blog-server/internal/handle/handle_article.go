@@ -140,10 +140,10 @@ func (*Article) GetList(c *gin.Context) {
 	rdb := GetRDB(c)
 
 	list, total, err := model.GetArticleList(db, query.Page, query.Size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
-	if err != nil {
+	if err != nil || list == nil{
 		ReturnError(c, g.ErrDbOp, err)
 		return
-	}
+	} 
 
 	likeCountMap := rdb.HGetAll(rctx, g.ARTICLE_LIKE_COUNT).Val()
 	viewCountZ := rdb.ZRangeWithScores(rctx, g.ARTICLE_VIEW_COUNT, 0, -1).Val()
@@ -233,7 +233,7 @@ func (*Article) Import(c *gin.Context) {
 	}
 
 	defaultImg := model.GetConfig(db, g.CONFIG_ARTICLE_COVER)
-	err = model.ImportArticle(db, auth.ID, title, content, defaultImg)
+	err = model.ImportArticle(db, auth.ID, title, content, defaultImg,"学习","Golang")
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
