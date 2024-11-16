@@ -4,6 +4,8 @@
 
 2023-12-27: v2 版本重构 初步完成, 从之间的 Java 风格项目改为 Golang 风格, 还有些功能在修补!
 
+2024-11-16: 最近忙于工作, 没怎么更新, 希望有兴趣的同学可以多多维护该项目, 感谢!
+
 项目交流 QQ 群号：777260310
 
 ## 博客介绍
@@ -36,17 +38,7 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 
 ## 在线预览
 
-博客前台链接：[hahacode.cn](https://www.hahacode.cn)（已适配移动端）
-
-博客后台链接：[hahacode.cn/admin](https://www.hahacode.cn/admin)（暂未专门适配移动端）
-
-> 博客域名已通过备案，且配置 SSL，通过 https 访问
-
-测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
-
-> 在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)，准备换成 Swagger
-
-以下放几张简单的预览图，强烈建议点击上面的[预览链接](#在线预览)进去体验下：
+> PS: 由于云服务器过期, 目前没有在线预览的网址哦
 
 ![前台首页图片](./images/前台首页.png)
 
