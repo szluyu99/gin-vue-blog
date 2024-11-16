@@ -2,6 +2,9 @@ package model
 
 import (
 	"encoding/json"
+	"gin-blog/internal/utils"
+	"log/slog"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -359,4 +362,49 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 		Preload("Roles").Preload("UserInfo").
 		First(&userAuth)
 	return &userAuth, result.Error
+}
+
+// 注册新用户
+func CreateNewUser(db *gorm.DB,username, password string) (*UserAuth,*UserInfo,*UserAuthRole,error){
+	// 创建userinfo
+	num,err := Count(db,&UserInfo{})
+	if err != nil{
+		slog.Info(err.Error())
+	}
+	number := strconv.Itoa(num)
+	userinfo := &UserInfo{
+		Email : username,
+		Nickname : "游客"+number,
+		Avatar: "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
+		Intro: "我是这个程序的第"+number+"个用户",
+	}
+	result := db.Create(&userinfo)
+	if result.Error != nil {
+		return nil,nil,nil,result.Error
+	}
+
+	// 先创建userauth
+	pass ,_:= utils.BcryptHash(password)
+	userauth := &UserAuth{
+		Username: username,
+		Password: pass,
+		UserInfoId: userinfo.ID,
+	}
+	
+	result = db.Create(&userauth)
+	if result.Error != nil {
+		return nil,nil,nil,result.Error
+	}
+
+	// 再创建role关联表
+	user_role := &UserAuthRole{
+		UserAuthId: userauth.ID,
+		RoleId: 2,  // 默认身份为游客
+	}
+	result = db.Create(&user_role)
+	if result.Error != nil {
+		return nil,nil,nil,result.Error
+	}	
+
+	return userauth,userinfo,user_role,result.Error
 }

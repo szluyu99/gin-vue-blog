@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -27,10 +28,15 @@ func GetUserInfoById(db *gorm.DB, id int) (*UserInfo, error) {
 	return &userInfo, result.Error
 }
 
-func GetUserAuthInfoByName(db *gorm.DB, name string) (*UserAuth, error) {
-	var userAuth UserAuth
-	result := db.Where(&UserAuth{Username: name}).First(&userAuth)
-	return &userAuth, result.Error
+func GetUserAuthInfoByName(db *gorm.DB,name string) (*UserAuth,error){
+	var userauth UserAuth
+	
+	result := db.Model(&userauth).Where("username LIKE ?",name).First(&userauth)
+	if result.Error != nil && errors.Is(result.Error,gorm.ErrRecordNotFound){
+		return nil,result.Error
+	}
+	
+	return &userauth,result.Error
 }
 
 func GetUserList(db *gorm.DB, page, size int, loginType int8, nickname, username string) (list []UserAuth, total int64, err error) {

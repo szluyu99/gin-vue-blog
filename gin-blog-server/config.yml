@@ -14,7 +14,7 @@ Mysql:
   Config: "charset=utf8mb4&parseTime=True&loc=Local" # 其他配置, 例如时区
   Dbname: "gvb"
   Username: "root"
-  Password: "123456"
+  Password: ""
 Sqlite:
   Dsn: "gvb.db"
 Redis:
@@ -30,12 +30,11 @@ Log:
   Format: "text" # text | json
   Directory: "log"
 Email:
-  Host: "smtp.163.com" # 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
-  Port: 465 # 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
+  Host: "smtp.qq.com" # 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
+  Port: 465  # 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
   From: "" # 发件人 (邮箱)
-  IsSSL: true # 是否开启 SSL
-  Secret: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
-  Nickname: "" # 发件人昵称, 通常为自己的邮箱名
+  SmtpPass: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
+  SmtpUser: "" # 发件人昵称, 通常为自己的邮箱名
 Captcha:
   SendEmail: true # 通过邮箱发送验证码
   ExpireTime: 15  # 过期时间 (分钟)
