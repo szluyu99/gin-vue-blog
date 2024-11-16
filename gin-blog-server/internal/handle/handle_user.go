@@ -61,12 +61,12 @@ func (*User) GetInfo(c *gin.Context) {
 	}
 
 	userInfoVO := model.UserInfoVO{UserInfo: *user.UserInfo}
-	userInfoVO.ArticleLikeSet, err = rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
+	userInfoVO.ArticleLikeSet, err = rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(user.ID)).Result()
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
-	userInfoVO.CommentLikeSet, err = rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(user.UserInfoId)).Result()
+	userInfoVO.CommentLikeSet, err = rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(user.ID)).Result()
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return

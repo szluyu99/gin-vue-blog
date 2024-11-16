@@ -100,12 +100,12 @@ func (*UserAuth) Login(c *gin.Context) {
 
 	articleLikeSet, err := rdb.SMembers(rctx, g.ARTICLE_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOp, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 	commentLikeSet, err := rdb.SMembers(rctx, g.COMMENT_USER_LIKE_SET+strconv.Itoa(userAuth.ID)).Result()
 	if err != nil {
-		ReturnError(c, g.ErrDbOp, err)
+		ReturnError(c, g.ErrRedisOp, err)
 		return
 	}
 
