@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"html/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -125,6 +126,7 @@ func (*Front) SaveMessage(c *gin.Context) {
 		return
 	}
 
+	req.Content = template.HTMLEscapeString(req.Content)
 	auth, _ := CurrentUserAuth(c)
 	db := GetDB(c)
 
@@ -153,6 +155,8 @@ func (*Front) SaveComment(c *gin.Context) {
 		return
 	}
 
+	// 过滤评论内容，防止XSS攻击
+	req.Content = template.HTMLEscapeString(req.Content)
 	auth, _ := CurrentUserAuth(c)
 	db := GetDB(c)
 	isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
