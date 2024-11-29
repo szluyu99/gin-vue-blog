@@ -268,6 +268,8 @@ Linux 和 Mac 不需要进行该操作。
 
 > 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 crlf，经过测试，构建过程会产生 BUG。
 
+> docker部署需要把 注册功能(gin-blog-server/internal/utils/email.go)中的GetEmailVerifyURL函数  loaclhost+端口 换成 你的域名
+
 ```bash
 # 防止 git 自动将换行符转换为 crlf
 git config --global core.autocrlf false
