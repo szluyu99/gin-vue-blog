@@ -79,6 +79,8 @@ func GetEmailVerifyURL(info string) string{
 	if baseurl[0] ==':'{
 		baseurl = fmt.Sprintf("localhost%s",baseurl)
 	}
+	// 如果是用docker部署,则 注释上面的代码，使用下面的代码
+	// baseurl := "你的域名"   切记不需要加端口
 
 	return fmt.Sprintf("%s/api/email/verify?info=%s",baseurl,info)  // form数据
 }
