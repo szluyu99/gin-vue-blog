@@ -81,12 +81,13 @@ function buildRoutes(routes = []) {
 
   for (const e of routes) {
     if (e.is_catalogue) {
+      console.log(e)
       result.push({
-        name: e.name,
-        path: '/', // *
+        name: `${e.name}Parent`,
+        path: '/',
         component: shallowRef(Layout),
         isHidden: e.is_hidden,
-        isCatalogue: true, // *
+        isCatalogue: true,
         redirect: e.redirect,
         meta: {
           order: e.order_num,
@@ -94,11 +95,13 @@ function buildRoutes(routes = []) {
         children: [{
           name: e.name,
           path: e.path,
-          component: vueModules[`/src/views${e.component}/index.vue`],
+          component: e.component === 'Layout'
+            ? vueModules[`/src/views${e.path}/index.vue`]
+            : vueModules[`/src/views${e.component}/index.vue`],
           meta: {
             title: e.name,
             icon: e.icon,
-            keepAlive: e.keep_alive, // TODO:
+            keepAlive: e.keep_alive,
             order: 0,
           },
         }],
@@ -106,7 +109,7 @@ function buildRoutes(routes = []) {
     }
     else {
       result.push({
-        name: e.name,
+        name: `${e.name}Parent`,
         path: e.path,
         component: shallowRef(Layout),
         isHidden: e.is_hidden,
@@ -114,12 +117,12 @@ function buildRoutes(routes = []) {
         meta: {
           title: e.name,
           icon: e.icon,
-          keepAlive: e.keep_alive, // TODO:
+          keepAlive: e.keep_alive,
           order: e.order_num,
         },
         children: e.children?.map(ee => ({
           name: ee.name,
-          path: ee.path, // 父路径 + 当前菜单路径
+          path: ee.path,
           component: vueModules[`/src/views${ee.component}/index.vue`],
           isHidden: ee.is_hidden,
           meta: {
