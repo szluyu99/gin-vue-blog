@@ -1,9 +1,5 @@
 ## 博客交流群
 
-2023-12-09：最近项目处于重构中，会经历快速迭代，线上版本不一定是最新，暂时不要上生产环境
-
-2023-12-27: v2 版本重构 初步完成, 从之间的 Java 风格项目改为 Golang 风格, 还有些功能在修补!
-
 项目交流 QQ 群号：777260310
 
 ## 博客介绍
@@ -34,20 +30,7 @@ Github 地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/sz
 
 Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
 
-## 在线预览
-
-博客前台链接：[hahacode.cn](https://www.hahacode.cn)（已适配移动端）
-
-博客后台链接：[hahacode.cn/admin](https://www.hahacode.cn/admin)（暂未专门适配移动端）
-
-> 博客域名已通过备案，且配置 SSL，通过 https 访问
-
-测试账号：test@qq.com，密码：11111，前后台都可用这个账号登录
-
-> 在线接口文档地址：[doc.hahacode.cn](http://doc.hahacode.cn/)，准备换成 Swagger
-
-以下放几张简单的预览图，强烈建议点击上面的[预览链接](#在线预览)进去体验下：
-
+## 预览
 ![前台首页图片](./images/前台首页.png)
 
 ![前台首页文章列表](./images/前台文章列表.png)
@@ -260,9 +243,9 @@ deploy
 
 ## 快速开始
 
-建议下载本项目后，先一键运行起来，查看本项目在本地的运行效果。
+**本地开发的完整启动步骤见 [quick_start.md](./quick_start.md)**，包含 Mock 模式（不启动后端，只跑前端）和完整启动两种方式、访问地址、默认账号以及常见问题。
 
-需要修改源码的话，参考常规运行，前后端分开运行。
+只想快速看效果，推荐下面的 Docker Compose 一键运行。
 
 本项目开发环境是 Linux，如果 Windows 下运行有奇奇怪怪的问题，可以进群交流或提 Issue
 
@@ -281,7 +264,7 @@ Linux 和 Mac 不需要进行该操作。
 git config --global core.autocrlf false
 ```
 
-### 方式一：Docker Compose 一键运行
+### Docker Compose 一键运行
 
 需要有 Docker 和 Docker Compose 的环境
 
@@ -299,121 +282,30 @@ cd gin-vue-blog/deploy
 
 本地后台访问 [localhost/admin](http://localhost/admin)
 
-默认用户：
-
-- 管理员 admin 123456
-- 普通用户 user 123456
-- 测试用户 test 123456
+默认用户：管理员 `admin / 123456`
 
 如果运行遇到问题，请查看详细文章 [deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
 
-### 方式二：常规运行
+### 开发环境依赖
 
-需要安装 Golang、Node、MySQL、Redis 环境：
- 
-- Golang 安装参考 [官方文档](https://go.dev/doc/install)
+分开运行前后端时需要：Golang 1.21+、Node（建议用 [Nvm](https://nvm.uihtm.com/) 安装）、pnpm、Redis。
 
-- Node 安装建议使用 [Nvm](https://nvm.uihtm.com/)，也可以直接去 [Node 官网](https://nodejs.org/en) 下载
+数据库默认使用 SQLite，开箱即用；切换 MySQL 需要 8.0 以上版本，并修改 `gin-blog-server/config.yml`。
 
-- MySQL、Redis 建议使用 Docker 安装
-
-> 以下使用 Docker 安装环境，未做持久化处理，仅用于开发和演示
-
-Docker 安装 MySQL：
+MySQL、Redis 建议用 Docker 安装（以下未做持久化，仅用于开发和演示）：
 
 ```bash
-# 注意: 必须安装 MySQL 8.0 以上版本
-docker pull mysql:8.0
-
-# 运行 MySQL
+# MySQL 8.0
 docker run --name mysql8 -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:8.0
 
-# 查看是否运行成功, STATUS 为 Up 即成功
-docker ps
-
-# 进入容器, CTRL + D 退出
-docker exec -it mysql8 bash
-mysql -u root -p123456
-```
-
-Docker 安装 Redis：
-
-```bash
-docker pull redis:7.0
-
-# 运行 Redis
+# Redis 7.0
 docker run --name redis7 -p 6379:6379 -d redis:7.0
 
 # 查看是否运行成功, STATUS 为 Up 即成功
 docker ps
-
-# 进入容器, CTRL + D 退出
-docker exec -it redis7 bash
-redis-cli
 ```
 
-需要先运行后端服务，再运行前端项目，因为很多前端配置由后端动态加载（如菜单等）。
-
-拉取项目到本地：
-
-```bash
-git clone https://github.com/szluyu99/gin-vue-blog.git
-```
-
-后端项目运行：
-
-```bash
-# 1、进入后端项目根目录 
-cd gin-blog-server
-
-# 2、修改项目运行的配置文件，默认加载位于 config/config.toml 
-
-# 3、MySQL 导入 gvb.sql
-
-# 4、启动 Redis 
-
-# 5、运行项目
-go mod tidy
-go run main.go
-```
-
-数据库中的默认用户：
-
-- 管理员 admin 123456
-- 普通用户 user 123456
-- 测试用户 test 123456
-
-前端项目运行： 本项目使用 pnpm 进行包管理，建议全局安装 `pnpm`
-
-```bash
-npm install -g pnpm
-```
-
-前台前端：
-
-```bash
-# 1、进入前台前端项目根目录
-cd gin-blog-front
-
-# 2、安装依赖
-pnpm install
-
-# 3、运行项目
-pnpm dev
-```
-
-后台前端：
-
-```bash
-# 1、进入后台前端项目根目录
-cd gin-blog-admin
-
-# 2、安装依赖
-pnpm install
-
-# 3、运行项目
-pnpm dev
-```
+环境就绪后，按 [quick_start.md](./quick_start.md) 启动即可。
 
 ### 项目部署
 

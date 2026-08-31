@@ -1,10 +1,15 @@
 import axios from 'axios'
 import { useAuthStore } from '@/store'
+import { mockAdapter } from '@/mock'
+
+// 是否使用 mock 数据: 开启后不请求后端, 由 src/mock 返回假数据
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export const request = axios.create(
   {
     baseURL: import.meta.env.VITE_BASE_API,
     timeout: 12000,
+    ...(USE_MOCK ? { adapter: mockAdapter } : {}),
   },
 )
 
