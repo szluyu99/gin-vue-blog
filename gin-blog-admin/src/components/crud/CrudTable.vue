@@ -1,5 +1,4 @@
 <script setup>
-import ExcelJS from 'exceljs'
 import { NButton, NDataTable, NSpace } from 'naive-ui'
 import { nextTick, reactive, ref } from 'vue'
 
@@ -136,13 +135,15 @@ async function handleExport(columns = props.columns, data = tableData.value) {
   const thData = columnsData.map(item => item.title)
   const trData = data.map(item => thKeys.map(key => item[key]))
 
-  const workbook = new ExcelJS.Workbook()
-  const sheet = workbook.addWorksheet('数据报表')
-  sheet.addRows([thData, ...trData])
-
   // exceljs 不提供浏览器端下载, 需自行生成 Blob 触发
   // 本函数为 async, 失败时的 rejection 不会被 Vue 的错误处理捕获, 故在此兜住
   try {
+    // exceljs 体积较大(gzip 后约 300KB), 点击导出时才加载, 不进入首屏
+    const { default: ExcelJS } = await import('exceljs')
+    const workbook = new ExcelJS.Workbook()
+    const sheet = workbook.addWorksheet('数据报表')
+    sheet.addRows([thData, ...trData])
+
     const buffer = await workbook.xlsx.writeBuffer()
     const blob = new Blob([buffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

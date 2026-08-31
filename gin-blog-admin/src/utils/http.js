@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { mockAdapter } from '@/mock'
 import { useAuthStore } from '@/store'
 
 // 是否使用 mock 数据: 开启后不请求后端, 由 src/mock 返回假数据
@@ -9,9 +8,18 @@ export const request = axios.create(
   {
     baseURL: import.meta.env.VITE_BASE_API,
     timeout: 12000,
-    ...(USE_MOCK ? { adapter: mockAdapter } : {}),
   },
 )
+
+// mock 数据通过动态引入, 使其只出现在 mock 构建的产物中
+// 需要在应用挂载前调用, 见 main.js
+export async function setupMock() {
+  if (!USE_MOCK) {
+    return
+  }
+  const { mockAdapter } = await import('@/mock')
+  request.defaults.adapter = mockAdapter
+}
 
 request.interceptors.request.use(
   // 请求成功拦截
