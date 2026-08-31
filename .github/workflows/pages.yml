@@ -3,6 +3,10 @@ name: Deploy Mock Pages
 on:
   push:
     branches: [main]
+    # 纯文档改动不重新部署演示页面
+    paths-ignore:
+      - '**.md'
+      - .github/dependabot.yml
   workflow_dispatch:
 
 # 只允许一个部署同时进行, 新的推送取消进行中的旧部署

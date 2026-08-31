@@ -1,0 +1,45 @@
+version: 2
+
+updates:
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+
+  # 后端 Go 依赖
+  - package-ecosystem: gomod
+    directory: /gin-blog-server
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(server)
+    groups:
+      go-minor-patch:
+        update-types: [minor, patch]
+
+  # 前端依赖: Dependabot 对 pnpm 的支持时有问题, 若长期不出 PR 就用 taze 手动升级
+  - package-ecosystem: npm
+    directory: /gin-blog-front
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(front)
+    groups:
+      front-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /gin-blog-admin
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(admin)
+    groups:
+      admin-minor-patch:
+        update-types: [minor, patch]
