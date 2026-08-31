@@ -83,8 +83,9 @@ function buildRoutes(routes = []) {
     if (e.is_catalogue) {
       console.log(e)
       result.push({
-        name: `${e.name}Parent`,
-        path: '/',
+        // 父路由名称不能和子路由相同, 否则 vue-router 会抛出错误
+        name: `${e.name}-catalogue`,
+        path: '/', // *
         component: shallowRef(Layout),
         isHidden: e.is_hidden,
         isCatalogue: true,

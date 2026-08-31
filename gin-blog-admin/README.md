@@ -1,46 +1,65 @@
-本后台项目基于这个项目骨架：[https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin), 感谢开源作者的奉献。
+# gin-blog-admin
 
-## 项目路由
+博客后台。Vue 3 + Vite + Naive UI + UnoCSS，开发端口 `8889`。项目骨架来自 [vue-naive-admin](https://github.com/zclzone/vue-naive-admin)。
 
-后端路由：由后端传来一个基础的菜单数组, 前端组装成可访问的路由格式
+支持两种运行模式：**Mock 模式**（不需要后端，全部数据来自本地假数据）和**接后端模式**。
 
-前端路由: 加载前端写死的路由, 根据其 meta.requireAuth 判断是否需要鉴权, 同时由前端判断角色
+## 安装依赖
 
-## 相比 Vue Naive Admin 项目的变化
+```bash
+pnpm install
+```
 
-原则：一个问题不需要太多解决方案，所以本项目中只保留最常用的解决方案，如果实在不能解决需求，需要自行添加
+> 使用 pnpm 10+ 时，依赖的 install/postinstall 脚本默认被禁止执行，未批准会直接报 `ERR_PNPM_IGNORED_BUILDS`。
+> 本项目已在 `pnpm-workspace.yaml` 的 `allowBuilds` 中批准了必需的几个（`esbuild` 等），正常安装即可。
 
-基于 Vue Naive Admin, 本项目在其基础上更新了很多，主要是为了精简项目, 对接后端, 大致列出如下:
+## Mock 模式（推荐用于只改前端）
 
-整体结构：
-- 去除 Mock: 因为项目有真实的后端, 无需 Mock
-- 去除 build 文件夹, 因为去除了很多插件 (unplugin 全部去除), 所以并不必须
-- 对接真实后端数据, 添加后端路由等功能
+`.env.development` 中设置：
 
-插件相关：
-- 去除 unplugin 系列所有插件: `unplugin-auto-import`, `unplugin-icons`, `unplugin-vue-components`
-- 去除 `vite-plugin-html`, `vite-plugin-mock`, `vite-plugin-svg-icons`: 本项目中未使用
-- 去除 prettier, 统一使用 eslint
-- 去除 `@commitlint/cli`, `@commitlint/config-conventional`: 非必须, 追求精简
-- 去除 `lint-staged`, `husky`: 本项目是大仓库的子项目, 不需要提交前检查
-- 去除 `@unocss/preset-rem-to-px` 插件，一般情况下不需要转换字体
-- 添加 taze 插件: 用于升级依赖
+```ini
+VITE_USE_MOCK = true
+```
 
-去除 unplugin 系插件的主要原因有以下：
-- 这些插件并不涉及业务功能上的必须, 只是为了方便开发
-- 为了降低项目的耦合性, 以及项目对插件的依赖性, 提高项目移植的便捷性, 去除这些插件
-- 这些插件某种程度上可以让单人开发者的开发效率提高, 但是根据经验发现不便于维护, 对其他人不友好
-- 可能会导致一些奇奇怪怪的问题
+```bash
+pnpm dev
+```
 
-UnoCSS - `uno.config.js` 中: 以下预设都不是必须, 追求精简
-- 去除 presetAttributify 预设
-- 去除 shortcuts
-- 去除 rules
-- 采用 @unocss/reset 代替 reset.css
-- 图标统一使用 UnoCSS 的使用方法, 使用 presetIcons 预设
+打开 http://localhost:8889 即可，不需要启动 Go 后端和 Redis。
 
-## 代码风格控制
+实现方式是替换 axios 的 `adapter`（`src/utils/http.js`），请求不会发出浏览器，但仍会走原有的响应拦截器，所以业务状态码、token 注入、鉴权跳转等逻辑与真实环境一致。
 
-关于项目中为什么不使用 Prettier，参考 Antfu 大佬： [为什么我不使用 Prettier](https://antfu.me/posts/why-not-prettier-zh)
+- 假数据在 `src/mock/data.js`，接口路由表在 `src/mock/index.js`，覆盖 `src/api.js` 中的全部接口
+- 菜单、资源、角色三份数据与后端 `generate_data.sh` 生成的默认数据一致，保证动态路由和权限页面可用
+- 列表页支持分页与查询条件；新增、编辑、删除、置顶、审核、禁用、强制下线都会写入内存，**刷新浏览器后重置**
+- 登录不校验账号密码，任意输入都会以 admin 身份登录
 
-Eslint 方案采用 [https://github.com/antfu/eslint-config](https://github.com/antfu/eslint-config)，最大化减少配置
+## 接后端模式
+
+`.env.development` 中设置：
+
+```ini
+VITE_USE_MOCK = false
+VITE_SERVER_URL = 'http://localhost:8765'
+```
+
+然后按 `gin-blog-server/README.md` 启动后端并初始化数据，再 `pnpm dev`，用 `admin / 123456` 登录。`/api` 请求由 vite 代理到 `VITE_SERVER_URL`。
+
+> 修改 `.env*` 后必须重启 dev server，vite 不会热更环境变量。
+
+## 路由与权限
+
+`VITE_BACK_ROUTER = true` 时走后端路由：后端 `/menu/user/list` 返回当前用户的菜单树，前端在 `src/store/modules/permission.js` 的 `buildRoutes` 中组装成 vue-router 路由并动态注册。
+
+`VITE_BACK_ROUTER = false` 时走前端路由：加载 `src/views/**/route.js`，按 `meta.requireAuth` 和角色过滤。
+
+> 注意 vue-router 4.3+ 不允许子路由与父路由同名，会直接抛异常导致动态路由全部注册失败（表现为登录后所有页面跳 404）。新增菜单时不要让父子同名。
+
+## 其他命令
+
+```bash
+pnpm build    # 生产构建
+pnpm lint     # 代码检查
+```
+
+代码风格使用 [antfu/eslint-config](https://github.com/antfu/eslint-config)，不使用 Prettier。

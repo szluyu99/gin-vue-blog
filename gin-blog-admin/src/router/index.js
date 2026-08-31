@@ -45,7 +45,7 @@ export async function addDynamicRoutes() {
     const accessRoutes = JSON.parse(import.meta.env.VITE_BACK_ROUTER)
       ? await permissionStore.generateRoutesBack()
       : permissionStore.generateRoutesFront(['admin'])
-  console.log(accessRoutes)
+
     // 检查重复路由名称并添加路由
     const addedNames = new Set()
 
