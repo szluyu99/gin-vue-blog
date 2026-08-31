@@ -94,7 +94,6 @@ function handleScroll(x, width) {
 function debounce(method, wait, immediate) {
   let timeout
   return function (...args) {
-    // eslint-disable-next-line ts/no-this-alias
     const context = this
     if (timeout) {
       clearTimeout(timeout)

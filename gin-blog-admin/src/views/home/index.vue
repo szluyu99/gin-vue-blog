@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import { NAvatar, NButton, NCard, NGi, NGradientText, NGrid, NStatistic } from 'naive-ui'
+import { onMounted, ref } from 'vue'
 
+import api from '@/api'
 import AppPage from '@/components/common/AppPage.vue'
 import { useUserStore } from '@/store'
-import api from '@/api'
 
 const { nickname, avatar } = useUserStore()
 

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { convertImgUrl } from '@/utils'
 import api from '@/api'
+import { convertImgUrl } from '@/utils'
 
 // 用户全局变量
 export const useUserStore = defineStore('user', {

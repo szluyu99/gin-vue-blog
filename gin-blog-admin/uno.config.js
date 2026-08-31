@@ -1,4 +1,35 @@
+import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import { defineConfig, presetIcons, presetUno } from 'unocss'
+
+const require = createRequire(import.meta.url)
+
+// presetIcons 默认的自动加载在当前 pnpm 布局下解析不到 @iconify/json,
+// 结果是所有 i-xxx:yyy 类名图标静默不生成, 故显式指定图标集的读取方式。
+function loadCollection(name) {
+  return () => JSON.parse(
+    fs.readFileSync(require.resolve(`@iconify/json/json/${name}.json`), 'utf-8'),
+  )
+}
+
+// 模板中实际用到的图标集
+const iconCollections = Object.fromEntries([
+  'ant-design',
+  'bxs',
+  'fa6-solid',
+  'fe',
+  'heroicons',
+  'ic',
+  'ion',
+  'line-md',
+  'lucide',
+  'majesticons',
+  'material-symbols',
+  'mdi',
+  'mi',
+  'mingcute',
+  'uiw',
+].map(name => [name, loadCollection(name)]))
 
 export default defineConfig({
   presets: [
@@ -6,6 +37,9 @@ export default defineConfig({
     presetIcons({
       prefix: ['i-'],
       scale: 1.2,
+      // 加载失败时告警, 避免再次静默不生成
+      warn: true,
+      collections: iconCollections,
       extraProperties: {
         'display': 'inline-block',
         'vertical-align': 'middle',

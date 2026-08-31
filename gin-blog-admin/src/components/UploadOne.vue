@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
 import { NIcon, NText, NUpload, NUploadDragger } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '@/store'
 import { convertImgUrl } from '@/utils'
 

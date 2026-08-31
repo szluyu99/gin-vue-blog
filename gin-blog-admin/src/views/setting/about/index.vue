@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { MdEditor } from 'md-editor-v3'
 import { NButton } from 'naive-ui'
 
-import { MdEditor } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
+import { onMounted, ref } from 'vue'
+import api from '@/api'
 
 import CommonPage from '@/components/common/CommonPage.vue'
-import api from '@/api'
+import 'md-editor-v3/lib/style.css'
 
 defineOptions({ name: '关于我' })
 

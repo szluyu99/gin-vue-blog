@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import { NButton, NDatePicker, NForm, NFormItem, NInput, NRadio, NRadioGroup, NTabPane, NTabs } from 'naive-ui'
-
-import CommonPage from '@/components/common/CommonPage.vue'
-import UploadOne from '@/components//UploadOne.vue'
+import { onMounted, ref } from 'vue'
 
 import api from '@/api'
+import UploadOne from '@/components//UploadOne.vue'
+
+import CommonPage from '@/components/common/CommonPage.vue'
 
 defineOptions({ name: '网站管理' })
 
@@ -53,7 +53,7 @@ function handleSave() {
         $message.success('博客信息更新成功')
         // fetchData()
       }
-      catch (err) {
+      catch {
         $loadingBar?.error()
       }
     }

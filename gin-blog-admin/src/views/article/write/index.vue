@@ -1,17 +1,17 @@
 <script setup>
+import { MdEditor } from 'md-editor-v3'
+import { NButton, NDynamicTags, NForm, NFormItem, NInput, NRadio, NRadioGroup, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
 import { h, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { NButton, NDynamicTags, NForm, NFormItem, NInput, NRadio, NRadioGroup, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
-import { MdEditor } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
-
-import CommonPage from '@/components/common/CommonPage.vue'
-import CrudModal from '@/components/crud/CrudModal.vue'
-import UploadOne from '@/components//UploadOne.vue'
+import api from '@/api'
 
 import { articleTypeOptions } from '@/assets/config'
+import UploadOne from '@/components//UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+
+import CrudModal from '@/components/crud/CrudModal.vue'
 import { useTagStore } from '@/store'
-import api from '@/api'
+import 'md-editor-v3/lib/style.css'
 
 defineOptions({ name: '发布文章' })
 
@@ -84,7 +84,7 @@ async function getArticleInfo() {
     formModel.value.category_name = category.name
     window.$loadingBar?.finish()
   }
-  catch (err) {
+  catch {
     window.$loadingBar?.error()
     $message?.error('加载失败')
   }

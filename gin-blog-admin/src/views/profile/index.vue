@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NTabPane, NTabs } from 'naive-ui'
+import { onMounted, ref } from 'vue'
 
-import CommonPage from '@/components/common/CommonPage.vue'
-import UploadOne from '@/components//UploadOne.vue'
-import { useUserStore } from '@/store'
 import api from '@/api'
+import UploadOne from '@/components//UploadOne.vue'
+import CommonPage from '@/components/common/CommonPage.vue'
+import { useUserStore } from '@/store'
 
 const userStore = useUserStore()
 

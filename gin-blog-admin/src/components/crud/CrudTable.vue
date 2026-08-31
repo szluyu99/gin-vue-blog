@@ -1,7 +1,7 @@
 <script setup>
-import { nextTick, reactive, ref } from 'vue'
+import ExcelJS from 'exceljs'
 import { NButton, NDataTable, NSpace } from 'naive-ui'
-import { utils, writeFile } from 'xlsx'
+import { nextTick, reactive, ref } from 'vue'
 
 const props = defineProps({
   /** 是否不设定列的分割线 */
@@ -84,7 +84,7 @@ async function handleQuery() {
     tableData.value = data?.page_data || data
     pagination.itemCount = data?.total ?? data.length
   }
-  catch (error) {
+  catch {
     tableData.value = []
     pagination.itemCount = 0
   }
@@ -127,7 +127,7 @@ function onSorterChange(sorter) {
   emit('sorterChange', sorter)
 }
 
-function handleExport(columns = props.columns, data = tableData.value) {
+async function handleExport(columns = props.columns, data = tableData.value) {
   if (!data?.length) {
     return window.$message.warning('没有数据')
   }
@@ -135,10 +135,28 @@ function handleExport(columns = props.columns, data = tableData.value) {
   const thKeys = columnsData.map(item => item.key)
   const thData = columnsData.map(item => item.title)
   const trData = data.map(item => thKeys.map(key => item[key]))
-  const sheet = utils.aoa_to_sheet([thData, ...trData])
-  const workBook = utils.book_new()
-  utils.book_append_sheet(workBook, sheet, '数据报表')
-  writeFile(workBook, '数据报表.xlsx')
+
+  const workbook = new ExcelJS.Workbook()
+  const sheet = workbook.addWorksheet('数据报表')
+  sheet.addRows([thData, ...trData])
+
+  // exceljs 不提供浏览器端下载, 需自行生成 Blob 触发
+  // 本函数为 async, 失败时的 rejection 不会被 Vue 的错误处理捕获, 故在此兜住
+  try {
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '数据报表.xlsx'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+  catch {
+    window.$message.error('导出失败')
+  }
 }
 
 defineExpose({

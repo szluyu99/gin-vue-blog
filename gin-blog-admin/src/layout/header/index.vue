@@ -1,11 +1,11 @@
 <script setup>
-import MenuCollapse from './components/MenuCollapse.vue'
 import BreadCrumb from './components/BreadCrumb.vue'
-import ThemeMode from './components/ThemeMode.vue'
-import Watermark from './components/Watermark.vue'
-import GithubSite from './components/GithubSite.vue'
 import FullScreen from './components/FullScreen.vue'
+import GithubSite from './components/GithubSite.vue'
+import MenuCollapse from './components/MenuCollapse.vue'
+import ThemeMode from './components/ThemeMode.vue'
 import UserAvatar from './components/UserAvatar.vue'
+import Watermark from './components/Watermark.vue'
 </script>
 
 <template>

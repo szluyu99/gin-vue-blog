@@ -1,7 +1,7 @@
 <script setup>
+import { NMenu } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NMenu } from 'naive-ui'
 import { usePermissionStore, useTagStore } from '@/store'
 import { renderIcon } from '@/utils'
 
@@ -113,7 +113,7 @@ function handleMenuSelect(_, item) {
  * @returns {boolean} 是否是外链
  */
 function isExternal(path) {
-  return /^(https?:|mailto:|tel:)/.test(path)
+  return /^(?:https?:|mailto:|tel:)/.test(path)
 }
 </script>
 

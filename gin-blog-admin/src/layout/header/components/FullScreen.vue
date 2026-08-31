@@ -1,6 +1,6 @@
 <script setup>
-import { NIcon } from 'naive-ui'
 import { useFullscreen } from '@vueuse/core'
+import { NIcon } from 'naive-ui'
 
 const { isFullscreen, toggle } = useFullscreen()
 </script>

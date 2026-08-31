@@ -1,10 +1,10 @@
 <script setup>
-import { ref } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { NInput, NPopover } from 'naive-ui'
+import { ref } from 'vue'
 
-import TheIcon from './TheIcon.vue'
 import iconData from '@/assets/icons'
+import TheIcon from './TheIcon.vue'
 
 const props = defineProps({ value: String })
 const emit = defineEmits(['update:value'])

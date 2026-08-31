@@ -1,16 +1,16 @@
 <script setup>
-import { h, onMounted, ref } from 'vue'
 import { NButton, NCheckbox, NCheckboxGroup, NForm, NFormItem, NImage, NInput, NSelect, NSpace, NSwitch, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
 
-import CommonPage from '@/components/common/CommonPage.vue'
-import QueryItem from '@/components/crud/QueryItem.vue'
-import CrudModal from '@/components/crud/CrudModal.vue'
-import CrudTable from '@/components/crud/CrudTable.vue'
-
-import { loginTypeMap, loginTypeOptions } from '@/assets/config'
-import { convertImgUrl, formatDate } from '@/utils'
-import { useCRUD } from '@/composables'
 import api from '@/api'
+import { loginTypeMap, loginTypeOptions } from '@/assets/config'
+import CommonPage from '@/components/common/CommonPage.vue'
+import CrudModal from '@/components/crud/CrudModal.vue'
+
+import CrudTable from '@/components/crud/CrudTable.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import { useCRUD } from '@/composables'
+import { convertImgUrl, formatDate } from '@/utils'
 
 defineOptions({ name: '用户列表' })
 

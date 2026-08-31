@@ -1,16 +1,16 @@
 <script setup>
+import { NButton, NImage, NInput, NPopconfirm, NSelect, NSwitch, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
 import { defineOptions, h, onActivated, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NButton, NImage, NInput, NPopconfirm, NSelect, NSwitch, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
 
-import CommonPage from '@/components/common/CommonPage.vue'
-import QueryItem from '@/components/crud/QueryItem.vue'
-import CrudTable from '@/components/crud/CrudTable.vue'
-
-import { convertImgUrl, formatDate } from '@/utils'
-import { useCRUD } from '@/composables'
-import { articleTypeMap, articleTypeOptions } from '@/assets/config'
 import api from '@/api'
+import { articleTypeMap, articleTypeOptions } from '@/assets/config'
+import CommonPage from '@/components/common/CommonPage.vue'
+
+import CrudTable from '@/components/crud/CrudTable.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
+import { useCRUD } from '@/composables'
+import { convertImgUrl, formatDate } from '@/utils'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
@@ -171,28 +171,28 @@ const columns = [
       return [
         row.is_delete
           ? h(
-            NButton,
-            {
-              size: 'small',
-              type: 'success',
-              secondary: true,
-              onClick: async () => {
-                await api.softDeleteArticle([row.id], false)
-                await $table.value?.handleSearch()
+              NButton,
+              {
+                size: 'small',
+                type: 'success',
+                secondary: true,
+                onClick: async () => {
+                  await api.softDeleteArticle([row.id], false)
+                  await $table.value?.handleSearch()
+                },
               },
-            },
-            { default: () => '恢复', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
-          )
+              { default: () => '恢复', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
+            )
           : h(
-            NButton,
-            {
-              size: 'small',
-              type: 'primary',
-              secondary: true,
-              onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
-            },
-            { default: () => '查看', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
-          ),
+              NButton,
+              {
+                size: 'small',
+                type: 'primary',
+                secondary: true,
+                onClick: () => router.push(`/article/write/${row.id}`), // 携带参数前往 写文章 页面
+              },
+              { default: () => '查看', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
+            ),
         h(
           NPopconfirm,
           { onPositiveClick: () => handleDelete([row.id], false) },

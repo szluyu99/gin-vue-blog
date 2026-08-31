@@ -1,11 +1,11 @@
-import { nextTick } from 'vue'
 import { defineStore } from 'pinia'
+import { nextTick } from 'vue'
 import { router } from '@/router'
 
 export const useTagStore = defineStore('tag', {
   persist: {
     key: 'gvb_admin_tag',
-    paths: ['tags'],
+    pick: ['tags'],
     storage: window.sessionStorage,
   },
   state: () => ({
@@ -28,7 +28,7 @@ export const useTagStore = defineStore('tag', {
      * @param {string} name route name
      */
     updateAliveKey(name) {
-      this.aliveKeys[name] = (+new Date())
+      this.aliveKeys[name] = (Date.now())
     },
     /**
      * 设置当前激活的标签
@@ -96,7 +96,7 @@ export const useTagStore = defineStore('tag', {
       const filterTags = this.tags.filter((item, index) => index >= curIndex)
       this.setTags(filterTags)
       // 如果当前浏览的标签被关闭, 打开一个新标签
-      if (!filterTags.find(item => item.path === this.activeTag)) {
+      if (!filterTags.some(item => item.path === this.activeTag)) {
         router.push(filterTags[filterTags.length - 1].path)
       }
     },
@@ -110,7 +110,7 @@ export const useTagStore = defineStore('tag', {
       const filterTags = this.tags.filter((item, index) => index <= curIndex)
       this.setTags(filterTags)
       // 如果当前浏览的标签被关闭, 打开一个新标签
-      if (!filterTags.find(item => item.path === this.activeTag)) {
+      if (!filterTags.some(item => item.path === this.activeTag)) {
         router.push(filterTags[filterTags.length - 1].path)
       }
     },

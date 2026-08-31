@@ -1,14 +1,14 @@
 <script setup>
-import { h, onMounted, ref } from 'vue'
 import { NButton, NImage, NInput, NPopconfirm, NTabPane, NTabs, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
 
+import api from '@/api'
 import CommonPage from '@/components/common/CommonPage.vue'
-import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { convertImgUrl, formatDate } from '@/utils'
+import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import api from '@/api'
+import { convertImgUrl, formatDate } from '@/utils'
 
 defineOptions({ name: '留言管理' })
 
@@ -116,30 +116,30 @@ const columns = [
       return [
         row.is_review
           ? h(
-            NButton,
-            {
-              size: 'small',
-              type: 'warning',
-              onClick: () => handleUpdateReview([row.id], false),
-            },
-            {
-              default: () => '撤下',
-              icon: () => h('i', { class: 'i-mi:circle-error' }),
-            },
-          )
+              NButton,
+              {
+                size: 'small',
+                type: 'warning',
+                onClick: () => handleUpdateReview([row.id], false),
+              },
+              {
+                default: () => '撤下',
+                icon: () => h('i', { class: 'i-mi:circle-error' }),
+              },
+            )
           : h(
-            NButton,
-            {
-              size: 'small',
-              type: 'success',
-              style: 'margin-left: 15px;',
-              onClick: () => handleUpdateReview([row.id], true),
-            },
-            {
-              default: () => '通过',
-              icon: () => h('i', { class: 'i-mi:circle-check' }),
-            },
-          ),
+              NButton,
+              {
+                size: 'small',
+                type: 'success',
+                style: 'margin-left: 15px;',
+                onClick: () => handleUpdateReview([row.id], true),
+              },
+              {
+                default: () => '通过',
+                icon: () => h('i', { class: 'i-mi:circle-check' }),
+              },
+            ),
         h(
           NPopconfirm,
           { onPositiveClick: () => handleDelete([row.id], false) },

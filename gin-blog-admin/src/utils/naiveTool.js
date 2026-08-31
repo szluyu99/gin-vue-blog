@@ -1,7 +1,7 @@
-import { computed } from 'vue'
 import * as NaiveUI from 'naive-ui'
-import { useThemeStore } from '@/store'
+import { computed } from 'vue'
 import themes from '@/assets/themes'
+import { useThemeStore } from '@/store'
 
 function setupMessage(NMessage) {
   class Message {

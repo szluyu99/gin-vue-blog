@@ -44,7 +44,7 @@ function createPermissionGuard(router) {
     }
 
     // 能在路由中找到, 则正常访问
-    if (router.getRoutes().find(e => e.name === to.name)) {
+    if (router.getRoutes().some(e => e.name === to.name)) {
       return true
     }
 

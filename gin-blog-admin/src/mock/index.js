@@ -440,11 +440,11 @@ export function mockAdapter(requestConfig) {
     ? matched[2](requestConfig.params ?? {}, body ?? {}, path.match(matched[1]).slice(1))
     : fail(`[mock] 未定义的接口: ${method} ${path}`)
 
-  return new Promise(resolve => setTimeout(() => resolve({
+  return new Promise(resolve => setTimeout(resolve, DELAY, {
     data,
     status: 200,
     statusText: 'OK',
     headers: {},
     config: requestConfig,
-  }), DELAY))
+  }))
 }

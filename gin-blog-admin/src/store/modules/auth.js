@@ -1,13 +1,13 @@
-import { unref } from 'vue'
 import { defineStore } from 'pinia'
-import { usePermissionStore, useTagStore, useUserStore } from '@/store'
-import { resetRouter, router } from '@/router'
+import { unref } from 'vue'
 import api from '@/api'
+import { resetRouter, router } from '@/router'
+import { usePermissionStore, useTagStore, useUserStore } from '@/store'
 
 export const useAuthStore = defineStore('auth', {
   persist: {
     key: 'gvb_admin_auth',
-    paths: ['token'],
+    pick: ['token'],
   },
   state: () => ({
     token: null,

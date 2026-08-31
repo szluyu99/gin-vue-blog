@@ -1,15 +1,15 @@
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useStorage } from '@vueuse/core'
 import { NButton, NCheckbox, NInput } from 'naive-ui'
+import { reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import api from '@/api'
 
 import AppPage from '@/components/common/AppPage.vue'
-
 import { addDynamicRoutes } from '@/router'
-import { getLocal, removeLocal, setLocal } from '@/utils'
 import { useAuthStore, useUserStore } from '@/store'
-import api from '@/api'
+import { getLocal, removeLocal, setLocal } from '@/utils'
 
 const title = import.meta.env.VITE_TITLE // 环境变量中读取
 

@@ -13,7 +13,7 @@ export function useForm(initForm = {}) {
       await formRef.value?.validate()
       return true
     }
-    catch (error) {
+    catch {
       return false
     }
   }

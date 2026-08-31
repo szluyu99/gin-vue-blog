@@ -1,17 +1,17 @@
 <script setup>
-import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NInputNumber, NPopconfirm, NRadio, NRadioGroup, NSpace, NSwitch, NTag } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
 
+import api from '@/api'
 import CommonPage from '@/components/common/CommonPage.vue'
-import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
+import QueryItem from '@/components/crud/QueryItem.vue'
 import IconPicker from '@/components/icon/IconPicker.vue'
-import TheIcon from '@/components/icon/TheIcon.vue'
 
-import { formatDate } from '@/utils'
+import TheIcon from '@/components/icon/TheIcon.vue'
 import { useCRUD } from '@/composables'
-import api from '@/api'
+import { formatDate } from '@/utils'
 
 defineOptions({ name: '菜单管理' })
 
@@ -27,7 +27,6 @@ const initForm = {
   is_external: false, // 是否外链
   keep_alive: false,
   icon: 'mdi-account',
-  order_num: 1,
   name: '',
   path: '',
   redirect: '',

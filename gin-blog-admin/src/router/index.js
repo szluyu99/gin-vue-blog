@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { basicRoutes } from './routes'
+import { useAuthStore, usePermissionStore, useUserStore } from '@/store'
 import { setupRouterGuard } from './guard'
 
-import { useAuthStore, usePermissionStore, useUserStore } from '@/store'
+import { basicRoutes } from './routes'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_PUBLIC_PATH), // '/admin'

@@ -1,15 +1,15 @@
 <script setup>
-import { h, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NPopconfirm, NSwitch, NTag, NTree } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
 
+import api from '@/api'
 import CommonPage from '@/components/common/CommonPage.vue'
-import QueryItem from '@/components/crud/QueryItem.vue'
 import CrudModal from '@/components/crud/CrudModal.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 
-import { formatDate } from '@/utils'
+import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import api from '@/api'
+import { formatDate } from '@/utils'
 
 defineOptions({ name: '角色管理' })
 

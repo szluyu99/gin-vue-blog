@@ -1,14 +1,14 @@
 <script setup>
+import { NLayout, NLayoutSider } from 'naive-ui'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { NLayout, NLayoutSider } from 'naive-ui'
 
+import themes from '@/assets/themes'
+import { useTagStore, useThemeStore } from '@/store'
 import AppHeader from './header/index.vue'
+
 import Sidebar from './sidebar/index.vue'
 import AppTags from './tags/index.vue'
-
-import { useTagStore, useThemeStore } from '@/store'
-import themes from '@/assets/themes'
 
 const themeStore = useThemeStore()
 const tagStore = useTagStore()

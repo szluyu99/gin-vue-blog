@@ -1,7 +1,7 @@
 <script setup>
+import { NDropdown } from 'naive-ui'
 import { h } from 'vue'
 import { useRouter } from 'vue-router'
-import { NDropdown } from 'naive-ui'
 
 import { useAuthStore, useUserStore } from '@/store'
 

@@ -1,11 +1,11 @@
-import { defineStore } from 'pinia'
 import { useDark } from '@vueuse/core'
+import { defineStore } from 'pinia'
 
 const isDark = useDark()
 export const useThemeStore = defineStore('theme-store', {
   persist: {
     key: 'gvb_admin_theme',
-    paths: ['collapsed', 'watermarked'],
+    pick: ['collapsed', 'watermarked'],
   },
   state: () => ({
     collapsed: false, // 侧边栏折叠

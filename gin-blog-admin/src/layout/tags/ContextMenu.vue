@@ -1,7 +1,7 @@
 <script setup>
+import { NDropdown } from 'naive-ui'
 import { computed, h } from 'vue'
 import { useRoute } from 'vue-router'
-import { NDropdown } from 'naive-ui'
 
 import { useTagStore } from '@/store'
 

@@ -1,12 +1,12 @@
 <script setup>
+import { NTag } from 'naive-ui'
 import { nextTick, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NTag } from 'naive-ui'
 
-import ContextMenu from './ContextMenu.vue'
-import TheIcon from '@/components/icon/TheIcon.vue'
 import ScrollX from '@/components/common/ScrollX.vue'
+import TheIcon from '@/components/icon/TheIcon.vue'
 import { useTagStore } from '@/store'
+import ContextMenu from './ContextMenu.vue'
 
 const route = useRoute()
 const router = useRouter()

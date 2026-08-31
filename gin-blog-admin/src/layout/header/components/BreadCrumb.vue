@@ -1,6 +1,6 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
 import { NBreadcrumb, NBreadcrumbItem } from 'naive-ui'
+import { useRoute, useRouter } from 'vue-router'
 import { renderIcon } from '@/utils'
 
 const router = useRouter()

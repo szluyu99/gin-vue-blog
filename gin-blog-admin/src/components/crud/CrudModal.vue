@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue'
 import { NButton, NModal } from 'naive-ui'
+import { computed } from 'vue'
 
 const props = defineProps({
   visible: { type: Boolean, required: true },

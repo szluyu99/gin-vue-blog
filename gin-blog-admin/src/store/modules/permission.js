@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
-import { asyncRoutes, basicRoutes, vueModules } from '@/router/routes'
-import Layout from '@/layout/index.vue'
 import api from '@/api'
+import Layout from '@/layout/index.vue'
+import { asyncRoutes, basicRoutes, vueModules } from '@/router/routes'
 
 export const usePermissionStore = defineStore('permission', {
   persist: {
@@ -81,7 +81,6 @@ function buildRoutes(routes = []) {
 
   for (const e of routes) {
     if (e.is_catalogue) {
-      console.log(e)
       result.push({
         // 父路由名称不能和子路由相同, 否则 vue-router 会抛出错误
         name: `${e.name}-catalogue`,
