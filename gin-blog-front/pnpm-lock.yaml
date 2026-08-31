@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@iconify/vue':
+        specifier: ^5.0.1
+        version: 5.0.1(vue@3.5.42(typescript@6.0.3))
       '@vueuse/core':
         specifier: ^14.4.0
         version: 14.4.0(vue@3.5.42(typescript@6.0.3))
@@ -17,15 +20,18 @@ importers:
       dayjs:
         specifier: ^1.11.10
         version: 1.11.23
+      easy-typer-js:
+        specifier: ^2.1.0
+        version: 2.1.0
       highlight.js:
         specifier: ^11.9.0
         version: 11.12.0
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.18.1
       marked:
         specifier: ^18.0.11
         version: 18.0.11
+      nprogress:
+        specifier: ^0.2.0
+        version: 0.2.0
       pinia:
         specifier: ^4.0.3
         version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3))
@@ -51,9 +57,6 @@ importers:
       '@iconify/json':
         specifier: ^2.2.155
         version: 2.2.522
-      '@iconify/vue':
-        specifier: ^5.0.1
-        version: 5.0.1(vue@3.5.42(typescript@6.0.3))
       '@unocss/eslint-config':
         specifier: ^66.8.1
         version: 66.8.1(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -63,15 +66,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.8
         version: 6.0.8(vite@8.2.2(jiti@2.7.0)(sass@1.103.1)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
-      easy-typer-js:
-        specifier: ^2.1.0
-        version: 2.1.0
       eslint:
         specifier: ^10.9.1
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
-      nprogress:
-        specifier: ^0.2.0
-        version: 0.2.0
       rollup-plugin-visualizer:
         specifier: ^7.1.1
         version: 7.1.1(rolldown@1.2.6)(rollup@4.63.1)
@@ -1936,9 +1933,6 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
-
-  lodash-es@4.18.1:
-    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -4512,8 +4506,6 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
-
-  lodash-es@4.18.1: {}
 
   longest-streak@3.1.0: {}
 

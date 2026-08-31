@@ -127,15 +127,6 @@ cd gin-vue-blog/deploy
 >
 > Docker 部署需要把 `gin-blog-server/internal/utils/email.go` 中 `GetEmailVerifyURL` 的 localhost 换成自己的域名。
 
-## 鸣谢
-
-参考了以下优秀的开源项目：
-
-- [Butterfly](https://butterfly.js.org/) — 前台界面设计
-- [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) — 后台前端基于此二开，改动较大，详见 [gin-blog-admin/README.md](./gin-blog-admin/README.md)
-- [GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
-- [vitesse](https://github.com/antfu/vitesse)
-
 ## 后续计划
 
 功能：

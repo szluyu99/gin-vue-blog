@@ -10,6 +10,7 @@
     "up": "taze major -I"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.1",
     "@vueuse/core": "^14.4.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
@@ -26,7 +27,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@iconify/json": "^2.2.155",
-    "@iconify/vue": "^5.0.1",
     "@unocss/eslint-plugin": "^66.8.1",
     "@unocss/reset": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
