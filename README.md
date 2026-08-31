@@ -1,380 +1,159 @@
-## 博客交流群
-
-项目交流 QQ 群号：777260310
-
-## 博客介绍
-
-<p align=center>
-<a href="http://www.hahacode.cn">
-<img src="./images/头像.jpeg"  width="200" hight="200" alt="阵、雨的个人博客" style="border-radius: 50%">
+<p align="center">
+<a href="https://szluyu99.github.io/gin-vue-blog/">
+<img src="./images/头像.jpeg" width="140" height="140" alt="gin-vue-blog" style="border-radius: 50%">
 </a>
 </p>
 
 <p align="center">
-   <a target="_blank" href="#">
-      <img style="display: inline-block;" src="https://img.shields.io/badge/Go-1.19-blue"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/Gin-v1.8.1-blue"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/Casbin-v2.56.0-blue"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/mysql-8.0-blue"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/GORM-v1.24.0-blue"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/redis-7.0-red"/>
-      <img style="display: inline-block;" src="https://img.shields.io/badge/vue-v3.X-green"/>
-    </a>
+  <img src="https://img.shields.io/badge/Go-1.26-blue"/>
+  <img src="https://img.shields.io/badge/Gin-v1.12-blue"/>
+  <img src="https://img.shields.io/badge/GORM-v1.31-blue"/>
+  <img src="https://img.shields.io/badge/Vue-v3.5-green"/>
+  <img src="https://img.shields.io/badge/Vite-v8-green"/>
+  <img src="https://img.shields.io/badge/UnoCSS-v66-green"/>
 </p>
 
-[在线预览](#在线预览) | [项目介绍](#项目介绍) | [技术介绍](#技术介绍) | [目录结构](#目录结构) | [环境介绍](#环境介绍) | [快速开始](#快速开始) | [总结&鸣谢](#总结鸣谢)  | [后续计划](#后续计划)
+一个前后端分离的博客项目：Go + Gin 后端，Vue 3 前台 + Vue 3 后台。代码轻量、注释完善，适合学习全栈开发。
 
-您的 Star 是我坚持的动力，感谢大家的支持，欢迎提交 Pr 共同改进项目。
+- Github: [szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
+- Gitee: [szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
+- 交流 QQ 群: 777260310
 
-Github 地址：[https://github.com/szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
-
-Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
+欢迎 Star 和 PR。
 
 ## 在线预览
 
-在线演示（Mock 数据，不依赖后端，由 GitHub Actions 自动部署到 GitHub Pages）：
+纯前端 Mock 数据，不依赖后端，由 GitHub Actions 自动部署：
 
-- 博客前台：[https://szluyu99.github.io/gin-vue-blog/](https://szluyu99.github.io/gin-vue-blog/)
-- 博客后台：[https://szluyu99.github.io/gin-vue-blog/admin/](https://szluyu99.github.io/gin-vue-blog/admin/) （任意账号密码均可登录）
+- 博客前台: <https://szluyu99.github.io/gin-vue-blog/>
+- 博客后台: <https://szluyu99.github.io/gin-vue-blog/admin/> （任意账号密码均可登录）
 
-> PS: 演示站的数据来自前端内置的假数据（`src/mock`），所有修改仅存在于当前页面，刷新后恢复；只用于预览界面和交互，不代表真实功能的完整表现。
+> 演示数据来自前端内置假数据（`src/mock`），改动仅存在于当前页面，刷新即还原。
 
-![前台首页图片](./images/前台首页.png)
+![前台首页](./images/前台首页.png)
 
-![前台首页文章列表](./images/前台文章列表.png)
+![前台文章列表](./images/前台文章列表.png)
 
 ![后台文章列表](./images/后台文章列表.png)
 
-## 有 Docker 环境可一键启动效果
+## 功能
 
-Linux/Mac 可直接运行，Windows 要使用 GitBash 运行（默认终端不能执行 shell）
+前台（`gin-blog-front`）：
 
-```bash
-git clone https://github.com/szluyu99/gin-vue-blog 
-cd gin-vue-blog/deploy
-./bootstrap.sh
-```
+- 界面参考 Hexo 主题 Butterfly，响应式适配移动端
+- 文章详情支持目录锚点、推荐文章
+- 评论 + 回复，留言弹幕墙
+- 点赞、访客统计（Redis）
+- 邮箱注册 + 邮件验证码
 
-## 项目介绍
+后台（`gin-blog-admin`）：
 
-Github 上有很多优秀的前后台框架，本项目也参考了许多开源项目，但是大多项目都比较重量级（并非坏处），如果从学习的角度来看对初学者并不是很友好。本项目在以**博客**这个业务为主的前提下，提供一个完整的全栈项目代码（前台前端 + 后台前端 + 后端），技术点基本都是最新 + 最火的技术，代码轻量级，注释完善，适合学习。
+- JWT 鉴权 + 基于角色的权限控制，菜单和接口权限均可在后台动态配置
+- 前端菜单由后端下发（动态路由）
+- Markdown 文章编辑，支持 `.md` 导入导出
+- 操作日志、在线用户监听与强制下线
+- 文件上传支持本地和七牛云
+- CRUD 操作封装为通用 Hook
 
-同时，本项目可用于一键搭建动态博客（参考 [快速开始](#快速开始)）。
+## 技术栈
 
-前台：
+后端：Go / Gin / GORM / SQLite（默认，可换 MySQL）/ Redis / Viper / `log/slog`
 
-- 前台界面设计参考 Hexo 的 Butterfly 设计，美观简洁
-- 响应式布局，适配了移动端
-- 实现点赞，统计用户等功能 (Redis)
-- 评论 + 回复评论功能
-- 留言采用弹幕墙，效果炫酷
-- 文章详情页有文章目录、推荐文章等功能，优化用户体验
+前端：Vue 3 / Vite / Vue Router / Pinia / UnoCSS / VueUse / Axios，后台额外使用 Naive UI，包管理用 pnpm
 
-后台：
+其他：Docker Compose 一键部署、Nginx 静态资源与反向代理、七牛云对象存储、腾讯云人机验证（可选，默认关闭）
 
-- 鉴权使用 JWT
-- 权限管理使用 CASBIN，实现基于 RBAC 的权限管理
-- 支持动态权限修改，前端菜单由后端生成（动态路由）
-- 文章编辑使用 Markdown 编辑器
-- 常规后台功能齐全：侧边栏、面包屑、标签栏等
-- 实现记录操作日志功能（GET 不记录）
-- 实现监听在线用户、强制下线功能
-- 文件上传支持七牛云、本地（后续计划支持更多）
-- 对 CRUD 操作封装了通用 Hook
-
-其他：
-
-- 采用 Restful 风格的 API
-- 前后端分离部署，前端使用 Nginx，后端使用 Docker
-- 代码整洁层次清晰，利于开发者学习
-- 技术点新颖，代码轻量级，适度封装
-- Docker Compose 一键运行，轻松搭建在线博客
-
-### 技术介绍
-
-> 这里写一些主流的通用技术，详细第三方库：前端参考 `package.json` 文件，后端参考 `go.mod` 文件
-
-前端技术栈: 使用 pnpm 包管理工具
-
-- 基于 TypeScript
-- Vue3
-- VueUse: 服务于 Vue Composition API 的工具集
-- Unocss: 原子化 CSS
-- Pinia
-- Vue Router 
-- Axios 
-- Naive UI
-- ...
-
-后端技术栈:
-
-- Golang
-- Docker
-- Gin
-- GORM
-- Viper: 支持 TOML (默认)、YAML 等常用格式作为配置文件
-- Casbin
-- Zap
-- MySQL
-- Redis
-- Nginx: 部署静态资源 + 反向代理
-- ...
-
-其他:
-
-- 腾讯云人机验证
-- 七牛云对象存储
-- ...
-
-### 目录结构
-
-> 这里简单列出目录结构，具体可以查看源码
-
-代码仓库目录：
+## 目录结构
 
 ```bash
 gin-vue-blog
-├── gin-blog-admin      -- 博客后台前端
-├── gin-blog-front      -- 博客前台前端
-├── gin-blog-server     -- 博客后端
-├── deploy              -- 部署
+├── gin-blog-admin      # 博客后台前端
+├── gin-blog-front      # 博客前台前端
+├── gin-blog-server     # 博客后端
+└── deploy              # Docker 部署
 ```
 
-> 项目运行参考：[快速开始](#快速开始)
-
-后端目录：简略版
+后端：
 
 ```bash
 gin-blog-server
-├── api             -- API
-│   ├── front       -- 前台接口
-│   └── v1          -- 后台接口
-├── dao             -- 数据库操作模块
-├── service         -- 服务模块
-├── model           -- 数据模型
-│   ├── req             -- 请求 VO 模型
-│   ├── resp            -- 响应 VO 模型
-│   ├── dto             -- 内部传输 DTO 模型
-│   └── ...             -- 数据库模型对象 PO 模型
-├── routes          -- 路由模块
-│   └── middleware      -- 路由中间件
-├── utils           -- 工具模块
-│   ├── r               -- 响应封装
-│   ├── upload          -- 文件上传
-│   └── ...
-├── routes          -- 路由模块
-├── config          -- 配置文件
-├── test            -- 测试模块
-├── assets          -- 资源文件
-├── log             -- 存放日志的目录
-├── public          -- 外部访问的静态资源
-│   └── uploaded    -- 本地文件上传目录
-├── Dockerfile
-└── main.go
+├── cmd                 # 程序入口, 数据初始化脚本
+├── internal
+│   ├── handle          # 接口处理
+│   ├── model           # 数据模型 + 数据库操作
+│   ├── middleware      # 中间件
+│   ├── global          # 全局配置、错误码
+│   └── utils           # 工具方法
+├── docs                # Swagger 文档
+├── assets              # 资源文件
+├── config.yml          # 配置文件
+└── Dockerfile
 ```
 
-前端目录：简略版
+前端（两个项目大体一致，后台额外有 `layout`、`composables`）：
 
+```bash
+├── src
+│   ├── api.js          # 接口
+│   ├── assets          # 静态资源
+│   ├── components      # 组件
+│   ├── mock            # Mock 数据
+│   ├── router          # 路由（前台为单文件 router.js）
+│   ├── store           # 状态管理
+│   ├── utils           # 工具方法
+│   └── views           # 页面
+├── .env.*              # 环境变量（development / production / mock）
+├── uno.config.js       # UnoCSS 配置
+└── vite.config.js      # Vite 配置
 ```
-gin-vue-admin / gin-vue-front 通用目录结构
-├── src              
-│   ├── api             -- 接口
-│   ├── assets          -- 静态资源
-│   ├── styles          -- 样式
-│   ├── components      -- 组件
-│   ├── composables     -- 组合式函数
-│   ├── router          -- 路由
-│   ├── store           -- 状态管理
-│   ├── utils           -- 工具方法
-│   ├── views           -- 页面
-│   ├── App.vue
-│   └── main.ts
-├── settings         -- 项目配置
-├── build            -- 构建相关的配置
-├── public           -- 公共资源, 在打包后会被加到 dist 根目录
-├── package.json 
-├── package-lock.json
-├── index.html
-├── tsconfig.json
-├── unocss.config.ts -- unocss 配置
-└── vite.config.ts   -- vite 配置
-├── .env             -- 通用环境变量
-├── .env.development -- 开发环境变量
-├── .env.production  -- 线上环境变量
-├── .gitignore
-├── .editorconfig    -- 编辑器配置
-```
-
-部署目录：简略版
-
-```
-deploy
-├── build      -- 镜像构建
-│   ├── mysql  -- mysql 镜像构建
-│   ├── server -- 后端镜像构建 (基于 gin-blog-server 目录)
-│   └── web    -- 前端镜像构建 (基于前端项目打包的静态资源)
-└── start
-    ├── docker-compose.yml    -- 多容器管理
-    └── .env                  -- 环境变量
-    └── ...
-```
-
-## 环境介绍
-
-### 线上环境
-
-服务器：腾讯云 2核 4G Ubuntu 22.04 LTS
-
-对象存储：七牛云
-
-### 开发环境
-
-| 开发工具                          | 说明                  |
-| ----------------------------- | ------------------- |
-| Vscode                        | Golang 后端 +  Vue 前端 |
-| Navicat                       | MySQL 远程连接工具        |
-| Another Redis Desktop Manager | Redis 远程连接工具        |
-| MobaXterm                     | Linux 远程工具          |
-| Apifox                        | 接口调试 + 文档生成         |
-
-| 开发环境   | 版本   |
-| ------ | ---- |
-| Golang | 1.19 |
-| MySQL  | 8.x  |
-| Redis  | 7.x  |
-
-### VsCode 插件
-
-目前推荐安装插件已经写到 `.vscode/extensions.json` 中，使用 VsCode 打开项目会推荐安装。
-
-> 注意，使用 VsCode 打开 gin-blog-admin 和 gin-blog-front 这两个项目，而不是打开 gin-vue-blog 这个目录！
 
 ## 快速开始
 
-**本地开发的完整启动步骤见 [quick_start.md](./quick_start.md)**，包含 Mock 模式（不启动后端，只跑前端）和完整启动两种方式、访问地址、默认账号以及常见问题。
+**本地开发见 [quick_start.md](./quick_start.md)**，含 Mock 模式（不启动后端）和完整启动两种方式、访问地址、默认账号和常见问题。
 
-只想快速看效果，推荐下面的 Docker Compose 一键运行。
-
-本项目开发环境是 Linux，如果 Windows 下运行有奇奇怪怪的问题，可以进群交流或提 Issue
-
-### 拉取项目前的准备 (Windows)
-
-如果是 Windows 系统，需要先执行以下指令，否则 Docker 构建过程可能会出 BUG。
-
-或者直接下载 ZIP 而不是通过 git clone 克隆项目。
-
-Linux 和 Mac 不需要进行该操作。
-
-> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 crlf，经过测试，构建过程会产生 BUG。
-
-> docker部署需要把 注册功能(gin-blog-server/internal/utils/email.go)中的GetEmailVerifyURL函数  loaclhost+端口 换成 你的域名
+只想看效果，用 Docker Compose 一键运行（需要 Docker + Docker Compose，Windows 请用 GitBash）：
 
 ```bash
-# 防止 git 自动将换行符转换为 crlf
-git config --global core.autocrlf false
-```
-
-### Docker Compose 一键运行
-
-需要有 Docker 和 Docker Compose 的环境
-
-> 详细运行文档（包含环境搭建）参考：[deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
-
-Linux 下可以正常启动：（Windows 请使用 `GitBash` 进行操作）
-
-```bash
-git clone https://github.com/szluyu99/gin-vue-blog 
+git clone https://github.com/szluyu99/gin-vue-blog
 cd gin-vue-blog/deploy
 ./bootstrap.sh
 ```
 
-本地前台访问 [localhost](http://localhost/)
+前台 [localhost](http://localhost/)，后台 [localhost/admin](http://localhost/admin)，默认账号 `admin / 123456`。
 
-本地后台访问 [localhost/admin](http://localhost/admin)
+详细部署文档见 [deploy/README.md](./deploy/README.md)。
 
-默认用户：管理员 `admin / 123456`
+> Windows 下 clone 前建议执行 `git config --global core.autocrlf false`，本项目使用 lf 换行符，crlf 会导致 Docker 构建异常。
+>
+> Docker 部署需要把 `gin-blog-server/internal/utils/email.go` 中 `GetEmailVerifyURL` 的 localhost 换成自己的域名。
 
-如果运行遇到问题，请查看详细文章 [deploy/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/deploy)
+## 鸣谢
 
-### 开发环境依赖
+参考了以下优秀的开源项目：
 
-分开运行前后端时需要：Golang 1.26+、Node（建议用 [Nvm](https://nvm.uihtm.com/) 安装）、pnpm、Redis。
-
-数据库默认使用 SQLite，开箱即用；切换 MySQL 需要 8.0 以上版本，并修改 `gin-blog-server/config.yml`。
-
-MySQL、Redis 建议用 Docker 安装（以下未做持久化，仅用于开发和演示）：
-
-```bash
-# MySQL 8.0
-docker run --name mysql8 -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:8.0
-
-# Redis 7.0
-docker run --name redis7 -p 6379:6379 -d redis:7.0
-
-# 查看是否运行成功, STATUS 为 Up 即成功
-docker ps
-```
-
-环境就绪后，按 [quick_start.md](./quick_start.md) 启动即可。
-
-### 项目部署
-
-TODO
-
-## 总结鸣谢
-
-这个项目不管是前端，还是后端，都是花了比较大心血去架构的，并且从技术选型上，都是选择了目前最火 + 最新的技术栈。当然，这也是个人的学习之作，很多知识点都是边学边开发的（例如 Casbin），这个过程中也参考了很多优秀的开源项目，感谢大家的开源让程序员的世界更加美好，这也是开源本项目的目的之一。本项目中仍有很多不足，后续会继续更新。
-
-最后，项目整体代码风格很优秀，注释完善，适合 Golang 后端开发者、前端开发者学习。
-
- 鸣谢项目：
-
-- [https://butterfly.js.org/](https://butterfly.js.org/)
-- [https://github.com/qifengzhang007/GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
-- [https://github.com/zclzone/vue-naive-admin](https://github.com/zclzone/vue-naive-admin)
-- [https://github.com/antfu/vitesse](https://github.com/antfu/vitesse)
-- ...
-
-⭐ 博客后台的前端基于 [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) 进行二开，感谢作者的开源。但是和原项目区别较大，详见 [gin-blog-admin/README.md](https://github.com/szluyu99/gin-vue-blog/tree/main/gin-blog-admin)
-
-> 需要感谢的绝不止以上这些开源项目，但是一时难以全部列出，后面会慢慢补上。
+- [Butterfly](https://butterfly.js.org/) — 前台界面设计
+- [vue-naive-admin](https://github.com/zclzone/vue-naive-admin) — 后台前端基于此二开，改动较大，详见 [gin-blog-admin/README.md](./gin-blog-admin/README.md)
+- [GinSkeleton](https://github.com/qifengzhang007/GinSkeleton)
+- [vitesse](https://github.com/antfu/vitesse)
 
 ## 后续计划
 
-高优先级: 
+功能：
 
-- ~~完善图片上传功能, 目前文件上传还没怎么处理~~ 🆗
-- 后台首页重新设计（目前没放什么内容）
-- ~~前台首页搜索文章（目前使用数据库模糊搜索）~~ 🆗
-- ~~博客文章导入导出 (.md 文件)~~ 🆗
-- ~~权限管理中菜单编辑时选择图标（现在只能输入图标字符串）~~ 🆗
+- 黑夜模式（后台已有基础，前台待支持）
+- 前台侧边信息收缩
+- 说说、相册、音乐播放器
+- 第三方登录：QQ、微信、Github
+- 评论表情选择（参考 Valine）
+- 前台搜索集成 ElasticSearch（当前为数据库模糊查询）
+- 国际化
+
+工程：
+
+- 补齐后端单元测试，当前覆盖率很低且集中在 model 层
 - 后端日志切割
-- ~~后台修改背景图片，博客配置等~~ 🆗
-- ~~后端的 IP 地址检测 BUG 待修复~~ 🆗
-- ~~博客前台适配移动端~~ 🆗
-- ~~文章详情, 目录锚点跟随~~ 🆗
-- ~~邮箱注册 + 邮件发送验证码~~ 🆗
-- 修改测试环境的数据库为 SQLite3，方便运行
-
-后续有空安排上：
-
-- 黑夜模式
-- 前台收缩侧边信息功能
-- 说说
-- 相册
-- 音乐播放器
-- 鼠标左击特效
-- 看板娘
-- 第三方登录: QQ、微信、Github ...
-- 评论时支持选择表情，参考 Valine
-- 单独部署：前后端 + 环境
-- 重写单元测试，目前的单元测试是早期版本，项目架构更改后，无法跑通
-- 前台首页搜索集成 ElasticSearch
-- 国际化?
-
-其他：
-
-- 写一份好的文档
-- 补全 README.md
-- 完善 Apifox 生成的接口文档
-- ~~一键部署：使用 docker compose 单机一键部署整个项目（前后端 + 环境）~~ 🆗
+- 后台首页重新设计（目前内容较少）
+- 前端打包体积优化（后台存在超过 1MB 的 chunk）
+- 引入 Dependabot 持续跟进依赖更新
+- 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
+- 完善接口文档
