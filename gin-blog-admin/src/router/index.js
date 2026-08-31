@@ -43,12 +43,33 @@ export async function addDynamicRoutes() {
 
     // 根据环境变量中的值决定前端生成路由还是后端路由
     const accessRoutes = JSON.parse(import.meta.env.VITE_BACK_ROUTER)
-      ? await permissionStore.generateRoutesBack() // ! 后端生成路由
-      : permissionStore.generateRoutesFront(['admin']) // ! 前端生成路由 (根据角色), 待完善
-    console.log(accessRoutes)
+      ? await permissionStore.generateRoutesBack()
+      : permissionStore.generateRoutesFront(['admin'])
+  console.log(accessRoutes)
+    // 检查重复路由名称并添加路由
+    const addedNames = new Set()
 
-    // 将当前没有的路由添加进去
-    accessRoutes.forEach(route => !router.hasRoute(route.name) && router.addRoute(route))
+    const addRoute = (route) => {
+      let routeName = route.name
+
+      // 处理重复的路由名称
+      if (addedNames.has(routeName) || router.hasRoute(routeName)) {
+        routeName = `${routeName}-${Date.now()}`
+        route.name = routeName
+      }
+
+      addedNames.add(routeName)
+
+      try {
+        router.addRoute(route)
+      }
+      catch (e) {
+        console.warn(`添加路由 ${routeName} 失败:`, e.message)
+      }
+    }
+
+    // 添加路由
+    accessRoutes.forEach(addRoute)
   }
   catch (err) {
     console.error('addDynamicRoutes Error: ', err)

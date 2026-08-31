@@ -15,7 +15,7 @@ WORKDIR ${WORK_PATH}
 COPY --from=0 ${WORK_PATH}/cmd/server .
 COPY --from=0 ${WORK_PATH}/config.docker.yml .
 COPY --from=0 ${WORK_PATH}/assets/ip2region.xdb ./assets/ip2region.xdb
-
+COPY --from=0 ${WORK_PATH}/assets/templates ./assets/templates
 EXPOSE 8765
 
 ENTRYPOINT ./server -c config.docker.yml

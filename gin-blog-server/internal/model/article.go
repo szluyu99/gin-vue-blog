@@ -73,6 +73,7 @@ type RecommendArticleVO struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+// 文章的详细信息
 func GetArticle(db *gorm.DB, id int) (data *Article, err error) {
 	result := db.Preload("Category").Preload("Tags").
 		Where(Article{Model: Model{ID: id}}).
@@ -80,7 +81,7 @@ func GetArticle(db *gorm.DB, id int) (data *Article, err error) {
 	return data, result.Error
 }
 
-// 前台文章详情（不在回收站并且状态为公开）
+// 获取第一个可获得的文章 （不在回收站并且状态为公开）
 func GetBlogArticle(db *gorm.DB, id int) (data *Article, err error) {
 	result := db.Preload("Category").Preload("Tags").
 		Where(Article{Model: Model{ID: id}}).
@@ -279,7 +280,7 @@ func UpdateArticleTop(db *gorm.DB, id int, isTop bool) error {
 	return result.Error
 }
 
-func ImportArticle(db *gorm.DB, userAuthId int, title, content, img string) error {
+func ImportArticle(db *gorm.DB, userAuthId int, title string, content string, img string ,categoryname string,tangname string) error {
 	article := Article{
 		Title:   title,
 		Content: content,
@@ -288,7 +289,28 @@ func ImportArticle(db *gorm.DB, userAuthId int, title, content, img string) erro
 		Type:    TYPE_ORIGINAL,
 		UserId:  userAuthId,
 	}
+	category := Category{Name : categoryname}
+	result := db.Model(&Category{}).Where("name",categoryname).FirstOrCreate(&category)
+	if result.Error != nil{
+			return result.Error
+		}
+		article.CategoryId =category.ID
+		
+	result = db.Create(&article)		
+	if result.Error!= nil{
+		return result.Error
+	}
 
-	result := db.Create(&article)
+	var articletag ArticleTag
+	tag := Tag{Name: tangname}	
+	result = db.Model(&Tag{}).Where("name",tangname).FirstOrCreate(&tag)
+	if result.Error!= nil{
+		return result.Error
+	}
+
+	articletag.ArticleId = article.ID
+	articletag.TagId = tag.ID
+	result = db.Create(&articletag)
+	
 	return result.Error
 }

@@ -88,7 +88,8 @@ var (
 	ErrMenuUsedByRole      = RegisterResult(6007, "该菜单正在被角色使用，无法删除")
 	ErrMenuHasChildren     = RegisterResult(6008, "该菜单下存在子菜单，无法删除")
 
-	ErrMailSend         = RegisterResult(1011, "邮件发送失败")
-	ErrMailHasSend      = RegisterResult(1012, "已朝该邮箱发送验证码（有效期 15 分钟），请检查回收站")
-	ErrVerificationCode = RegisterResult(1013, "验证码错误")
+	ErrSendEmail = RegisterResult(6101, "发送邮件失败")
+	ErrCodeNoexit = RegisterResult(6102, "Code不存在 请重新注册")
+	ErrParseEmailCode = RegisterResult(6103, "解析邮件Code失败 请重试")
+	ErrUserExist = RegisterResult(6104, "该邮箱已经注册 请重新注册")
 )

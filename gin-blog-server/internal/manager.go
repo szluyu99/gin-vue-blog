@@ -56,7 +56,7 @@ func registerBaseHandler(r *gin.Engine) {
 	base.POST("/report", blogInfoAPI.Report)        // 上报信息
 	base.GET("/config", blogInfoAPI.GetConfigMap)   // 获取配置
 	base.PATCH("/config", blogInfoAPI.UpdateConfig) // 更新配置
-	base.GET("/code", userAuthAPI.SendCode)         // 验证码
+	base.GET("/email/verify",userAuthAPI.VerifyCode)
 }
 
 // 后台管理系统的接口: 全部需要 登录 + 鉴权

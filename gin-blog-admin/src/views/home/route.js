@@ -11,8 +11,8 @@ export default {
   isCatalogue: true,
   children: [
     {
-      name: 'Home',
-      path: 'home',
+      name: 'Home2',
+      path: 'home2',
       component: () => import('./index.vue'),
       meta: {
         title: '首页',
