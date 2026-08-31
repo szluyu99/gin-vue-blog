@@ -26,7 +26,6 @@ type LoginReq struct {
 type RegisterReq struct {
 	Username string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required,min=4,max=20"`
-	
 }
 
 type LoginVO struct {
@@ -146,7 +145,6 @@ func (*UserAuth) Login(c *gin.Context) {
 	})
 }
 
-
 // @Summary 退出登录
 // @Description 退出登录
 // @Tags UserAuth
@@ -156,7 +154,7 @@ func (*UserAuth) Login(c *gin.Context) {
 // @Router /logout [post]
 func (*UserAuth) Logout(c *gin.Context) {
 	c.Set(g.CTX_USER_AUTH, nil)
-	
+
 	// 已经退出登录
 	auth, _ := CurrentUserAuth(c)
 	if auth == nil {
@@ -167,7 +165,7 @@ func (*UserAuth) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Delete(g.CTX_USER_AUTH)
 	session.Save()
-	
+
 	// 删除 Redis 中的在线状态
 	rdb := GetRDB(c)
 	onlineKey := g.ONLINE_USER + strconv.Itoa(auth.ID)
@@ -182,42 +180,41 @@ func (*UserAuth) Logout(c *gin.Context) {
 func (*UserAuth) Register(c *gin.Context) {
 	var regreq RegisterReq
 	if err := c.ShouldBindJSON(&regreq); err != nil {
-		ReturnError(c,g.ErrRequest,err)
+		ReturnError(c, g.ErrRequest, err)
 		return
 	}
 	// 格式化用户名
 	regreq.Username = utils.Format(regreq.Username)
 
 	// 检查用户名是否存在，避免重复注册
-	auth,err := model.GetUserAuthInfoByName(GetDB(c),regreq.Username)
+	auth, err := model.GetUserAuthInfoByName(GetDB(c), regreq.Username)
 	if err != nil {
 		var flag bool = false
-		if errors.Is(err,gorm.ErrRecordNotFound) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			flag = true
 		}
-		if !flag{
-			ReturnError(c,g.ErrDbOp,err)
+		if !flag {
+			ReturnError(c, g.ErrDbOp, err)
 			return
 		}
 	}
 
 	if auth != nil {
-		ReturnError(c,g.ErrUserExist,err)
+		ReturnError(c, g.ErrUserExist, err)
 		return
 	}
-	
 
 	// 通过邮箱验证
-	info := utils.GenEmailVerificationInfo(regreq.Username,regreq.Password)
-	SetMailInfo(GetRDB(c),info,15*time.Minute) // 15分钟过期
-	EmailData := utils.GetEmailData(regreq.Username,info)
-	err = utils.SendEmail(regreq.Username,EmailData)
+	info := utils.GenEmailVerificationInfo(regreq.Username, regreq.Password)
+	SetMailInfo(GetRDB(c), info, 15*time.Minute) // 15分钟过期
+	EmailData := utils.GetEmailData(regreq.Username, info)
+	err = utils.SendEmail(regreq.Username, EmailData)
 	if err != nil {
-		ReturnError(c,g.ErrSendEmail,err)
+		ReturnError(c, g.ErrSendEmail, err)
 		return
 	}
 
-	ReturnSuccess(c,nil)
+	ReturnSuccess(c, nil)
 }
 
 // 邮箱验证
@@ -225,40 +222,40 @@ func (*UserAuth) Register(c *gin.Context) {
 // Verify会检查info是否存在redis中，若存在则认证成功，完成注册
 // 会在以下方面出错： 1. 发送信息中没有info 2. info不存在redis中(已过期) 3. 创造新用户失败
 func (*UserAuth) VerifyCode(c *gin.Context) {
-    var code string
-    if code = c.Query("info"); code == "" {
-        returnErrorPage(c)
-        return
-    }
+	var code string
+	if code = c.Query("info"); code == "" {
+		returnErrorPage(c)
+		return
+	}
 
-    // 验证是否有code在数据库中
-    ifExist, err := GetMailInfo(GetRDB(c), code)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
-    if !ifExist {
-        returnErrorPage(c)
-        return
-    }
+	// 验证是否有code在数据库中
+	ifExist, err := GetMailInfo(GetRDB(c), code)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
+	if !ifExist {
+		returnErrorPage(c)
+		return
+	}
 
-    DeleteMailInfo(GetRDB(c), code)
+	DeleteMailInfo(GetRDB(c), code)
 
-    username, password, err := utils.ParseEmailVerificationInfo(code)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
+	username, password, err := utils.ParseEmailVerificationInfo(code)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
 
-    // 注册用户
-      _,_,_,err = model.CreateNewUser(GetDB(c), username, password)
-    if err != nil {
-        returnErrorPage(c)
-        return
-    }
+	// 注册用户
+	_, _, _, err = model.CreateNewUser(GetDB(c), username, password)
+	if err != nil {
+		returnErrorPage(c)
+		return
+	}
 
-    // 注册成功，返回成功页面
-    c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`
+	// 注册成功，返回成功页面
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`
         <!DOCTYPE html>
         <html lang="zh-CN">
         <head>
@@ -301,7 +298,7 @@ func (*UserAuth) VerifyCode(c *gin.Context) {
 }
 
 func returnErrorPage(c *gin.Context) {
-    c.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(`
+	c.Data(http.StatusInternalServerError, "text/html; charset=utf-8", []byte(`
         <!DOCTYPE html>
         <html lang="zh-CN">
         <head>

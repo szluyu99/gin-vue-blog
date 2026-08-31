@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
-	"time"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 // redis context
@@ -62,12 +62,12 @@ func getConfigCache(rdb *redis.Client) (cache map[string]string, err error) {
 }
 
 // email
-func SetMailInfo (rdb *redis.Client,info string,expire time.Duration) error{
-	return rdb.Set(rctx,info,true,expire).Err()
+func SetMailInfo(rdb *redis.Client, info string, expire time.Duration) error {
+	return rdb.Set(rctx, info, true, expire).Err()
 }
-func GetMailInfo (rdb *redis.Client,info string) (bool,error){
-	return rdb.Get(rctx,info).Bool()
+func GetMailInfo(rdb *redis.Client, info string) (bool, error) {
+	return rdb.Get(rctx, info).Bool()
 }
-func DeleteMailInfo(rdb *redis.Client,info string) error{
-	return rdb.Del(rctx,info).Err()
+func DeleteMailInfo(rdb *redis.Client, info string) error {
+	return rdb.Del(rctx, info).Err()
 }

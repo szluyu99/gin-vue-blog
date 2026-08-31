@@ -29,6 +29,16 @@ jobs:
           go-version-file: gin-blog-server/go.mod
           cache-dependency-path: gin-blog-server/go.sum
 
+      - name: Gofmt
+        working-directory: gin-blog-server
+        run: |
+          files=$(gofmt -l .)
+          if [ -n "$files" ]; then
+            echo "以下文件未格式化, 请执行 gofmt -w .:"
+            echo "$files"
+            exit 1
+          fi
+
       - name: Vet
         working-directory: gin-blog-server
         run: go vet ./...

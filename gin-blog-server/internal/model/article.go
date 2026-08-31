@@ -280,7 +280,7 @@ func UpdateArticleTop(db *gorm.DB, id int, isTop bool) error {
 	return result.Error
 }
 
-func ImportArticle(db *gorm.DB, userAuthId int, title string, content string, img string ,categoryname string,tangname string) error {
+func ImportArticle(db *gorm.DB, userAuthId int, title string, content string, img string, categoryname string, tangname string) error {
 	article := Article{
 		Title:   title,
 		Content: content,
@@ -289,28 +289,28 @@ func ImportArticle(db *gorm.DB, userAuthId int, title string, content string, im
 		Type:    TYPE_ORIGINAL,
 		UserId:  userAuthId,
 	}
-	category := Category{Name : categoryname}
-	result := db.Model(&Category{}).Where("name",categoryname).FirstOrCreate(&category)
-	if result.Error != nil{
-			return result.Error
-		}
-		article.CategoryId =category.ID
-		
-	result = db.Create(&article)		
-	if result.Error!= nil{
+	category := Category{Name: categoryname}
+	result := db.Model(&Category{}).Where("name", categoryname).FirstOrCreate(&category)
+	if result.Error != nil {
+		return result.Error
+	}
+	article.CategoryId = category.ID
+
+	result = db.Create(&article)
+	if result.Error != nil {
 		return result.Error
 	}
 
 	var articletag ArticleTag
-	tag := Tag{Name: tangname}	
-	result = db.Model(&Tag{}).Where("name",tangname).FirstOrCreate(&tag)
-	if result.Error!= nil{
+	tag := Tag{Name: tangname}
+	result = db.Model(&Tag{}).Where("name", tangname).FirstOrCreate(&tag)
+	if result.Error != nil {
 		return result.Error
 	}
 
 	articletag.ArticleId = article.ID
 	articletag.TagId = tag.ID
 	result = db.Create(&articletag)
-	
+
 	return result.Error
 }

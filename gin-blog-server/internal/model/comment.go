@@ -74,15 +74,15 @@ func ReplyComment(db *gorm.DB, userId, replyUserId, parentId int, content string
 
 // 获取后台评论列表
 func GetCommentList(db *gorm.DB, page, size, typ int, isReview *bool, nickname string) (data []Comment, total int64, err error) {
-	
+
 	// SELECT UID FROM user_info WHERE nikename LIKE nickname
 	var uid int
 	if nickname != "" {
-		result := db.Model(&UserInfo{}).Where("nickname LIKE ?",nickname).Pluck("id",&uid)
-		if result.Error != nil{
-			return nil,0,result.Error
+		result := db.Model(&UserInfo{}).Where("nickname LIKE ?", nickname).Pluck("id", &uid)
+		if result.Error != nil {
+			return nil, 0, result.Error
 		}
-		db = db.Where("user_id = ?",uid)
+		db = db.Where("user_id = ?", uid)
 	}
 
 	if typ != 0 {
