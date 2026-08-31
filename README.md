@@ -32,7 +32,12 @@ Gitee 地址：[https://gitee.com/szluyu99/gin-vue-blog](https://gitee.com/szluy
 
 ## 在线预览
 
-> PS: 由于云服务器过期, 目前没有在线预览的网址哦
+在线演示（Mock 数据，不依赖后端，由 GitHub Actions 自动部署到 GitHub Pages）：
+
+- 博客前台：[https://szluyu99.github.io/gin-vue-blog/](https://szluyu99.github.io/gin-vue-blog/)
+- 博客后台：[https://szluyu99.github.io/gin-vue-blog/admin/](https://szluyu99.github.io/gin-vue-blog/admin/) （任意账号密码均可登录）
+
+> PS: 演示站的数据来自前端内置的假数据（`src/mock`），所有修改仅存在于当前页面，刷新后恢复；只用于预览界面和交互，不代表真实功能的完整表现。
 
 ![前台首页图片](./images/前台首页.png)
 
