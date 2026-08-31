@@ -18,3 +18,6 @@ public/uploaded/
 public/markdown/
 
 *.db
+
+# Redis 持久化文件, 本地运行时生成
+*.rdb
