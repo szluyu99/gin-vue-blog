@@ -37,3 +37,5 @@ stats.html
 .env*
 *.local
 !.env.sample
+# mock 静态演示页面的构建配置, 不含敏感信息, 需要纳入版本管理
+!.env.mock

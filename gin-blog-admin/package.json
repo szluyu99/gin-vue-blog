@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:mock": "vite build --mode mock",
     "preview": "vite preview",
     "lint": "eslint .",
     "up": "taze major -I"

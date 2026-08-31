@@ -1,0 +1,72 @@
+name: Deploy Mock Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 只允许一个部署同时进行, 新的推送取消进行中的旧部署
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build mock pages
+    runs-on: ubuntu-latest
+    # 项目站点的 URL 前缀是仓库名, 如 https://<user>.github.io/gin-vue-blog/
+    env:
+      BASE: /${{ github.event.repository.name }}/
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: '*/pnpm-lock.yaml'
+
+      - name: Build front (site root)
+        working-directory: gin-blog-front
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build:mock --base="$BASE"
+
+      - name: Build admin (/admin/)
+        working-directory: gin-blog-admin
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build:mock --base="${BASE}admin/"
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          cp -r gin-blog-front/dist/. site/
+          mkdir -p site/admin
+          cp -r gin-blog-admin/dist/. site/admin/
+          # 产物中存在下划线开头的文件, 禁用 Jekyll 处理避免被忽略
+          touch site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

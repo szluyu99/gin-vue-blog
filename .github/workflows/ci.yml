@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server:
+    name: Server (Go)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: gin-blog-server/go.mod
+          cache-dependency-path: gin-blog-server/go.sum
+
+      - name: Vet
+        working-directory: gin-blog-server
+        run: go vet ./...
+
+      - name: Test
+        working-directory: gin-blog-server
+        run: go test ./...
+
+  frontend:
+    name: Frontend (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [gin-blog-front, gin-blog-admin]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: ${{ matrix.project }}/pnpm-lock.yaml
+
+      - name: Install
+        working-directory: ${{ matrix.project }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        working-directory: ${{ matrix.project }}
+        run: pnpm lint
+
+      - name: Build
+        working-directory: ${{ matrix.project }}
+        run: pnpm build

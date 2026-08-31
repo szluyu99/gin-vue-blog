@@ -5,6 +5,7 @@
     "dev": "vite",
     "lint": "eslint .",
     "build": "vite build",
+    "build:mock": "vite build --mode mock",
     "preview": "vite preview",
     "up": "taze major -I"
   },
