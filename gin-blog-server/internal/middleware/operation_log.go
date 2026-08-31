@@ -95,7 +95,7 @@ func OperationLog() gin.HandlerFunc {
 
 			db := c.MustGet(g.CTX_DB).(*gorm.DB)
 			if err := db.Create(&operationLog).Error; err != nil {
-				slog.Error("操作日志记录失败: ", err)
+				slog.Error("操作日志记录失败", "err", err)
 				handle.ReturnError(c, g.ErrDbOp, err)
 				return
 			}

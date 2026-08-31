@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -43,12 +43,12 @@ func ParseToken(secret, token string) (*MyClaims, error) {
 		})
 
 	if err != nil {
-		switch vError, ok := err.(*jwt.ValidationError); ok {
-		case vError.Errors&jwt.ValidationErrorMalformed != 0:
+		switch {
+		case errors.Is(err, jwt.ErrTokenMalformed):
 			return nil, ErrTokenMalformed
-		case vError.Errors&jwt.ValidationErrorExpired != 0:
+		case errors.Is(err, jwt.ErrTokenExpired):
 			return nil, ErrTokenExpired
-		case vError.Errors&jwt.ValidationErrorNotValidYet != 0:
+		case errors.Is(err, jwt.ErrTokenNotValidYet):
 			return nil, ErrTokenNotValidYet
 		default:
 			return nil, ErrTokenInvalid

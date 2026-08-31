@@ -361,7 +361,10 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 	result := db.Model(&userAuth).
 		Preload("Roles").Preload("UserInfo").
 		First(&userAuth)
-	return &userAuth, result.Error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &userAuth, nil
 }
 
 // 注册新用户

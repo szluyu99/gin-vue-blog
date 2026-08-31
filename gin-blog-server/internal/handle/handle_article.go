@@ -245,13 +245,13 @@ func (*Article) Import(c *gin.Context) {
 func readFromFileHeader(file *multipart.FileHeader) (string, error) {
 	open, err := file.Open()
 	if err != nil {
-		slog.Error("文件读取, 目标地址错误: ", err)
+		slog.Error("文件读取, 目标地址错误", "err", err)
 		return "", err
 	}
 	defer open.Close()
 	all, err := io.ReadAll(open)
 	if err != nil {
-		slog.Error("文件读取失败: ", err)
+		slog.Error("文件读取失败", "err", err)
 		return "", err
 	}
 	return string(all), nil

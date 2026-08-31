@@ -293,7 +293,7 @@ cd gin-vue-blog/deploy
 
 ### 开发环境依赖
 
-分开运行前后端时需要：Golang 1.21+、Node（建议用 [Nvm](https://nvm.uihtm.com/) 安装）、pnpm、Redis。
+分开运行前后端时需要：Golang 1.26+、Node（建议用 [Nvm](https://nvm.uihtm.com/) 安装）、pnpm、Redis。
 
 数据库默认使用 SQLite，开箱即用；切换 MySQL 需要 8.0 以上版本，并修改 `gin-blog-server/config.yml`。
 

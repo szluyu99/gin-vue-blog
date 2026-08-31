@@ -1,6 +1,6 @@
 # gin-blog-server
 
-博客后端。Go 1.21 + Gin + GORM，支持 SQLite / MySQL，**Redis 为必需依赖**（默认 `127.0.0.1:6379` 的 DB 7）。
+博客后端。Go 1.26 + Gin + GORM，支持 SQLite / MySQL，**Redis 为必需依赖**（默认 `127.0.0.1:6379` 的 DB 7）。
 
 监听 `:8765`，接口前缀 `/api`。
 

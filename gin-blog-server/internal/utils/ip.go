@@ -55,7 +55,7 @@ func (*ipUtil) GetIpAddress(c *gin.Context) (ipAddress string) {
 	if strings.HasPrefix(ipAddress, "127.0.0.1") || strings.HasPrefix(ipAddress, "[::1]") {
 		ip, err := externalIP()
 		if err != nil {
-			slog.Error("GetIpAddress, externalIP, err: ", err)
+			slog.Error("GetIpAddress, externalIP", "err", err)
 		}
 		ipAddress = ip.String()
 	}
@@ -90,7 +90,7 @@ func (*ipUtil) GetIpSource(ipAddress string) string {
 	searcher, err := xdb.NewWithVectorIndex(dbPath, vIndex)
 
 	if err != nil {
-		slog.Error("failed to create searcher with vector index: ", err)
+		slog.Error("failed to create searcher with vector index", "err", err)
 		return ""
 	}
 	defer searcher.Close()

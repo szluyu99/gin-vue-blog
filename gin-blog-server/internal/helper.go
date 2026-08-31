@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/glebarez/sqlite"
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

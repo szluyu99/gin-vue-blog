@@ -6,7 +6,7 @@ import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"time"
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 // redis context
