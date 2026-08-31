@@ -40,7 +40,7 @@ async function handleFileChange() {
     }
 
     previewImg.value = responseJSON.data
-    emit('update:preview', previewImg)
+    emit('update:preview', previewImg.value)
   }
   catch (err) {
     console.error(err)

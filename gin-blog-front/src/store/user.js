@@ -5,7 +5,7 @@ import api from '@/api'
 export const useUserStore = defineStore('user', {
   persist: {
     key: 'gvb_blog_user',
-    paths: ['token'],
+    pick: ['token'],
   },
   state: () => ({
     userInfo: {

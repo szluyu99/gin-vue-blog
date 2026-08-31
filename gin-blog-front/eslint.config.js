@@ -5,7 +5,7 @@ export default antfu({
   rules: {
     'no-console': 'warn',
     'curly': 'off',
-    '@typescript-eslint/brace-style': 'off',
+    'style/brace-style': 'off',
     'node/prefer-global/process': 'off',
     'unused-imports/no-unused-imports': 'off',
   },
