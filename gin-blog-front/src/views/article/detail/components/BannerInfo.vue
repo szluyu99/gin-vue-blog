@@ -1,7 +1,7 @@
 <script setup>
+import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import dayjs from 'dayjs'
 
 const { article } = defineProps({
   article: {},
@@ -20,8 +20,8 @@ onMounted(() => {
 // 删除 HTML 标签
 function deleteHTMLTag(str) {
   return str
-    .replace(/<\/?[^>]*>/g, '')
-    .replace(/[|]*\n/, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\|*\n/, '')
     .replace(/&npsp;/gi, '')
 }
 

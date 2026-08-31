@@ -1,16 +1,16 @@
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
-import { marked } from 'marked'
 import hljs from 'highlight.js/lib/core'
-import 'highlight.js/styles/a11y-dark.css'
-import go from 'highlight.js/lib/languages/go'
-import json from 'highlight.js/lib/languages/json'
-import javascript from 'highlight.js/lib/languages/javascript'
 import bash from 'highlight.js/lib/languages/bash'
+import go from 'highlight.js/lib/languages/go'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import { marked } from 'marked'
+import { nextTick, onMounted, ref } from 'vue'
+import api from '@/api'
 
 import BannerPage from '@/components/BannerPage.vue'
 import { useAppStore } from '@/store'
-import api from '@/api'
+import 'highlight.js/styles/a11y-dark.css'
 
 hljs.registerLanguage('go', go)
 hljs.registerLanguage('bash', bash)

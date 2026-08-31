@@ -1,9 +1,9 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import { storeToRefs } from 'pinia'
-
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+
+import { storeToRefs } from 'pinia'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { useAppStore } from '@/store'
 

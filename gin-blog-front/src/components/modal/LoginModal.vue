@@ -1,9 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
 
+import api from '@/api'
 import UModal from '@/components/ui/UModal.vue'
 import { useAppStore, useUserStore } from '@/store'
-import api from '@/api'
 
 const userStore = useUserStore()
 const appStore = useAppStore()

@@ -2,11 +2,11 @@
 import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
-import UploadOne from './UploadOne.vue'
+import api from '@/api'
 import BannerPage from '@/components/BannerPage.vue'
 
 import { useUserStore } from '@/store'
-import api from '@/api'
+import UploadOne from './UploadOne.vue'
 
 const userStore = useUserStore()
 const router = useRouter()

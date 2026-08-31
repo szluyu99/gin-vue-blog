@@ -1,13 +1,12 @@
 <script setup>
+import { Icon } from '@iconify/vue'
+import { useWindowScroll, watchThrottled } from '@vueuse/core'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useWindowScroll, watchThrottled } from '@vueuse/core'
-import { Icon } from '@iconify/vue'
 
-import MobileSideBar from './MobileSideBar.vue'
-import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
-import api from '@/api'
+import { convertImgUrl } from '@/utils'
+import MobileSideBar from './MobileSideBar.vue'
 
 const appStore = useAppStore()
 const userStore = useUserStore()

@@ -20,5 +20,5 @@ export function convertImgUrl(imgUrl) {
   return `${SERVER_URL}/${imgUrl}`
 }
 
-export * from './local'
 export * from './http'
+export * from './local'

@@ -10,7 +10,7 @@ export function setLocal(key, value, expire = 60 * 60 * 24 * 7) {
   const data = JSON.stringify({
     value,
     time: Date.now(),
-    expire: expire ? new Date().getTime() + expire * 1000 : null,
+    expire: expire ? Date.now() + expire * 1000 : null,
   })
   window.localStorage.setItem(key, encrypto(data)) // 加密存储
 }
@@ -25,7 +25,7 @@ export function getLocal(key) {
     const val = decrypto(encryptedVal) // 解密
     const { value, expire } = JSON.parse(val)
     // 未过期则返回
-    if (!expire || expire > new Date().getTime()) {
+    if (!expire || expire > Date.now()) {
       return value
     }
   }
@@ -63,7 +63,7 @@ function decrypto(cipherText) {
     const parsedData = JSON.parse(originalText)
     return parsedData
   }
-  catch (error) {
+  catch {
     return null
   }
 }

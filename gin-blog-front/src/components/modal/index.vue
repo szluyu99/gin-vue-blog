@@ -1,7 +1,7 @@
 <script setup>
-import SearchModal from '@/components/modal/SearchModal.vue'
 import LoginModal from '@/components/modal/LoginModal.vue'
 import RegisterModal from '@/components/modal/RegisterModal.vue'
+import SearchModal from '@/components/modal/SearchModal.vue'
 </script>
 
 <template>

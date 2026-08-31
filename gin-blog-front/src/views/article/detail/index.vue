@@ -1,28 +1,28 @@
 <script setup>
+import hljs from 'highlight.js/lib/core'
+import bash from 'highlight.js/lib/languages/bash'
+import go from 'highlight.js/lib/languages/go'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import { marked } from 'marked'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { marked } from 'marked'
-import hljs from 'highlight.js/lib/core'
-import 'highlight.js/styles/a11y-dark.css'
-import go from 'highlight.js/lib/languages/go'
-import json from 'highlight.js/lib/languages/json'
-import javascript from 'highlight.js/lib/languages/javascript'
-import bash from 'highlight.js/lib/languages/bash'
+import api from '@/api'
 
+import Comment from '@/components/comment/Comment.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
+import { convertImgUrl } from '@/utils'
 import BannerInfo from './components/BannerInfo.vue'
+import Catalogue from './components/Catalogue.vue'
 import Copyright from './components/Copyright.vue'
-import LatestList from './components/LatestList.vue'
-import Reward from './components/Reward.vue'
 import Forward from './components/Forward.vue'
 import LastNext from './components/LastNext.vue'
+
+import LatestList from './components/LatestList.vue'
 import Recommend from './components/Recommend.vue'
-import Catalogue from './components/Catalogue.vue'
 
-import AppFooter from '@/components/layout/AppFooter.vue'
-import Comment from '@/components/comment/Comment.vue'
-
-import { convertImgUrl } from '@/utils'
-import api from '@/api'
+import Reward from './components/Reward.vue'
+import 'highlight.js/styles/a11y-dark.css'
 
 hljs.registerLanguage('go', go)
 hljs.registerLanguage('bash', bash)

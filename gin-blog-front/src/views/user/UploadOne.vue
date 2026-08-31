@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { convertImgUrl } from '@/utils'
 import { useUserStore } from '@/store'
+import { convertImgUrl } from '@/utils'
 
 const props = defineProps({
   preview: {

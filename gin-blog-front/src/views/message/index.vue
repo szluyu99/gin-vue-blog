@@ -1,11 +1,11 @@
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import vueDanmaku from 'vue3-danmaku'
 
 import api from '@/api'
-import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
+import { convertImgUrl } from '@/utils'
 
 const userStore = useUserStore()
 const { pageList } = storeToRefs(useAppStore())

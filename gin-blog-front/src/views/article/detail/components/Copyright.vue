@@ -1,6 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/store'
+
 const { blogConfig } = storeToRefs(useAppStore())
 const articleHref = window.location.href
 </script>
@@ -10,19 +11,19 @@ const articleHref = window.location.href
     <!-- TODO: 点击复制 -->
     <div class="relative">
       <div class="absolute right-0 top-0 h-5 w-5 border-4px border-blue rounded-full bg-white" />
-      <span class="font-bold color-#49b1f5"> 文章作者： </span>
+      <span class="color-#49b1f5 font-bold"> 文章作者： </span>
       <RouterLink to="/" class="color-#99a9bf !underline">
         {{ blogConfig.website_author }}
       </RouterLink>
     </div>
     <div>
-      <span class="font-bold color-#49b1f5"> 文章链接： </span>
+      <span class="color-#49b1f5 font-bold"> 文章链接： </span>
       <a :href="articleHref" class="color-#99a9bf !underline">
         {{ articleHref }}
       </a>
     </div>
     <div>
-      <span class="font-bold color-#49b1f5"> 版权声明： </span>
+      <span class="color-#49b1f5 font-bold"> 版权声明： </span>
       <span>
         本博客所有文章除特别声明外，均采用
         <a

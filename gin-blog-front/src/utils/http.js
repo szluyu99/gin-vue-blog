@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { useAppStore, useUserStore } from '@/store'
 import { mockAdapter } from '@/mock'
+import { useAppStore, useUserStore } from '@/store'
 
 // 是否使用 mock 数据: 开启后不请求后端, 由 src/mock 返回假数据
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'

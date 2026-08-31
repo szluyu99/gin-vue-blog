@@ -1,20 +1,28 @@
-<script setup lang="ts">
-import { defineProps, withDefaults } from 'vue'
-
-withDefaults(defineProps<{
-  as?: 'button' | 'a'
-  type?: 'default' | 'success' | 'info' | 'warning' | 'error' | 'primary' | 'secondary' | 'accent'
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-}>(), {
-  as: 'button',
-  size: 'md',
-  type: 'default',
-  disabled: false,
+<script setup>
+defineProps({
+  // 'button' | 'a'
+  as: {
+    type: String,
+    default: 'button',
+  },
+  // 'default' | 'success' | 'info' | 'warning' | 'error' | 'primary' | 'secondary' | 'accent'
+  type: {
+    type: String,
+    default: 'default',
+  },
+  // 'sm' | 'md' | 'lg'
+  size: {
+    type: String,
+    default: 'md',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 </script>
 
-<script lang="ts">
+<script>
 export default {
   name: 'UButton',
   inheritAttrs: false,
@@ -29,7 +37,7 @@ export default {
       type="button"
       :disabled="disabled"
       :aria-disabled="disabled"
-      class="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md font-sans text-xs font-semibold leading-4 shadow-sm disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-offset-2"
+      class="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md text-xs font-semibold leading-4 font-sans shadow-sm disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none focus:ring-2 focus:ring-offset-2"
       :class="[
         type === 'default'
           ? 'text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-gray-500'

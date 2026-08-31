@@ -2,7 +2,7 @@
   <div class="space-y-5">
     <p class="flex items-center text-xl">
       <span class="i-mdi:link-variant-plus mr-4 text-blue" />
-      <span class="font-bold color-#344c67"> 申请友链 </span>
+      <span class="color-#344c67 font-bold"> 申请友链 </span>
     </p>
     <!-- 添加友链格式 -->
     <blockquote class="border-l-3 border-color-#49b1f5 rounded-l-5 bg-#ecf7fe px-4 py-3 leading-7">

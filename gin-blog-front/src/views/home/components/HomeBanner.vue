@@ -1,8 +1,8 @@
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import EasyTyper from 'easy-typer-js'
 import { storeToRefs } from 'pinia'
 
-import EasyTyper from 'easy-typer-js'
+import { computed, onMounted, reactive } from 'vue'
 import { useAppStore } from '@/store'
 
 const { pageList, blogConfig } = storeToRefs(useAppStore())

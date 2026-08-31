@@ -1,21 +1,21 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+// Markdown => Html
+import { marked } from 'marked'
 
 // 无限轮播图
 import InfiniteLoading from 'v3-infinite-loading'
 
-// Markdown => Html
-import { marked } from 'marked'
-
-import ArticleCard from './components/ArticleCard.vue'
-import AuthorInfo from './components/AuthorInfo.vue'
-import WebsiteInfo from './components/WebsiteInfo.vue'
-import HomeBanner from './components/HomeBanner.vue'
-import Announcement from './components/Announcement.vue'
-import TalkingCarousel from './components/TalkingCarousel.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
+import { onMounted, reactive, ref } from 'vue'
 
 import api from '@/api'
+import AppFooter from '@/components/layout/AppFooter.vue'
+import Announcement from './components/Announcement.vue'
+import ArticleCard from './components/ArticleCard.vue'
+import AuthorInfo from './components/AuthorInfo.vue'
+import HomeBanner from './components/HomeBanner.vue'
+import TalkingCarousel from './components/TalkingCarousel.vue'
+
+import WebsiteInfo from './components/WebsiteInfo.vue'
 
 const articleList = ref([])
 const loading = ref(false)
@@ -38,7 +38,7 @@ async function getArticlesInfinite($state) {
       params.page_num++
       $state.loaded()
     }
-    catch (error) {
+    catch {
       $state.error()
     }
   }
@@ -58,8 +58,8 @@ onMounted(async () => {
 // 过滤 Markdown 符号: 先转 Html 再去除 Html 标签
 function filterMdSymbol(md) {
   return marked(md) // 转 HTML
-    .replace(/<\/?[^>]*>/g, '') // 正则去除 Html 标签
-    .replace(/[|]*\n/, '')
+    .replace(/<[^>]*>/g, '') // 正则去除 Html 标签
+    .replace(/\|*\n/, '')
     .replace(/&npsp;/gi, '')
 }
 

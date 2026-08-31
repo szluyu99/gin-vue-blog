@@ -1,12 +1,12 @@
 <script setup>
+import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
+
+import ULoading from '@/components/ui/ULoading.vue'
+import { useAppStore } from '@/store'
 
 import AppFooter from './layout/AppFooter.vue'
-import ULoading from '@/components/ui/ULoading.vue'
-
-import { useAppStore } from '@/store'
 
 // 注意, 如果使用了解构赋值的形式, watch 会失效
 // const {
@@ -57,7 +57,7 @@ const coverStyle = computed(() => {
 <template>
   <!-- 顶部图片 -->
   <div :style="coverStyle" class="banner-fade-down absolute inset-x-0 top-0 h-[280px] f-c-c lg:h-[400px]">
-    <h1 class="mt-[40px] animate-fade-in-down animate-duration-800 text-3xl font-bold text-light lg:text-4xl">
+    <h1 class="mt-[40px] animate-fade-in-down animate-duration-800 text-3xl text-light font-bold lg:text-4xl">
       {{ props.title }}
     </h1>
   </div>

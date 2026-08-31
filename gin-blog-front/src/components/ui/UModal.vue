@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
 
 // import { useDOMScrollLock } from '../composables/useDOMScrollLock'
@@ -30,10 +30,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'close'): void
-}>()
+const emit = defineEmits(['update:modelValue', 'close'])
 
 const isOpen = computed({
   get: () => props.modelValue,

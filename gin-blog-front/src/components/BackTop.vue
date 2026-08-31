@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
-import { useWindowScroll, watchThrottled } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
+import { useWindowScroll, watchThrottled } from '@vueuse/core'
+import { ref } from 'vue'
 
 const { y } = useWindowScroll()
 const styleVal = ref('')

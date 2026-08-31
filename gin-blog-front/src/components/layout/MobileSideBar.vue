@@ -1,12 +1,11 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 
-import { Icon } from '@iconify/vue'
-import UDrawer from '@/components/ui/UDrawer.vue'
+import { useRoute, useRouter } from 'vue-router'
 
+import UDrawer from '@/components/ui/UDrawer.vue'
 import { useAppStore, useUserStore } from '@/store'
-import api from '@/api'
 
 const { collapsed, blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
 

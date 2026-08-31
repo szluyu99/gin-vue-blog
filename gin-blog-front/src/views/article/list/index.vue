@@ -1,11 +1,11 @@
 <script setup>
+import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import dayjs from 'dayjs'
 
+import api from '@/api'
 import BannerPage from '@/components/BannerPage.vue'
 import { convertImgUrl } from '@/utils'
-import api from '@/api'
 
 const route = useRoute()
 

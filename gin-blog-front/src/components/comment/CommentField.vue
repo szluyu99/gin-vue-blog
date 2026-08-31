@@ -1,9 +1,9 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 
-import { convertImgUrl } from '@/utils'
-import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
+import { useAppStore, useUserStore } from '@/store'
+import { convertImgUrl } from '@/utils'
 
 const props = defineProps({
   // 评论类型 1-文章 2-友链

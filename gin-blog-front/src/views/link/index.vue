@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import LinkList from './components/LinkList.vue'
-import AddLink from './components/AddLink.vue'
-import Comment from '@/components/comment/Comment.vue'
-import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
+import BannerPage from '@/components/BannerPage.vue'
+import Comment from '@/components/comment/Comment.vue'
+import AddLink from './components/AddLink.vue'
+import LinkList from './components/LinkList.vue'
 
 const loading = ref(true)
 const linkList = ref([])
@@ -31,4 +31,3 @@ onMounted(() => {
     </div>
   </BannerPage>
 </template>
-

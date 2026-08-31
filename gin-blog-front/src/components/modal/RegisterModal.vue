@@ -1,9 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
-import config from '@/assets/config'
+import api from '@/api'
 
 import UModal from '@/components/ui/UModal.vue'
-import api from '@/api'
 import { useAppStore } from '@/store'
 
 const appStore = useAppStore()
@@ -22,7 +21,7 @@ const form = ref({
 async function handleRegister() {
   const { email, password } = form.value
 
-  const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+  const reg = /^[a-z0-9][\w-]+@[a-z0-9]+\.[a-z]{2,4}$/i
   if (!reg.test(email)) {
     window.$message?.warning('请输入正确的邮箱格式')
     return

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useAppStore, useUserStore } from '@/store'
 import api from '@/api'
+import { useAppStore, useUserStore } from '@/store'
 
 const { articleId, likeCount } = defineProps({
   articleId: Number,

@@ -1,10 +1,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import UToast from '@/components/ui/UToast.vue'
+import BackToTop from '@/components/BackTop.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import GlobalModal from '@/components/modal/index.vue'
-import BackToTop from '@/components/BackTop.vue'
+import UToast from '@/components/ui/UToast.vue'
 
 import { useAppStore, useUserStore } from '@/store'
 

@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-
 import NProgress from 'nprogress'
+
+import { createRouter, createWebHistory } from 'vue-router'
 import './styles/nprogress.css'
 
 const basicRoutes = [

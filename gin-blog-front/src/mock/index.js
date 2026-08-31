@@ -5,8 +5,8 @@ import {
   articles,
   blogConfig,
   categories,
-  commentUsers,
   comments,
+  commentUsers,
   currentUser,
   links,
   messages,
@@ -284,11 +284,11 @@ export function mockAdapter(config) {
     console.warn(`[mock] 未定义的接口: ${method} ${path}`)
   }
 
-  return new Promise(resolve => setTimeout(() => resolve({
+  return new Promise(resolve => setTimeout(resolve, DELAY, {
     data,
     status: 200,
     statusText: 'OK',
     headers: {},
     config,
-  }), DELAY))
+  }))
 }

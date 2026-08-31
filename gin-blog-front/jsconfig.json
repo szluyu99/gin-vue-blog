@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "ESNext",
-    "moduleResolution": "node",
-    "strict": true,
     "jsx": "preserve",
+    "baseUrl": ".",
+    "moduleResolution": "node",
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"]
-    }
+    },
+    "strict": true
   },
   "exclude": ["dist", "node_modules"]
 }

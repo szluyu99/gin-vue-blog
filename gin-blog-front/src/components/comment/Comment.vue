@@ -1,20 +1,20 @@
 <script setup>
+import dayjs from 'dayjs'
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import dayjs from 'dayjs'
 
-// import EmojiList from '@/assets/emoji'
-import CommentField from './CommentField.vue'
-
-// 评论 / 回复 框
-import Paging from './Paging.vue'
+import api from '@/api'
 
 // 分页
 import ULoading from '@/components/ui/ULoading.vue'
 
-import { convertImgUrl } from '@/utils'
 import { useAppStore, useUserStore } from '@/store'
-import api from '@/api'
+
+import { convertImgUrl } from '@/utils'
+// import EmojiList from '@/assets/emoji'
+import CommentField from './CommentField.vue'
+// 评论 / 回复 框
+import Paging from './Paging.vue'
 
 const { type } = defineProps({
   // 评论类型: 1-文章, 2-友链, 3-说说
@@ -40,7 +40,6 @@ async function getComments() {
   listLoading.value = true
   try {
     const resp = await api.getComments(params)
-    console.log(resp.data.page_data)
 
     // * 全局加载更多, 0.8s 延时
     setTimeout(() => {
@@ -48,7 +47,6 @@ async function getComments() {
         ? commentList.value = resp.data.page_data
         : commentList.value.push(...resp.data.page_data)
       commentCount.value = resp.data.total
-      console.log(commentCount.value)
       params.page_num++
       listLoading.value = false
     }, 800)

@@ -112,7 +112,7 @@ defineExpose({
                 </div>
                 <button
                   v-if="closeable"
-                  class="i-mdi:close h-5 w-5 flex items-center justify-center rounded-full rounded-full p-1 font-bold text-gray-400 hover:text-gray-600"
+                  class="i-mdi:close h-5 w-5 flex items-center justify-center rounded-full rounded-full p-1 text-gray-400 font-bold hover:text-gray-600"
                   @click="flux.remove(event)"
                 />
               </div>

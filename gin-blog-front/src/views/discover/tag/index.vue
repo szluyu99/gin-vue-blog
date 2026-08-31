@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
+import BannerPage from '@/components/BannerPage.vue'
 
 const loading = ref(true)
 const tagList = ref([])

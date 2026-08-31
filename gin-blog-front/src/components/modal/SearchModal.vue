@@ -1,9 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
 import { debouncedWatch } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
-import UModal from '@/components/ui/UModal.vue'
 import api from '@/api'
+import UModal from '@/components/ui/UModal.vue'
 import { useAppStore } from '@/store'
 
 const appStore = useAppStore()

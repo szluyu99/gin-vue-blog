@@ -1,10 +1,10 @@
 <script setup>
+import dayjs from 'dayjs'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import dayjs from 'dayjs'
 
-import BannerPage from '@/components/BannerPage.vue'
 import api from '@/api'
+import BannerPage from '@/components/BannerPage.vue'
 
 const router = useRouter()
 
