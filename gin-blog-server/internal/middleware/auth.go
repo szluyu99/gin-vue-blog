@@ -19,7 +19,11 @@ import (
 // 基于 JWT 的授权
 // 如果存在 session, 则直接从 session 中获取用户信息
 // 如果不存在 session, 则从 Authorization 中获取 token, 并解析 token 获取用户信息, 并设置到 session 中
-func JWTAuth() gin.HandlerFunc {
+// requireLogin 为 true 时, 资源表中不存在的接口也必须携带有效 token,
+// 仅跳过权限校验(fail closed)。后台接口必须用 true, 否则新增接口忘记
+// 在资源表登记, 该接口就会完全无鉴权。
+// 前台接口用 false: 大部分是匿名可读的, 只是顺便识别一下当前用户。
+func JWTAuth(requireLogin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// FIXME: 前后台 session 混乱, 暂时无法将用户信息挂载在 gin context 缓存
 		// auth, _ := handle.CurrentUserAuth(c)
@@ -37,19 +41,22 @@ func JWTAuth() gin.HandlerFunc {
 		url, method := c.FullPath()[4:], c.Request.Method
 		resource, err := model.GetResource(db, url, method)
 		if err != nil {
-			// 没有找到的资源, 直接跳过后续验证
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				slog.Debug("[middleware-JWTAuth] resource not exist, skip jwt auth")
-				c.Set("skip_check", true)
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				handle.ReturnError(c, g.ErrDbOp, err)
+				return
+			}
+			// 资源表中没有登记的接口: 不做权限校验
+			slog.Debug("[middleware-JWTAuth] resource not exist, skip permission check")
+			c.Set("skip_check", true)
+			// 前台接口允许匿名访问, 后台接口仍然要求登录
+			if !requireLogin {
 				c.Next()
 				c.Set("skip_check", false)
 				return
 			}
-			handle.ReturnError(c, g.ErrDbOp, err)
-			return
 		}
 
-		// 匿名资源, 直接跳过后续验证
+		// 匿名资源, 直接跳过后续验证 (资源表中没登记时 resource 为零值)
 		if resource.Anonymous {
 			slog.Debug(fmt.Sprintf("[middleware-JWTAuth] resource: %s %s is anonymous, skip jwt auth!", url, method))
 			c.Set("skip_check", true)

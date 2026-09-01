@@ -231,7 +231,7 @@ func generateDefaultResources(db *gorm.DB) {
 		// 菜单模块
 		{Name: "菜单列表", ParentId: parents[5].ID, Url: "/menu/list", Method: "GET"},
 		{Name: "新增/编辑菜单", ParentId: parents[5].ID, Url: "/menu", Method: "POST"},
-		{Name: "删除菜单", ParentId: parents[5].ID, Url: "/menu", Method: "DELETE"},
+		{Name: "删除菜单", ParentId: parents[5].ID, Url: "/menu/:id", Method: "DELETE"},
 		{Name: "菜单选项列表(树形)", ParentId: parents[5].ID, Url: "/menu/option", Method: "GET"},
 		{Name: "获取当前用户菜单", ParentId: parents[5].ID, Url: "/menu/user/list", Method: "GET"},
 		// 角色模块
@@ -242,7 +242,7 @@ func generateDefaultResources(db *gorm.DB) {
 		// 资源模块
 		{Name: "资源列表", ParentId: parents[7].ID, Url: "/resource/list", Method: "GET"},
 		{Name: "新增/编辑资源", ParentId: parents[7].ID, Url: "/resource", Method: "POST"},
-		{Name: "删除资源", ParentId: parents[7].ID, Url: "/resource", Method: "DELETE"},
+		{Name: "删除资源", ParentId: parents[7].ID, Url: "/resource/:id", Method: "DELETE"},
 		{Name: "资源选项列表(树形)", ParentId: parents[7].ID, Url: "/resource/option", Method: "GET"},
 		{Name: "修改资源匿名访问", ParentId: parents[7].ID, Url: "/resource/anonymous", Method: "PUT"},
 		// 评论模块
@@ -256,9 +256,7 @@ func generateDefaultResources(db *gorm.DB) {
 		// 文件模块
 		{Name: "文件上传", ParentId: parents[10].ID, Url: "/upload", Method: "POST"},
 		// 博客信息模块
-		{Name: "获取博客设置", ParentId: parents[11].ID, Url: "/setting/blog-config", Method: "GET"},
 		{Name: "获取关于我", ParentId: parents[11].ID, Url: "/setting/about", Method: "GET"},
-		{Name: "修改博客设置", ParentId: parents[11].ID, Url: "/setting/blog-config", Method: "PUT"},
 		{Name: "修改关于我", ParentId: parents[11].ID, Url: "/setting/about", Method: "PUT"},
 		{Name: "获取后台首页信息", ParentId: parents[11].ID, Url: "/home", Method: "GET"},
 		{Name: "修改博客配置", ParentId: parents[11].ID, Url: "/config", Method: "PATCH"},
@@ -267,7 +265,7 @@ func generateDefaultResources(db *gorm.DB) {
 		{Name: "获取当前用户信息", ParentId: parents[12].ID, Url: "/user/info", Method: "GET"},
 		{Name: "修改用户信息", ParentId: parents[12].ID, Url: "/user", Method: "PUT"},
 		{Name: "获取在线用户列表", ParentId: parents[12].ID, Url: "/user/online", Method: "GET"},
-		{Name: "强制离线用户", ParentId: parents[12].ID, Url: "/user/offline", Method: "DELETE"},
+		{Name: "强制离线用户", ParentId: parents[12].ID, Url: "/user/offline/:id", Method: "POST"},
 		{Name: "修改当前用户密码", ParentId: parents[12].ID, Url: "/user/current/password", Method: "PUT"},
 		{Name: "修改当前用户信息", ParentId: parents[12].ID, Url: "/user/current", Method: "PUT"},
 		{Name: "修改用户禁用", ParentId: parents[12].ID, Url: "/user/disable", Method: "PUT"},

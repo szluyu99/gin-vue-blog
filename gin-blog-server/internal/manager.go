@@ -63,7 +63,7 @@ func registerAdminHandler(r *gin.Engine) {
 	auth := r.Group("/api")
 
 	// !注意使用中间件的顺序
-	auth.Use(middleware.JWTAuth())
+	auth.Use(middleware.JWTAuth(true)) // 后台接口: 未登记的接口也要求登录
 	auth.Use(middleware.PermissionCheck())
 	auth.Use(middleware.OperationLog())
 	auth.Use(middleware.ListenOnline())
@@ -219,7 +219,7 @@ func registerBlogHandler(r *gin.Engine) {
 	}
 
 	// 需要登录才能进行的操作
-	base.Use(middleware.JWTAuth())
+	base.Use(middleware.JWTAuth(false)) // 前台接口: 允许匿名访问, 仅识别用户
 	{
 		base.POST("/upload", uploadAPI.UploadFile)    // 文件上传
 		base.GET("/user/info", userAPI.GetInfo)       // 根据 Token 获取用户信息
