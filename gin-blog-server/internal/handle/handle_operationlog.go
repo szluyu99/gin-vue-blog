@@ -9,15 +9,14 @@ import (
 
 type OperationLog struct{}
 
-// @Summary 获取操作日志列表
-// @Description 根据条件查询获取操作日志列表
+// @Summary 条件查询操作日志列表
+// @Description 关键字匹配操作模块与操作描述
 // @Tags OperationLog
-// @Accept json
 // @Produce json
+// @Param keyword query string false "关键字"
 // @Param page_num query int false "页码"
 // @Param page_size query int false "每页数量"
-// @Param keyword query string false "关键字"
-// @Success 0 {object} Response[[]model.OperationLog]
+// @Success 0 {object} Response[PageResult[model.OperationLog]]
 // @Security ApiKeyAuth
 // @Router /operation/log/list [get]
 func (*OperationLog) GetList(c *gin.Context) {
@@ -41,13 +40,13 @@ func (*OperationLog) GetList(c *gin.Context) {
 	})
 }
 
-// @Summary 删除操作日志
-// @Description 删除操作日志
+// @Summary 删除操作日志（批量）
+// @Description 根据 ID 数组删除操作日志
 // @Tags OperationLog
 // @Accept json
 // @Produce json
-// @Param ids body []int true "操作日志ID列表"
-// @Success 0 {object} Response[int]
+// @Param ids body []int true "操作日志 ID 数组"
+// @Success 0 {object} Response[int64]
 // @Security ApiKeyAuth
 // @Router /operation/log [delete]
 func (*OperationLog) Delete(c *gin.Context) {

@@ -27,6 +27,7 @@
 
 - 博客前台: <https://szluyu99.github.io/gin-vue-blog/>
 - 博客后台: <https://szluyu99.github.io/gin-vue-blog/admin/> （任意账号密码均可登录）
+- 接口文档: <https://szluyu99.github.io/gin-vue-blog/api-docs/> （Swagger 注解生成，静态托管无法在线调用）
 
 > 演示数据来自前端内置假数据（`src/mock`），改动仅存在于当前页面，刷新即还原。
 

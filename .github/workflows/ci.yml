@@ -36,6 +36,18 @@ jobs:
         working-directory: gin-blog-server
         run: go test ./...
 
+      # docs/ 是 swag init 的产物, 提交时容易忘记重新生成
+      - name: Swagger
+        working-directory: gin-blog-server
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@v1.16.6
+          swag init -g ./cmd/main.go
+          if ! git diff --quiet docs; then
+            echo "docs/ 与代码中的注解不一致, 请执行 ./swag_init.sh 并提交生成结果:"
+            git diff --stat docs
+            exit 1
+          fi
+
   frontend:
     name: Frontend (${{ matrix.project }})
     runs-on: ubuntu-latest

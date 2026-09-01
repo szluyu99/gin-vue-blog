@@ -57,6 +57,15 @@ type ArticleVO struct {
 	CommentCount int `json:"comment_count" gorm:"-"`
 }
 
+// @Summary 新增或编辑文章
+// @Description 新增或编辑文章, 分类和标签不存在时按名称自动创建
+// @Tags Article
+// @Accept json
+// @Produce json
+// @Param form body AddOrEditArticleReq true "新增或编辑文章"
+// @Success 0 {object} Response[model.Article]
+// @Security ApiKeyAuth
+// @Router /article [post]
 func (*Article) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditArticleReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -100,6 +109,15 @@ func (*Article) SaveOrUpdate(c *gin.Context) {
 	ReturnSuccess(c, article)
 }
 
+// @Summary 软删除文章（批量）
+// @Description 将文章移入或移出回收站
+// @Tags Article
+// @Accept json
+// @Produce json
+// @Param form body SoftDeleteReq true "软删除文章"
+// @Success 0 {object} Response[int64]
+// @Security ApiKeyAuth
+// @Router /article/soft-delete [put]
 func (*Article) UpdateSoftDelete(c *gin.Context) {
 	var req SoftDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -116,6 +134,15 @@ func (*Article) UpdateSoftDelete(c *gin.Context) {
 	ReturnSuccess(c, rows)
 }
 
+// @Summary 物理删除文章（批量）
+// @Description 根据 ID 数组物理删除文章, 同时删除文章标签关联
+// @Tags Article
+// @Accept json
+// @Produce json
+// @Param ids body []int true "文章 ID 数组"
+// @Success 0 {object} Response[int64]
+// @Security ApiKeyAuth
+// @Router /article [delete]
 func (*Article) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
@@ -132,6 +159,21 @@ func (*Article) Delete(c *gin.Context) {
 	ReturnSuccess(c, rows)
 }
 
+// @Summary 条件查询文章列表
+// @Description 后台文章列表, 支持标题/分类/标签/类型/状态/回收站过滤
+// @Tags Article
+// @Produce json
+// @Param title query string false "标题关键字"
+// @Param category_id query int false "分类 ID"
+// @Param tag_id query int false "标签 ID"
+// @Param type query int false "类型(1-原创 2-转载 3-翻译)"
+// @Param status query int false "状态(1-公开 2-私密 3-草稿)"
+// @Param is_delete query bool false "是否在回收站"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[PageResult[ArticleVO]]
+// @Security ApiKeyAuth
+// @Router /article/list [get]
 func (*Article) GetList(c *gin.Context) {
 	var query ArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -176,7 +218,14 @@ func (*Article) GetList(c *gin.Context) {
 
 }
 
-// 获取文章详细信息
+// @Summary 获取文章详情
+// @Description 根据 ID 获取文章详情, 包含分类和标签
+// @Tags Article
+// @Produce json
+// @Param id path int true "文章 ID"
+// @Success 0 {object} Response[model.Article]
+// @Security ApiKeyAuth
+// @Router /article/{id} [get]
 func (*Article) GetDetail(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -193,7 +242,15 @@ func (*Article) GetDetail(c *gin.Context) {
 	ReturnSuccess(c, article)
 }
 
-// 修改置顶信息
+// @Summary 修改文章置顶
+// @Description 修改文章置顶状态
+// @Tags Article
+// @Accept json
+// @Produce json
+// @Param form body UpdateArticleTopReq true "修改置顶"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /article/top [put]
 func (*Article) UpdateTop(c *gin.Context) {
 	var req UpdateArticleTopReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -211,12 +268,26 @@ func (*Article) UpdateTop(c *gin.Context) {
 }
 
 // TODO: 目前是前端导出
-// 导出文章: 获取导出后的资源链接列表
+// @Summary 导出文章
+// @Description 目前由前端导出, 后端只返回空数据
+// @Tags Article
+// @Produce json
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /article/export [post]
 func (*Article) Export(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
-// 导入文章: 题目 + 内容
+// @Summary 导入文章
+// @Description 上传 Markdown 文件导入文章, 文件名作为标题, 导入后为草稿
+// @Tags Article
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "Markdown 文件"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /article/import [post]
 func (*Article) Import(c *gin.Context) {
 	db := GetDB(c)
 	auth, ok := MustCurrentUserAuth(c)

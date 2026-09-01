@@ -1,5 +1,49 @@
+basePath: /api
 definitions:
-  handler.AddOrEditCategoryReq:
+  handle.AboutReq:
+    properties:
+      content:
+        type: string
+    type: object
+  handle.AddOrEditArticleReq:
+    properties:
+      category_name:
+        type: string
+      content:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      is_top:
+        type: boolean
+      original_url:
+        type: string
+      status:
+        description: '状态: 1-公开 2-私密 3-评论可见'
+        maximum: 3
+        minimum: 1
+        type: integer
+      tag_names:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      type:
+        description: '类型: 1-原创 2-转载 3-翻译'
+        maximum: 3
+        minimum: 1
+        type: integer
+    required:
+    - content
+    - status
+    - title
+    - type
+    type: object
+  handle.AddOrEditCategoryReq:
     properties:
       id:
         type: integer
@@ -8,7 +52,7 @@ definitions:
     required:
     - name
     type: object
-  handler.AddOrEditLinkReq:
+  handle.AddOrEditLinkReq:
     properties:
       address:
         type: string
@@ -24,18 +68,44 @@ definitions:
     - address
     - name
     type: object
-  handler.AddOrEditPageReq:
+  handle.AddOrEditResourceReq:
     properties:
-      cover:
-        type: string
       id:
         type: integer
-      label:
-        type: string
       name:
         type: string
+      parent_id:
+        type: integer
+      request_method:
+        type: string
+      url:
+        type: string
     type: object
-  handler.AddOrEditTagReq:
+  handle.AddOrEditRoleReq:
+    properties:
+      id:
+        type: integer
+      is_disable:
+        type: boolean
+      label:
+        type: string
+      menu_ids:
+        description: 菜单 id 列表
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      resource_ids:
+        description: 资源 id 列表
+        items:
+          type: integer
+        type: array
+    required:
+    - label
+    - name
+    type: object
+  handle.AddOrEditTagReq:
     properties:
       id:
         type: integer
@@ -44,7 +114,125 @@ definitions:
     required:
     - name
     type: object
-  handler.LoginReq:
+  handle.ArchiveVO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  handle.ArticleSearchVO:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  handle.ArticleVO:
+    properties:
+      category:
+        $ref: '#/definitions/model.Category'
+      category_id:
+        type: integer
+      comment_count:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      is_delete:
+        type: boolean
+      is_top:
+        type: boolean
+      like_count:
+        type: integer
+      original_url:
+        type: string
+      status:
+        description: 1-公开 2-私密
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      title:
+        type: string
+      type:
+        description: 1-原创 2-转载 3-翻译
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/model.UserAuth'
+      view_count:
+        type: integer
+    type: object
+  handle.BlogHomeVO:
+    properties:
+      article_count:
+        description: 文章数量
+        type: integer
+      message_count:
+        description: 留言数量
+        type: integer
+      user_count:
+        description: 用户数量
+        type: integer
+      view_count:
+        description: 访问量
+        type: integer
+    type: object
+  handle.EditAnonymousReq:
+    properties:
+      id:
+        type: integer
+      is_anonymous:
+        type: boolean
+    required:
+    - id
+    type: object
+  handle.FAddCommentReq:
+    properties:
+      content:
+        type: string
+      parent_id:
+        type: integer
+      reply_user_id:
+        type: integer
+      topic_id:
+        type: integer
+      type:
+        maximum: 3
+        minimum: 1
+        type: integer
+    required:
+    - type
+    type: object
+  handle.FAddMessageReq:
+    properties:
+      avatar:
+        type: string
+      content:
+        type: string
+      nickname:
+        type: string
+      speed:
+        type: integer
+    required:
+    - content
+    - nickname
+    type: object
+  handle.LoginReq:
     properties:
       password:
         type: string
@@ -54,7 +242,123 @@ definitions:
     - password
     - username
     type: object
-  handler.PageResult-model_CategoryVO:
+  handle.LoginVO:
+    properties:
+      article_like_set:
+        description: '点赞 Set: 用于记录用户点赞过的文章, 评论'
+        items:
+          type: string
+        type: array
+      avatar:
+        type: string
+      comment_like_set:
+        items:
+          type: string
+        type: array
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      nickname:
+        type: string
+      token:
+        type: string
+      updated_at:
+        type: string
+      website:
+        type: string
+    type: object
+  handle.MenuTreeVO:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/handle.MenuTreeVO'
+        type: array
+      component:
+        description: 组件路径
+        type: string
+      created_at:
+        type: string
+      external_link:
+        description: 外链地址
+        type: string
+      icon:
+        description: 图标
+        type: string
+      id:
+        type: integer
+      is_catalogue:
+        description: 是否为目录
+        type: boolean
+      is_external:
+        description: 是否外链
+        type: boolean
+      is_hidden:
+        description: 是否隐藏
+        type: boolean
+      keep_alive:
+        description: 是否缓存
+        type: boolean
+      name:
+        description: 菜单名称
+        type: string
+      order_num:
+        description: 排序
+        type: integer
+      parent_id:
+        type: integer
+      path:
+        description: 路由地址
+        type: string
+      redirect:
+        description: 重定向地址
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  handle.PageResult-handle_ArchiveVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/handle.ArchiveVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.PageResult-handle_ArticleVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/handle.ArticleVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.PageResult-model_CategoryVO:
     properties:
       page_data:
         description: 分页数据
@@ -71,7 +375,41 @@ definitions:
         description: 总条数
         type: integer
     type: object
-  handler.PageResult-model_FriendLink:
+  handle.PageResult-model_Comment:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.Comment'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.PageResult-model_CommentVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.CommentVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.PageResult-model_FriendLink:
     properties:
       page_data:
         description: 分页数据
@@ -88,7 +426,7 @@ definitions:
         description: 总条数
         type: integer
     type: object
-  handler.PageResult-model_Message:
+  handle.PageResult-model_Message:
     properties:
       page_data:
         description: 分页数据
@@ -105,7 +443,24 @@ definitions:
         description: 总条数
         type: integer
     type: object
-  handler.PageResult-model_RoleVO:
+  handle.PageResult-model_OperationLog:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.OperationLog'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.PageResult-model_RoleVO:
     properties:
       page_data:
         description: 分页数据
@@ -122,7 +477,7 @@ definitions:
         description: 总条数
         type: integer
     type: object
-  handler.PageResult-model_TagVO:
+  handle.PageResult-model_TagVO:
     properties:
       page_data:
         description: 分页数据
@@ -139,22 +494,55 @@ definitions:
         description: 总条数
         type: integer
     type: object
-  handler.RegisterReq:
+  handle.PageResult-model_UserAuth:
     properties:
-      code:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.UserAuth'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
+  handle.RegisterReq:
+    properties:
+      email:
         type: string
       password:
         maxLength: 20
         minLength: 4
         type: string
-      username:
-        type: string
     required:
-    - code
+    - email
     - password
-    - username
     type: object
-  handler.Response-any:
+  handle.ResourceTreeVO:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/handle.ResourceTreeVO'
+        type: array
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_anonymous:
+        type: boolean
+      name:
+        type: string
+      request_method:
+        type: string
+      url:
+        type: string
+    type: object
+  handle.Response-any:
     properties:
       code:
         description: 业务状态码
@@ -165,7 +553,7 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-array_model_OperationLog:
+  handle.Response-array_handle_ArticleSearchVO:
     properties:
       code:
         description: 业务状态码
@@ -173,13 +561,125 @@ definitions:
       data:
         description: 响应数据
         items:
-          $ref: '#/definitions/model.OperationLog'
+          $ref: '#/definitions/handle.ArticleSearchVO'
         type: array
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-array_model_OptionVO:
+  handle.Response-array_handle_MenuTreeVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/handle.MenuTreeVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_handle_ResourceTreeVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/handle.ResourceTreeVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_handle_TreeOptionVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/handle.TreeOptionVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_Article:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_CategoryVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.CategoryVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_CommentVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.CommentVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_FriendLink:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.FriendLink'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_Message:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.Message'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_OptionVO:
     properties:
       code:
         description: 业务状态码
@@ -193,7 +693,7 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-array_model_Page:
+  handle.Response-array_model_Page:
     properties:
       code:
         description: 业务状态码
@@ -207,109 +707,255 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-handler_PageResult-model_CategoryVO:
+  handle.Response-array_model_TagVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.TagVO'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-array_model_UserAuth:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        items:
+          $ref: '#/definitions/model.UserAuth'
+        type: array
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_BlogHomeVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/handler.PageResult-model_CategoryVO'
+        - $ref: '#/definitions/handle.BlogHomeVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-handler_PageResult-model_FriendLink:
+  handle.Response-handle_LoginVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/handler.PageResult-model_FriendLink'
+        - $ref: '#/definitions/handle.LoginVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-handler_PageResult-model_Message:
+  handle.Response-handle_PageResult-handle_ArchiveVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/handler.PageResult-model_Message'
+        - $ref: '#/definitions/handle.PageResult-handle_ArchiveVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-handler_PageResult-model_RoleVO:
+  handle.Response-handle_PageResult-handle_ArticleVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/handler.PageResult-model_RoleVO'
+        - $ref: '#/definitions/handle.PageResult-handle_ArticleVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-handler_PageResult-model_TagVO:
+  handle.Response-handle_PageResult-model_CategoryVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/handler.PageResult-model_TagVO'
+        - $ref: '#/definitions/handle.PageResult-model_CategoryVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-int:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        description: 响应数据
-        type: integer
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  handler.Response-int64:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        description: 响应数据
-        type: integer
-      message:
-        description: 响应消息
-        type: string
-    type: object
-  handler.Response-model_BlogHomeVO:
+  handle.Response-handle_PageResult-model_Comment:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/model.BlogHomeVO'
+        - $ref: '#/definitions/handle.PageResult-model_Comment'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_Category:
+  handle.Response-handle_PageResult-model_CommentVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_CommentVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_FriendLink:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_FriendLink'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_Message:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_Message'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_OperationLog:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_OperationLog'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_RoleVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_RoleVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_TagVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_TagVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_UserAuth:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_UserAuth'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-int64:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        description: 响应数据
+        type: integer
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-map_string_string:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/map_string_string'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-model_Article:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.Article'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-model_BlogArticleVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.BlogArticleVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-model_Category:
     properties:
       code:
         description: 业务状态码
@@ -322,20 +968,20 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_CommentVO:
+  handle.Response-model_Comment:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/model.CommentVO'
+        - $ref: '#/definitions/model.Comment'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_FriendLink:
+  handle.Response-model_FriendLink:
     properties:
       code:
         description: 业务状态码
@@ -348,33 +994,33 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_LoginVO:
+  handle.Response-model_FrontHomeVO:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/model.LoginVO'
+        - $ref: '#/definitions/model.FrontHomeVO'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_OptionVO:
+  handle.Response-model_Message:
     properties:
       code:
         description: 业务状态码
         type: integer
       data:
         allOf:
-        - $ref: '#/definitions/model.OptionVO'
+        - $ref: '#/definitions/model.Message'
         description: 响应数据
       message:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_Page:
+  handle.Response-model_Page:
     properties:
       code:
         description: 业务状态码
@@ -387,7 +1033,7 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-model_Tag:
+  handle.Response-model_Tag:
     properties:
       code:
         description: 业务状态码
@@ -400,7 +1046,20 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.Response-string:
+  handle.Response-model_UserInfoVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/model.UserInfoVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-string:
     properties:
       code:
         description: 业务状态码
@@ -412,21 +1071,99 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handler.UpdateReviewReq:
+  handle.SoftDeleteReq:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+      is_delete:
+        type: boolean
+    type: object
+  handle.TreeOptionVO:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/handle.TreeOptionVO'
+        type: array
+      key:
+        type: integer
+      label:
+        type: string
+    type: object
+  handle.UpdateArticleTopReq:
+    properties:
+      id:
+        type: integer
+      is_top:
+        type: boolean
+    type: object
+  handle.UpdateCurrentPasswordReq:
+    properties:
+      new_password:
+        maxLength: 20
+        minLength: 4
+        type: string
+      old_password:
+        maxLength: 20
+        minLength: 4
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  handle.UpdateCurrentUserReq:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      intro:
+        type: string
+      nickname:
+        type: string
+      website:
+        type: string
+    required:
+    - nickname
+    type: object
+  handle.UpdateReviewReq:
     properties:
       ids:
         items:
           type: integer
         type: array
       is_review:
-        maximum: 1
-        minimum: 0
+        type: boolean
+    type: object
+  handle.UpdateUserDisableReq:
+    properties:
+      id:
         type: integer
+      is_disable:
+        type: boolean
+    type: object
+  handle.UpdateUserReq:
+    properties:
+      id:
+        type: integer
+      nickname:
+        type: string
+      role_ids:
+        items:
+          type: integer
+        type: array
     required:
-    - is_review
+    - nickname
+    type: object
+  map_string_string:
+    additionalProperties:
+      type: string
     type: object
   model.Article:
     properties:
+      category:
+        $ref: '#/definitions/model.Category'
       category_id:
         type: integer
       content:
@@ -440,41 +1177,106 @@ definitions:
       img:
         type: string
       is_delete:
-        type: integer
+        type: boolean
       is_top:
-        type: integer
+        type: boolean
       original_url:
         type: string
       status:
+        description: 1-公开 2-私密
         type: integer
+      tags:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
       title:
         type: string
       type:
+        description: 1-原创 2-转载 3-翻译
         type: integer
       updated_at:
         type: string
-      user_id:
-        type: integer
+      user:
+        $ref: '#/definitions/model.UserAuth'
     type: object
-  model.BlogHomeVO:
+  model.ArticlePaginationVO:
     properties:
-      article_count:
-        description: 文章数量
+      id:
         type: integer
-      message_count:
-        description: 留言数量
+      img:
+        type: string
+      title:
+        type: string
+    type: object
+  model.BlogArticleVO:
+    properties:
+      category:
+        $ref: '#/definitions/model.Category'
+      category_id:
         type: integer
-      user_count:
-        description: 用户数量
+      comment_count:
+        description: 评论数量
         type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      is_delete:
+        type: boolean
+      is_top:
+        type: boolean
+      last_article:
+        allOf:
+        - $ref: '#/definitions/model.ArticlePaginationVO'
+        description: 上一篇
+      like_count:
+        description: 点赞数量
+        type: integer
+      newest_articles:
+        description: 最新文章
+        items:
+          $ref: '#/definitions/model.RecommendArticleVO'
+        type: array
+      next_article:
+        allOf:
+        - $ref: '#/definitions/model.ArticlePaginationVO'
+        description: 下一篇
+      original_url:
+        type: string
+      recommend_articles:
+        description: 推荐文章
+        items:
+          $ref: '#/definitions/model.RecommendArticleVO'
+        type: array
+      status:
+        description: 1-公开 2-私密
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      title:
+        type: string
+      type:
+        description: 1-原创 2-转载 3-翻译
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/model.UserAuth'
       view_count:
-        description: 访问量
+        description: 访问数量
         type: integer
     type: object
   model.Category:
     properties:
       articles:
-        description: 重写外键
         items:
           $ref: '#/definitions/model.Article'
         type: array
@@ -490,8 +1292,11 @@ definitions:
   model.CategoryVO:
     properties:
       article_count:
-        description: 文章数量
         type: integer
+      articles:
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
       created_at:
         type: string
       id:
@@ -501,12 +1306,10 @@ definitions:
       updated_at:
         type: string
     type: object
-  model.CommentVO:
+  model.Comment:
     properties:
-      article_title:
-        type: string
-      avatar:
-        type: string
+      article:
+        $ref: '#/definitions/model.Article'
       content:
         type: string
       created_at:
@@ -514,12 +1317,73 @@ definitions:
       id:
         type: integer
       is_review:
+        type: boolean
+      parent_id:
+        description: 父评论 被回复的评论
         type: integer
-      nickname:
-        type: string
-      reply_nickname:
-        type: string
+      reply_user:
+        $ref: '#/definitions/model.UserAuth'
+      reply_user_id:
+        description: 被回复者
+        type: integer
+      topic_id:
+        description: 评论的文章
+        type: integer
       type:
+        description: 评论类型 1.文章 2.友链 3.说说
+        type: integer
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/model.UserAuth'
+        description: Belongs To
+      user_id:
+        description: 评论者
+        type: integer
+    type: object
+  model.CommentVO:
+    properties:
+      article:
+        $ref: '#/definitions/model.Article'
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_review:
+        type: boolean
+      like_count:
+        type: integer
+      parent_id:
+        description: 父评论 被回复的评论
+        type: integer
+      reply_count:
+        type: integer
+      reply_list:
+        items:
+          $ref: '#/definitions/model.CommentVO'
+        type: array
+      reply_user:
+        $ref: '#/definitions/model.UserAuth'
+      reply_user_id:
+        description: 被回复者
+        type: integer
+      topic_id:
+        description: 评论的文章
+        type: integer
+      type:
+        description: 评论类型 1.文章 2.友链 3.说说
+        type: integer
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/model.UserAuth'
+        description: Belongs To
+      user_id:
+        description: 评论者
         type: integer
     type: object
   model.FriendLink:
@@ -539,42 +1403,78 @@ definitions:
       updated_at:
         type: string
     type: object
-  model.LoginVO:
+  model.FrontHomeVO:
     properties:
-      article_like_set:
-        description: '点赞 Set: 用于记录用户点赞过的文章, 评论'
-        items:
+      article_count:
+        description: 文章数量
+        type: integer
+      blog_config:
+        additionalProperties:
           type: string
-        type: array
-      avatar:
+        description: 博客信息
+        type: object
+      category_count:
+        description: 分类数量
+        type: integer
+      message_count:
+        description: 留言数量
+        type: integer
+      tag_count:
+        description: 标签数量
+        type: integer
+      user_count:
+        description: 用户数量
+        type: integer
+      view_count:
+        description: 访问量
+        type: integer
+    type: object
+  model.Menu:
+    properties:
+      component:
+        description: 组件路径
         type: string
-      comment_like_set:
-        items:
-          type: string
-        type: array
-      email:
+      created_at:
+        type: string
+      external_link:
+        description: 外链地址
+        type: string
+      icon:
+        description: 图标
         type: string
       id:
         type: integer
-      intro:
+      is_catalogue:
+        description: 是否为目录
+        type: boolean
+      is_external:
+        description: 是否外链
+        type: boolean
+      is_hidden:
+        description: 是否隐藏
+        type: boolean
+      keep_alive:
+        description: 是否缓存
+        type: boolean
+      name:
+        description: 菜单名称
         type: string
-      ip_address:
-        type: string
-      ip_source:
-        type: string
-      last_login_time:
-        type: string
-      login_type:
+      order_num:
+        description: 排序
         type: integer
-      nickname:
-        type: string
-      token:
-        type: string
-      user_info_id:
+      parent_id:
         type: integer
-      username:
+      path:
+        description: 路由地址
         type: string
-      website:
+      redirect:
+        description: 重定向地址
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      updated_at:
         type: string
     type: object
   model.Message:
@@ -592,7 +1492,7 @@ definitions:
       ip_source:
         type: string
       is_review:
-        type: integer
+        type: boolean
       nickname:
         type: string
       speed:
@@ -655,6 +1555,67 @@ definitions:
       updated_at:
         type: string
     type: object
+  model.RecommendArticleVO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      title:
+        type: string
+    type: object
+  model.Resource:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_anonymous:
+        type: boolean
+      name:
+        type: string
+      parent_id:
+        type: integer
+      request_method:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  model.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_disable:
+        type: boolean
+      label:
+        type: string
+      menus:
+        items:
+          $ref: '#/definitions/model.Menu'
+        type: array
+      name:
+        type: string
+      resources:
+        items:
+          $ref: '#/definitions/model.Resource'
+        type: array
+      updated_at:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/model.UserAuth'
+        type: array
+    type: object
   model.RoleVO:
     properties:
       created_at:
@@ -704,50 +1665,97 @@ definitions:
       updated_at:
         type: string
     type: object
+  model.UserAuth:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      info:
+        $ref: '#/definitions/model.UserInfo'
+      ip_address:
+        type: string
+      ip_source:
+        type: string
+      is_disable:
+        type: boolean
+      is_super:
+        description: 超级管理员只能后台设置
+        type: boolean
+      last_login_time:
+        type: string
+      login_type:
+        type: integer
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+      updated_at:
+        type: string
+      user_info_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  model.UserInfo:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      nickname:
+        type: string
+      updated_at:
+        type: string
+      website:
+        type: string
+    type: object
+  model.UserInfoVO:
+    properties:
+      article_like_set:
+        items:
+          type: string
+        type: array
+      avatar:
+        type: string
+      comment_like_set:
+        items:
+          type: string
+        type: array
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      nickname:
+        type: string
+      updated_at:
+        type: string
+      website:
+        type: string
+    type: object
 info:
   contact: {}
+  description: gin-vue-blog 后端接口文档。业务状态码 0 表示成功, 其他表示失败, HTTP 状态码统一为 200
+  title: gin-vue-blog API
+  version: "1.0"
 paths:
-  /about:
-    get:
-      description: 获取关于
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.Response-string'
-      summary: 获取关于
-      tags:
-      - blog_info
-    put:
-      consumes:
-      - application/json
-      description: 更新关于
-      parameters:
-      - description: 关于
-        in: body
-        name: data
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: ""
-          schema:
-            $ref: '#/definitions/handler.Response-string'
-      summary: 更新关于
-      tags:
-      - blog_info
-  /category:
+  /article:
     delete:
       consumes:
       - application/json
-      description: 根据 ID 数组删除留言
+      description: 根据 ID 数组物理删除文章, 同时删除文章标签关联
       parameters:
-      - description: 留言 ID 数组
+      - description: 文章 ID 数组
         in: body
         name: ids
         required: true
@@ -761,103 +1769,282 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
-      summary: 删除留言（批量）
+      summary: 物理删除文章（批量）
+      tags:
+      - Article
+    post:
+      consumes:
+      - application/json
+      description: 新增或编辑文章, 分类和标签不存在时按名称自动创建
+      parameters:
+      - description: 新增或编辑文章
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.AddOrEditArticleReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_Article'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增或编辑文章
+      tags:
+      - Article
+  /article/{id}:
+    get:
+      description: 根据 ID 获取文章详情, 包含分类和标签
+      parameters:
+      - description: 文章 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_Article'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取文章详情
+      tags:
+      - Article
+  /article/export:
+    post:
+      description: 目前由前端导出, 后端只返回空数据
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 导出文章
+      tags:
+      - Article
+  /article/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传 Markdown 文件导入文章, 文件名作为标题, 导入后为草稿
+      parameters:
+      - description: Markdown 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 导入文章
+      tags:
+      - Article
+  /article/list:
+    get:
+      description: 后台文章列表, 支持标题/分类/标签/类型/状态/回收站过滤
+      parameters:
+      - description: 标题关键字
+        in: query
+        name: title
+        type: string
+      - description: 分类 ID
+        in: query
+        name: category_id
+        type: integer
+      - description: 标签 ID
+        in: query
+        name: tag_id
+        type: integer
+      - description: 类型(1-原创 2-转载 3-翻译)
+        in: query
+        name: type
+        type: integer
+      - description: 状态(1-公开 2-私密 3-草稿)
+        in: query
+        name: status
+        type: integer
+      - description: 是否在回收站
+        in: query
+        name: is_delete
+        type: boolean
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-handle_ArticleVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询文章列表
+      tags:
+      - Article
+  /article/soft-delete:
+    put:
+      consumes:
+      - application/json
+      description: 将文章移入或移出回收站
+      parameters:
+      - description: 软删除文章
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.SoftDeleteReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 软删除文章（批量）
+      tags:
+      - Article
+  /article/top:
+    put:
+      consumes:
+      - application/json
+      description: 修改文章置顶状态
+      parameters:
+      - description: 修改置顶
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateArticleTopReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改文章置顶
+      tags:
+      - Article
+  /category:
+    delete:
+      consumes:
+      - application/json
+      description: 分类下存在文章时不允许删除
+      parameters:
+      - description: 分类 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除分类（批量）
       tags:
       - Category
     post:
       consumes:
       - application/json
-      description: 添加或修改分类
+      description: 分类名称不能重复
       parameters:
-      - description: 添加或修改分类
+      - description: 新增或编辑分类
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.AddOrEditCategoryReq'
+          $ref: '#/definitions/handle.AddOrEditCategoryReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_Category'
+            $ref: '#/definitions/handle.Response-model_Category'
       security:
       - ApiKeyAuth: []
-      summary: 添加或修改分类
+      summary: 新增或编辑分类
       tags:
       - Category
   /category/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询获取分类列表
+      description: 分类列表, 附带每个分类下的文章数
       parameters:
-      - description: 当前页数
-        in: query
-        name: page_size
-        type: integer
-      - description: 每页条数
-        in: query
-        name: page_num
-        type: integer
-      - description: 搜索关键字
+      - description: 关键字
         in: query
         name: keyword
         type: string
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-handler_PageResult-model_CategoryVO'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_CategoryVO'
       security:
       - ApiKeyAuth: []
-      summary: 获取分类列表
+      summary: 条件查询分类列表
       tags:
       - Category
   /category/option:
     get:
-      consumes:
-      - application/json
-      description: 获取标签选项列表
+      description: 用于文章选择分类
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-array_model_OptionVO'
+            $ref: '#/definitions/handle.Response-array_model_OptionVO'
       security:
       - ApiKeyAuth: []
-      summary: 获取分类选项列表
+      summary: 获取分类选项
       tags:
       - Category
-  /code:
-    get:
-      consumes:
-      - application/json
-      description: 发送邮箱验证码
-      parameters:
-      - description: 邮箱
-        in: query
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: ""
-          schema:
-            type: string
-      summary: 发送邮箱验证码
-      tags:
-      - UserAuth
   /comment:
     delete:
       consumes:
@@ -878,16 +2065,15 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: 删除评论（批量）
       tags:
       - Comment
+  /comment/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询评论列表
+      description: 支持按昵称/审核状态/类型过滤
       parameters:
       - description: 昵称
         in: query
@@ -896,8 +2082,8 @@ paths:
       - description: 审核状态
         in: query
         name: is_review
-        type: integer
-      - description: 评论类型
+        type: boolean
+      - description: 评论类型(1-文章 2-友链 3-说说)
         in: query
         name: type
         type: integer
@@ -915,7 +2101,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_CommentVO'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_Comment'
       security:
       - ApiKeyAuth: []
       summary: 条件查询评论列表
@@ -932,39 +2118,486 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.UpdateReviewReq'
+          $ref: '#/definitions/handle.UpdateReviewReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-any'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: 修改评论审核（批量）
       tags:
       - Comment
-  /home:
+  /config:
     get:
-      description: 获取博客首页信息
+      description: 获取博客配置, 优先读 Redis 缓存
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_BlogHomeVO'
-      summary: 获取博客首页信息
+            $ref: '#/definitions/handle.Response-map_string_string'
+      summary: 获取博客配置
       tags:
-      - blog_info
+      - BlogInfo
+    patch:
+      consumes:
+      - application/json
+      description: 更新博客配置, 同时清除 Redis 缓存
+      parameters:
+      - description: 博客配置
+        in: body
+        name: form
+        required: true
+        schema:
+          additionalProperties:
+            type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新博客配置
+      tags:
+      - BlogInfo
+  /email/verify:
+    get:
+      description: 点击邮件中的链接完成注册, 返回 HTML 页面
+      parameters:
+      - description: 注册信息(加密后的帐号密码)
+        in: query
+        name: info
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: 注册结果页面
+          schema:
+            type: string
+      summary: 邮箱验证
+      tags:
+      - UserAuth
+  /front/about:
+    get:
+      description: 获取关于我的内容
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-string'
+      summary: 获取关于我
+      tags:
+      - BlogInfo
+  /front/article/{id}:
+    get:
+      description: 文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同时浏览量 +1
+      parameters:
+      - description: 文章 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_BlogArticleVO'
+      summary: 前台文章详情
+      tags:
+      - Front
+  /front/article/archive:
+    get:
+      description: 按时间归档的文章列表
+      parameters:
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-handle_ArchiveVO'
+      summary: 前台文章归档
+      tags:
+      - Front
+  /front/article/like/{article_id}:
+    get:
+      description: 点赞/取消点赞文章, 需要登录
+      parameters:
+      - description: 文章 ID
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 点赞文章
+      tags:
+      - Front
+  /front/article/list:
+    get:
+      description: 只返回公开且不在回收站的文章
+      parameters:
+      - description: 分类 ID
+        in: query
+        name: category_id
+        type: integer
+      - description: 标签 ID
+        in: query
+        name: tag_id
+        type: integer
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_Article'
+      summary: 前台文章列表
+      tags:
+      - Front
+  /front/article/search:
+    get:
+      description: 按关键字搜索标题和内容, 命中处高亮
+      parameters:
+      - description: 搜索关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_handle_ArticleSearchVO'
+      summary: 搜索文章
+      tags:
+      - Front
+  /front/category/list:
+    get:
+      description: 获取全部分类
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_CategoryVO'
+      summary: 前台分类列表
+      tags:
+      - Front
+  /front/comment:
+    post:
+      consumes:
+      - application/json
+      description: 新增评论或回复评论, 需要登录
+      parameters:
+      - description: 新增评论
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.FAddCommentReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_Comment'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增评论
+      tags:
+      - Front
+  /front/comment/like/{comment_id}:
+    get:
+      description: 点赞/取消点赞评论, 需要登录
+      parameters:
+      - description: 评论 ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 点赞评论
+      tags:
+      - Front
+  /front/comment/list:
+    get:
+      description: 顶级评论列表, 每条最多带 3 条回复
+      parameters:
+      - description: 主题 ID(文章/说说)
+        in: query
+        name: topic_id
+        type: integer
+      - description: 评论类型(1-文章 2-友链 3-说说)
+        in: query
+        name: type
+        type: integer
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_CommentVO'
+      summary: 前台评论列表
+      tags:
+      - Front
+  /front/comment/replies/{comment_id}:
+    get:
+      description: 根据评论 ID 分页查询其回复
+      parameters:
+      - description: 评论 ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_CommentVO'
+      summary: 获取评论的回复列表
+      tags:
+      - Front
+  /front/home:
+    get:
+      description: 文章数, 分类数, 标签数, 公告与访问量
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_FrontHomeVO'
+      summary: 前台首页信息
+      tags:
+      - Front
+  /front/link/list:
+    get:
+      description: 获取全部友链
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_FriendLink'
+      summary: 前台友链列表
+      tags:
+      - Front
+  /front/message:
+    post:
+      consumes:
+      - application/json
+      description: 新增留言, 需要登录, 是否需要审核取决于博客配置
+      parameters:
+      - description: 新增留言
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.FAddMessageReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_Message'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增留言
+      tags:
+      - Front
+  /front/message/list:
+    get:
+      description: 只返回审核通过的留言
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_Message'
+      summary: 前台留言列表
+      tags:
+      - Front
+  /front/page:
+    get:
+      description: 获取页面列表, 优先读 Redis 缓存
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_Page'
+      summary: 获取页面列表
+      tags:
+      - Page
+  /front/tag/list:
+    get:
+      description: 获取全部标签
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_TagVO'
+      summary: 前台标签列表
+      tags:
+      - Front
+  /front/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传文件到本地或七牛云, 返回访问地址
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-string'
+      security:
+      - ApiKeyAuth: []
+      summary: 上传文件
+      tags:
+      - Upload
+  /front/user/info:
+    get:
+      description: 根据 Token 获取用户信息与点赞记录
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_UserInfoVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取当前用户信息
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: 修改昵称/头像/简介/网站, 用户 ID 从 Token 中解析
+      parameters:
+      - description: 修改当前用户信息
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateCurrentUserReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改当前用户信息
+      tags:
+      - User
+  /home:
+    get:
+      description: 文章数, 用户数, 留言数, 访问量
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_BlogHomeVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取后台首页信息
+      tags:
+      - BlogInfo
   /link:
     delete:
       consumes:
       - application/json
       description: 根据 ID 数组删除友链
       parameters:
-      - description: 友链ID数组
+      - description: 友链 ID 数组
         in: body
         name: ids
         required: true
@@ -978,7 +2611,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int64'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: 删除友链（批量）
@@ -987,41 +2620,139 @@ paths:
     post:
       consumes:
       - application/json
-      description: 添加或修改友链
+      description: 新增或编辑友链
       parameters:
-      - description: 添加或修改友链
+      - description: 新增或编辑友链
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.AddOrEditLinkReq'
+          $ref: '#/definitions/handle.AddOrEditLinkReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_FriendLink'
+            $ref: '#/definitions/handle.Response-model_FriendLink'
       security:
       - ApiKeyAuth: []
-      summary: 添加或修改友链
+      summary: 新增或编辑友链
       tags:
       - Link
   /link/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询获取友链列表
+      description: 关键字匹配名称/地址/简介
       parameters:
-      - description: 当前页数
+      - description: 关键字
         in: query
-        name: page_size
-        type: integer
-      - description: 每页条数
+        name: keyword
+        type: string
+      - description: 页码
         in: query
         name: page_num
         type: integer
-      - description: 搜索关键字
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_FriendLink'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询友链列表
+      tags:
+      - Link
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 用户名密码登录, 成功后返回 JWT Token
+      parameters:
+      - description: 登录
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_LoginVO'
+      summary: 登录
+      tags:
+      - UserAuth
+  /logout:
+    get:
+      description: 清除 session 与 Redis 中的在线状态
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      summary: 退出登录
+      tags:
+      - UserAuth
+  /menu:
+    post:
+      consumes:
+      - application/json
+      description: 新增或编辑菜单
+      parameters:
+      - description: 新增或编辑菜单
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/model.Menu'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增或编辑菜单
+      tags:
+      - Menu
+  /menu/{id}:
+    delete:
+      description: 被角色使用或存在子菜单时不允许删除
+      parameters:
+      - description: 菜单 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除菜单
+      tags:
+      - Menu
+  /menu/list:
+    get:
+      description: 获取菜单列表, 支持关键字过滤
+      parameters:
+      - description: 关键字
         in: query
         name: keyword
         type: string
@@ -1031,54 +2762,71 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-handler_PageResult-model_FriendLink'
+            $ref: '#/definitions/handle.Response-array_handle_MenuTreeVO'
       security:
       - ApiKeyAuth: []
-      summary: 获取友链列表
+      summary: 获取菜单列表（树形）
       tags:
-      - Link
-  /login:
-    post:
+      - Menu
+  /menu/option:
+    get:
+      description: 用于角色分配菜单
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_handle_TreeOptionVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取菜单选项（树形）
+      tags:
+      - Menu
+  /menu/user/list:
+    get:
+      description: 超级管理员返回全部菜单, 其他用户按角色返回
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_handle_MenuTreeVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取当前用户菜单
+      tags:
+      - Menu
+  /message:
+    delete:
       consumes:
       - application/json
-      description: 登录
+      description: 根据 ID 数组删除留言
       parameters:
-      - description: 登录
+      - description: 留言 ID 数组
         in: body
-        name: form
+        name: ids
         required: true
         schema:
-          $ref: '#/definitions/handler.LoginReq'
+          items:
+            type: integer
+          type: array
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_LoginVO'
-      summary: 登录
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除留言（批量）
       tags:
-      - UserAuth
-  /logout:
-    post:
-      consumes:
-      - application/json
-      description: 退出登录
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: ""
-          schema:
-            type: string
-      summary: 退出登录
-      tags:
-      - UserAuth
+      - Message
   /message/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询留言列表
+      description: 支持按昵称与审核状态过滤
       parameters:
       - description: 昵称
         in: query
@@ -1087,14 +2835,14 @@ paths:
       - description: 审核状态
         in: query
         name: is_review
-        type: integer
-      - description: 当前页数
-        in: query
-        name: page_size
-        type: integer
-      - description: 每页条数
+        type: boolean
+      - description: 页码
         in: query
         name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
         type: integer
       produces:
       - application/json
@@ -1102,7 +2850,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-handler_PageResult-model_Message'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_Message'
       security:
       - ApiKeyAuth: []
       summary: 条件查询留言列表
@@ -1119,14 +2867,14 @@ paths:
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.UpdateReviewReq'
+          $ref: '#/definitions/handle.UpdateReviewReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: 修改留言审核（批量）
@@ -1136,9 +2884,9 @@ paths:
     delete:
       consumes:
       - application/json
-      description: 删除操作日志
+      description: 根据 ID 数组删除操作日志
       parameters:
-      - description: 操作日志ID列表
+      - description: 操作日志 ID 数组
         in: body
         name: ids
         required: true
@@ -1152,18 +2900,20 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
-      summary: 删除操作日志
+      summary: 删除操作日志（批量）
       tags:
       - OperationLog
   /operation/log/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询获取操作日志列表
+      description: 关键字匹配操作模块与操作描述
       parameters:
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
       - description: 页码
         in: query
         name: page_num
@@ -1172,27 +2922,23 @@ paths:
         in: query
         name: page_size
         type: integer
-      - description: 关键字
-        in: query
-        name: keyword
-        type: string
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-array_model_OperationLog'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_OperationLog'
       security:
       - ApiKeyAuth: []
-      summary: 获取操作日志列表
+      summary: 条件查询操作日志列表
       tags:
       - OperationLog
   /page:
     delete:
       consumes:
       - application/json
-      description: 根据 ID 数组删除页面
+      description: 根据 ID 数组删除页面, 同时清除 Redis 缓存
       parameters:
       - description: 页面 ID 数组
         in: body
@@ -1208,49 +2954,45 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
-      summary: 删除页面
+      summary: 删除页面（批量）
       tags:
       - Page
     post:
       consumes:
       - application/json
-      description: 添加或修改页面
+      description: 新增或编辑页面, 同时清除 Redis 缓存
       parameters:
-      - description: 添加或修改页面
+      - description: 新增或编辑页面
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.AddOrEditPageReq'
+          $ref: '#/definitions/model.Page'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_Page'
+            $ref: '#/definitions/handle.Response-model_Page'
       security:
       - ApiKeyAuth: []
-      summary: 添加或修改页面
+      summary: 新增或编辑页面
       tags:
       - Page
   /page/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询获取页面列表
+      description: 获取页面列表, 优先读 Redis 缓存
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-array_model_Page'
-      security:
-      - ApiKeyAuth: []
+            $ref: '#/definitions/handle.Response-array_model_Page'
       summary: 获取页面列表
       tags:
       - Page
@@ -1258,49 +3000,193 @@ paths:
     post:
       consumes:
       - application/json
-      description: 注册
+      description: 校验邮箱是否已注册, 通过后发送验证邮件, 待验证后才真正创建用户
       parameters:
       - description: 注册
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.RegisterReq'
+          $ref: '#/definitions/handle.RegisterReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            type: string
+            $ref: '#/definitions/handle.Response-any'
       summary: 注册
       tags:
       - UserAuth
   /report:
     post:
-      consumes:
-      - application/json
-      description: 用户登进后台时上报信息
-      parameters:
-      - description: 用户信息
-        in: body
-        name: data
-        required: true
-        schema:
-          type: object
+      description: 统计访问量, 独立访客数与访客地域分布
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-any'
-      summary: 上报用户信息
+            $ref: '#/definitions/handle.Response-any'
+      summary: 上报访客信息
       tags:
-      - blog_info
+      - BlogInfo
+  /resource:
+    post:
+      consumes:
+      - application/json
+      description: 新增或编辑接口资源
+      parameters:
+      - description: 新增或编辑资源
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.AddOrEditResourceReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增或编辑资源
+      tags:
+      - Resource
+  /resource/{id}:
+    delete:
+      description: 被角色使用或存在子资源时不允许删除
+      parameters:
+      - description: 资源 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除资源
+      tags:
+      - Resource
+  /resource/anonymous:
+    put:
+      consumes:
+      - application/json
+      description: 修改资源是否允许匿名访问
+      parameters:
+      - description: 修改匿名访问
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.EditAnonymousReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改资源匿名访问
+      tags:
+      - Resource
+  /resource/list:
+    get:
+      description: 获取接口资源列表, 支持关键字过滤
+      parameters:
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_handle_ResourceTreeVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取资源列表（树形）
+      tags:
+      - Resource
+  /resource/option:
+    get:
+      description: 用于角色分配资源
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_handle_TreeOptionVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取资源选项（树形）
+      tags:
+      - Resource
+  /role:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除角色, 同时清理资源与菜单关联
+      parameters:
+      - description: 角色 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除角色（批量）
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: 新增或编辑角色, 同时维护角色的资源与菜单关联
+      parameters:
+      - description: 新增或编辑角色
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.AddOrEditRoleReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 新增或编辑角色
+      tags:
+      - Role
   /role/list:
     get:
-      description: 获取角色列表
+      description: 角色列表, 附带其资源和菜单 ID
       parameters:
       - description: 关键字
         in: query
@@ -1308,11 +3194,11 @@ paths:
         type: string
       - description: 页码
         in: query
-        name: pageNum
+        name: page_num
         type: integer
       - description: 每页数量
         in: query
-        name: pageSize
+        name: page_size
         type: integer
       produces:
       - application/json
@@ -1320,28 +3206,68 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-handler_PageResult-model_RoleVO'
-      summary: 获取角色列表
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_RoleVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询角色列表
       tags:
-      - role
+      - Role
   /role/option:
     get:
-      description: 获取角色选项
+      description: 用于给用户分配角色
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_OptionVO'
+            $ref: '#/definitions/handle.Response-array_model_OptionVO'
+      security:
+      - ApiKeyAuth: []
       summary: 获取角色选项
       tags:
-      - role
+      - Role
+  /setting/about:
+    get:
+      description: 获取关于我的内容
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-string'
+      summary: 获取关于我
+      tags:
+      - BlogInfo
+    put:
+      consumes:
+      - application/json
+      description: 更新关于我的内容
+      parameters:
+      - description: 关于我
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.AboutReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-string'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新关于我
+      tags:
+      - BlogInfo
   /tag:
     delete:
       consumes:
       - application/json
-      description: 根据 ID 数组删除标签
+      description: 标签下存在文章时不允许删除
       parameters:
       - description: 标签 ID 数组
         in: body
@@ -1357,7 +3283,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-int'
+            $ref: '#/definitions/handle.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: 删除标签（批量）
@@ -1366,78 +3292,74 @@ paths:
     post:
       consumes:
       - application/json
-      description: 添加或修改标签
+      description: 标签名称不能重复
       parameters:
-      - description: 添加或修改标签
+      - description: 新增或编辑标签
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/handler.AddOrEditTagReq'
+          $ref: '#/definitions/handle.AddOrEditTagReq'
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_Tag'
+            $ref: '#/definitions/handle.Response-model_Tag'
       security:
       - ApiKeyAuth: []
-      summary: 添加或修改标签
+      summary: 新增或编辑标签
       tags:
       - Tag
   /tag/list:
     get:
-      consumes:
-      - application/json
-      description: 根据条件查询获取标签列表
+      description: 标签列表, 附带每个标签下的文章数
       parameters:
-      - description: 当前页数
-        in: query
-        name: page_size
-        type: integer
-      - description: 每页条数
-        in: query
-        name: page_num
-        type: integer
-      - description: 搜索关键字
+      - description: 关键字
         in: query
         name: keyword
         type: string
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: 成功
-          schema:
-            $ref: '#/definitions/handler.Response-handler_PageResult-model_TagVO'
-      security:
-      - ApiKeyAuth: []
-      summary: 获取标签列表
-      tags:
-      - Tag
-  /tag/option:
-    get:
-      consumes:
-      - application/json
-      description: 获取标签选项列表
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
       produces:
       - application/json
       responses:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-model_OptionVO'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_TagVO'
       security:
       - ApiKeyAuth: []
-      summary: 获取标签选项列表
+      summary: 条件查询标签列表
       tags:
       - Tag
-  /upload/file:
+  /tag/option:
+    get:
+      description: 用于文章选择标签
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_OptionVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取标签选项
+      tags:
+      - Tag
+  /upload:
     post:
       consumes:
       - multipart/form-data
-      description: 上传文件
+      description: 上传文件到本地或七牛云, 返回访问地址
       parameters:
       - description: 文件
         in: formData
@@ -1450,8 +3372,203 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handler.Response-string'
+            $ref: '#/definitions/handle.Response-string'
+      security:
+      - ApiKeyAuth: []
       summary: 上传文件
       tags:
-      - upload
+      - Upload
+  /user:
+    put:
+      consumes:
+      - application/json
+      description: 修改指定用户的昵称与角色
+      parameters:
+      - description: 修改用户信息
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改用户信息
+      tags:
+      - User
+  /user/current:
+    put:
+      consumes:
+      - application/json
+      description: 修改昵称/头像/简介/网站, 用户 ID 从 Token 中解析
+      parameters:
+      - description: 修改当前用户信息
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateCurrentUserReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改当前用户信息
+      tags:
+      - User
+  /user/current/password:
+    put:
+      consumes:
+      - application/json
+      description: 需要提供旧密码进行验证
+      parameters:
+      - description: 修改密码
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateCurrentPasswordReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改当前用户密码
+      tags:
+      - User
+  /user/disable:
+    put:
+      consumes:
+      - application/json
+      description: 禁用或启用用户
+      parameters:
+      - description: 修改禁用状态
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.UpdateUserDisableReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      security:
+      - ApiKeyAuth: []
+      summary: 修改用户禁用状态
+      tags:
+      - User
+  /user/info:
+    get:
+      description: 根据 Token 获取用户信息与点赞记录
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-model_UserInfoVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取当前用户信息
+      tags:
+      - User
+  /user/list:
+    get:
+      description: 支持按登录类型/用户名/昵称过滤
+      parameters:
+      - description: 登录类型
+        in: query
+        name: login_type
+        type: integer
+      - description: 用户名
+        in: query
+        name: username
+        type: string
+      - description: 昵称
+        in: query
+        name: nickname
+        type: string
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_UserAuth'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询用户列表
+      tags:
+      - User
+  /user/offline/{id}:
+    post:
+      description: 强制指定用户下线, 不能强制自己下线
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-string'
+      security:
+      - ApiKeyAuth: []
+      summary: 强制用户下线
+      tags:
+      - User
+  /user/online:
+    get:
+      description: 从 Redis 中读取在线用户, 按上次登录时间倒序
+      parameters:
+      - description: 用户名或昵称关键字
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-array_model_UserAuth'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取在线用户列表
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

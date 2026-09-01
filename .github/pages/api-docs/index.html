@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gin-vue-blog API 文档</title>
+  <link rel="stylesheet" href="./swagger-ui.css">
+  <style>
+    body { margin: 0; }
+    .topbar { display: none; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="./swagger-ui-bundle.js"></script>
+  <script src="./swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: './swagger.json',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        docExpansion: 'none',
+        defaultModelsExpandDepth: -1,
+        // 静态托管没有后端服务, 隐藏 Try it out 避免误以为可以直接调用
+        supportedSubmitMethods: [],
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+      })
+    }
+  </script>
+</body>
+</html>

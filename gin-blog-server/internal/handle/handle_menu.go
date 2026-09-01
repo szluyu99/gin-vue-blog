@@ -18,7 +18,13 @@ type MenuTreeVO struct {
 	Children []MenuTreeVO `json:"children"`
 }
 
-// 获取当前用户菜单: 生成后台管理界面的菜单
+// @Summary 获取当前用户菜单
+// @Description 超级管理员返回全部菜单, 其他用户按角色返回
+// @Tags Menu
+// @Produce json
+// @Success 0 {object} Response[[]MenuTreeVO]
+// @Security ApiKeyAuth
+// @Router /menu/user/list [get]
 func (*Menu) GetUserMenu(c *gin.Context) {
 	db := GetDB(c)
 	auth, ok := MustCurrentUserAuth(c)
@@ -43,6 +49,14 @@ func (*Menu) GetUserMenu(c *gin.Context) {
 	ReturnSuccess(c, menus2MenuVos(menus))
 }
 
+// @Summary 获取菜单列表（树形）
+// @Description 获取菜单列表, 支持关键字过滤
+// @Tags Menu
+// @Produce json
+// @Param keyword query string false "关键字"
+// @Success 0 {object} Response[[]MenuTreeVO]
+// @Security ApiKeyAuth
+// @Router /menu/list [get]
 func (*Menu) GetTreeList(c *gin.Context) {
 	keyword := c.Query("keyword")
 
@@ -55,6 +69,15 @@ func (*Menu) GetTreeList(c *gin.Context) {
 	ReturnSuccess(c, menus2MenuVos(menuList))
 }
 
+// @Summary 新增或编辑菜单
+// @Description 新增或编辑菜单
+// @Tags Menu
+// @Accept json
+// @Produce json
+// @Param form body model.Menu true "新增或编辑菜单"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /menu [post]
 func (*Menu) SaveOrUpdate(c *gin.Context) {
 	var req model.Menu
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -70,6 +93,14 @@ func (*Menu) SaveOrUpdate(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
+// @Summary 删除菜单
+// @Description 被角色使用或存在子菜单时不允许删除
+// @Tags Menu
+// @Produce json
+// @Param id path int true "菜单 ID"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /menu/{id} [delete]
 func (*Menu) Delete(c *gin.Context) {
 	menuId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -114,6 +145,13 @@ func (*Menu) Delete(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
+// @Summary 获取菜单选项（树形）
+// @Description 用于角色分配菜单
+// @Tags Menu
+// @Produce json
+// @Success 0 {object} Response[[]TreeOptionVO]
+// @Security ApiKeyAuth
+// @Router /menu/option [get]
 func (*Menu) GetOption(c *gin.Context) {
 	menus, _, err := model.GetMenuList(GetDB(c), "")
 	if err != nil {

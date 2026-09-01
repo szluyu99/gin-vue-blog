@@ -22,10 +22,11 @@ type AddOrEditRoleReq struct {
 }
 
 // @Summary 获取角色选项
-// @Description 获取角色选项
-// @Tags role
+// @Description 用于给用户分配角色
+// @Tags Role
 // @Produce json
-// @Success 0 {object} Response[model.OptionVO]
+// @Success 0 {object} Response[[]model.OptionVO]
+// @Security ApiKeyAuth
 // @Router /role/option [get]
 func (*Role) GetOption(c *gin.Context) {
 	list, err := model.GetRoleOption(GetDB(c))
@@ -37,14 +38,15 @@ func (*Role) GetOption(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
-// @Summary 获取角色列表
-// @Description 获取角色列表
-// @Tags role
+// @Summary 条件查询角色列表
+// @Description 角色列表, 附带其资源和菜单 ID
+// @Tags Role
 // @Produce json
 // @Param keyword query string false "关键字"
-// @Param pageNum query int false "页码"
-// @Param pageSize query int false "每页数量"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
 // @Success 0 {object} Response[PageResult[model.RoleVO]]
+// @Security ApiKeyAuth
 // @Router /role/list [get]
 func (*Role) GetTreeList(c *gin.Context) {
 	var query PageQuery
@@ -77,6 +79,15 @@ func (*Role) GetTreeList(c *gin.Context) {
 	})
 }
 
+// @Summary 新增或编辑角色
+// @Description 新增或编辑角色, 同时维护角色的资源与菜单关联
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param form body AddOrEditRoleReq true "新增或编辑角色"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /role [post]
 func (*Role) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditRoleReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -103,6 +114,15 @@ func (*Role) SaveOrUpdate(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
+// @Summary 删除角色（批量）
+// @Description 根据 ID 数组删除角色, 同时清理资源与菜单关联
+// @Tags Role
+// @Accept json
+// @Produce json
+// @Param ids body []int true "角色 ID 数组"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /role [delete]
 func (*Role) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {

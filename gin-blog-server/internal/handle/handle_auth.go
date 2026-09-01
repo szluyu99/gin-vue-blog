@@ -38,12 +38,12 @@ type LoginVO struct {
 }
 
 // @Summary 登录
-// @Description 登录
+// @Description 用户名密码登录, 成功后返回 JWT Token
 // @Tags UserAuth
-// @Param form body LoginReq true "登录"
 // @Accept json
 // @Produce json
-// @Success 0 {object} Response[model.LoginVO]
+// @Param form body LoginReq true "登录"
+// @Success 0 {object} Response[LoginVO]
 // @Router /login [post]
 func (*UserAuth) Login(c *gin.Context) {
 	var req LoginReq
@@ -146,12 +146,11 @@ func (*UserAuth) Login(c *gin.Context) {
 }
 
 // @Summary 退出登录
-// @Description 退出登录
+// @Description 清除 session 与 Redis 中的在线状态
 // @Tags UserAuth
-// @Accept json
 // @Produce json
-// @Success 0 {object} string
-// @Router /logout [post]
+// @Success 0 {object} Response[any]
+// @Router /logout [get]
 func (*UserAuth) Logout(c *gin.Context) {
 	c.Set(g.CTX_USER_AUTH, nil)
 
@@ -177,6 +176,14 @@ func (*UserAuth) Logout(c *gin.Context) {
 // 完成注册功能
 // 首先检查用户名是否存在，避免重复注册；其次把用户输入的信息加密保存在redis中，等待验证
 // 在以下情况下会出错：1. 用户邮箱已经注册过 2.用户邮箱无效等原因导致的发送邮件失败
+// @Summary 注册
+// @Description 校验邮箱是否已注册, 通过后发送验证邮件, 待验证后才真正创建用户
+// @Tags UserAuth
+// @Accept json
+// @Produce json
+// @Param form body RegisterReq true "注册"
+// @Success 0 {object} Response[any]
+// @Router /register [post]
 func (*UserAuth) Register(c *gin.Context) {
 	var regreq RegisterReq
 	if err := c.ShouldBindJSON(&regreq); err != nil {
@@ -221,6 +228,13 @@ func (*UserAuth) Register(c *gin.Context) {
 // 当用户点击邮箱中的链接时，会携带info（加密后的帐号密码）向这个接口发送请求。
 // Verify会检查info是否存在redis中，若存在则认证成功，完成注册
 // 会在以下方面出错： 1. 发送信息中没有info 2. info不存在redis中(已过期) 3. 创造新用户失败
+// @Summary 邮箱验证
+// @Description 点击邮件中的链接完成注册, 返回 HTML 页面
+// @Tags UserAuth
+// @Produce html
+// @Param info query string true "注册信息(加密后的帐号密码)"
+// @Success 200 {string} string "注册结果页面"
+// @Router /email/verify [get]
 func (*UserAuth) VerifyCode(c *gin.Context) {
 	var code string
 	if code = c.Query("info"); code == "" {

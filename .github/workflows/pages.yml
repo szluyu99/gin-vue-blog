@@ -60,6 +60,18 @@ jobs:
           # 产物中存在下划线开头的文件, 禁用 Jekyll 处理避免被忽略
           touch site/.nojekyll
 
+      # 接口文档只是静态页面 + swagger.json, 不需要起后端
+      - name: Assemble API docs (/api-docs/)
+        run: |
+          npm install swagger-ui-dist@5.32.14 --no-save --silent
+          mkdir -p site/api-docs
+          cp .github/pages/api-docs/index.html site/api-docs/
+          cp gin-blog-server/docs/swagger.json site/api-docs/
+          cp node_modules/swagger-ui-dist/swagger-ui.css \
+             node_modules/swagger-ui-dist/swagger-ui-bundle.js \
+             node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js \
+             site/api-docs/
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

@@ -29,6 +29,12 @@ type AboutReq struct {
 	Content string `json:"content"`
 }
 
+// @Summary 获取博客配置
+// @Description 获取博客配置, 优先读 Redis 缓存
+// @Tags BlogInfo
+// @Produce json
+// @Success 0 {object} Response[map[string]string]
+// @Router /config [get]
 func (*BlogInfo) GetConfigMap(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
@@ -62,6 +68,15 @@ func (*BlogInfo) GetConfigMap(c *gin.Context) {
 	ReturnSuccess(c, data)
 }
 
+// @Summary 更新博客配置
+// @Description 更新博客配置, 同时清除 Redis 缓存
+// @Tags BlogInfo
+// @Accept json
+// @Produce json
+// @Param form body map[string]string true "博客配置"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /config [patch]
 func (*BlogInfo) UpdateConfig(c *gin.Context) {
 	var m map[string]string
 	if err := c.ShouldBindJSON(&m); err != nil {
@@ -83,11 +98,12 @@ func (*BlogInfo) UpdateConfig(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
-// @Summary 获取博客首页信息
-// @Description 获取博客首页信息
-// @Tags blog_info
+// @Summary 获取后台首页信息
+// @Description 文章数, 用户数, 留言数, 访问量
+// @Tags BlogInfo
 // @Produce json
-// @Success 0 {object} Response[model.BlogHomeVO]
+// @Success 0 {object} Response[BlogHomeVO]
+// @Security ApiKeyAuth
 // @Router /home [get]
 func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 	db := GetDB(c)
@@ -123,24 +139,26 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 	})
 }
 
-// @Summary 获取关于
-// @Description 获取关于
-// @Tags blog_info
+// @Summary 获取关于我
+// @Description 获取关于我的内容
+// @Tags BlogInfo
 // @Produce json
 // @Success 0 {object} Response[string]
-// @Router /about [get]
+// @Router /setting/about [get]
+// @Router /front/about [get]
 func (*BlogInfo) GetAbout(c *gin.Context) {
 	ReturnSuccess(c, model.GetConfig(GetDB(c), g.CONFIG_ABOUT))
 }
 
-// @Summary 更新关于
-// @Description 更新关于
-// @Tags blog_info
+// @Summary 更新关于我
+// @Description 更新关于我的内容
+// @Tags BlogInfo
 // @Accept json
 // @Produce json
-// @Param data body object true "关于"
+// @Param form body AboutReq true "关于我"
 // @Success 0 {object} Response[string]
-// @Router /about [put]
+// @Security ApiKeyAuth
+// @Router /setting/about [put]
 func (*BlogInfo) UpdateAbout(c *gin.Context) {
 	var req AboutReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -157,12 +175,10 @@ func (*BlogInfo) UpdateAbout(c *gin.Context) {
 	ReturnSuccess(c, req.Content)
 }
 
-// @Summary 上报用户信息
-// @Description 用户登进后台时上报信息
-// @Tags blog_info
-// @Accept json
+// @Summary 上报访客信息
+// @Description 统计访问量, 独立访客数与访客地域分布
+// @Tags BlogInfo
 // @Produce json
-// @Param data body object true "用户信息"
 // @Success 0 {object} Response[any]
 // @Router /report [post]
 func (*BlogInfo) Report(c *gin.Context) {

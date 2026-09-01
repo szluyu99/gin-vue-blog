@@ -24,13 +24,13 @@ type Message struct{}
 
 // @Summary 删除留言（批量）
 // @Description 根据 ID 数组删除留言
-// @Tags Category
-// @Param ids body []int true "留言 ID 数组"
+// @Tags Message
 // @Accept json
 // @Produce json
-// @Success 0 {object} Response[int]
+// @Param ids body []int true "留言 ID 数组"
+// @Success 0 {object} Response[int64]
 // @Security ApiKeyAuth
-// @Router /category [delete]
+// @Router /message [delete]
 func (*Message) Delete(c *gin.Context) {
 	var ids []int
 	if err := c.ShouldBindJSON(&ids); err != nil {
@@ -50,10 +50,10 @@ func (*Message) Delete(c *gin.Context) {
 // @Summary 修改留言审核（批量）
 // @Description 根据 ID 数组修改审核状态
 // @Tags Message
-// @Param form body UpdateReviewReq true "修改审核状态"
 // @Accept json
 // @Produce json
-// @Success 0 {object} Response[int]
+// @Param form body UpdateReviewReq true "修改审核状态"
+// @Success 0 {object} Response[int64]
 // @Security ApiKeyAuth
 // @Router /message/review [put]
 func (*Message) UpdateReview(c *gin.Context) {
@@ -73,14 +73,13 @@ func (*Message) UpdateReview(c *gin.Context) {
 }
 
 // @Summary 条件查询留言列表
-// @Description 根据条件查询留言列表
+// @Description 支持按昵称与审核状态过滤
 // @Tags Message
-// @Param nickname query string false "昵称"
-// @Param is_review query int false "审核状态"
-// @Param page_size query int false "当前页数"
-// @Param page_num query int false "每页条数"
-// @Accept json
 // @Produce json
+// @Param nickname query string false "昵称"
+// @Param is_review query bool false "审核状态"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
 // @Success 0 {object} Response[PageResult[model.Message]]
 // @Security ApiKeyAuth
 // @Router /message/list [get]

@@ -19,10 +19,10 @@ type Comment struct{}
 // @Summary 删除评论（批量）
 // @Description 根据 ID 数组删除评论
 // @Tags Comment
-// @Param ids body []int true "评论 ID 数组"
 // @Accept json
 // @Produce json
-// @Success 0 {object} Response[int]
+// @Param ids body []int true "评论 ID 数组"
+// @Success 0 {object} Response[int64]
 // @Security ApiKeyAuth
 // @Router /comment [delete]
 func (*Comment) Delete(c *gin.Context) {
@@ -44,10 +44,10 @@ func (*Comment) Delete(c *gin.Context) {
 // @Summary 修改评论审核（批量）
 // @Description 根据 ID 数组修改审核状态
 // @Tags Comment
-// @Param form body UpdateReviewReq true "修改审核状态"
 // @Accept json
 // @Produce json
-// @Success 0 {object} Response[any]
+// @Param form body UpdateReviewReq true "修改审核状态"
+// @Success 0 {object} Response[int64]
 // @Security ApiKeyAuth
 // @Router /comment/review [put]
 func (*Comment) UpdateReview(c *gin.Context) {
@@ -67,18 +67,17 @@ func (*Comment) UpdateReview(c *gin.Context) {
 }
 
 // @Summary 条件查询评论列表
-// @Description 根据条件查询评论列表
+// @Description 支持按昵称/审核状态/类型过滤
 // @Tags Comment
+// @Produce json
 // @Param nickname query string false "昵称"
-// @Param is_review query int false "审核状态"
-// @Param type query int false "评论类型"
+// @Param is_review query bool false "审核状态"
+// @Param type query int false "评论类型(1-文章 2-友链 3-说说)"
 // @Param page_num query int false "页码"
 // @Param page_size query int false "每页数量"
-// @Accept json
-// @Produce json
-// @Success 0 {object} Response[model.CommentVO]
+// @Success 0 {object} Response[PageResult[model.Comment]]
 // @Security ApiKeyAuth
-// @Router /comment [get]
+// @Router /comment/list [get]
 func (*Comment) GetList(c *gin.Context) {
 	var query CommentQuery
 	if err := c.ShouldBindQuery(&query); err != nil {

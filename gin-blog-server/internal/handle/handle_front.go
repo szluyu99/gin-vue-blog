@@ -56,7 +56,12 @@ type ArticleSearchVO struct {
 	Content string `json:"content"`
 }
 
-// 前台首页信息
+// @Summary 前台首页信息
+// @Description 文章数, 分类数, 标签数, 公告与访问量
+// @Tags Front
+// @Produce json
+// @Success 0 {object} Response[model.FrontHomeVO]
+// @Router /front/home [get]
 func (*Front) GetHomeInfo(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
@@ -71,7 +76,12 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 	ReturnSuccess(c, data)
 }
 
-// 查询标签列表
+// @Summary 前台标签列表
+// @Description 获取全部标签
+// @Tags Front
+// @Produce json
+// @Success 0 {object} Response[[]model.TagVO]
+// @Router /front/tag/list [get]
 func (*Front) GetTagList(c *gin.Context) {
 	list, _, err := model.GetTagList(GetDB(c), 1, 1000, "")
 	if err != nil {
@@ -81,7 +91,12 @@ func (*Front) GetTagList(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
-// 查询分类列表
+// @Summary 前台分类列表
+// @Description 获取全部分类
+// @Tags Front
+// @Produce json
+// @Success 0 {object} Response[[]model.CategoryVO]
+// @Router /front/category/list [get]
 func (*Front) GetCategoryList(c *gin.Context) {
 	list, _, err := model.GetCategoryList(GetDB(c), 1, 1000, "")
 	if err != nil {
@@ -91,7 +106,12 @@ func (*Front) GetCategoryList(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
-// 查询消息列表
+// @Summary 前台留言列表
+// @Description 只返回审核通过的留言
+// @Tags Front
+// @Produce json
+// @Success 0 {object} Response[[]model.Message]
+// @Router /front/message/list [get]
 func (*Front) GetMessageList(c *gin.Context) {
 	isReview := true
 	list, _, err := model.GetMessageList(GetDB(c), 1, 1000, "", &isReview)
@@ -102,7 +122,12 @@ func (*Front) GetMessageList(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
-// 获取友链列表
+// @Summary 前台友链列表
+// @Description 获取全部友链
+// @Tags Front
+// @Produce json
+// @Success 0 {object} Response[[]model.FriendLink]
+// @Router /front/link/list [get]
 func (*Front) GetLinkList(c *gin.Context) {
 	list, _, err := model.GetLinkList(GetDB(c), 1, 1000, "")
 	if err != nil {
@@ -118,7 +143,15 @@ func (*Front) GetLinkList(c *gin.Context) {
 */
 
 // TODO: 添加自定义头像和昵称留言功能（即可以不登录留言）
-// 保存留言（只能新增，不能编辑）
+// @Summary 新增留言
+// @Description 新增留言, 需要登录, 是否需要审核取决于博客配置
+// @Tags Front
+// @Accept json
+// @Produce json
+// @Param form body FAddMessageReq true "新增留言"
+// @Success 0 {object} Response[model.Message]
+// @Security ApiKeyAuth
+// @Router /front/message [post]
 func (*Front) SaveMessage(c *gin.Context) {
 	var req FAddMessageReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -151,6 +184,15 @@ func (*Front) SaveMessage(c *gin.Context) {
 // TODO: 添加自定义头像和昵称留言功能（即可以不登录评论）
 // TODO: 开启邮箱通知用户功能
 // TODO: HTMLUtil.Filter 过滤 HTML 元素中的字符串...
+// @Summary 新增评论
+// @Description 新增评论或回复评论, 需要登录
+// @Tags Front
+// @Accept json
+// @Produce json
+// @Param form body FAddCommentReq true "新增评论"
+// @Success 0 {object} Response[model.Comment]
+// @Security ApiKeyAuth
+// @Router /front/comment [post]
 func (*Front) SaveComment(c *gin.Context) {
 	var req FAddCommentReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -184,7 +226,16 @@ func (*Front) SaveComment(c *gin.Context) {
 	ReturnSuccess(c, comment)
 }
 
-// 获取评论列表
+// @Summary 前台评论列表
+// @Description 顶级评论列表, 每条最多带 3 条回复
+// @Tags Front
+// @Produce json
+// @Param topic_id query int false "主题 ID(文章/说说)"
+// @Param type query int false "评论类型(1-文章 2-友链 3-说说)"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[PageResult[model.CommentVO]]
+// @Router /front/comment/list [get]
 func (*Front) GetCommentList(c *gin.Context) {
 	var query FCommentQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -217,7 +268,15 @@ func (*Front) GetCommentList(c *gin.Context) {
 	})
 }
 
-// 根据 [评论id] 获取 [回复列表]
+// @Summary 获取评论的回复列表
+// @Description 根据评论 ID 分页查询其回复
+// @Tags Front
+// @Produce json
+// @Param comment_id path int true "评论 ID"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[[]model.CommentVO]
+// @Router /front/comment/replies/{comment_id} [get]
 func (*Front) GetReplyListByCommentId(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("comment_id"))
 	if err != nil {
@@ -254,7 +313,14 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 	ReturnSuccess(c, data)
 }
 
-// 点赞评论
+// @Summary 点赞评论
+// @Description 点赞/取消点赞评论, 需要登录
+// @Tags Front
+// @Produce json
+// @Param comment_id path int true "评论 ID"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /front/comment/like/{comment_id} [get]
 func (*Front) LikeComment(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("comment_id"))
 	if err != nil {
@@ -286,7 +352,16 @@ func (*Front) LikeComment(c *gin.Context) {
 文章相关接口
 */
 
-// 获取文章列表
+// @Summary 前台文章列表
+// @Description 只返回公开且不在回收站的文章
+// @Tags Front
+// @Produce json
+// @Param category_id query int false "分类 ID"
+// @Param tag_id query int false "标签 ID"
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[[]model.Article]
+// @Router /front/article/list [get]
 func (*Front) GetArticleList(c *gin.Context) {
 	var query FArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -303,7 +378,13 @@ func (*Front) GetArticleList(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
-// 根据 [文章id] 获取 [文章详情]
+// @Summary 前台文章详情
+// @Description 文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同时浏览量 +1
+// @Tags Front
+// @Produce json
+// @Param id path int true "文章 ID"
+// @Success 0 {object} Response[model.BlogArticleVO]
+// @Router /front/article/{id} [get]
 func (*Front) GetArticleInfo(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -373,7 +454,14 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 	ReturnSuccess(c, article)
 }
 
-// 获取文章归档
+// @Summary 前台文章归档
+// @Description 按时间归档的文章列表
+// @Tags Front
+// @Produce json
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[PageResult[ArchiveVO]]
+// @Router /front/article/archive [get]
 func (*Front) GetArchiveList(c *gin.Context) {
 	var query FArticleQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -404,8 +492,14 @@ func (*Front) GetArchiveList(c *gin.Context) {
 	})
 }
 
-// 点赞文章
-// 需要记录某个用户已经对某篇文章点过赞, 防止重复点赞
+// @Summary 点赞文章
+// @Description 点赞/取消点赞文章, 需要登录
+// @Tags Front
+// @Produce json
+// @Param article_id path int true "文章 ID"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /front/article/like/{article_id} [get]
 func (*Front) LikeArticle(c *gin.Context) {
 	auth, ok := MustCurrentUserAuth(c)
 	if !ok {
@@ -434,7 +528,13 @@ func (*Front) LikeArticle(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
-// 文章搜索
+// @Summary 搜索文章
+// @Description 按关键字搜索标题和内容, 命中处高亮
+// @Tags Front
+// @Produce json
+// @Param keyword query string false "搜索关键字"
+// @Success 0 {object} Response[[]ArticleSearchVO]
+// @Router /front/article/search [get]
 func (*Front) SearchArticle(c *gin.Context) {
 	result := make([]ArticleSearchVO, 0)
 

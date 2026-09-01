@@ -43,7 +43,14 @@ type EditAnonymousReq struct {
 	Anonymous bool `json:"is_anonymous"`
 }
 
-// 获取资源列表(树形)
+// @Summary 获取资源列表（树形）
+// @Description 获取接口资源列表, 支持关键字过滤
+// @Tags Resource
+// @Produce json
+// @Param keyword query string false "关键字"
+// @Success 0 {object} Response[[]ResourceTreeVO]
+// @Security ApiKeyAuth
+// @Router /resource/list [get]
 func (*Resource) GetTreeList(c *gin.Context) {
 	keyword := c.Query("keyword")
 
@@ -56,7 +63,13 @@ func (*Resource) GetTreeList(c *gin.Context) {
 	ReturnSuccess(c, resources2ResourceVos(resourceList))
 }
 
-// 获取数据选项(树形)
+// @Summary 获取资源选项（树形）
+// @Description 用于角色分配资源
+// @Tags Resource
+// @Produce json
+// @Success 0 {object} Response[[]TreeOptionVO]
+// @Security ApiKeyAuth
+// @Router /resource/option [get]
 func (*Resource) GetOption(c *gin.Context) {
 	result := make([]TreeOptionVO, 0)
 
@@ -87,7 +100,15 @@ func (*Resource) GetOption(c *gin.Context) {
 	ReturnSuccess(c, result)
 }
 
-// 新增或编辑资源, 关联更新 casbin_rule 中数据
+// @Summary 新增或编辑资源
+// @Description 新增或编辑接口资源
+// @Tags Resource
+// @Accept json
+// @Produce json
+// @Param form body AddOrEditResourceReq true "新增或编辑资源"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /resource [post]
 func (*Resource) SaveOrUpdate(c *gin.Context) {
 	var req AddOrEditResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -105,7 +126,15 @@ func (*Resource) SaveOrUpdate(c *gin.Context) {
 	ReturnSuccess(c, nil)
 }
 
-// 编辑资源的匿名访问, 关联更新 casbin_rule 中数据
+// @Summary 修改资源匿名访问
+// @Description 修改资源是否允许匿名访问
+// @Tags Resource
+// @Accept json
+// @Produce json
+// @Param form body EditAnonymousReq true "修改匿名访问"
+// @Success 0 {object} Response[any]
+// @Security ApiKeyAuth
+// @Router /resource/anonymous [put]
 func (*Resource) UpdateAnonymous(c *gin.Context) {
 	var req EditAnonymousReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -124,6 +153,14 @@ func (*Resource) UpdateAnonymous(c *gin.Context) {
 
 // TODO: 考虑删除模块后, 其子资源怎么办? 目前做法是有子资源无法删除
 // TODO: 强制删除?
+// @Summary 删除资源
+// @Description 被角色使用或存在子资源时不允许删除
+// @Tags Resource
+// @Produce json
+// @Param id path int true "资源 ID"
+// @Success 0 {object} Response[int64]
+// @Security ApiKeyAuth
+// @Router /resource/{id} [delete]
 func (*Resource) Delete(c *gin.Context) {
 	resourceId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

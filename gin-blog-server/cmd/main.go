@@ -11,6 +11,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title gin-vue-blog API
+// @version 1.0
+// @description gin-vue-blog 后端接口文档。业务状态码 0 表示成功, 其他表示失败, HTTP 状态码统一为 200
+// @BasePath /api
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	configPath := flag.String("c", "../config.yml", "配置文件路径")
 	flag.Parse()
