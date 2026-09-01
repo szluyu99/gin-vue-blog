@@ -79,3 +79,42 @@ jobs:
       - name: Build
         working-directory: ${{ matrix.project }}
         run: pnpm build
+
+  # 镜像构建依赖网络与基础镜像, 只在 CI 里验证能否构建并正常启动
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build web image
+        run: docker build -t gvb-web:ci .
+
+      - name: Build server image
+        run: docker build -t gvb-server:ci gin-blog-server
+
+      - name: Smoke test web image
+        run: |
+          docker run -d --name gvb-web -p 8080:80 \
+            -e USE_HTTPS=false -e SERVER_NAME=localhost \
+            -e BACKEND_HOST=127.0.0.1 -e SERVER_PORT=8765 gvb-web:ci
+          for i in $(seq 15); do
+            curl -sf http://127.0.0.1:8080/ > /dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8080/ > /dev/null
+          curl -sf http://127.0.0.1:8080/admin/ > /dev/null
+
+      - name: Smoke test server image
+        run: |
+          docker run -d --name gvb-redis redis:7.0-alpine
+          redis_ip=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' gvb-redis)
+          # 用 sqlite 起, 不依赖 MySQL 容器
+          docker run -d --name gvb-server -p 8765:8765 \
+            -e SERVER_DBTYPE=sqlite -e REDIS_ADDR="$redis_ip:6379" gvb-server:ci
+          for i in $(seq 15); do
+            curl -sf http://127.0.0.1:8765/api/config > /dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8765/api/config > /dev/null
+          docker logs gvb-server

@@ -1,0 +1,7 @@
+# 构建镜像时不需要, 且体积大 / 会覆盖镜像内安装结果的目录
+**/node_modules
+**/dist
+.git
+.github
+images
+*.md

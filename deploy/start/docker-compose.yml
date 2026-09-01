@@ -1,5 +1,3 @@
-version: "3"
-
 networks:
   gvb-network:
     driver: bridge
@@ -17,6 +15,11 @@ services:
     ports:
       - ${REDIS_PORT}:6379 # 自定义的是暴露出去的端口, Redis 容器内运行固定为 6379
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       gvb-network:
         ipv4_address: ${REDIS_HOST}
@@ -32,6 +35,13 @@ services:
       - TZ=Asia/Shanghai
     ports:
       - ${MYSQL_PORT}:3306 # 自定义的是暴露出去的端口, MySQL 容器内运行固定为 3306
+    # 首次启动要导入 gvb.sql, 期间只有 socket 可用, 用 TCP ping 才能反映"真正可连接"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     networks:
       gvb-network:
         ipv4_address: ${MYSQL_HOST}
@@ -41,11 +51,12 @@ services:
     container_name: gvb-server
     restart: always
     # 后端服务依赖 MySQL 和 Redis
+    # 用 service_healthy: MySQL 首次导入 gvb.sql 需要时间, 只等"已启动"会让后端反复崩溃重启
     depends_on:
       gvb-redis:
-        condition: service_started
+        condition: service_healthy
       gvb-mysql:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ${DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
     environment:

@@ -121,9 +121,9 @@ cd deploy
 
 修改 gin-blog-server 后端源码，不需要额外做什么，因为后端构建镜像时直接依赖 gin-blog-server 中的 Dockerfile
 
-修改 gin-blog-admin 后台源码后，需要将打包后静态资源覆盖 build/web/html/admin 
+修改 gin-blog-admin 后台源码后，需要将打包后静态资源覆盖 build/web/dist_admin
 
-修改 gin-blog-front 前台源码后，需要将打包后静态资源覆盖 build/web/html/blog
+修改 gin-blog-front 前台源码后，需要将打包后静态资源覆盖 build/web/dist_blog
 
 执行以上操作后，在 start 目录重新构建运行：
 
@@ -147,7 +147,7 @@ docker-compose up -d --build
 
 其他根据需求修改，一般不用动
 
-2、后端镜像的构建直接依赖于 gin-blog-server 中的源码，构建时加载的是 config/config.docker.toml 配置文件。
+2、后端镜像的构建直接依赖于 gin-blog-server 中的源码，构建时加载的是 gin-blog-server/config.docker.yml 配置文件。
 
 其中有一些参数推荐重新设置，具体可以查看该文件注释。
 
