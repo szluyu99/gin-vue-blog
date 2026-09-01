@@ -1,0 +1,107 @@
+package handle
+
+import (
+	"bytes"
+	"encoding/json"
+	g "gin-blog/internal/global"
+	"gin-blog/internal/model"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/alicebob/miniredis/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
+	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
+)
+
+/*
+接口级测试脚手架
+
+- 数据库: sqlite 内存库, 每个测试独立, 用真实的 model 迁移
+- Redis: miniredis 内存实现, 不需要本地装 Redis
+- 路由: 只挂被测 handler, 不经过 JWTAuth 和 PermissionCheck
+  (鉴权中间件在 internal/middleware, 引入会造成 import 循环)
+*/
+
+type testEnv struct {
+	engine *gin.Engine
+	db     *gorm.DB
+	rdb    *redis.Client
+	mr     *miniredis.Miniredis
+	user   *model.UserAuth // 非 nil 时模拟该用户已登录
+}
+
+// 模拟登录: CurrentUserAuth 会优先从 gin.Context 取用户, 不需要真的走 session
+func (e *testEnv) loginAs(id int, username string) *model.UserAuth {
+	e.user = &model.UserAuth{Model: model.Model{ID: id}, Username: username}
+	return e.user
+}
+
+func newTestEnv(t *testing.T) *testEnv {
+	t.Helper()
+	gin.SetMode(gin.TestMode)
+
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
+		SkipDefaultTransaction: true,
+		NamingStrategy:         schema.NamingStrategy{SingularTable: true},
+	})
+	assert.Nil(t, err)
+	assert.Nil(t, model.MakeMigrate(db))
+
+	mr := miniredis.RunT(t)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+
+	env := &testEnv{db: db, rdb: rdb, mr: mr}
+
+	engine := gin.New()
+	engine.Use(func(c *gin.Context) {
+		c.Set(g.CTX_DB, db)
+		c.Set(g.CTX_RDB, rdb)
+		if env.user != nil {
+			c.Set(g.CTX_USER_AUTH, env.user)
+		}
+		c.Next()
+	})
+	env.engine = engine
+
+	return env
+}
+
+// 发起请求, 返回解析后的响应
+func (e *testEnv) do(t *testing.T, method, path string, body any) Response[any] {
+	t.Helper()
+
+	var reader *bytes.Reader
+	if body != nil {
+		raw, err := json.Marshal(body)
+		assert.Nil(t, err)
+		reader = bytes.NewReader(raw)
+	} else {
+		reader = bytes.NewReader(nil)
+	}
+
+	req := httptest.NewRequest(method, path, reader)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	e.engine.ServeHTTP(w, req)
+
+	// 业务错误也返回 HTTP 200, 非 200 说明中间件或 gin 层面出了问题
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp Response[any]
+	assert.Nil(t, json.Unmarshal(w.Body.Bytes(), &resp))
+	return resp
+}
+
+// 把 resp.Data 转换成具体类型, 便于断言
+func decodeData[T any](t *testing.T, data any, out *T) {
+	t.Helper()
+	raw, err := json.Marshal(data)
+	assert.Nil(t, err)
+	assert.Nil(t, json.Unmarshal(raw, out))
+}

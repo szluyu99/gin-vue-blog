@@ -47,6 +47,10 @@ func getPageCache(rdb *redis.Client) (cache []model.Page, err error) {
 
 // 将博客配置缓存到 Redis 中
 func addConfigCache(rdb *redis.Client, config map[string]string) error {
+	// HMSET 不接受空的 field-value 列表, 配置表为空时直接跳过
+	if len(config) == 0 {
+		return nil
+	}
 	return rdb.HMSet(rctx, g.CONFIG, config).Err()
 }
 

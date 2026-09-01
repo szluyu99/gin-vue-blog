@@ -169,9 +169,12 @@ func (*BlogInfo) Report(c *gin.Context) {
 	rdb := GetRDB(c)
 
 	ipAddress := utils.IP.GetIpAddress(c)
-	userAgent := utils.IP.GetUserAgent(c)
-	browser := userAgent.Name + " " + userAgent.Version.String()
-	os := userAgent.OS + " " + userAgent.OSVersion.String()
+	// 非浏览器(如 curl)或没有 User-Agent 时, 解析结果为 nil, 不能直接取字段
+	var browser, os string
+	if userAgent := utils.IP.GetUserAgent(c); userAgent != nil {
+		browser = userAgent.Name + " " + userAgent.Version.String()
+		os = userAgent.OS + " " + userAgent.OSVersion.String()
+	}
 	uuid := utils.MD5(ipAddress + browser + os)
 
 	ctx := context.Background()

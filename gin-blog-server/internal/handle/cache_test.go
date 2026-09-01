@@ -1,29 +1,19 @@
 package handle
 
 import (
-	"context"
 	"gin-blog/internal/model"
 	"testing"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
 
-// 需要 Redis 环境, 本地没有 Redis 时跳过, CI 中由 service 容器提供
+// 使用 miniredis 提供内存中的 Redis, 不依赖本地环境
 func initRdb(t *testing.T) *redis.Client {
 	t.Helper()
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       11,
-	})
-
-	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
-		t.Skip("Redis 连接失败, 跳过缓存测试: ", err)
-	}
-
-	return rdb
+	mr := miniredis.RunT(t)
+	return redis.NewClient(&redis.Options{Addr: mr.Addr()})
 }
 
 func TestPageCache(t *testing.T) {
