@@ -235,7 +235,7 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 	return db.Transaction(func(tx *gorm.DB) error {
 		// 分类不存在则创建
 		category := Category{Name: categoryName}
-		result := db.Model(&Category{}).Where("name", categoryName).FirstOrCreate(&category)
+		result := tx.Model(&Category{}).Where("name", categoryName).FirstOrCreate(&category)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -243,16 +243,16 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 
 		// 先 添加/更新 文章, 获取到其 ID
 		if article.ID == 0 {
-			result = db.Create(&article)
+			result = tx.Create(&article)
 		} else {
-			result = db.Model(&article).Where("id", article.ID).Updates(article)
+			result = tx.Model(&article).Where("id", article.ID).Updates(article)
 		}
 		if result.Error != nil {
 			return result.Error
 		}
 
 		// 清空文章标签关联
-		result = db.Delete(ArticleTag{}, "article_id", article.ID)
+		result = tx.Delete(ArticleTag{}, "article_id", article.ID)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -261,7 +261,7 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 		for _, tagName := range tagNames {
 			// 标签不存在则创建
 			tag := Tag{Name: tagName}
-			result := db.Model(&Tag{}).Where("name", tagName).FirstOrCreate(&tag)
+			result := tx.Model(&Tag{}).Where("name", tagName).FirstOrCreate(&tag)
 			if result.Error != nil {
 				return result.Error
 			}
@@ -270,7 +270,7 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 				TagId:     tag.ID,
 			})
 		}
-		result = db.Create(&articleTags)
+		result = tx.Create(&articleTags)
 		return result.Error
 	})
 }

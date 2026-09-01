@@ -7,6 +7,8 @@ import (
 	"gin-blog/internal/model"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
@@ -47,7 +49,11 @@ func newTestEnv(t *testing.T) *testEnv {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
-	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
+	// cache=shared + 每个测试独立的库名: file::memory: 会让连接池里的每条连接
+	// 各自持有一个空库, 事务里换连接就会报 "no such table"
+	dsn := "file:" + strings.NewReplacer("/", "_", " ", "_").Replace(t.Name()) +
+		"?mode=memory&cache=shared"
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy:         schema.NamingStrategy{SingularTable: true},
 	})
@@ -108,4 +114,9 @@ func decodeData[T any](t *testing.T, data any, out *T) {
 	raw, err := json.Marshal(data)
 	assert.Nil(t, err)
 	assert.Nil(t, json.Unmarshal(raw, out))
+}
+
+// 路径参数拼接用, 避免每个测试都写 strconv
+func itoa(i int) string {
+	return strconv.Itoa(i)
 }

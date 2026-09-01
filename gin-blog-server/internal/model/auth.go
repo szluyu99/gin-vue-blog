@@ -304,26 +304,26 @@ func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourc
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
-		if err := db.Model(&role).Select("name", "label", "is_disable").Updates(&role).Error; err != nil {
+		if err := tx.Model(&role).Select("name", "label", "is_disable").Updates(&role).Error; err != nil {
 			return err
 		}
 
 		// role_resource
-		if err := db.Delete(&RoleResource{}, "role_id = ?", id).Error; err != nil {
+		if err := tx.Delete(&RoleResource{}, "role_id = ?", id).Error; err != nil {
 			return err
 		}
 		for _, rid := range resourceIds {
-			if err := db.Create(&RoleResource{RoleId: role.ID, ResourceId: rid}).Error; err != nil {
+			if err := tx.Create(&RoleResource{RoleId: role.ID, ResourceId: rid}).Error; err != nil {
 				return err
 			}
 		}
 
 		// role_menu
-		if err := db.Delete(&RoleMenu{}, "role_id = ?", id).Error; err != nil {
+		if err := tx.Delete(&RoleMenu{}, "role_id = ?", id).Error; err != nil {
 			return err
 		}
 		for _, mid := range menuIds {
-			if err := db.Create(&RoleMenu{RoleId: role.ID, MenuId: mid}).Error; err != nil {
+			if err := tx.Create(&RoleMenu{RoleId: role.ID, MenuId: mid}).Error; err != nil {
 				return err
 			}
 		}
@@ -335,17 +335,17 @@ func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourc
 func DeleteRoles(db *gorm.DB, ids []int) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 
-		result := db.Delete(&Role{}, "id in ?", ids)
+		result := tx.Delete(&Role{}, "id in ?", ids)
 		if result.Error != nil {
 			return result.Error
 		}
 
-		result = db.Delete(&RoleResource{}, "role_id in ?", ids)
+		result = tx.Delete(&RoleResource{}, "role_id in ?", ids)
 		if result.Error != nil {
 			return result.Error
 		}
 
-		result = db.Delete(&RoleMenu{}, "role_id in ?", ids)
+		result = tx.Delete(&RoleMenu{}, "role_id in ?", ids)
 		if result.Error != nil {
 			return result.Error
 		}
