@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/redis/go-redis/v9"
@@ -58,6 +60,8 @@ func newTestEnv(t *testing.T) *testEnv {
 	env := &testEnv{db: db, rdb: rdb, mr: mr}
 
 	engine := gin.New()
+	// CurrentUserAuth 会读 session, 生产环境在 cmd/main.go 中注册, 测试里也要有
+	engine.Use(sessions.Sessions("test-session", memstore.NewStore([]byte("test-secret"))))
 	engine.Use(func(c *gin.Context) {
 		c.Set(g.CTX_DB, db)
 		c.Set(g.CTX_RDB, rdb)

@@ -127,7 +127,10 @@ func (*Front) SaveMessage(c *gin.Context) {
 	}
 
 	req.Content = template.HTMLEscapeString(req.Content)
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 	db := GetDB(c)
 
 	ipAddress := utils.IP.GetIpAddress(c)
@@ -157,7 +160,10 @@ func (*Front) SaveComment(c *gin.Context) {
 
 	// 过滤评论内容，防止XSS攻击
 	req.Content = template.HTMLEscapeString(req.Content)
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 	db := GetDB(c)
 	isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
 
@@ -257,7 +263,10 @@ func (*Front) LikeComment(c *gin.Context) {
 	}
 
 	rdb := GetRDB(c)
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 
 	// 记录某个用户已经对某个评论点过赞
 	commentLikeUserKey := g.COMMENT_USER_LIKE_SET + strconv.Itoa(auth.ID)
@@ -398,7 +407,10 @@ func (*Front) GetArchiveList(c *gin.Context) {
 // 点赞文章
 // 需要记录某个用户已经对某篇文章点过赞, 防止重复点赞
 func (*Front) LikeArticle(c *gin.Context) {
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 
 	articleId, err := strconv.Atoi(c.Param("article_id"))
 	if err != nil {

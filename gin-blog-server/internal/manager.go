@@ -50,12 +50,11 @@ func registerBaseHandler(r *gin.Engine) {
 	base := r.Group("/api")
 
 	// TODO: 登录, 注册 记录日志
-	base.POST("/login", userAuthAPI.Login)          // 登录
-	base.POST("/register", userAuthAPI.Register)    // 注册
-	base.GET("/logout", userAuthAPI.Logout)         // 退出登录
-	base.POST("/report", blogInfoAPI.Report)        // 上报信息
-	base.GET("/config", blogInfoAPI.GetConfigMap)   // 获取配置
-	base.PATCH("/config", blogInfoAPI.UpdateConfig) // 更新配置
+	base.POST("/login", userAuthAPI.Login)        // 登录
+	base.POST("/register", userAuthAPI.Register)  // 注册
+	base.GET("/logout", userAuthAPI.Logout)       // 退出登录
+	base.POST("/report", blogInfoAPI.Report)      // 上报信息
+	base.GET("/config", blogInfoAPI.GetConfigMap) // 获取配置
 	base.GET("/email/verify", userAuthAPI.VerifyCode)
 }
 
@@ -69,8 +68,9 @@ func registerAdminHandler(r *gin.Engine) {
 	auth.Use(middleware.OperationLog())
 	auth.Use(middleware.ListenOnline())
 
-	auth.GET("/home", blogInfoAPI.GetHomeInfo) // 后台首页信息
-	auth.POST("/upload", uploadAPI.UploadFile) // 文件上传
+	auth.GET("/home", blogInfoAPI.GetHomeInfo)      // 后台首页信息
+	auth.POST("/upload", uploadAPI.UploadFile)      // 文件上传
+	auth.PATCH("/config", blogInfoAPI.UpdateConfig) // 更新配置
 
 	// 博客设置
 	setting := auth.Group("/setting")

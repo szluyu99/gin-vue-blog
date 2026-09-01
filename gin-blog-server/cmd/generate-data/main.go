@@ -261,6 +261,7 @@ func generateDefaultResources(db *gorm.DB) {
 		{Name: "修改博客设置", ParentId: parents[11].ID, Url: "/setting/blog-config", Method: "PUT"},
 		{Name: "修改关于我", ParentId: parents[11].ID, Url: "/setting/about", Method: "PUT"},
 		{Name: "获取后台首页信息", ParentId: parents[11].ID, Url: "/home", Method: "GET"},
+		{Name: "修改博客配置", ParentId: parents[11].ID, Url: "/config", Method: "PATCH"},
 		// 用户信息模块
 		{Name: "用户列表", ParentId: parents[12].ID, Url: "/user/list", Method: "GET"},
 		{Name: "获取当前用户信息", ParentId: parents[12].ID, Url: "/user/info", Method: "GET"},

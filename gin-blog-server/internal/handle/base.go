@@ -100,6 +100,22 @@ func GetRDB(c *gin.Context) *redis.Client {
 }
 
 /*
+获取当前登录用户, 未登录时直接响应错误并返回 false
+
+调用方必须在返回 false 时立即 return。
+JWTAuth 中间件对资源表中不存在的接口会跳过鉴权, 因此 handler 里
+不能假设一定拿得到用户, 否则会 nil 解引用导致 panic。
+*/
+func MustCurrentUserAuth(c *gin.Context) (*model.UserAuth, bool) {
+	auth, err := CurrentUserAuth(c)
+	if err != nil || auth == nil {
+		ReturnError(c, g.ErrTokenNotExist, err)
+		return nil, false
+	}
+	return auth, true
+}
+
+/*
 获取当前登录用户信息
 1. 能从 gin Context 上获取到 user 对象, 说明本次请求链路中获取过了
 2. 从 session 中获取到 uid

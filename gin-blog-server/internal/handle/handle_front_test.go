@@ -83,3 +83,21 @@ func TestFrontLikeArticleMultiUser(t *testing.T) {
 	assert.True(t, env.rdb.SIsMember(rctx, g.ARTICLE_USER_LIKE_SET+"1", 9).Val())
 	assert.False(t, env.rdb.SIsMember(rctx, g.ARTICLE_USER_LIKE_SET+"2", 9).Val())
 }
+
+// 未登录访问需要登录的接口: 应返回业务错误而不是 panic 成 500
+// (JWTAuth 对资源表中不存在的接口会跳过鉴权, 因此 handler 必须自己兜住)
+func TestFrontLikeWithoutLogin(t *testing.T) {
+	env := newTestEnv(t) // 不调用 loginAs
+	env.engine.GET("/front/article/like/:article_id", (&Front{}).LikeArticle)
+	env.engine.GET("/front/comment/like/:comment_id", (&Front{}).LikeComment)
+
+	resp := env.do(t, http.MethodGet, "/front/article/like/1", nil)
+	assert.Equal(t, g.ErrTokenNotExist.Code(), resp.Code)
+
+	resp = env.do(t, http.MethodGet, "/front/comment/like/1", nil)
+	assert.Equal(t, g.ErrTokenNotExist.Code(), resp.Code)
+
+	// 未登录不应产生任何点赞数据
+	assert.Empty(t, env.rdb.HGetAll(rctx, g.ARTICLE_LIKE_COUNT).Val())
+	assert.Empty(t, env.rdb.HGetAll(rctx, g.COMMENT_LIKE_COUNT).Val())
+}

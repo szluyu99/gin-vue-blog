@@ -68,7 +68,17 @@ func OperationLog() gin.HandlerFunc {
 			}
 			c.Writer = blw
 
+			// 未登录时(JWTAuth 对资源表中不存在的接口会跳过鉴权)拿不到用户,
+			// 此处不能直接取字段, 否则会 nil 解引用
 			auth, _ := handle.CurrentUserAuth(c)
+			var userId int
+			var nickname string
+			if auth != nil {
+				userId = auth.UserInfoId
+				if auth.UserInfo != nil {
+					nickname = auth.UserInfo.Nickname
+				}
+			}
 
 			body, _ := io.ReadAll(c.Request.Body)
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
@@ -85,8 +95,8 @@ func OperationLog() gin.HandlerFunc {
 				OptDesc:       GetOptString(c.Request.Method) + moduleName, // TODO: 优化
 				RequestParam:  string(body),
 				RequestMethod: c.Request.Method,
-				UserId:        auth.UserInfoId,
-				Nickname:      auth.UserInfo.Nickname,
+				UserId:        userId,
+				Nickname:      nickname,
 				IpAddress:     ipAddress,
 				IpSource:      ipSource,
 			}

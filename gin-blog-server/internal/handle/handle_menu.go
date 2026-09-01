@@ -21,7 +21,10 @@ type MenuTreeVO struct {
 // 获取当前用户菜单: 生成后台管理界面的菜单
 func (*Menu) GetUserMenu(c *gin.Context) {
 	db := GetDB(c)
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 
 	var menus []model.Menu
 	var err error

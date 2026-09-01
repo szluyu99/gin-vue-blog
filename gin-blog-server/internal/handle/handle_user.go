@@ -84,7 +84,10 @@ func (*User) UpdateCurrent(c *gin.Context) {
 		return
 	}
 
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 	err := model.UpdateUserInfo(GetDB(c), auth.UserInfoId, req.Nickname, req.Avatar, req.Intro, req.Website)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
@@ -158,7 +161,10 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 		return
 	}
 
-	auth, _ := CurrentUserAuth(c)
+	auth, ok := MustCurrentUserAuth(c)
+	if !ok {
+		return
+	}
 
 	if !utils.BcryptCheck(req.OldPassword, auth.Password) {
 		ReturnError(c, g.ErrOldPassword, nil)
