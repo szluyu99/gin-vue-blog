@@ -65,6 +65,29 @@ func TestCheckRoleAuthMethod(t *testing.T) {
 	assert.False(t, flag)
 }
 
+// 匿名资源只代表该资源本身不需要登录, 不能让拥有它的角色获得所有权限
+func TestCheckRoleAuthAnonymous(t *testing.T) {
+	db, _ := initModelDB()
+
+	anon, _ := AddResource(db, "public", "/v1/public", "GET", true)
+	secret, _ := AddResource(db, "secret", "/v1/secret", "DELETE", false)
+	role, _ := AddRoleWithResources(db, "role", "角色", []int{anon.ID})
+
+	// 拥有匿名资源, 不能越权访问其他资源
+	flag, err := CheckRoleAuth(db, role.ID, "/v1/secret", "DELETE")
+	assert.Nil(t, err)
+	assert.False(t, flag)
+
+	// 匿名资源自身仍然能通过
+	flag, _ = CheckRoleAuth(db, role.ID, "/v1/public", "GET")
+	assert.True(t, flag)
+
+	// 显式分配后才有权限
+	UpdateRoleWithResources(db, role.ID, "role", "角色", []int{anon.ID, secret.ID})
+	flag, _ = CheckRoleAuth(db, role.ID, "/v1/secret", "DELETE")
+	assert.True(t, flag)
+}
+
 func TestResourceQuery(t *testing.T) {
 	db, _ := initModelDB()
 

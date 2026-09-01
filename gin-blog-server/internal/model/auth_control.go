@@ -136,8 +136,10 @@ func CheckRoleAuth(db *gorm.DB, rid int, uri, method string) (bool, error) {
 		return false, err
 	}
 
+	// 匿名资源的放行由 middleware.JWTAuth 按当次请求的资源判断(设置 skip_check),
+	// 这里只判断角色是否拥有该资源, 不能因为角色拥有某个匿名资源就放行所有请求
 	for _, r := range resources {
-		if r.Anonymous || (r.Url == uri && r.Method == method) {
+		if r.Url == uri && r.Method == method {
 			return true, nil
 		}
 	}
