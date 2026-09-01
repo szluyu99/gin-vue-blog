@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -101,6 +102,30 @@ func (e *testEnv) do(t *testing.T, method, path string, body any) Response[any] 
 	e.engine.ServeHTTP(w, req)
 
 	// 业务错误也返回 HTTP 200, 非 200 说明中间件或 gin 层面出了问题
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp Response[any]
+	assert.Nil(t, json.Unmarshal(w.Body.Bytes(), &resp))
+	return resp
+}
+
+// 以 multipart/form-data 上传一个文件, 字段名固定为 file
+func (e *testEnv) upload(t *testing.T, path, filename, content string) Response[any] {
+	t.Helper()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", filename)
+	assert.Nil(t, err)
+	_, err = part.Write([]byte(content))
+	assert.Nil(t, err)
+	assert.Nil(t, writer.Close())
+
+	req := httptest.NewRequest(http.MethodPost, path, body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	w := httptest.NewRecorder()
+	e.engine.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var resp Response[any]

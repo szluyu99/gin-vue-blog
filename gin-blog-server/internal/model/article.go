@@ -270,6 +270,10 @@ func SaveOrUpdateArticle(db *gorm.DB, article *Article, categoryName string, tag
 				TagId:     tag.ID,
 			})
 		}
+		// 没有标签时不能调 Create, gorm 对空切片会直接报 ErrEmptySlice
+		if len(articleTags) == 0 {
+			return nil
+		}
 		result = tx.Create(&articleTags)
 		return result.Error
 	})
