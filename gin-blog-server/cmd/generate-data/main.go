@@ -174,104 +174,28 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 func generateDefaultResources(db *gorm.DB) {
 	slog.Info("-----初始化接口资源 start-----")
 
-	parents := []model.Resource{
-		{Name: "文章模块"},
-		{Name: "分类模块"},
-		{Name: "标签模块"},
-		{Name: "页面模块"},
-		{Name: "友链模块"},
-		{Name: "菜单模块"},
-		{Name: "角色模块"},
-		{Name: "资源模块"},
-		{Name: "评论模块"},
-		{Name: "留言模块"},
-		{Name: "文件模块"},
-		{Name: "博客信息模块"},
-		{Name: "用户信息模块"},
-		{Name: "操作日志模块"},
-	}
-	for i := range parents {
-		if err := db.Create(&parents[i]).Error; err != nil {
+	// 资源定义见 internal/model/seed_resource.go, 与后台路由一一对应
+	var resources []model.Resource
+	for _, module := range model.AdminResources {
+		parent := model.Resource{Name: module.Name}
+		if err := db.Create(&parent).Error; err != nil {
 			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
-				slog.Info(parents[i].Name + " 资源已经存在")
+				slog.Info(module.Name + " 资源已经存在")
+				// 重复执行时取回已有 ID, 否则子资源的 parent_id 会是 0
+				db.Where("name", module.Name).First(&parent)
 			} else {
-				slog.Error(parents[i].Name + " 资源初始化失败" + err.Error())
+				slog.Error(module.Name + " 资源初始化失败" + err.Error())
 			}
 		}
-	}
 
-	resources := []model.Resource{
-		// 文章模块
-		{Name: "文章列表", ParentId: parents[0].ID, Url: "/article/list", Method: "GET"},
-		{Name: "文章详情", ParentId: parents[0].ID, Url: "/article/:id", Method: "GET"},
-		{Name: "新增/编辑文章", ParentId: parents[0].ID, Url: "/article", Method: "POST"},
-		{Name: "更新文章软删除", ParentId: parents[0].ID, Url: "/article/soft-delete", Method: "PUT"},
-		{Name: "删除文章", ParentId: parents[0].ID, Url: "/article", Method: "DELETE"},
-		{Name: "修改文章置顶", ParentId: parents[0].ID, Url: "/article/top", Method: "PUT"},
-		{Name: "导出文章", ParentId: parents[0].ID, Url: "/article/export", Method: "POST"},
-		{Name: "导入文章", ParentId: parents[0].ID, Url: "/article/import", Method: "POST"},
-		// 分类模块
-		{Name: "分类列表", ParentId: parents[1].ID, Url: "/category/list", Method: "GET"},
-		{Name: "新增/编辑分类", ParentId: parents[1].ID, Url: "/category", Method: "POST"},
-		{Name: "删除分类", ParentId: parents[1].ID, Url: "/category", Method: "DELETE"},
-		{Name: "分类选项列表", ParentId: parents[1].ID, Url: "/category/option", Method: "GET"},
-		// 标签模块
-		{Name: "标签列表", ParentId: parents[2].ID, Url: "/tag/list", Method: "GET"},
-		{Name: "新增/编辑标签", ParentId: parents[2].ID, Url: "/tag", Method: "POST"},
-		{Name: "删除标签", ParentId: parents[2].ID, Url: "/tag", Method: "DELETE"},
-		{Name: "标签选项列表", ParentId: parents[2].ID, Url: "/tag/option", Method: "GET"},
-		// 页面模块
-		{Name: "页面列表", ParentId: parents[3].ID, Url: "/page/list", Method: "GET"},
-		{Name: "新增/编辑页面", ParentId: parents[3].ID, Url: "/page", Method: "POST"},
-		{Name: "删除页面", ParentId: parents[3].ID, Url: "/page", Method: "DELETE"},
-		// 友链模块
-		{Name: "友链列表", ParentId: parents[4].ID, Url: "/link/list", Method: "GET"},
-		{Name: "新增/编辑友链", ParentId: parents[4].ID, Url: "/link", Method: "POST"},
-		{Name: "删除友链", ParentId: parents[4].ID, Url: "/link", Method: "DELETE"},
-		// 菜单模块
-		{Name: "菜单列表", ParentId: parents[5].ID, Url: "/menu/list", Method: "GET"},
-		{Name: "新增/编辑菜单", ParentId: parents[5].ID, Url: "/menu", Method: "POST"},
-		{Name: "删除菜单", ParentId: parents[5].ID, Url: "/menu/:id", Method: "DELETE"},
-		{Name: "菜单选项列表(树形)", ParentId: parents[5].ID, Url: "/menu/option", Method: "GET"},
-		{Name: "获取当前用户菜单", ParentId: parents[5].ID, Url: "/menu/user/list", Method: "GET"},
-		// 角色模块
-		{Name: "角色列表", ParentId: parents[6].ID, Url: "/role/list", Method: "GET"},
-		{Name: "新增/编辑角色", ParentId: parents[6].ID, Url: "/role", Method: "POST"},
-		{Name: "删除角色", ParentId: parents[6].ID, Url: "/role", Method: "DELETE"},
-		{Name: "角色选项列表", ParentId: parents[6].ID, Url: "/role/option", Method: "GET"},
-		// 资源模块
-		{Name: "资源列表", ParentId: parents[7].ID, Url: "/resource/list", Method: "GET"},
-		{Name: "新增/编辑资源", ParentId: parents[7].ID, Url: "/resource", Method: "POST"},
-		{Name: "删除资源", ParentId: parents[7].ID, Url: "/resource/:id", Method: "DELETE"},
-		{Name: "资源选项列表(树形)", ParentId: parents[7].ID, Url: "/resource/option", Method: "GET"},
-		{Name: "修改资源匿名访问", ParentId: parents[7].ID, Url: "/resource/anonymous", Method: "PUT"},
-		// 评论模块
-		{Name: "评论列表", ParentId: parents[8].ID, Url: "/comment/list", Method: "GET"},
-		{Name: "删除评论", ParentId: parents[8].ID, Url: "/comment", Method: "DELETE"},
-		{Name: "修改评论审核", ParentId: parents[8].ID, Url: "/comment/review", Method: "PUT"},
-		// 留言模块
-		{Name: "留言列表", ParentId: parents[9].ID, Url: "/message/list", Method: "GET"},
-		{Name: "删除留言", ParentId: parents[9].ID, Url: "/message", Method: "DELETE"},
-		{Name: "修改留言审核", ParentId: parents[9].ID, Url: "/message/review", Method: "PUT"},
-		// 文件模块
-		{Name: "文件上传", ParentId: parents[10].ID, Url: "/upload", Method: "POST"},
-		// 博客信息模块
-		{Name: "获取关于我", ParentId: parents[11].ID, Url: "/setting/about", Method: "GET"},
-		{Name: "修改关于我", ParentId: parents[11].ID, Url: "/setting/about", Method: "PUT"},
-		{Name: "获取后台首页信息", ParentId: parents[11].ID, Url: "/home", Method: "GET"},
-		{Name: "修改博客配置", ParentId: parents[11].ID, Url: "/config", Method: "PATCH"},
-		// 用户信息模块
-		{Name: "用户列表", ParentId: parents[12].ID, Url: "/user/list", Method: "GET"},
-		{Name: "获取当前用户信息", ParentId: parents[12].ID, Url: "/user/info", Method: "GET"},
-		{Name: "修改用户信息", ParentId: parents[12].ID, Url: "/user", Method: "PUT"},
-		{Name: "获取在线用户列表", ParentId: parents[12].ID, Url: "/user/online", Method: "GET"},
-		{Name: "强制离线用户", ParentId: parents[12].ID, Url: "/user/offline/:id", Method: "POST"},
-		{Name: "修改当前用户密码", ParentId: parents[12].ID, Url: "/user/current/password", Method: "PUT"},
-		{Name: "修改当前用户信息", ParentId: parents[12].ID, Url: "/user/current", Method: "PUT"},
-		{Name: "修改用户禁用", ParentId: parents[12].ID, Url: "/user/disable", Method: "PUT"},
-		// 操作日志模块
-		{Name: "日志列表", ParentId: parents[13].ID, Url: "/operation/log/list", Method: "GET"},
-		{Name: "删除操作日志", ParentId: parents[13].ID, Url: "/operation/log", Method: "DELETE"},
+		for _, item := range module.Items {
+			resources = append(resources, model.Resource{
+				Name:     item.Name,
+				ParentId: parent.ID,
+				Url:      item.Url,
+				Method:   item.Method,
+			})
+		}
 	}
 
 	for i := range resources {
