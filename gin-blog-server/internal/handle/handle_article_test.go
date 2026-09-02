@@ -240,6 +240,16 @@ func TestArticleDeleteCleansRedis(t *testing.T) {
 	likeSetKey := g.ARTICLE_USER_LIKE_SET + "7"
 	viewVisitorKey := g.ARTICLE_VIEW_VISITOR + itoa(gone.ID) + ":fingerprint"
 
+	// 被删文章下的评论, 其点赞数据也要一起清掉
+	comment, err := model.AddComment(env.db, 7, model.TYPE_ARTICLE, gone.ID, "评论", true)
+	assert.Nil(t, err)
+	keptComment, err := model.AddComment(env.db, 7, model.TYPE_ARTICLE, kept.ID, "别动我", true)
+	assert.Nil(t, err)
+	commentLikeSetKey := g.COMMENT_USER_LIKE_SET + "7"
+	env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(comment.ID), 4)
+	env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(keptComment.ID), 2)
+	env.rdb.SAdd(rctx, commentLikeSetKey, itoa(comment.ID), itoa(keptComment.ID))
+
 	env.rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 5, itoa(gone.ID))
 	env.rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 3, itoa(kept.ID))
 	env.rdb.HSet(rctx, g.ARTICLE_LIKE_COUNT, itoa(gone.ID), 2)
@@ -256,10 +266,19 @@ func TestArticleDeleteCleansRedis(t *testing.T) {
 	assert.False(t, env.rdb.SIsMember(rctx, likeSetKey, itoa(gone.ID)).Val())
 	assert.Equal(t, int64(0), env.rdb.Exists(rctx, viewVisitorKey).Val())
 
+	// 文章下的评论连带删除, 评论点赞数据同步清理
+	var commentCount int64
+	env.db.Model(&model.Comment{}).Where("topic_id = ?", gone.ID).Count(&commentCount)
+	assert.Equal(t, int64(0), commentCount)
+	assert.False(t, env.rdb.HExists(rctx, g.COMMENT_LIKE_COUNT, itoa(comment.ID)).Val())
+	assert.False(t, env.rdb.SIsMember(rctx, commentLikeSetKey, itoa(comment.ID)).Val())
+
 	// 其他文章的计数不受影响
 	assert.Equal(t, float64(3), env.rdb.ZScore(rctx, g.ARTICLE_VIEW_COUNT, itoa(kept.ID)).Val())
 	assert.Equal(t, "1", env.rdb.HGet(rctx, g.ARTICLE_LIKE_COUNT, itoa(kept.ID)).Val())
 	assert.True(t, env.rdb.SIsMember(rctx, likeSetKey, itoa(kept.ID)).Val())
+	assert.Equal(t, "2", env.rdb.HGet(rctx, g.COMMENT_LIKE_COUNT, itoa(keptComment.ID)).Val())
+	assert.True(t, env.rdb.SIsMember(rctx, commentLikeSetKey, itoa(keptComment.ID)).Val())
 }
 
 func TestArticleImport(t *testing.T) {

@@ -151,7 +151,7 @@ func (*Article) Delete(c *gin.Context) {
 		return
 	}
 
-	rows, err := model.DeleteArticle(GetDB(c), ids)
+	rows, commentIds, err := model.DeleteArticle(GetDB(c), ids)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
@@ -160,6 +160,7 @@ func (*Article) Delete(c *gin.Context) {
 	// 数据库里的文章没了, Redis 里的计数也要跟着清,
 	// 否则新文章复用到同一个 id 时会直接继承旧文章的浏览量和点赞数
 	cleanArticleCounters(GetRDB(c), ids)
+	cleanCommentCounters(GetRDB(c), commentIds)
 
 	ReturnSuccess(c, rows)
 }
@@ -198,6 +199,29 @@ func cleanArticleCounters(rdb *redis.Client, ids []int) {
 		}); err != nil {
 			slog.Error("清理文章浏览去重记录失败", "id", id, "err", err)
 		}
+	}
+}
+
+// 清理评论相关的 Redis 计数: 点赞数、用户点赞记录
+func cleanCommentCounters(rdb *redis.Client, ids []int) {
+	if len(ids) == 0 {
+		return
+	}
+
+	members := make([]any, 0, len(ids))
+	fields := make([]string, 0, len(ids))
+	for _, id := range ids {
+		members = append(members, strconv.Itoa(id))
+		fields = append(fields, strconv.Itoa(id))
+	}
+
+	if err := rdb.HDel(rctx, g.COMMENT_LIKE_COUNT, fields...).Err(); err != nil {
+		slog.Error("清理评论点赞数失败", "ids", ids, "err", err)
+	}
+	if err := scanKeys(rdb, g.COMMENT_USER_LIKE_SET+"*", func(key string) {
+		rdb.SRem(rctx, key, members...)
+	}); err != nil {
+		slog.Error("清理用户评论点赞记录失败", "ids", ids, "err", err)
 	}
 }
 

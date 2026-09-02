@@ -1,13 +1,20 @@
 package ginblog
 
 import (
+	"encoding/json"
+	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
+	"net/http"
+	"net/http/httptest"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 /*
@@ -103,5 +110,48 @@ func TestAdminResourcesNameUnique(t *testing.T) {
 			assert.False(t, seen[item.Name], "资源名重复: "+item.Name)
 			seen[item.Name] = true
 		}
+	}
+}
+
+/*
+前台只读接口也必须经过 JWTAuth。
+
+gin 的中间件只对之后注册的路由生效, 如果 base.Use(JWTAuth) 写在这些路由后面,
+它们就完全不过鉴权: 坏 token 被当成匿名放行, handler 里也拿不到当前用户。
+*/
+func TestBlogReadRoutesGoThroughJWTAuth(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	db, err := gorm.Open(sqlite.Open("file:blog_route_jwt?mode=memory&cache=shared"), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{SingularTable: true},
+	})
+	assert.Nil(t, err)
+	assert.Nil(t, model.MakeMigrate(db))
+
+	r := gin.New()
+	r.Use(func(c *gin.Context) {
+		c.Set(g.CTX_DB, db)
+		c.Next()
+	})
+	registerBlogHandler(r)
+
+	// 只读接口: 不带 token 可以匿名访问, 带了坏 token 必须报错
+	for _, path := range []string{
+		"/api/front/home",
+		"/api/front/article/list",
+		"/api/front/category/list",
+		"/api/front/tag/list",
+		"/api/front/comment/list",
+	} {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		req.Header.Set("Authorization", "broken-token")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		var resp struct {
+			Code int `json:"code"`
+		}
+		assert.Nil(t, json.Unmarshal(w.Body.Bytes(), &resp))
+		assert.Equal(t, g.ErrTokenType.Code(), resp.Code, path+" 没有经过 JWTAuth")
 	}
 }

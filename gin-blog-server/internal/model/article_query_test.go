@@ -150,13 +150,39 @@ func TestArticleTopSoftDeleteAndDelete(t *testing.T) {
 	assert.True(t, got.IsTop)
 
 	// 物理删除会一并清掉标签关联
-	rows, err = DeleteArticle(db, []int{article.ID})
+	rows, _, err = DeleteArticle(db, []int{article.ID})
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), rows)
 
 	var count int64
 	db.Model(&ArticleTag{}).Where("article_id = ?", article.ID).Count(&count)
 	assert.Zero(t, count)
+}
+
+// 物理删除文章要连带删掉文章下的评论(含回复), 并把评论 id 交给调用方清理 Redis
+func TestDeleteArticleRemovesComments(t *testing.T) {
+	db := newModelDB(t)
+	gone := seedArticle(t, db, Article{Title: "待删除", Status: STATUS_PUBLIC})
+	kept := seedArticle(t, db, Article{Title: "保留", Status: STATUS_PUBLIC})
+
+	comment, err := AddComment(db, 1, TYPE_ARTICLE, gone.ID, "评论", true)
+	assert.Nil(t, err)
+	reply, err := ReplyComment(db, 2, 1, comment.ID, "回复", true)
+	assert.Nil(t, err)
+	keptComment, err := AddComment(db, 1, TYPE_ARTICLE, kept.ID, "别动我", true)
+	assert.Nil(t, err)
+	linkComment, err := AddComment(db, 1, TYPE_LINK, 0, "友链留言", true)
+	assert.Nil(t, err)
+
+	rows, commentIds, err := DeleteArticle(db, []int{gone.ID})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), rows)
+	assert.ElementsMatch(t, []int{comment.ID, reply.ID}, commentIds)
+
+	var ids []int
+	assert.Nil(t, db.Model(&Comment{}).Pluck("id", &ids).Error)
+	assert.ElementsMatch(t, []int{keptComment.ID, linkComment.ID}, ids,
+		"其他文章的评论和友链留言不受影响")
 }
 
 // 导入 markdown: 分类和标签不存在时自动创建

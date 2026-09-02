@@ -202,21 +202,44 @@ func GetNewestList(db *gorm.DB, n int) (data []RecommendArticleVO, err error) {
 	return data, result.Error
 }
 
-// 物理删除文章
-func DeleteArticle(db *gorm.DB, ids []int) (int64, error) {
-	// 删除 [文章-标签] 关联
-	result := db.Where("article_id IN ?", ids).Delete(&ArticleTag{})
-	if result.Error != nil {
-		return 0, result.Error
-	}
+/*
+物理删除文章, 同时删除 [文章-标签] 关联 和 文章下的评论
 
-	// 删除 [文章]
-	result = db.Where("id IN ?", ids).Delete(&Article{})
-	if result.Error != nil {
-		return 0, result.Error
-	}
+返回被删除的行数和被删掉的评论 id:
+评论的点赞数存在 Redis 里, 调用方需要拿这些 id 去清理, 否则会留下永远访问不到的数据
+*/
+func DeleteArticle(db *gorm.DB, ids []int) (rows int64, commentIds []int, err error) {
+	err = db.Transaction(func(tx *gorm.DB) error {
+		// 删除 [文章-标签] 关联
+		if err := tx.Where("article_id IN ?", ids).Delete(&ArticleTag{}).Error; err != nil {
+			return err
+		}
 
-	return result.RowsAffected, nil
+		// 文章下的评论(含回复, 回复的 topic_id 与父评论一致)
+		if err := tx.Model(&Comment{}).
+			Where("type = ? AND topic_id IN ?", TYPE_ARTICLE, ids).
+			Pluck("id", &commentIds).Error; err != nil {
+			return err
+		}
+		if len(commentIds) > 0 {
+			if err := tx.Where("id IN ?", commentIds).Delete(&Comment{}).Error; err != nil {
+				return err
+			}
+		}
+
+		// 删除 [文章]
+		result := tx.Where("id IN ?", ids).Delete(&Article{})
+		if result.Error != nil {
+			return result.Error
+		}
+		rows = result.RowsAffected
+
+		return nil
+	})
+	if err != nil {
+		return 0, nil, err
+	}
+	return rows, commentIds, nil
 }
 
 // 软删除文章（修改）
