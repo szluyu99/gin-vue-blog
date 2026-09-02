@@ -6,13 +6,23 @@ import (
 	"io"
 	"log/slog"
 	"mime/multipart"
+	"path"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
 
 type Article struct{}
+
+// 导入文章的限制: 只收 Markdown, 正文会整个读进内存, 所以要有大小上限
+const maxImportSize = 5 << 20
+
+var allowedImportExt = map[string]bool{
+	".md":       true,
+	".markdown": true,
+}
 
 type SoftDeleteReq struct {
 	Ids      []int `json:"ids"`
@@ -352,12 +362,12 @@ func (*Article) Export(c *gin.Context) {
 }
 
 // @Summary 导入文章
-// @Description 上传 Markdown 文件导入文章, 文件名作为标题, 导入后为草稿
+// @Description 上传 Markdown 文件导入文章, 文件名(去掉扩展名)作为标题。只支持 .md/.markdown, 不超过 5MB。导入后为草稿, 不带分类和标签, 需要到后台编辑时补充
 // @Tags Article
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "Markdown 文件"
-// @Success 0 {object} Response[any]
+// @Success 0 {object} Response[model.Article]
 // @Security ApiKeyAuth
 // @Router /article/import [post]
 func (*Article) Import(c *gin.Context) {
@@ -373,8 +383,25 @@ func (*Article) Import(c *gin.Context) {
 		return
 	}
 
-	fileName := fileHeader.Filename
-	title := fileName[:len(fileName)-3]
+	// 后缀与大小都要校验: 以前这里什么都不查, 任意文件都会被整个读进内存当正文
+	ext := strings.ToLower(path.Ext(fileHeader.Filename))
+	if !allowedImportExt[ext] {
+		ReturnError(c, g.ErrImportType, nil)
+		return
+	}
+	if fileHeader.Size > maxImportSize {
+		ReturnError(c, g.ErrFileSize, nil)
+		return
+	}
+
+	// 用 TrimSuffix 去扩展名: 以前是 fileName[:len(fileName)-3], 文件名短于 3 字节会 panic,
+	// 而且它假设扩展名恰好 3 个字符, .markdown 会被砍掉一截
+	title := strings.TrimSuffix(fileHeader.Filename, path.Ext(fileHeader.Filename))
+	if title == "" {
+		ReturnError(c, g.ErrRequest, nil)
+		return
+	}
+
 	content, err := readFromFileHeader(fileHeader)
 	if err != nil {
 		ReturnError(c, g.ErrFileReceive, err)
@@ -382,13 +409,14 @@ func (*Article) Import(c *gin.Context) {
 	}
 
 	defaultImg := model.GetConfig(db, g.CONFIG_ARTICLE_COVER)
-	err = model.ImportArticle(db, auth.ID, title, content, defaultImg, "学习", "Golang")
+	// 用 UserInfoId 而不是 auth.ID: Article.UserId 指向 user_info, 与新建文章的逻辑保持一致
+	article, err := model.ImportArticle(db, auth.UserInfoId, title, content, defaultImg)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
-	ReturnSuccess(c, nil)
+	ReturnSuccess(c, article)
 }
 
 func readFromFileHeader(file *multipart.FileHeader) (string, error) {

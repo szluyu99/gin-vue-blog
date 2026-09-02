@@ -82,6 +82,7 @@ var (
 	ErrFileReceive = RegisterResult(9101, "文件接收失败")
 	ErrFileType    = RegisterResult(9102, "只支持上传图片")
 	ErrFileSize    = RegisterResult(9103, "文件大小超出限制")
+	ErrImportType  = RegisterResult(9104, "只支持导入 Markdown 文件")
 
 	ErrTagHasArt  = RegisterResult(4003, "删除失败，标签下存在文章")
 	ErrCateHasArt = RegisterResult(3003, "删除失败，分类下存在文章")

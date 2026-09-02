@@ -205,25 +205,34 @@ func TestHotQueryIndexesCreated(t *testing.T) {
 	}
 }
 
-// 导入 markdown: 分类和标签不存在时自动创建
+// 导入 markdown: 草稿状态, 不带分类和标签
 func TestImportArticle(t *testing.T) {
 	db := newModelDB(t)
 	user := UserAuth{Username: "admin", Password: "x", UserInfo: &UserInfo{Nickname: "管理员"}}
 	assert.Nil(t, db.Create(&user).Error)
 
-	assert.Nil(t, ImportArticle(db, user.ID, "标题", "内容", "", "学习", "Golang"))
+	article, err := ImportArticle(db, user.UserInfo.ID, "标题", "内容", "cover.png")
+	assert.Nil(t, err)
+	assert.NotZero(t, article.ID)
 
 	list, total, err := GetArticleList(db, 1, 10, "", nil, 0, 0, 0, 0)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), total)
 	assert.Equal(t, "标题", list[0].Title)
+	assert.Equal(t, "cover.png", list[0].Img)
+	assert.Equal(t, user.UserInfo.ID, list[0].UserId)
 	assert.Equal(t, STATUS_DRAFT, list[0].Status, "导入的文章是草稿")
 
-	category, err := GetCategoryByName(db, "学习")
-	assert.Nil(t, err)
-	assert.Equal(t, category.ID, list[0].CategoryId)
+	// 不再硬编码分类标签, 也不会凭空建出来
+	assert.Zero(t, list[0].CategoryId)
 
 	names, err := GetTagNamesByArticleId(db, list[0].ID)
 	assert.Nil(t, err)
-	assert.Equal(t, []string{"Golang"}, names)
+	assert.Empty(t, names)
+
+	var count int64
+	assert.Nil(t, db.Model(&Category{}).Count(&count).Error)
+	assert.Zero(t, count)
+	assert.Nil(t, db.Model(&Tag{}).Count(&count).Error)
+	assert.Zero(t, count)
 }

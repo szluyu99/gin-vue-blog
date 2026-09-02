@@ -5,6 +5,9 @@
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
+当前进度：功能 BUG F1–F10 全部已修复；安全 S1–S8 全部暂缓（项目初期，安全要求不高，
+上线前必须回来处理）；潜在问题 P1 未处理。
+
 ## 安全
 
 按项目当前阶段（初期，安全要求不高）整体**暂缓**，但风险是真实的，上线前必须回来处理。
@@ -207,7 +210,7 @@ if use { ... }
 修复：把截断后的回复 id 一起收进 `hashCounts` 的入参，回填时给 `ReplyList` 也赋值。
 回归测试：`TestFrontCommentListFillsReplyLikeCount`。
 
-### F9 文章导入接口 — 待处理
+### F9 文章导入接口 — 已修复
 
 `internal/handle/handle_article.go:376`
 
@@ -216,13 +219,30 @@ fileName := fileHeader.Filename
 title := fileName[:len(fileName)-3]
 ```
 
-- 文件名短于 3 字节（如 `ab`）时切片下界为负，直接 panic → 500
+- 文件名短于 3 字节（如 `ab`）时切片下界为负，直接 panic → 500；
+  它还假设扩展名恰好 3 个字符，`.markdown` 会被砍掉一截
 - 该接口对文件类型与大小**完全没有校验**（`/upload` 是有的），任何文件都会被整体读入内存当作正文
 - `:385` 传的是 `auth.ID`（`user_auth` 主键），而正常新建走的是 `auth.UserInfoId`（`:101`），
   两个 id 空间不一致时作者归属错误
-- 分类与标签硬编码成 `"学习"` / `"Golang"`
+- 分类与标签硬编码成 `"学习"` / `"Golang"`，且 `ImportArticle` 里用 `FirstOrCreate`，
+  等于每次导入都可能凭空建出这两条分类标签
 
-### F10 注册流程：验证 token 先删、建用户无事务 — 待处理
+修复：
+
+- 标题改用 `strings.TrimSuffix(name, path.Ext(name))`，去掉后为空则返回 `ErrRequest`
+- 新增 `allowedImportExt`（`.md` / `.markdown`）与 `maxImportSize = 5 << 20`，
+  并新增业务码 `g.ErrImportType = 9104`（`ErrFileType` 的文案是"只支持上传图片"，不适用于导入）
+- 作者改用 `auth.UserInfoId`
+- **分类标签方案：不建。** `model.ImportArticle` 去掉这两个参数，导入后是草稿、
+  分类标签留空，由用户在后台编辑时补。相应地它现在返回创建出来的 `*Article`，
+  handler 也把文章返回给前端
+
+回归测试：`TestArticleImport`（故意让 `auth.ID` 与 `UserInfoId` 错开，断言作者用的是后者，
+并断言没有凭空创建分类标签）、`TestArticleImportFileName`（`a.md` / `ab.md` /
+`文章.markdown` / `带.点.的.名字.md`）、`TestArticleImportRejectsBadFile`（非法后缀、
+只有扩展名、超过大小上限，且都不写库）、`model.TestImportArticle`。
+
+### F10 注册流程：验证 token 先删、建用户无事务 — 已修复
 
 `internal/handle/handle_auth.go:303`
 
@@ -238,6 +258,21 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 （`user_info`、`user_auth`、`user_auth_role`）**没有事务**，
 第 2 或第 3 步失败会留下孤儿 `user_info`，或一个没有角色的用户。
 昵称按 `Count` 生成"游客N"，并发注册会重名，且那次 `Count` 的 error 只打了日志。
+
+修复：
+
+- `VerifyCode` 里把 `DeleteMailInfo` 挪到 `CreateNewUser` 成功之后。
+  删 token 本身失败最多导致链接可重复点，而重复点会被下面的查重挡住，比现在直接废掉链接好
+- `CreateNewUser` 整体包进 `db.Transaction`
+- 昵称改用插入后拿到的 `userinfo.ID`（先 insert 再 update 昵称和简介），并发不会重名
+- 事务内加一次 `username = ?` 的存在性检查，避免同一邮箱的两封未过期邮件都点导致建出两个账号；
+  命中时返回新的 sentinel error `model.ErrUsernameTaken`
+- `BcryptHash` 的 error 不再忽略
+
+回归测试：`model.TestCreateNewUser`（断言昵称按 id 生成）、
+`model.TestCreateNewUserRejectsDuplicate`、`model.TestCreateNewUserRollsBackOnFailure`
+（删掉 `user_auth_role` 表制造第三步失败，断言前两张表都回滚）、
+`TestAuthVerifyCodeKeepsTokenWhenCreateFails`（断言建用户失败后验证链接仍然有效、库里没有半个用户）。
 
 ## 潜在问题（当前打不到）
 

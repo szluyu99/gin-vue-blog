@@ -1,6 +1,7 @@
 package model
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -213,6 +214,47 @@ func TestCreateNewUser(t *testing.T) {
 	gotInfo, err := GetUserInfoById(db, info.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, info.Nickname, gotInfo.Nickname)
+	// 昵称按 user_info 的自增 id 生成, 不是按当前行数
+	assert.Equal(t, "游客"+strconv.Itoa(info.ID), gotInfo.Nickname)
+	assert.NotEmpty(t, gotInfo.Intro)
+}
+
+// 同一个邮箱不能注册两次: 同时存在多封未过期的验证邮件时, 两个链接都点也只能建一个账号
+func TestCreateNewUserRejectsDuplicate(t *testing.T) {
+	db := newModelDB(t)
+	assert.Nil(t, SaveRole(db, "admin", "管理员", nil, nil))
+	assert.Nil(t, SaveRole(db, "user", "普通用户", nil, nil))
+
+	_, _, _, err := CreateNewUser(db, "dup@qq.com", "123456")
+	assert.Nil(t, err)
+
+	_, _, _, err = CreateNewUser(db, "dup@qq.com", "123456")
+	assert.ErrorIs(t, err, ErrUsernameTaken)
+
+	// 失败的那次不能留下任何残留
+	var authCount, infoCount, roleCount int64
+	assert.Nil(t, db.Model(&UserAuth{}).Count(&authCount).Error)
+	assert.Nil(t, db.Model(&UserInfo{}).Count(&infoCount).Error)
+	assert.Nil(t, db.Model(&UserAuthRole{}).Count(&roleCount).Error)
+	assert.Equal(t, int64(1), authCount)
+	assert.Equal(t, int64(1), infoCount, "不能留下孤儿 user_info")
+	assert.Equal(t, int64(1), roleCount)
+}
+
+// 建用户中途失败要整体回滚, 不能留下没有角色的用户或孤儿 user_info
+func TestCreateNewUserRollsBackOnFailure(t *testing.T) {
+	db := newModelDB(t)
+	// 故意不建角色表以外的东西: 把 user_auth_role 表删掉, 让第三步插入失败
+	assert.Nil(t, db.Migrator().DropTable(&UserAuthRole{}))
+
+	_, _, _, err := CreateNewUser(db, "rollback@qq.com", "123456")
+	assert.NotNil(t, err)
+
+	var authCount, infoCount int64
+	assert.Nil(t, db.Model(&UserAuth{}).Count(&authCount).Error)
+	assert.Nil(t, db.Model(&UserInfo{}).Count(&infoCount).Error)
+	assert.Zero(t, authCount, "user_auth 要回滚")
+	assert.Zero(t, infoCount, "user_info 要回滚")
 }
 
 func TestUserListAndUpdate(t *testing.T) {

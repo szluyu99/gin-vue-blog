@@ -243,3 +243,32 @@ func TestAuthVerifyCodeWithoutInfo(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Contains(t, w.Body.String(), "注册失败")
 }
+
+// 建用户失败时不能把一次性链接消耗掉, 否则用户只能重新走一遍注册
+func TestAuthVerifyCodeKeepsTokenWhenCreateFails(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/verify", (&UserAuth{}).VerifyCode)
+
+	// 故意让 CreateNewUser 失败: 把 user_auth_role 表删掉
+	assert.Nil(t, env.db.Migrator().DropTable(&model.UserAuthRole{}))
+
+	info := utils.GenEmailVerificationInfo("new@qq.com", "123456")
+	assert.Nil(t, SetMailInfo(env.rdb, info, time.Minute))
+
+	w := httptest.NewRecorder()
+	env.engine.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/verify?info="+info, nil))
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Contains(t, w.Body.String(), "注册失败")
+
+	// 链接还在, 修好问题之后重新点一次仍然有效
+	exist, err := GetMailInfo(env.rdb, info)
+	assert.Nil(t, err)
+	assert.True(t, exist, "建用户失败不应该消耗掉验证链接")
+
+	// 并且不能留下半个用户
+	var count int64
+	assert.Nil(t, env.db.Model(&model.UserAuth{}).Count(&count).Error)
+	assert.Zero(t, count)
+	assert.Nil(t, env.db.Model(&model.UserInfo{}).Count(&count).Error)
+	assert.Zero(t, count)
+}

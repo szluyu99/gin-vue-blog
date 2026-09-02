@@ -328,37 +328,20 @@ func UpdateArticleTop(db *gorm.DB, id int, isTop bool) error {
 	return result.Error
 }
 
-func ImportArticle(db *gorm.DB, userAuthId int, title string, content string, img string, categoryname string, tangname string) error {
+// 导入 Markdown 文章: 状态为草稿, 不带分类和标签
+//
+// 以前会把分类/标签硬编码成 "学习"/"Golang" 并用 FirstOrCreate 建出来,
+// 等于每次导入都可能给博客凭空多两条分类标签。导入本来就是草稿,
+// 分类和标签留空, 由用户在后台编辑时自己补。
+func ImportArticle(db *gorm.DB, userId int, title, content, img string) (*Article, error) {
 	article := Article{
 		Title:   title,
 		Content: content,
 		Img:     img,
 		Status:  STATUS_DRAFT,
 		Type:    TYPE_ORIGINAL,
-		UserId:  userAuthId,
+		UserId:  userId,
 	}
-	category := Category{Name: categoryname}
-	result := db.Model(&Category{}).Where("name", categoryname).FirstOrCreate(&category)
-	if result.Error != nil {
-		return result.Error
-	}
-	article.CategoryId = category.ID
-
-	result = db.Create(&article)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	var articletag ArticleTag
-	tag := Tag{Name: tangname}
-	result = db.Model(&Tag{}).Where("name", tangname).FirstOrCreate(&tag)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	articletag.ArticleId = article.ID
-	articletag.TagId = tag.ID
-	result = db.Create(&articletag)
-
-	return result.Error
+	result := db.Create(&article)
+	return &article, result.Error
 }

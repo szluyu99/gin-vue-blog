@@ -2,13 +2,16 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"gin-blog/internal/utils"
-	"log/slog"
 	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 )
+
+// 注册时邮箱已存在, 由 handle 层翻译成对应的业务错误码
+var ErrUsernameTaken = errors.New("该邮箱已经注册")
 
 // 权限控制: 7 张表（4 模型 + 3 关联）
 
@@ -383,46 +386,60 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 }
 
 // 注册新用户
+//
+// 三张表必须一起成功: 以前没有事务, 中途失败会留下孤儿 user_info,
+// 或者一个没有任何角色的用户(能登录, 但 PermissionCheck 查不到角色)。
+// 昵称也不再按 Count 生成, 并发注册会重名, 改用插入后拿到的自增 id。
 func CreateNewUser(db *gorm.DB, username, password string) (*UserAuth, *UserInfo, *UserAuthRole, error) {
-	// 创建userinfo
-	num, err := Count(db, &UserInfo{})
+	pass, err := utils.BcryptHash(password)
 	if err != nil {
-		slog.Info(err.Error())
+		return nil, nil, nil, err
 	}
-	number := strconv.Itoa(num)
+
 	userinfo := &UserInfo{
-		Email:    username,
-		Nickname: "游客" + number,
-		Avatar:   "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
-		Intro:    "我是这个程序的第" + number + "个用户",
+		Email:  username,
+		Avatar: "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
 	}
-	result := db.Create(&userinfo)
-	if result.Error != nil {
-		return nil, nil, nil, result.Error
+	userauth := &UserAuth{}
+	userRole := &UserAuthRole{}
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		// 邮箱验证链接是一次性的, 但同一个邮箱可能有多封未过期的邮件,
+		// 这里再查一次, 避免两个链接都点导致建出两个账号
+		var exist int64
+		if err := tx.Model(&UserAuth{}).Where("username = ?", username).Count(&exist).Error; err != nil {
+			return err
+		}
+		if exist > 0 {
+			return ErrUsernameTaken
+		}
+
+		if err := tx.Create(userinfo).Error; err != nil {
+			return err
+		}
+		// 拿到 id 之后再补昵称和简介, 保证唯一
+		number := strconv.Itoa(userinfo.ID)
+		userinfo.Nickname = "游客" + number
+		userinfo.Intro = "我是这个程序的第" + number + "个用户"
+		if err := tx.Model(userinfo).
+			Select("nickname", "intro").Updates(userinfo).Error; err != nil {
+			return err
+		}
+
+		userauth.Username = username
+		userauth.Password = pass
+		userauth.UserInfoId = userinfo.ID
+		if err := tx.Create(userauth).Error; err != nil {
+			return err
+		}
+
+		userRole.UserAuthId = userauth.ID
+		userRole.RoleId = 2 // 默认身份为游客
+		return tx.Create(userRole).Error
+	})
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
-	// 先创建userauth
-	pass, _ := utils.BcryptHash(password)
-	userauth := &UserAuth{
-		Username:   username,
-		Password:   pass,
-		UserInfoId: userinfo.ID,
-	}
-
-	result = db.Create(&userauth)
-	if result.Error != nil {
-		return nil, nil, nil, result.Error
-	}
-
-	// 再创建role关联表
-	user_role := &UserAuthRole{
-		UserAuthId: userauth.ID,
-		RoleId:     2, // 默认身份为游客
-	}
-	result = db.Create(&user_role)
-	if result.Error != nil {
-		return nil, nil, nil, result.Error
-	}
-
-	return userauth, userinfo, user_role, result.Error
+	return userauth, userinfo, userRole, nil
 }

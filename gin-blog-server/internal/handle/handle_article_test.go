@@ -4,6 +4,7 @@ import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -299,6 +300,9 @@ func TestArticleDeleteCleansRedis(t *testing.T) {
 
 func TestArticleImport(t *testing.T) {
 	env := newArticleEnv(t)
+	// auth.ID 与 UserInfoId 故意错开: 作者必须是 UserInfoId
+	env.user.Model.ID = 9
+	env.user.UserInfoId = 3
 
 	resp := env.upload(t, "/article/import", "导入的文章.md", "# 标题\n正文")
 	assert.Equal(t, g.SUCCESS, resp.Code)
@@ -309,15 +313,65 @@ func TestArticleImport(t *testing.T) {
 	assert.Equal(t, "导入的文章", article.Title)
 	assert.Equal(t, "# 标题\n正文", article.Content)
 	assert.Equal(t, model.STATUS_DRAFT, article.Status)
+	assert.Equal(t, 3, article.UserId, "作者要用 UserInfoId, 不是 user_auth 的主键")
 
-	// 固定归到 "学习" 分类 + "Golang" 标签
-	var cate model.Category
-	assert.Nil(t, env.db.First(&cate, article.CategoryId).Error)
-	assert.Equal(t, "学习", cate.Name)
+	// 不带分类和标签, 也不会凭空建出分类标签
+	assert.Zero(t, article.CategoryId)
 
 	var count int64
 	env.db.Model(&model.ArticleTag{}).Where("article_id", article.ID).Count(&count)
-	assert.Equal(t, int64(1), count)
+	assert.Zero(t, count)
+	env.db.Model(&model.Category{}).Count(&count)
+	assert.Zero(t, count, "导入不应该创建分类")
+	env.db.Model(&model.Tag{}).Count(&count)
+	assert.Zero(t, count, "导入不应该创建标签")
+}
+
+// 文件名的处理: 短文件名不能 panic, 多字符扩展名要完整去掉
+func TestArticleImportFileName(t *testing.T) {
+	cases := []struct {
+		filename string
+		title    string
+	}{
+		{"a.md", "a"},
+		{"ab.md", "ab"},
+		{"文章.markdown", "文章"},
+		{"带.点.的.名字.md", "带.点.的.名字"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.filename, func(t *testing.T) {
+			env := newArticleEnv(t)
+			resp := env.upload(t, "/article/import", tc.filename, "正文")
+			assert.Equal(t, g.SUCCESS, resp.Code)
+
+			var article model.Article
+			assert.Nil(t, env.db.First(&article).Error)
+			assert.Equal(t, tc.title, article.Title)
+		})
+	}
+}
+
+// 后缀与大小校验
+func TestArticleImportRejectsBadFile(t *testing.T) {
+	env := newArticleEnv(t)
+
+	// 非 Markdown 后缀
+	for _, name := range []string{"a.txt", "a.png", "README", "a.md.exe"} {
+		resp := env.upload(t, "/article/import", name, "正文")
+		assert.Equal(t, g.ErrImportType.Code(), resp.Code, name)
+	}
+
+	// 只有扩展名, 去掉之后标题是空的
+	resp := env.upload(t, "/article/import", ".md", "正文")
+	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
+
+	// 超过大小上限
+	resp = env.upload(t, "/article/import", "big.md", strings.Repeat("x", maxImportSize+1))
+	assert.Equal(t, g.ErrFileSize.Code(), resp.Code)
+
+	var count int64
+	env.db.Model(&model.Article{}).Count(&count)
+	assert.Zero(t, count, "被拒绝的请求不应该写入文章")
 }
 
 func TestArticleImportWithoutFile(t *testing.T) {

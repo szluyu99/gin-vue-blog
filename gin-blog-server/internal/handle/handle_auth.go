@@ -300,8 +300,6 @@ func (*UserAuth) VerifyCode(c *gin.Context) {
 		return
 	}
 
-	DeleteMailInfo(GetRDB(c), code)
-
 	username, password, err := utils.ParseEmailVerificationInfo(code)
 	if err != nil {
 		returnErrorPage(c)
@@ -309,11 +307,16 @@ func (*UserAuth) VerifyCode(c *gin.Context) {
 	}
 
 	// 注册用户
+	// 注意顺序: 以前是先 DeleteMailInfo 再建用户, 建用户失败这个一次性链接就废了,
+	// 用户只能重新走一遍注册。改成建成功之后再删。
 	_, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 	if err != nil {
 		returnErrorPage(c)
 		return
 	}
+
+	// 删 token 失败最多导致链接可以重复点, 而重复点会被 CreateNewUser 里的查重挡住
+	DeleteMailInfo(GetRDB(c), code)
 
 	// 注册成功，返回成功页面
 	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`

@@ -126,7 +126,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传 Markdown 文件导入文章, 文件名作为标题, 导入后为草稿",
+                "description": "上传 Markdown 文件导入文章, 文件名(去掉扩展名)作为标题。只支持 .md/.markdown, 不超过 5MB。导入后为草稿, 不带分类和标签, 需要到后台编辑时补充",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -150,7 +150,7 @@ const docTemplate = `{
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/handle.Response-any"
+                            "$ref": "#/definitions/handle.Response-model_Article"
                         }
                     }
                 }
