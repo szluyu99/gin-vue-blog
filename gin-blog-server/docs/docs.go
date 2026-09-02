@@ -1236,7 +1236,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传文件到本地或七牛云, 返回访问地址",
+                "description": "上传图片到本地或七牛云, 返回访问地址。需要登录, 只允许图片, 单个文件不超过 10MB",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1250,7 +1250,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "文件",
+                        "description": "图片文件",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -2591,7 +2591,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传文件到本地或七牛云, 返回访问地址",
+                "description": "上传图片到本地或七牛云, 返回访问地址。需要登录, 只允许图片, 单个文件不超过 10MB",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -2605,7 +2605,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "文件",
+                        "description": "图片文件",
                         "name": "file",
                         "in": "formData",
                         "required": true

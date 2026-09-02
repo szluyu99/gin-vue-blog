@@ -12,7 +12,9 @@ server {
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $remote_addr;
 
-        client_max_body_size 40M;
+        # 后端限制单个上传文件 10MB, 这里留一点 multipart 的余量,
+        # 超出的请求在 Nginx 就挡掉, 不用把整个 body 转给后端
+        client_max_body_size 12M;
     }
     # Gin 处理静态资源, Nginx 反向代理 Gin (本地文件上传才需要)
     location /public/uploaded {

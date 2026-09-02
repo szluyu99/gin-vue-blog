@@ -37,6 +37,8 @@ type mwEnv struct {
 
 	// 请求是否走到了最终的 handler, 用来判断中间件有没有拦住
 	handlerRan bool
+	// handler 里从 gin context 拿到的登录用户, nil 说明中间件没识别出用户
+	handlerUser *model.UserAuth
 	// 大于 0 时在中间件链最前面把用户写进 session, 模拟已登录
 	loginId int
 }
@@ -85,6 +87,9 @@ func (e *mwEnv) handle(method, path string, mws ...gin.HandlerFunc) {
 	api.Use(mws...)
 	api.Handle(method, path, func(c *gin.Context) {
 		e.handlerRan = true
+		if user, exist := c.Get(g.CTX_USER_AUTH); exist {
+			e.handlerUser, _ = user.(*model.UserAuth)
+		}
 		c.JSON(http.StatusOK, gin.H{"code": 0, "message": "ok"})
 	})
 }

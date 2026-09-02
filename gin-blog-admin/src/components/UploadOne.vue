@@ -46,6 +46,7 @@ defineExpose({ previewImg })
     <NUpload
       action="/api/upload"
       :headers="{ Authorization: `Bearer ${token}` }"
+      accept="image/jpeg,image/png,image/gif,image/webp,image/bmp"
       :show-file-list="false"
       @finish="handleImgUpload"
     >

@@ -17,60 +17,52 @@ import (
 )
 
 // 基于 JWT 的授权
-// 如果存在 session, 则直接从 session 中获取用户信息
-// 如果不存在 session, 则从 Authorization 中获取 token, 并解析 token 获取用户信息, 并设置到 session 中
+//
+// 无论接口是否允许匿名访问, 只要请求带了 Authorization 就会解析 token,
+// 把用户挂到 gin context 与 session 上 —— 前台接口靠这一步识别当前用户。
+// (之前资源表中没登记的接口会直接跳过解析, 前台的登录态只能依赖 session cookie,
+// session 只有 10 分钟, 过期后发评论/上传头像都会莫名返回 TOKEN 不存在)
+//
 // requireLogin 为 true 时, 资源表中不存在的接口也必须携带有效 token,
 // 仅跳过权限校验(fail closed)。后台接口必须用 true, 否则新增接口忘记
 // 在资源表登记, 该接口就会完全无鉴权。
 // 前台接口用 false: 大部分是匿名可读的, 只是顺便识别一下当前用户。
 func JWTAuth(requireLogin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// FIXME: 前后台 session 混乱, 暂时无法将用户信息挂载在 gin context 缓存
-		// auth, _ := handle.CurrentUserAuth(c)
-		// if auth != nil {
-		// 	slog.Debug("[middleware-JWTAuth] user auth exist, skip jwt auth")
-		// 	c.Next()
-		// 	return
-		// }
-
-		slog.Debug("[middleware-JWTAuth] user auth not exist, do jwt auth")
-
 		db := c.MustGet(g.CTX_DB).(*gorm.DB)
 
 		// 系统管理的资源需要做验证, 没有加进来的不需要
 		url, method := c.FullPath()[4:], c.Request.Method
 		resource, err := model.GetResource(db, url, method)
-		if err != nil {
-			if !errors.Is(err, gorm.ErrRecordNotFound) {
-				handle.ReturnError(c, g.ErrDbOp, err)
-				return
-			}
-			// 资源表中没有登记的接口: 不做权限校验
-			slog.Debug("[middleware-JWTAuth] resource not exist, skip permission check")
-			c.Set("skip_check", true)
-			// 前台接口允许匿名访问, 后台接口仍然要求登录
-			if !requireLogin {
-				c.Next()
-				c.Set("skip_check", false)
-				return
-			}
-		}
-
-		// 匿名资源, 直接跳过后续验证 (资源表中没登记时 resource 为零值)
-		if resource.Anonymous {
-			slog.Debug(fmt.Sprintf("[middleware-JWTAuth] resource: %s %s is anonymous, skip jwt auth!", url, method))
-			c.Set("skip_check", true)
-			c.Next()
-			c.Set("skip_check", false)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			handle.ReturnError(c, g.ErrDbOp, err)
 			return
 		}
+		registered := err == nil
+
+		// 资源表中没登记的接口, 以及登记为匿名的接口, 都不做权限校验
+		if !registered || resource.Anonymous {
+			slog.Debug(fmt.Sprintf("[middleware-JWTAuth] resource: %s %s skip permission check", url, method))
+			c.Set("skip_check", true)
+		}
+
+		// 是否必须携带有效 token:
+		// 资源表中登记且非匿名的接口必须; 没登记的接口由 requireLogin 决定
+		mustLogin := (registered && !resource.Anonymous) || (!registered && requireLogin)
 
 		authorization := c.Request.Header.Get("Authorization")
 		if authorization == "" {
-			handle.ReturnError(c, g.ErrTokenNotExist, nil)
+			if mustLogin {
+				handle.ReturnError(c, g.ErrTokenNotExist, nil)
+				return
+			}
+			// 匿名访问: 后续 handler 自己决定要不要用户信息
+			slog.Debug("[middleware-JWTAuth] no authorization header, continue as anonymous")
 			return
 		}
 
+		// 带了凭证就必须是有效的, 坏掉的 token 直接报错而不是降级成匿名,
+		// 否则前端无法区分"没登录"和"登录过期"
 		// token 的正确格式: `Bearer [tokenString]`
 		parts := strings.Split(authorization, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
@@ -96,7 +88,7 @@ func JWTAuth(requireLogin bool) gin.HandlerFunc {
 			return
 		}
 
-		// session
+		// session: 每次请求都刷新一次, 避免 10 分钟后失效
 		session := sessions.Default(c)
 		session.Set(g.CTX_USER_AUTH, claims.UserId)
 		session.Save()

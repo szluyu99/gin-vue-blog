@@ -126,3 +126,91 @@ func TestJWTAuthUserNotExist(t *testing.T) {
 	assert.False(t, e.handlerRan)
 	assert.Contains(t, w.Body.String(), "该用户不存在")
 }
+
+// 前台接口带了有效 token: 即使接口没登记在资源表里, 也要识别出当前用户
+// (前台的登录态之前只能靠 session cookie, session 只有 10 分钟)
+func TestJWTAuthOptionalLoginIdentifiesUser(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("tester", false)
+	e.handle(http.MethodPost, "/front/upload", JWTAuth(false))
+
+	w := e.request(http.MethodPost, "/api/front/upload", "{}", bearer(t, user.ID, 24))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, e.handlerRan)
+	assert.NotNil(t, e.handlerUser, "handler 应该能从 context 里拿到用户")
+	assert.Equal(t, "tester", e.handlerUser.Username)
+	// session 每次请求都会刷新, 不会因为 10 分钟没动就失效
+	assert.NotEmpty(t, w.Header().Get("Set-Cookie"))
+}
+
+// 前台接口不带 token: 匿名放行, handler 自己决定要不要用户
+func TestJWTAuthOptionalLoginAnonymous(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	e.handle(http.MethodGet, "/front/article/list", JWTAuth(false))
+
+	w := e.get("/api/front/article/list")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, e.handlerRan)
+	assert.Nil(t, e.handlerUser)
+}
+
+// 前台接口带了坏掉的 token: 直接报错, 不降级成匿名
+// 否则前端无法区分"没登录"和"登录过期"
+func TestJWTAuthOptionalLoginRejectsBadToken(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("tester", false)
+	e.handle(http.MethodPost, "/front/upload", JWTAuth(false))
+
+	w := e.request(http.MethodPost, "/api/front/upload", "{}", bearerWithSecret(t, "another-secret", user.ID, 24))
+
+	assert.False(t, e.handlerRan)
+	assert.Contains(t, w.Body.String(), "TOKEN 不正确")
+}
+
+// 前台接口带了过期的 token: 同样直接报错
+func TestJWTAuthOptionalLoginRejectsExpiredToken(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("tester", false)
+	e.handle(http.MethodPost, "/front/upload", JWTAuth(false))
+
+	w := e.request(http.MethodPost, "/api/front/upload", "{}", bearer(t, user.ID, -1))
+
+	assert.False(t, e.handlerRan)
+	assert.Contains(t, w.Body.String(), "TOKEN 不正确")
+}
+
+// 资源表中登记为匿名的接口: 不带 token 放行, 带 token 则识别用户
+func TestJWTAuthAnonymousResourceIdentifiesUser(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("tester", false)
+	e.seedResource("匿名接口", "/config", http.MethodGet, true)
+	e.handle(http.MethodGet, "/config", JWTAuth(true), PermissionCheck())
+
+	w := e.request(http.MethodGet, "/api/config", "", bearer(t, user.ID, 24))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, e.handlerRan, "匿名资源不做权限校验")
+	assert.NotNil(t, e.handlerUser)
+	assert.Equal(t, "tester", e.handlerUser.Username)
+}
+
+// 后台接口带了有效 token 但资源表中没登记: 允许访问(仅跳过权限校验), 用户要识别出来
+func TestJWTAuthRequireLoginIdentifiesUser(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("admin", true)
+	e.handle(http.MethodPost, "/whatever", JWTAuth(true), PermissionCheck())
+
+	w := e.request(http.MethodPost, "/api/whatever", "{}", bearer(t, user.ID, 24))
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, e.handlerRan)
+	assert.NotNil(t, e.handlerUser)
+}

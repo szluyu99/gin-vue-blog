@@ -69,7 +69,14 @@ async function handleFileChange() {
           </div>
         </div>
       </template>
-      <input id="dropzone-file" ref="fileRef" type="file" class="hidden" @change="handleFileChange">
+      <input
+        id="dropzone-file"
+        ref="fileRef"
+        type="file"
+        class="hidden"
+        accept="image/jpeg,image/png,image/gif,image/webp,image/bmp"
+        @change="handleFileChange"
+      >
     </label>
   </main>
 </template>

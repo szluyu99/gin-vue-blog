@@ -2519,9 +2519,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: 上传文件到本地或七牛云, 返回访问地址
+      description: 上传图片到本地或七牛云, 返回访问地址。需要登录, 只允许图片, 单个文件不超过 10MB
       parameters:
-      - description: 文件
+      - description: 图片文件
         in: formData
         name: file
         required: true
@@ -3359,9 +3359,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: 上传文件到本地或七牛云, 返回访问地址
+      description: 上传图片到本地或七牛云, 返回访问地址。需要登录, 只允许图片, 单个文件不超过 10MB
       parameters:
-      - description: 文件
+      - description: 图片文件
         in: formData
         name: file
         required: true
