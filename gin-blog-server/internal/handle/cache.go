@@ -5,12 +5,73 @@ import (
 	"encoding/json"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
-	"github.com/redis/go-redis/v9"
+	"log/slog"
+	"strconv"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // redis context
 var rctx = context.Background()
+
+/*
+按 id 批量取计数
+
+列表接口以前用 HGetAll / ZRange(0, -1) 把整个计数集合拉回来, 只为给当页十几条
+数据填数, 开销随文章/评论总量线性增长。这里只取当页需要的字段。
+计数属于展示信息, 取不到就当 0, 不让 Redis 抖动影响列表本身。
+*/
+func hashCounts(rdb *redis.Client, key string, ids []int) map[int]int {
+	counts := make(map[int]int, len(ids))
+	if len(ids) == 0 {
+		return counts
+	}
+
+	fields := make([]string, 0, len(ids))
+	for _, id := range ids {
+		fields = append(fields, strconv.Itoa(id))
+	}
+
+	vals, err := rdb.HMGet(rctx, key, fields...).Result()
+	if err != nil {
+		slog.Warn("批量读取计数失败", "key", key, "err", err)
+		return counts
+	}
+	for i, val := range vals {
+		s, ok := val.(string)
+		if !ok { // 字段不存在时是 nil
+			continue
+		}
+		if n, err := strconv.Atoi(s); err == nil {
+			counts[ids[i]] = n
+		}
+	}
+	return counts
+}
+
+// hashCounts 的 ZSet 版本
+func zsetCounts(rdb *redis.Client, key string, ids []int) map[int]int {
+	counts := make(map[int]int, len(ids))
+	if len(ids) == 0 {
+		return counts
+	}
+
+	members := make([]string, 0, len(ids))
+	for _, id := range ids {
+		members = append(members, strconv.Itoa(id))
+	}
+
+	scores, err := rdb.ZMScore(rctx, key, members...).Result()
+	if err != nil {
+		slog.Warn("批量读取计数失败", "key", key, "err", err)
+		return counts
+	}
+	for i, score := range scores {
+		counts[ids[i]] = int(score) // 成员不存在时 score 为 0
+	}
+	return counts
+}
 
 // Page
 

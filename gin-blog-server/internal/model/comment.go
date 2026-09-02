@@ -17,12 +17,12 @@ const (
 
 type Comment struct {
 	Model
-	UserId      int    `json:"user_id"`       // 评论者
-	ReplyUserId int    `json:"reply_user_id"` // 被回复者
-	TopicId     int    `json:"topic_id"`      // 评论的文章
-	ParentId    int    `json:"parent_id"`     // 父评论 被回复的评论
+	UserId      int    `gorm:"index:idx_comment_user" json:"user_id"`              // 评论者
+	ReplyUserId int    `json:"reply_user_id"`                                      // 被回复者
+	TopicId     int    `gorm:"index:idx_comment_topic,priority:2" json:"topic_id"` // 评论的文章
+	ParentId    int    `gorm:"index:idx_comment_parent" json:"parent_id"`          // 父评论 被回复的评论
 	Content     string `gorm:"type:varchar(500);not null" json:"content"`
-	Type        int    `gorm:"type:tinyint(1);not null;comment:评论类型(1.文章 2.友链 3.说说)" json:"type"` // 评论类型 1.文章 2.友链 3.说说
+	Type        int    `gorm:"type:tinyint(1);not null;index:idx_comment_topic,priority:1;comment:评论类型(1.文章 2.友链 3.说说)" json:"type"` // 评论类型 1.文章 2.友链 3.说说
 	IsReview    bool   `json:"is_review"`
 
 	// Belongs To
@@ -104,45 +104,69 @@ func GetCommentList(db *gorm.DB, page, size, typ int, isReview *bool, nickname s
 	return data, total, result.Error
 }
 
-// 获取博客评论列表
+// 获取博客评论列表: 顶级评论分页, 每条评论带上它的回复
+// 只返回审核通过的, 未审核的不能出现在前台(GetArticleCommentCount 也是按 is_review 统计的)
 func GetCommentVOList(db *gorm.DB, page, size, topic, typ int) (data []CommentVO, total int64, err error) {
-	var list []Comment
-
-	tx := db.Model(&Comment{})
-	if typ != 0 {
-		tx = tx.Where("type = ?", typ)
+	// 过滤条件写成 scope, Count 和 Find 各用一次全新的查询,
+	// 之前把 Preload / Scopes(Paginate) 的返回值丢掉了(链式调用返回的是新对象),
+	// 导致分页参数完全没生效, 每次都把所有顶级评论返回给前台
+	filter := func(d *gorm.DB) *gorm.DB {
+		d = d.Where("parent_id = 0 AND is_review = ?", true)
+		if typ != 0 {
+			d = d.Where("type = ?", typ)
+		}
+		if topic != 0 {
+			d = d.Where("topic_id = ?", topic)
+		}
+		return d
 	}
-	if topic != 0 {
-		tx = tx.Where("topic_id = ?", topic)
-	}
 
-	// 获取顶级评论列表
-	tx.Where("parent_id = 0").
-		Count(&total).
-		Preload("User").Preload("User.UserInfo").
-		// Preload("ReplyUser").Preload("ReplyUser.UserInfo").
-		Order("id DESC").
-		Scopes(Paginate(page, size))
-	if err := tx.Find(&list).Error; err != nil {
+	if err := db.Model(&Comment{}).Scopes(filter).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// 获取顶级评论的回复列表
+	var list []Comment
+	if err := db.Model(&Comment{}).Scopes(filter).
+		Preload("User").Preload("User.UserInfo").
+		Order("id DESC").
+		Scopes(Paginate(page, size)).
+		Find(&list).Error; err != nil {
+		return nil, 0, err
+	}
+
+	data = make([]CommentVO, 0, len(list))
+	if len(list) == 0 {
+		return data, total, nil
+	}
+
+	// 一次把本页所有顶级评论的回复查回来, 而不是每条评论查一次(N+1)
+	ids := make([]int, 0, len(list))
 	for _, v := range list {
-		replyList := make([]CommentVO, 0)
+		ids = append(ids, v.ID)
+	}
 
-		tx := db.Model(&Comment{})
-		tx.Where("parent_id = ?", v.ID).
-			Preload("User").Preload("User.UserInfo").
-			// Preload("ReplyUser").Preload("ReplyUser.UserInfo")
-			Order("id DESC")
-		if err := tx.Find(&replyList).Error; err != nil {
-			return nil, 0, err
+	var replies []Comment
+	if err := db.Model(&Comment{}).
+		Where("parent_id IN ? AND is_review = ?", ids, true).
+		Preload("User").Preload("User.UserInfo").
+		Order("id DESC").
+		Find(&replies).Error; err != nil {
+		return nil, 0, err
+	}
+
+	grouped := make(map[int][]CommentVO, len(ids))
+	for _, reply := range replies {
+		grouped[reply.ParentId] = append(grouped[reply.ParentId], CommentVO{Comment: reply})
+	}
+
+	for _, v := range list {
+		replyList := grouped[v.ID]
+		if replyList == nil {
+			replyList = make([]CommentVO, 0)
 		}
-
 		data = append(data, CommentVO{
-			ReplyCount: len(replyList),
 			Comment:    v,
+			ReplyCount: len(replyList),
 			ReplyList:  replyList,
 		})
 	}
@@ -150,10 +174,10 @@ func GetCommentVOList(db *gorm.DB, page, size, topic, typ int) (data []CommentVO
 	return data, total, nil
 }
 
-// 根据 [评论id] 获取 [回复列表]
+// 根据 [评论id] 获取 [回复列表], 同样只返回审核通过的
 func GetCommentReplyList(db *gorm.DB, id, page, size int) (data []Comment, err error) {
 	result := db.Model(&Comment{}).
-		Where(&Comment{ParentId: id}).
+		Where("parent_id = ? AND is_review = ?", id, true).
 		Preload("User").Preload("User.UserInfo").
 		Order("id DESC").
 		Scopes(Paginate(page, size)).

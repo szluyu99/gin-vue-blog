@@ -39,5 +39,6 @@ const (
 const (
 	CONFIG_ARTICLE_COVER     = "article_cover"
 	CONFIG_IS_COMMENT_REVIEW = "is_comment_review"
+	CONFIG_IS_MESSAGE_REVIEW = "is_message_review"
 	CONFIG_ABOUT             = "about"
 )

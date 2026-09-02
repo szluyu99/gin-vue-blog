@@ -28,14 +28,14 @@ type Article struct {
 	Desc        string `json:"desc"`
 	Content     string `json:"content"`
 	Img         string `json:"img"`
-	Type        int    `gorm:"type:tinyint;comment:类型(1-原创 2-转载 3-翻译)" json:"type"` // 1-原创 2-转载 3-翻译
-	Status      int    `gorm:"type:tinyint;comment:状态(1-公开 2-私密)" json:"status"`    // 1-公开 2-私密
+	Type        int    `gorm:"type:tinyint;comment:类型(1-原创 2-转载 3-翻译)" json:"type"`                                // 1-原创 2-转载 3-翻译
+	Status      int    `gorm:"type:tinyint;index:idx_article_list,priority:2;comment:状态(1-公开 2-私密)" json:"status"` // 1-公开 2-私密
 	IsTop       bool   `json:"is_top"`
-	IsDelete    bool   `json:"is_delete"`
+	IsDelete    bool   `gorm:"index:idx_article_list,priority:1" json:"is_delete"`
 	OriginalUrl string `json:"original_url"`
 
-	CategoryId int `json:"category_id"`
-	UserId     int `json:"-"` // user_auth_id
+	CategoryId int `gorm:"index:idx_article_category" json:"category_id"`
+	UserId     int `gorm:"index:idx_article_user" json:"-"` // user_auth_id
 
 	Tags     []*Tag    `gorm:"many2many:article_tag;joinForeignKey:article_id" json:"tags"`
 	Category *Category `gorm:"foreignkey:CategoryId" json:"category"`
@@ -43,6 +43,7 @@ type Article struct {
 }
 
 type ArticleTag struct {
+	// gorm 依据 many2many 自建这张表, 主键就是 (tag_id, article_id), 已经带索引
 	ArticleId int
 	TagId     int
 }

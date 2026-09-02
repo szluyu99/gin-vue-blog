@@ -2,10 +2,10 @@ package utils
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"net"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
@@ -70,27 +70,42 @@ func (*ipUtil) GetIpAddress(c *gin.Context) (ipAddress string) {
 
 // 获取 IP 来源
 // https://github.com/lionsoul2014/ip2region
-var vIndex []byte // 缓存 VectorIndex 索引, 减少一次固定的 IO 操作
+const xdbPath = "../assets/ip2region.xdb" // IP 数据库文件, 路径相对于 main.go
+
+var (
+	xdbOnce    sync.Once
+	xdbContent []byte
+	xdbErr     error
+)
+
+/*
+第一次用到时把整个 xdb(约 11MB) 读进内存并复用
+
+之前每次查询都要重新打开文件、构造 searcher, 而访客上报和登录都会走到这里。
+用内存缓存换掉这部分 IO, 代价是常驻内存多 11MB, 且只在真正查过 IP 后才占用。
+*/
+func loadXdbContent() ([]byte, error) {
+	xdbOnce.Do(func() {
+		xdbContent, xdbErr = xdb.LoadContentFromFile(xdbPath)
+		if xdbErr != nil {
+			slog.Error("加载 IP 数据库失败", "path", xdbPath, "err", xdbErr)
+		}
+	})
+	return xdbContent, xdbErr
+}
 
 // 获取地域信息: 中国|0|江苏省|苏州市|电信
 func (*ipUtil) GetIpSource(ipAddress string) string {
-	var dbPath = "../assets/ip2region.xdb" // IP 数据库文件
-	// 完全基于文件查询, 每次都读取文件
-	// searcher, err := xdb.NewWithFileOnly(dbPath)
-
-	// 缓存 VectorIndex 索引, 减少一次固定的 IO 操作
-	if vIndex == nil {
-		var err error
-		vIndex, err = xdb.LoadVectorIndexFromFile(dbPath)
-		if err != nil {
-			slog.Error(fmt.Sprintf("failed to load vector index from `%s`: %s\n", dbPath, err))
-			return ""
-		}
-	}
-	searcher, err := xdb.NewWithVectorIndex(dbPath, vIndex)
-
+	content, err := loadXdbContent()
 	if err != nil {
-		slog.Error("failed to create searcher with vector index", "err", err)
+		return ""
+	}
+
+	// searcher 只是包了一层 buffer, 构造过程没有 IO;
+	// 但它本身不是并发安全的, 所以不共享, 每次查询新建一个
+	searcher, err := xdb.NewWithBuffer(content)
+	if err != nil {
+		slog.Error("创建 IP 查询器失败", "err", err)
 		return ""
 	}
 	defer searcher.Close()
@@ -99,7 +114,7 @@ func (*ipUtil) GetIpSource(ipAddress string) string {
 	// 只有中国的数据绝大部分精确到了城市, 其他国家部分数据只能定位到国家, 后面的选项全部是 0
 	region, err := searcher.SearchByStr(ipAddress)
 	if err != nil {
-		slog.Error(fmt.Sprintf("failed to search ip(%s): %s\n", ipAddress, err))
+		slog.Error("查询 IP 归属失败", "ip", ipAddress, "err", err)
 		return ""
 	}
 	return region
