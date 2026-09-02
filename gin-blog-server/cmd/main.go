@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	ginblog "gin-blog/internal"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/middleware"
-	"log"
+	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -51,10 +53,17 @@ func main() {
 	}
 
 	serverAddr := conf.Server.Port
+	/*
+		启动横幅不走日志: slog 的级别由配置控制 (部署用的 config.docker.yml 是 error),
+		用 log/slog 输出会被直接丢掉, 容器起来后看不到监听地址。
+	*/
 	if serverAddr[0] == ':' || strings.HasPrefix(serverAddr, "0.0.0.0:") {
-		log.Printf("Serving HTTP on (http://localhost:%s/) ... \n", strings.Split(serverAddr, ":")[1])
+		fmt.Printf("Serving HTTP on (http://localhost:%s/) ... \n", strings.Split(serverAddr, ":")[1])
 	} else {
-		log.Printf("Serving HTTP on (http://%s/) ... \n", serverAddr)
+		fmt.Printf("Serving HTTP on (http://%s/) ... \n", serverAddr)
 	}
-	r.Run(serverAddr)
+	if err := r.Run(serverAddr); err != nil {
+		slog.Error("HTTP 服务启动失败", "addr", serverAddr, "err", err)
+		os.Exit(1)
+	}
 }
