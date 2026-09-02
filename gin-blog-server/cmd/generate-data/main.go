@@ -16,13 +16,17 @@ import (
 func main() {
 	configPath := flag.String("c", "../../config.yml", "配置文件路径")
 	typeName := flag.String("t", "all", "要初始化的数据类型: config | auth | page | all")
+	// 从 cmd/generate-data 目录运行时, sqlite 文件在上一级(与 server 的工作目录 cmd/ 一致);
+	// 容器里二进制和配置文件同级, 需要显式关掉
+	sqliteParent := flag.Bool("sqlite-parent", true, "sqlite 数据库文件是否在上级目录")
 	flag.Parse()
 
 	// 根据命令行参数读取配置文件, 其他变量的初始化依赖于配置文件对象
 	conf := g.ReadConfig(*configPath)
 
-	//! 处理 sqlite3 数据库路径
-	conf.SQLite.Dsn = "../" + conf.SQLite.Dsn
+	if *sqliteParent {
+		conf.SQLite.Dsn = "../" + conf.SQLite.Dsn
+	}
 	conf.Server.DbLogMode = "silent"
 
 	db := ginblog.InitDatabase(conf)
@@ -70,7 +74,7 @@ func generateDefaultPages(db *gorm.DB) {
 
 	for _, page := range pages {
 		if err := db.Create(&page).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(page.Name + " 页面数据已经存在")
 			} else {
 				slog.Error(page.Name + " 页面初始化失败" + err.Error())
@@ -105,7 +109,7 @@ func generateDefaultConfigs(db *gorm.DB) {
 
 	for _, config := range configs {
 		if err := db.Create(&config).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(config.Key + " 配置已经存在")
 			} else {
 				slog.Error(config.Key + " 配置初始化失败" + err.Error())
@@ -127,8 +131,10 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 
 	for i := range roles {
 		if err := db.Create(&roles[i]).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(roles[i].Name + " 角色已经存在")
+				// 取回已有 ID, 否则后面的关联关系会写成 0
+				db.Where("name", roles[i].Name).First(&roles[i])
 			} else {
 				slog.Error(roles[i].Name + " 角色初始化失败" + err.Error())
 			}
@@ -157,14 +163,18 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 
 	for i := range auths {
 		if err := db.Create(&auths[i]).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(auths[i].Username + " 用户已经存在")
+				// 取回已有 ID, 否则下面会插入 user_auth_id = 0 的脏数据
+				db.Where("username", auths[i].Username).First(&auths[i])
 			} else {
 				slog.Error(auths[i].Username + " 用户初始化失败" + err.Error())
 			}
 		}
 		// 创建用户角色关联关系
-		db.Create(&model.UserAuthRole{UserAuthId: auths[i].ID, RoleId: roles[i].ID})
+		if auths[i].ID != 0 && roles[i].ID != 0 {
+			db.Create(&model.UserAuthRole{UserAuthId: auths[i].ID, RoleId: roles[i].ID})
+		}
 	}
 
 	slog.Info("-----初始化默认角色用户 end-----")
@@ -179,7 +189,7 @@ func generateDefaultResources(db *gorm.DB) {
 	for _, module := range model.AdminResources {
 		parent := model.Resource{Name: module.Name}
 		if err := db.Create(&parent).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(module.Name + " 资源已经存在")
 				// 重复执行时取回已有 ID, 否则子资源的 parent_id 会是 0
 				db.Where("name", module.Name).First(&parent)
@@ -200,7 +210,7 @@ func generateDefaultResources(db *gorm.DB) {
 
 	for i := range resources {
 		if err := db.Create(&resources[i]).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(resources[i].Name + " 资源已经存在")
 			} else {
 				slog.Error(resources[i].Name + " 资源初始化失败" + err.Error())
@@ -217,7 +227,7 @@ func generateDefaultResources(db *gorm.DB) {
 		for _, resource := range resources {
 			if resource.ID != 0 {
 				if err := db.Create(&model.RoleResource{RoleId: adminRole.ID, ResourceId: resource.ID}).Error; err != nil {
-					if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+					if isDuplicate(err) {
 						slog.Info("admin 角色菜单关联关系初始化失败" + err.Error())
 					} else {
 						slog.Error("admin 角色菜单关联关系初始化失败" + err.Error())
@@ -233,7 +243,7 @@ func generateDefaultResources(db *gorm.DB) {
 		for _, resource := range resources {
 			if resource.ID != 0 && resource.Method == "GET" {
 				if err := db.Create(&model.RoleResource{RoleId: guestRole.ID, ResourceId: resource.ID}).Error; err != nil {
-					if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+					if isDuplicate(err) {
 						slog.Info("guest 角色菜单关联关系初始化失败" + err.Error())
 					} else {
 						slog.Error("guest 角色菜单关联关系初始化失败" + err.Error())
@@ -263,7 +273,7 @@ func generateDefaultMenus(db *gorm.DB) {
 
 	for i := range parents {
 		if err := db.Create(&parents[i]).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(parents[i].Name + " 菜单已经存在")
 			} else {
 				slog.Error(parents[i].Name + " 菜单初始化失败" + err.Error())
@@ -300,7 +310,7 @@ func generateDefaultMenus(db *gorm.DB) {
 
 	for i := range menus {
 		if err := db.Create(&menus[i]).Error; err != nil {
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+			if isDuplicate(err) {
 				slog.Info(menus[i].Name + " 菜单已经存在")
 			} else {
 				slog.Error(menus[i].Name + " 菜单初始化失败" + err.Error())
@@ -317,7 +327,7 @@ func generateDefaultMenus(db *gorm.DB) {
 		for _, menu := range menus {
 			if menu.ID != 0 {
 				if err := db.Create(&model.RoleMenu{RoleId: adminRole.ID, MenuId: menu.ID}).Error; err != nil {
-					if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+					if isDuplicate(err) {
 						slog.Info("admin 角色菜单关联关系初始化失败" + err.Error())
 					} else {
 						slog.Error("admin 角色菜单关联关系初始化失败" + err.Error())
@@ -333,7 +343,7 @@ func generateDefaultMenus(db *gorm.DB) {
 		for _, menu := range menus {
 			if menu.ID != 0 {
 				if err := db.Create(&model.RoleMenu{RoleId: guestRole.ID, MenuId: menu.ID}).Error; err != nil {
-					if strings.Contains(err.Error(), "UNIQUE constraint failed") || strings.Contains(err.Error(), "Duplicate entry") {
+					if isDuplicate(err) {
 						slog.Info("guest 角色菜单关联关系初始化失败" + err.Error())
 					} else {
 						slog.Error("guest 角色菜单关联关系初始化失败" + err.Error())
@@ -344,4 +354,12 @@ func generateDefaultMenus(db *gorm.DB) {
 	}
 
 	slog.Info("-----初始化菜单 end-----")
+}
+
+// sqlite 和 MySQL 的唯一约束冲突错误文案不同, 统一判断
+// 种子数据允许重复执行, 冲突说明已经初始化过, 不算失败
+func isDuplicate(err error) bool {
+	msg := err.Error()
+	return strings.Contains(msg, "UNIQUE constraint failed") ||
+		strings.Contains(msg, "Duplicate entry")
 }
