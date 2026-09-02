@@ -85,6 +85,12 @@ func newTestEnv(t *testing.T) *testEnv {
 // 发起请求, 返回解析后的响应
 func (e *testEnv) do(t *testing.T, method, path string, body any) Response[any] {
 	t.Helper()
+	return e.doWithHeader(t, method, path, body, nil)
+}
+
+// 带自定义请求头的版本, 用于模拟不同访客(X-Real-IP)等场景
+func (e *testEnv) doWithHeader(t *testing.T, method, path string, body any, header map[string]string) Response[any] {
+	t.Helper()
 
 	var reader *bytes.Reader
 	if body != nil {
@@ -97,6 +103,9 @@ func (e *testEnv) do(t *testing.T, method, path string, body any) Response[any] 
 
 	req := httptest.NewRequest(method, path, reader)
 	req.Header.Set("Content-Type", "application/json")
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
 
 	w := httptest.NewRecorder()
 	e.engine.ServeHTTP(w, req)

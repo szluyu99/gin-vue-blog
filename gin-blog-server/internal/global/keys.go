@@ -15,6 +15,8 @@ const (
 	ARTICLE_USER_LIKE_SET = "article_user_like:" // 文章点赞 Set
 	ARTICLE_LIKE_COUNT    = "article_like_count" // 文章点赞数
 	ARTICLE_VIEW_COUNT    = "article_view_count" // 文章查看数
+	// 文章浏览去重, 格式 article_view_visitor:<文章id>:<访客指纹>, 带 TTL
+	ARTICLE_VIEW_VISITOR = "article_view_visitor:"
 
 	COMMENT_USER_LIKE_SET = "comment_user_like:" // 评论点赞 Set
 	COMMENT_LIKE_COUNT    = "comment_like_count" // 评论点赞数

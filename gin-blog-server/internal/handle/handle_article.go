@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type Article struct{}
@@ -135,7 +136,7 @@ func (*Article) UpdateSoftDelete(c *gin.Context) {
 }
 
 // @Summary 物理删除文章（批量）
-// @Description 根据 ID 数组物理删除文章, 同时删除文章标签关联
+// @Description 根据 ID 数组物理删除文章, 同时删除文章标签关联与 Redis 中的浏览量/点赞记录
 // @Tags Article
 // @Accept json
 // @Produce json
@@ -156,7 +157,57 @@ func (*Article) Delete(c *gin.Context) {
 		return
 	}
 
+	// 数据库里的文章没了, Redis 里的计数也要跟着清,
+	// 否则新文章复用到同一个 id 时会直接继承旧文章的浏览量和点赞数
+	cleanArticleCounters(GetRDB(c), ids)
+
 	ReturnSuccess(c, rows)
+}
+
+// 清理文章相关的 Redis 计数: 浏览量、点赞数、用户点赞记录、浏览去重 key
+func cleanArticleCounters(rdb *redis.Client, ids []int) {
+	if len(ids) == 0 {
+		return
+	}
+
+	members := make([]any, 0, len(ids))
+	fields := make([]string, 0, len(ids))
+	for _, id := range ids {
+		members = append(members, strconv.Itoa(id))
+		fields = append(fields, strconv.Itoa(id))
+	}
+
+	if err := rdb.ZRem(rctx, g.ARTICLE_VIEW_COUNT, members...).Err(); err != nil {
+		slog.Error("清理文章浏览量失败", "ids", ids, "err", err)
+	}
+	if err := rdb.HDel(rctx, g.ARTICLE_LIKE_COUNT, fields...).Err(); err != nil {
+		slog.Error("清理文章点赞数失败", "ids", ids, "err", err)
+	}
+
+	// 用户点赞记录是按用户存的 Set, 只能扫出来把文章 id 从每个集合里移除
+	if err := scanKeys(rdb, g.ARTICLE_USER_LIKE_SET+"*", func(key string) {
+		rdb.SRem(rctx, key, members...)
+	}); err != nil {
+		slog.Error("清理用户点赞记录失败", "ids", ids, "err", err)
+	}
+
+	// 浏览去重的 key 一并删掉, 不然新文章的首次访问会被旧记录挡住
+	for _, id := range ids {
+		if err := scanKeys(rdb, g.ARTICLE_VIEW_VISITOR+strconv.Itoa(id)+":*", func(key string) {
+			rdb.Del(rctx, key)
+		}); err != nil {
+			slog.Error("清理文章浏览去重记录失败", "id", id, "err", err)
+		}
+	}
+}
+
+// 按 pattern 扫描 key 并逐个处理, 用 SCAN 而不是 KEYS, 避免阻塞 Redis
+func scanKeys(rdb *redis.Client, pattern string, fn func(key string)) error {
+	iter := rdb.Scan(rctx, 0, pattern, 100).Iterator()
+	for iter.Next(rctx) {
+		fn(iter.Val())
+	}
+	return iter.Err()
 }
 
 // @Summary 条件查询文章列表

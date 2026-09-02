@@ -4,7 +4,9 @@ import (
 	"errors"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
+	"gin-blog/internal/utils"
 	"log/slog"
+	"net"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -146,4 +148,26 @@ func CurrentUserAuth(c *gin.Context) (*model.UserAuth, error) {
 
 	c.Set(key, user)
 	return user, nil
+}
+
+/*
+访客指纹: IP + 浏览器 + 操作系统 的哈希, 用于同一访客的去重统计
+
+注意 RemoteAddr 形如 "1.2.3.4:54321", 端口每次请求都变, 不剥掉的话
+同一个访客会被当成无数个新访客, 去重就完全失效了。
+*/
+func visitorFingerprint(c *gin.Context) string {
+	ipAddress := utils.IP.GetIpAddress(c)
+	if host, _, err := net.SplitHostPort(ipAddress); err == nil {
+		ipAddress = host
+	}
+
+	// 非浏览器(如 curl)或没有 User-Agent 时, 解析结果为 nil, 不能直接取字段
+	var browser, os string
+	if ua := utils.IP.GetUserAgent(c); ua != nil {
+		browser = ua.Name + " " + ua.Version.String()
+		os = ua.OS + " " + ua.OSVersion.String()
+	}
+
+	return utils.MD5(ipAddress + browser + os)
 }

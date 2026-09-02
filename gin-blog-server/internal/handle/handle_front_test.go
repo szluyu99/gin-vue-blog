@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -218,9 +219,20 @@ func TestFrontGetArticleInfo(t *testing.T) {
 	assert.Len(t, data.NewestArticles, 3)
 	assert.Equal(t, int64(1), data.ViewCount, "访问一次浏览量 +1")
 
-	// 再访问一次浏览量继续累加
+	// 同一访客再访问一次不再计数, 否则刷新就能刷量
 	decodeData(t, env.do(t, http.MethodGet, "/front/article/"+itoa(a2.ID), nil).Data, &data)
+	assert.Equal(t, int64(1), data.ViewCount)
+
+	// 换一个访客(不同 IP)才继续累加
+	resp = env.doWithHeader(t, http.MethodGet, "/front/article/"+itoa(a2.ID), nil,
+		map[string]string{"X-Real-IP": "10.0.0.9"})
+	decodeData(t, resp.Data, &data)
 	assert.Equal(t, int64(2), data.ViewCount)
+
+	// 去重窗口过期后同一访客可以再计一次
+	env.mr.FastForward(articleViewInterval + time.Second)
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/"+itoa(a2.ID), nil).Data, &data)
+	assert.Equal(t, int64(3), data.ViewCount)
 
 	// 私密文章拿不到
 	secret := model.Article{Title: "私密", Status: model.STATUS_SECRET}

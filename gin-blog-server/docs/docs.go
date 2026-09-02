@@ -59,7 +59,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "根据 ID 数组物理删除文章, 同时删除文章标签关联",
+                "description": "根据 ID 数组物理删除文章, 同时删除文章标签关联与 Redis 中的浏览量/点赞记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -883,7 +883,7 @@ const docTemplate = `{
         },
         "/front/article/{id}": {
             "get": {
-                "description": "文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同时浏览量 +1",
+                "description": "文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同一访客一小时内只计一次浏览量",
                 "produces": [
                     "application/json"
                 ],

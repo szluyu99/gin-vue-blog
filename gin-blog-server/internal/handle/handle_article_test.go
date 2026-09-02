@@ -228,6 +228,40 @@ func TestArticleSoftDeleteAndTop(t *testing.T) {
 	assert.Equal(t, int64(0), count)
 }
 
+// 物理删除文章时要把 Redis 里的计数一起清掉, 否则新文章复用 id 会继承旧计数
+func TestArticleDeleteCleansRedis(t *testing.T) {
+	env := newArticleEnv(t)
+
+	kept := model.Article{Title: "保留", Status: model.STATUS_PUBLIC, Type: model.TYPE_ORIGINAL}
+	gone := model.Article{Title: "删除", Status: model.STATUS_PUBLIC, Type: model.TYPE_ORIGINAL}
+	env.db.Create(&kept)
+	env.db.Create(&gone)
+
+	likeSetKey := g.ARTICLE_USER_LIKE_SET + "7"
+	viewVisitorKey := g.ARTICLE_VIEW_VISITOR + itoa(gone.ID) + ":fingerprint"
+
+	env.rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 5, itoa(gone.ID))
+	env.rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 3, itoa(kept.ID))
+	env.rdb.HSet(rctx, g.ARTICLE_LIKE_COUNT, itoa(gone.ID), 2)
+	env.rdb.HSet(rctx, g.ARTICLE_LIKE_COUNT, itoa(kept.ID), 1)
+	env.rdb.SAdd(rctx, likeSetKey, itoa(gone.ID), itoa(kept.ID))
+	env.rdb.Set(rctx, viewVisitorKey, 1, articleViewInterval)
+
+	resp := env.do(t, http.MethodDelete, "/article", []int{gone.ID})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	// 被删文章的痕迹全部清掉
+	assert.Equal(t, float64(0), env.rdb.ZScore(rctx, g.ARTICLE_VIEW_COUNT, itoa(gone.ID)).Val())
+	assert.False(t, env.rdb.HExists(rctx, g.ARTICLE_LIKE_COUNT, itoa(gone.ID)).Val())
+	assert.False(t, env.rdb.SIsMember(rctx, likeSetKey, itoa(gone.ID)).Val())
+	assert.Equal(t, int64(0), env.rdb.Exists(rctx, viewVisitorKey).Val())
+
+	// 其他文章的计数不受影响
+	assert.Equal(t, float64(3), env.rdb.ZScore(rctx, g.ARTICLE_VIEW_COUNT, itoa(kept.ID)).Val())
+	assert.Equal(t, "1", env.rdb.HGet(rctx, g.ARTICLE_LIKE_COUNT, itoa(kept.ID)).Val())
+	assert.True(t, env.rdb.SIsMember(rctx, likeSetKey, itoa(kept.ID)).Val())
+}
+
 func TestArticleImport(t *testing.T) {
 	env := newArticleEnv(t)
 

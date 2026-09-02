@@ -5,6 +5,7 @@ import (
 	"gin-blog/internal/model"
 	"gin-blog/internal/utils"
 	"html/template"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +14,9 @@ import (
 )
 
 type Front struct{}
+
+// 同一访客对同一篇文章的浏览量计数间隔
+const articleViewInterval = time.Hour
 
 type FAddMessageReq struct {
 	Nickname string `json:"nickname" binding:"required"`
@@ -379,7 +383,7 @@ func (*Front) GetArticleList(c *gin.Context) {
 }
 
 // @Summary 前台文章详情
-// @Description 文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同时浏览量 +1
+// @Description 文章详情, 附带上下篇/推荐/最新文章与点赞浏览评论数, 同一访客一小时内只计一次浏览量
 // @Tags Front
 // @Produce json
 // @Param id path int true "文章 ID"
@@ -418,12 +422,17 @@ func (*Front) GetArticleInfo(c *gin.Context) {
 		return
 	}
 
-	// 更新文章浏览量 TODO: 删除文章时删除其浏览量
-	// updateArticleViewCount(c, id)
-
-	// TODO: 更新访问量
-	// * 目前请求一次就会增加访问量, 即刷新可以刷访问量
-	rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 1, strconv.Itoa(id))
+	// 更新文章浏览量: 同一访客在 articleViewInterval 内重复访问只算一次,
+	// 否则刷新页面就能刷量。SetNX 成功说明是这个窗口里的首次访问。
+	viewKey := g.ARTICLE_VIEW_VISITOR + strconv.Itoa(id) + ":" + visitorFingerprint(c)
+	first, err := rdb.SetNX(rctx, viewKey, 1, articleViewInterval).Result()
+	if err != nil {
+		// Redis 异常时宁可多计一次, 也不要让浏览量停止统计
+		slog.Warn("文章浏览去重失败, 本次直接计数", "article_id", id, "err", err)
+	}
+	if first || err != nil {
+		rdb.ZIncrBy(rctx, g.ARTICLE_VIEW_COUNT, 1, strconv.Itoa(id))
+	}
 
 	// 上一篇文章
 	article.LastArticle, err = model.GetLastArticle(db, id)
