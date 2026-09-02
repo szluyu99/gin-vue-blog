@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	ginblog "gin-blog/internal"
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
@@ -75,7 +77,7 @@ func generateDefaultPages(db *gorm.DB) {
 	for _, page := range pages {
 		if err := db.Create(&page).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(page.Name + " 页面数据已经存在")
+				slog.Debug(page.Name + " 页面数据已经存在")
 			} else {
 				slog.Error(page.Name + " 页面初始化失败" + err.Error())
 			}
@@ -110,7 +112,7 @@ func generateDefaultConfigs(db *gorm.DB) {
 	for _, config := range configs {
 		if err := db.Create(&config).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(config.Key + " 配置已经存在")
+				slog.Debug(config.Key + " 配置已经存在")
 			} else {
 				slog.Error(config.Key + " 配置初始化失败" + err.Error())
 			}
@@ -132,7 +134,7 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 	for i := range roles {
 		if err := db.Create(&roles[i]).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(roles[i].Name + " 角色已经存在")
+				slog.Debug(roles[i].Name + " 角色已经存在")
 				// 取回已有 ID, 否则后面的关联关系会写成 0
 				db.Where("name", roles[i].Name).First(&roles[i])
 			} else {
@@ -164,7 +166,7 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 	for i := range auths {
 		if err := db.Create(&auths[i]).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(auths[i].Username + " 用户已经存在")
+				slog.Debug(auths[i].Username + " 用户已经存在")
 				// 取回已有 ID, 否则下面会插入 user_auth_id = 0 的脏数据
 				db.Where("username", auths[i].Username).First(&auths[i])
 			} else {
@@ -181,79 +183,128 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 }
 
 // 生成默认的接口资源
+//
+// 资源定义见 internal/model/seed_resource.go, 与后台路由一一对应。
+// 这里是对账而不是只增不删: 接口下线或改名后, 旧资源如果留在表里会继续
+// 挂在角色上, 之后路由被复用时权限就凭空对上了。
 func generateDefaultResources(db *gorm.DB) {
 	slog.Info("-----初始化接口资源 start-----")
 
-	// 资源定义见 internal/model/seed_resource.go, 与后台路由一一对应
-	var resources []model.Resource
+	// 期望存在的接口资源, key 为 "METHOD URL"
+	wanted := make(map[string]model.Resource)
+	// 期望存在的模块(父资源)名称
+	moduleNames := make(map[string]bool)
+
 	for _, module := range model.AdminResources {
+		moduleNames[module.Name] = true
+
 		parent := model.Resource{Name: module.Name}
-		if err := db.Create(&parent).Error; err != nil {
-			if isDuplicate(err) {
-				slog.Info(module.Name + " 资源已经存在")
-				// 重复执行时取回已有 ID, 否则子资源的 parent_id 会是 0
-				db.Where("name", module.Name).First(&parent)
-			} else {
+		err := db.Where("name", module.Name).First(&parent).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&parent).Error; err != nil {
 				slog.Error(module.Name + " 资源初始化失败" + err.Error())
+				continue
 			}
+		} else if err != nil {
+			slog.Error(module.Name + " 资源查询失败" + err.Error())
+			continue
 		}
 
 		for _, item := range module.Items {
-			resources = append(resources, model.Resource{
+			wanted[item.Method+" "+item.Url] = model.Resource{
 				Name:     item.Name,
 				ParentId: parent.ID,
 				Url:      item.Url,
 				Method:   item.Method,
-			})
-		}
-	}
-
-	for i := range resources {
-		if err := db.Create(&resources[i]).Error; err != nil {
-			if isDuplicate(err) {
-				slog.Info(resources[i].Name + " 资源已经存在")
-			} else {
-				slog.Error(resources[i].Name + " 资源初始化失败" + err.Error())
 			}
 		}
 	}
 
-	// 加载所有资源
-	db.Find(&resources)
+	// 新增或更新: 以 url + method 定位, 名称和所属模块允许变更
+	for _, want := range wanted {
+		var exist model.Resource
+		err := db.Where(&model.Resource{Url: want.Url, Method: want.Method}).First(&exist).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&want).Error; err != nil {
+				slog.Error(want.Name + " 资源初始化失败" + err.Error())
+			}
+			continue
+		}
+		if err != nil {
+			slog.Error(want.Name + " 资源查询失败" + err.Error())
+			continue
+		}
+		if exist.Name != want.Name || exist.ParentId != want.ParentId {
+			if err := db.Model(&exist).
+				Updates(map[string]any{"name": want.Name, "parent_id": want.ParentId}).Error; err != nil {
+				slog.Error(want.Name + " 资源更新失败" + err.Error())
+			}
+		}
+	}
+
+	// 清理代码中已经不存在的资源, 连同它的角色关联
+	// 注意只删资源本身, 不动管理员在后台手动给角色配的其他权限
+	var all []model.Resource
+	if err := db.Find(&all).Error; err != nil {
+		slog.Error("资源列表查询失败" + err.Error())
+		return
+	}
+
+	var stale []int
+	for _, r := range all {
+		if r.Url == "" && r.Method == "" { // 模块(父资源)
+			if !moduleNames[r.Name] {
+				stale = append(stale, r.ID)
+			}
+			continue
+		}
+		if _, ok := wanted[r.Method+" "+r.Url]; !ok {
+			stale = append(stale, r.ID)
+		}
+	}
+
+	if len(stale) > 0 {
+		if err := db.Delete(&model.RoleResource{}, "resource_id in ?", stale).Error; err != nil {
+			slog.Error("清理过期资源的角色关联失败" + err.Error())
+		}
+		if err := db.Delete(&model.Resource{}, "id in ?", stale).Error; err != nil {
+			slog.Error("清理过期资源失败" + err.Error())
+		}
+		slog.Info(fmt.Sprintf("清理了 %d 条代码中已不存在的资源", len(stale)))
+	}
+
+	// 重新加载, 下面按最新的资源表建立角色关联
+	if err := db.Find(&all).Error; err != nil {
+		slog.Error("资源列表查询失败" + err.Error())
+		return
+	}
 
 	// 给 admin 角色添加所有资源访问权限
 	var adminRole model.Role
 	if err := db.Where("name", "admin").First(&adminRole).Error; err == nil {
-		for _, resource := range resources {
-			if resource.ID != 0 {
-				if err := db.Create(&model.RoleResource{RoleId: adminRole.ID, ResourceId: resource.ID}).Error; err != nil {
-					if isDuplicate(err) {
-						slog.Info("admin 角色菜单关联关系初始化失败" + err.Error())
-					} else {
-						slog.Error("admin 角色菜单关联关系初始化失败" + err.Error())
-					}
-				}
-			}
-		}
+		bindRoleResources(db, adminRole, all, func(model.Resource) bool { return true })
 	}
 
 	// 给 guest 添加查询资源访问权限
 	var guestRole model.Role
 	if err := db.Where("name", "guest").First(&guestRole).Error; err == nil {
-		for _, resource := range resources {
-			if resource.ID != 0 && resource.Method == "GET" {
-				if err := db.Create(&model.RoleResource{RoleId: guestRole.ID, ResourceId: resource.ID}).Error; err != nil {
-					if isDuplicate(err) {
-						slog.Info("guest 角色菜单关联关系初始化失败" + err.Error())
-					} else {
-						slog.Error("guest 角色菜单关联关系初始化失败" + err.Error())
-					}
-				}
-			}
-		}
+		bindRoleResources(db, guestRole, all, func(r model.Resource) bool { return r.Method == "GET" })
 	}
 
 	slog.Info("-----初始化接口资源 end-----")
+}
+
+// 把满足 match 的资源挂到角色下, 已经存在的关联跳过
+func bindRoleResources(db *gorm.DB, role model.Role, resources []model.Resource, match func(model.Resource) bool) {
+	for _, resource := range resources {
+		if resource.ID == 0 || !match(resource) {
+			continue
+		}
+		err := db.Create(&model.RoleResource{RoleId: role.ID, ResourceId: resource.ID}).Error
+		if err != nil && !isDuplicate(err) {
+			slog.Error(role.Name + " 角色资源关联关系初始化失败" + err.Error())
+		}
+	}
 }
 
 // 生成默认的菜单
@@ -274,7 +325,7 @@ func generateDefaultMenus(db *gorm.DB) {
 	for i := range parents {
 		if err := db.Create(&parents[i]).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(parents[i].Name + " 菜单已经存在")
+				slog.Debug(parents[i].Name + " 菜单已经存在")
 			} else {
 				slog.Error(parents[i].Name + " 菜单初始化失败" + err.Error())
 			}
@@ -311,7 +362,7 @@ func generateDefaultMenus(db *gorm.DB) {
 	for i := range menus {
 		if err := db.Create(&menus[i]).Error; err != nil {
 			if isDuplicate(err) {
-				slog.Info(menus[i].Name + " 菜单已经存在")
+				slog.Debug(menus[i].Name + " 菜单已经存在")
 			} else {
 				slog.Error(menus[i].Name + " 菜单初始化失败" + err.Error())
 			}
@@ -321,39 +372,30 @@ func generateDefaultMenus(db *gorm.DB) {
 	// 加载所有菜单
 	db.Find(&menus)
 
-	// 给 admin 角色添加所有菜单访问权限
-	var adminRole model.Role
-	if err := db.Where("name", "admin").First(&adminRole).Error; err == nil {
-		for _, menu := range menus {
-			if menu.ID != 0 {
-				if err := db.Create(&model.RoleMenu{RoleId: adminRole.ID, MenuId: menu.ID}).Error; err != nil {
-					if isDuplicate(err) {
-						slog.Info("admin 角色菜单关联关系初始化失败" + err.Error())
-					} else {
-						slog.Error("admin 角色菜单关联关系初始化失败" + err.Error())
-					}
-				}
-			}
+	// 给 admin 和 guest 角色添加所有菜单访问权限
+	for _, name := range []string{"admin", "guest"} {
+		var role model.Role
+		if err := db.Where("name", name).First(&role).Error; err != nil {
+			continue
 		}
-	}
-
-	// 给 guest 角色添加所有菜单访问权限
-	var guestRole model.Role
-	if err := db.Where("name", "guest").First(&guestRole).Error; err == nil {
-		for _, menu := range menus {
-			if menu.ID != 0 {
-				if err := db.Create(&model.RoleMenu{RoleId: guestRole.ID, MenuId: menu.ID}).Error; err != nil {
-					if isDuplicate(err) {
-						slog.Info("guest 角色菜单关联关系初始化失败" + err.Error())
-					} else {
-						slog.Error("guest 角色菜单关联关系初始化失败" + err.Error())
-					}
-				}
-			}
-		}
+		bindRoleMenus(db, role, menus)
 	}
 
 	slog.Info("-----初始化菜单 end-----")
+}
+
+// 把菜单挂到角色下, 已经存在的关联跳过
+// 重复执行是正常的(每次容器启动都会跑一遍), 不要为此刷一堆日志
+func bindRoleMenus(db *gorm.DB, role model.Role, menus []model.Menu) {
+	for _, menu := range menus {
+		if menu.ID == 0 {
+			continue
+		}
+		err := db.Create(&model.RoleMenu{RoleId: role.ID, MenuId: menu.ID}).Error
+		if err != nil && !isDuplicate(err) {
+			slog.Error(role.Name + " 角色菜单关联关系初始化失败" + err.Error())
+		}
+	}
 }
 
 // sqlite 和 MySQL 的唯一约束冲突错误文案不同, 统一判断

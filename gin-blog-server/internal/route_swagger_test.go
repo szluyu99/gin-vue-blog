@@ -68,3 +68,37 @@ func TestAllRoutesHaveSwaggerDoc(t *testing.T) {
 
 	assert.Empty(t, missing, "以下接口没有出现在 docs/swagger.json 中, 需要补 swagger 注解并重新生成文档")
 }
+
+/*
+反过来: 文档里不能有已经不存在的接口。
+
+删接口时容易只删代码, docs/ 里的路径会一直留着, 在线文档就会给出
+一个调不通的接口。
+*/
+func TestSwaggerDocHasNoExtraPath(t *testing.T) {
+	raw, err := os.ReadFile("../docs/swagger.json")
+	assert.Nil(t, err)
+
+	var doc swaggerDoc
+	assert.Nil(t, json.Unmarshal(raw, &doc))
+
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	RegisterHandlers(r)
+
+	registered := make(map[string]bool)
+	for _, route := range r.Routes() {
+		registered[strings.ToLower(route.Method)+" "+toSwaggerPath(route.Path)] = true
+	}
+
+	var extra []string
+	for path, operations := range doc.Paths {
+		for method := range operations {
+			if !registered[method+" "+path] {
+				extra = append(extra, strings.ToUpper(method)+" "+path)
+			}
+		}
+	}
+
+	assert.Empty(t, extra, "以下接口只存在于 docs/swagger.json 中, 需要删掉注解并重新生成文档")
+}

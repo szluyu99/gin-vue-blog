@@ -152,3 +152,75 @@ func TestUserOnlineAndForceOffline(t *testing.T) {
 	resp = env.do(t, http.MethodPost, "/user/offline/abc", nil)
 	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
 }
+
+// 修改当前用户信息: 用户 ID 取自登录态, 不信前端
+func TestUserUpdateCurrent(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.PUT("/user/current", (&User{}).UpdateCurrent)
+
+	info := model.UserInfo{Nickname: "老昵称"}
+	assert.Nil(t, env.db.Create(&info).Error)
+	user := model.UserAuth{Username: "tester", Password: "x", UserInfoId: info.ID}
+	assert.Nil(t, env.db.Create(&user).Error)
+	env.user = &model.UserAuth{Model: model.Model{ID: user.ID}, Username: "tester", UserInfoId: info.ID}
+
+	resp := env.do(t, http.MethodPut, "/user/current", map[string]any{
+		"nickname": "新昵称",
+		"avatar":   "avatar.png",
+		"intro":    "简介",
+		"website":  "https://test.com",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	got, err := model.GetUserInfoById(env.db, info.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, "新昵称", got.Nickname)
+	assert.Equal(t, "https://test.com", got.Website)
+
+	// 昵称必填
+	resp = env.do(t, http.MethodPut, "/user/current", map[string]any{"intro": "只改简介"})
+	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
+
+	// 未登录
+	env.user = nil
+	resp = env.do(t, http.MethodPut, "/user/current", map[string]any{"nickname": "匿名"})
+	assert.Equal(t, g.ErrTokenNotExist.Code(), resp.Code)
+}
+
+// 后台修改用户昵称与角色: 角色是整体替换
+func TestUserUpdate(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.PUT("/user", (&User{}).Update)
+
+	role1 := model.Role{Name: "role1", Label: "角色1"}
+	role2 := model.Role{Name: "role2", Label: "角色2"}
+	assert.Nil(t, env.db.Create(&role1).Error)
+	assert.Nil(t, env.db.Create(&role2).Error)
+
+	user := model.UserAuth{Username: "tester", Password: "x", UserInfo: &model.UserInfo{Nickname: "老昵称"}}
+	assert.Nil(t, env.db.Create(&user).Error)
+	assert.Nil(t, env.db.Create(&model.UserAuthRole{UserAuthId: user.ID, RoleId: role1.ID}).Error)
+
+	resp := env.do(t, http.MethodPut, "/user", map[string]any{
+		"id":       user.ID,
+		"nickname": "新昵称",
+		"role_ids": []int{role2.ID},
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	info, err := model.GetUserInfoById(env.db, user.UserInfoId)
+	assert.Nil(t, err)
+	assert.Equal(t, "新昵称", info.Nickname)
+
+	roleIds, err := model.GetRoleIdsByUserId(env.db, user.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, []int{role2.ID}, roleIds)
+
+	// 昵称必填
+	resp = env.do(t, http.MethodPut, "/user", map[string]any{"id": user.ID})
+	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
+
+	// 用户不存在
+	resp = env.do(t, http.MethodPut, "/user", map[string]any{"id": 999, "nickname": "x"})
+	assert.Equal(t, g.ErrDbOp.Code(), resp.Code)
+}

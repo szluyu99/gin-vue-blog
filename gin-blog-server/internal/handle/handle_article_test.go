@@ -257,3 +257,30 @@ func TestArticleImportWithoutFile(t *testing.T) {
 	resp := env.do(t, http.MethodPost, "/article/import", nil)
 	assert.Equal(t, g.ErrFileReceive.Code(), resp.Code)
 }
+
+// 标签下拉选项
+func TestTagGetOption(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/tag/option", (&Tag{}).GetOption)
+
+	assert.Nil(t, env.db.Create(&model.Tag{Name: "Go"}).Error)
+	assert.Nil(t, env.db.Create(&model.Tag{Name: "Vue"}).Error)
+
+	resp := env.do(t, http.MethodGet, "/tag/option", nil)
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var options []model.OptionVO
+	decodeData(t, resp.Data, &options)
+	assert.Len(t, options, 2)
+	assert.NotZero(t, options[0].ID)
+}
+
+// 导出文章目前由前端完成, 后端只返回成功
+func TestArticleExport(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.POST("/article/export", (&Article{}).Export)
+
+	resp := env.do(t, http.MethodPost, "/article/export", nil)
+	assert.Equal(t, g.SUCCESS, resp.Code)
+	assert.Nil(t, resp.Data)
+}

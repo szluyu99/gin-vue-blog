@@ -180,24 +180,39 @@ jobs:
           echo "anonymous: $anon_resp"
           echo "$anon_resp" | grep -q '"code":1201'
 
-      # 重启后种子数据不能重复写入
-      - name: Seeding is idempotent
+      # 重启后种子数据不能重复写入, 且代码里已经不存在的资源要被清理掉
+      - name: Seeding reconciles the resource table
         working-directory: deploy/start
         run: |
           # 密码见 deploy/start/.env 的 MYSQL_ROOT_PASSWORD
-          count_resource() {
-            docker exec gvb-mysql mysql -uroot -p12345566 -N -B -e \
-              "SELECT COUNT(*) FROM gvb.resource" 2>/dev/null
+          mysql() {
+            docker exec gvb-mysql mysql -uroot -p12345566 -N -B -e "$1" 2>/dev/null
           }
-          before=$(count_resource)
+          before=$(mysql "SELECT COUNT(*) FROM gvb.resource")
+
+          # 伪造一条已经下线的接口资源, 并挂到 guest 角色上
+          mysql "INSERT INTO gvb.resource (name, parent_id, url, method, anonymous, created_at, updated_at)
+                 VALUES ('已下线接口', 0, '/gone', 'GET', 0, NOW(), NOW())"
+          mysql "INSERT INTO gvb.role_resource (role_id, resource_id)
+                 SELECT r.id, res.id FROM gvb.role r, gvb.resource res
+                 WHERE r.name = 'guest' AND res.url = '/gone'"
+
           docker restart gvb-server
           for i in $(seq 30); do
             curl -sf http://127.0.0.1:8765/api/config > /dev/null && break
             sleep 2
           done
-          after=$(count_resource)
-          echo "resource: $before -> $after"
-          [ "$before" = "$after" ]
+
+          after=$(mysql "SELECT COUNT(*) FROM gvb.resource")
+          stale=$(mysql "SELECT COUNT(*) FROM gvb.resource WHERE url = '/gone'")
+          orphan=$(mysql "SELECT COUNT(*) FROM gvb.role_resource rr
+                          LEFT JOIN gvb.resource res ON res.id = rr.resource_id
+                          WHERE res.id IS NULL")
+          echo "resource: $before -> $after, stale: $stale, orphan bindings: $orphan"
+
+          [ "$before" = "$after" ] # 重复执行不新增
+          [ "$stale" = "0" ]       # 代码中不存在的资源被清理
+          [ "$orphan" = "0" ]      # 角色关联不残留
 
       - name: Dump logs
         if: failure()
