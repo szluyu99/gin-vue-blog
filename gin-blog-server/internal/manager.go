@@ -185,6 +185,12 @@ func registerAdminHandler(r *gin.Engine) {
 func registerBlogHandler(r *gin.Engine) {
 	base := r.Group("/api/front")
 
+	// 前台接口: 允许匿名访问, 仅识别用户
+	// 必须在注册任何路由之前 Use, gin 的中间件只对之后注册的路由生效。
+	// 放在后面会让只读接口完全不过鉴权: 坏 token 被当成匿名放行,
+	// handler 里也拿不到当前用户。
+	base.Use(middleware.JWTAuth(false))
+
 	base.GET("/about", blogInfoAPI.GetAbout) // 获取关于我
 	base.GET("/home", frontAPI.GetHomeInfo)  // 前台首页
 	base.GET("/page", pageAPI.GetList)       // 前台页面
@@ -218,8 +224,7 @@ func registerBlogHandler(r *gin.Engine) {
 		comment.GET("/replies/:comment_id", frontAPI.GetReplyListByCommentId) // 根据评论 id 查询回复
 	}
 
-	// 需要登录才能进行的操作
-	base.Use(middleware.JWTAuth(false)) // 前台接口: 允许匿名访问, 仅识别用户
+	// 需要登录才能进行的操作(由 handler 内的 MustCurrentUserAuth 兜底)
 	{
 		base.POST("/upload", uploadAPI.UploadFile)    // 文件上传
 		base.GET("/user/info", userAPI.GetInfo)       // 根据 Token 获取用户信息
