@@ -3229,6 +3229,7 @@ const docTemplate = `{
         "handle.FAddCommentReq": {
             "type": "object",
             "required": [
+                "content",
                 "type"
             ],
             "properties": {

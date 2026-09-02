@@ -76,6 +76,57 @@ func TestCommentAPI(t *testing.T) {
 	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
 }
 
+// 删除评论要连带删掉它的回复, 并清掉 Redis 里的点赞数据,
+// 否则回复变成查得到的孤儿数据, 新评论复用 id 还会继承旧计数
+func TestCommentDeleteCleansRepliesAndRedis(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.DELETE("/comment", (&Comment{}).Delete)
+
+	article := model.Article{Title: "文章", Status: model.STATUS_PUBLIC}
+	assert.Nil(t, env.db.Create(&article).Error)
+	user := model.UserAuth{Username: "u", Password: "x", UserInfo: &model.UserInfo{Nickname: "n"}}
+	assert.Nil(t, env.db.Create(&user).Error)
+
+	top, err := model.AddComment(env.db, user.ID, model.TYPE_ARTICLE, article.ID, "顶级评论", true)
+	assert.Nil(t, err)
+	reply, err := model.ReplyComment(env.db, user.ID, user.ID, top.ID, "回复", true)
+	assert.Nil(t, err)
+	// 另一条评论及其回复, 用来确认没被误删
+	other, err := model.AddComment(env.db, user.ID, model.TYPE_ARTICLE, article.ID, "另一条", true)
+	assert.Nil(t, err)
+	otherReply, err := model.ReplyComment(env.db, user.ID, user.ID, other.ID, "另一条的回复", true)
+	assert.Nil(t, err)
+
+	likeKey := g.COMMENT_USER_LIKE_SET + itoa(user.ID)
+	for _, id := range []int{top.ID, reply.ID, other.ID, otherReply.ID} {
+		env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(id), 2)
+		env.rdb.SAdd(rctx, likeKey, itoa(id))
+	}
+
+	// 只删顶级评论, 它的回复应该一起消失
+	resp := env.do(t, http.MethodDelete, "/comment", []int{top.ID})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+	assert.Equal(t, float64(2), resp.Data, "顶级评论 + 1 条回复")
+
+	var left []model.Comment
+	assert.Nil(t, env.db.Find(&left).Error)
+	assert.Len(t, left, 2)
+
+	var orphan int64
+	assert.Nil(t, env.db.Model(&model.Comment{}).Where("parent_id = ?", top.ID).Count(&orphan).Error)
+	assert.Zero(t, orphan, "不能留下 parent_id 指向已删评论的回复")
+
+	// 被删的两条的 Redis 数据清掉了, 没被删的还在
+	for _, id := range []int{top.ID, reply.ID} {
+		assert.False(t, env.rdb.HExists(rctx, g.COMMENT_LIKE_COUNT, itoa(id)).Val(), itoa(id))
+		assert.False(t, env.rdb.SIsMember(rctx, likeKey, itoa(id)).Val(), itoa(id))
+	}
+	for _, id := range []int{other.ID, otherReply.ID} {
+		assert.True(t, env.rdb.HExists(rctx, g.COMMENT_LIKE_COUNT, itoa(id)).Val(), itoa(id))
+		assert.True(t, env.rdb.SIsMember(rctx, likeKey, itoa(id)).Val(), itoa(id))
+	}
+}
+
 func TestMessageAPI(t *testing.T) {
 	env := newTestEnv(t)
 	api := Message{}

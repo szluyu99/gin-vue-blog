@@ -163,6 +163,41 @@ func TestFrontSimpleLists(t *testing.T) {
 	assert.Len(t, links, 1)
 }
 
+// 前台这几个列表是全量返回的, 不能被 Paginate 的 100 条上限截断
+func TestFrontSimpleListsReturnMoreThan100(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/front/tag/list", (&Front{}).GetTagList)
+	env.engine.GET("/front/category/list", (&Front{}).GetCategoryList)
+	env.engine.GET("/front/message/list", (&Front{}).GetMessageList)
+	env.engine.GET("/front/link/list", (&Front{}).GetLinkList)
+
+	const n = 120
+	for i := 0; i < n; i++ {
+		assert.Nil(t, env.db.Create(&model.Tag{Name: "tag" + itoa(i)}).Error)
+		assert.Nil(t, env.db.Create(&model.Category{Name: "cate" + itoa(i)}).Error)
+		_, err := model.SaveMessage(env.db, "u"+itoa(i), "", "内容", "", "", 10, true)
+		assert.Nil(t, err)
+		_, err = model.SaveOrUpdateLink(env.db, 0, "link"+itoa(i), "", "https://test.com", "简介")
+		assert.Nil(t, err)
+	}
+
+	var tags []model.TagVO
+	decodeData(t, env.do(t, http.MethodGet, "/front/tag/list", nil).Data, &tags)
+	assert.Len(t, tags, n)
+
+	var categories []model.CategoryVO
+	decodeData(t, env.do(t, http.MethodGet, "/front/category/list", nil).Data, &categories)
+	assert.Len(t, categories, n)
+
+	var messages []model.Message
+	decodeData(t, env.do(t, http.MethodGet, "/front/message/list", nil).Data, &messages)
+	assert.Len(t, messages, n)
+
+	var links []model.FriendLink
+	decodeData(t, env.do(t, http.MethodGet, "/front/link/list", nil).Data, &links)
+	assert.Len(t, links, n)
+}
+
 // 前台文章列表: 只出公开且未删除的文章, 支持分类和标签过滤
 func TestFrontGetArticleList(t *testing.T) {
 	env := newTestEnv(t)
@@ -474,4 +509,63 @@ func TestFrontGetCommentList(t *testing.T) {
 		"/front/comment/list?page_num=1&page_size=10&topic_id="+itoa(article.ID)+"&type=1", nil).Data, &page)
 	assert.Equal(t, int64(1), page.Total)
 	assert.Len(t, page.List, 1)
+}
+
+// 回复的点赞数也要填上: 以前只取了顶级评论的, 回复恒为 0,
+// 展开更多之后走另一个接口才会变成真实值
+func TestFrontCommentListFillsReplyLikeCount(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/front/comment/list", (&Front{}).GetCommentList)
+
+	article := model.Article{Title: "文章", Status: model.STATUS_PUBLIC}
+	assert.Nil(t, env.db.Create(&article).Error)
+	user := model.UserAuth{Username: "u", Password: "x", UserInfo: &model.UserInfo{Nickname: "n"}}
+	assert.Nil(t, env.db.Create(&user).Error)
+
+	top, err := model.AddComment(env.db, user.ID, 1, article.ID, "顶级评论", true)
+	assert.Nil(t, err)
+	reply, err := model.ReplyComment(env.db, user.ID, user.ID, top.ID, "回复", true)
+	assert.Nil(t, err)
+
+	env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(top.ID), 5)
+	env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(reply.ID), 3)
+
+	var page PageResult[model.CommentVO]
+	decodeData(t, env.do(t, http.MethodGet,
+		"/front/comment/list?page_num=1&page_size=10&topic_id="+itoa(article.ID)+"&type=1", nil).Data, &page)
+
+	assert.Len(t, page.List, 1)
+	assert.Equal(t, 5, page.List[0].LikeCount)
+	assert.Len(t, page.List[0].ReplyList, 1)
+	assert.Equal(t, 3, page.List[0].ReplyList[0].LikeCount, "回复的点赞数不能恒为 0")
+}
+
+// 评论入参校验: 以前用的是 validate tag, 但项目没注册自定义 validator, 校验完全不生效
+func TestFrontSaveCommentValidatesInput(t *testing.T) {
+	env := newTestEnv(t)
+	env.loginAsFullUser(7, "tester", "测试昵称")
+	env.engine.POST("/front/comment", (&Front{}).SaveComment)
+
+	article := model.Article{Title: "文章", Status: model.STATUS_PUBLIC}
+	assert.Nil(t, env.db.Create(&article).Error)
+
+	cases := []struct {
+		name string
+		body map[string]any
+	}{
+		{"type 缺失", map[string]any{"topic_id": article.ID, "content": "内容"}},
+		{"type 超出范围", map[string]any{"topic_id": article.ID, "type": 99, "content": "内容"}},
+		{"type 为负", map[string]any{"topic_id": article.ID, "type": -1, "content": "内容"}},
+		{"content 为空", map[string]any{"topic_id": article.ID, "type": 1, "content": ""}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			resp := env.do(t, http.MethodPost, "/front/comment", c.body)
+			assert.Equal(t, g.ErrRequest.Code(), resp.Code)
+		})
+	}
+
+	var count int64
+	assert.Nil(t, env.db.Model(&model.Comment{}).Count(&count).Error)
+	assert.Zero(t, count, "非法请求不应该写入任何评论")
 }

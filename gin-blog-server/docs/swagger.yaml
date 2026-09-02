@@ -216,6 +216,7 @@ definitions:
         minimum: 1
         type: integer
     required:
+    - content
     - type
     type: object
   handle.FAddMessageReq:

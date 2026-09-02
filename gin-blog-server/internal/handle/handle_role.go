@@ -98,7 +98,7 @@ func (*Role) SaveOrUpdate(c *gin.Context) {
 	db := GetDB(c)
 
 	if req.ID == 0 {
-		err := model.SaveRole(db, req.Name, req.Label)
+		err := model.SaveRole(db, req.Name, req.Label, req.ResourceIds, req.MenuIds)
 		if err != nil {
 			ReturnError(c, g.ErrDbOp, err)
 			return

@@ -181,9 +181,25 @@ func TestArticleList(t *testing.T) {
 	}
 	for _, tc := range cases {
 		resp = env.do(t, http.MethodGet, "/article/list"+tc.query, nil)
+		// 必须断言业务码: 以前零结果会返回 ErrDbOp, 而 decodeData 到零值后 total 也是 0, 断言不出来
+		assert.Equal(t, g.SUCCESS, resp.Code, tc.query)
 		decodeData(t, resp.Data, &page)
 		assert.Equal(t, tc.total, page.Total, tc.query)
 	}
+}
+
+// 查不到数据是正常的空列表, 不是数据库错误
+func TestArticleListEmptyResultIsNotError(t *testing.T) {
+	env := newArticleEnv(t)
+
+	resp := env.do(t, http.MethodGet, "/article/list?page_num=1&page_size=10", nil)
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var page PageResult[ArticleVO]
+	decodeData(t, resp.Data, &page)
+	assert.Equal(t, int64(0), page.Total)
+	assert.NotNil(t, page.List, "空结果应该是 [] 而不是 null")
+	assert.Len(t, page.List, 0)
 }
 
 func TestArticleSoftDeleteAndTop(t *testing.T) {

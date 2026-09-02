@@ -44,12 +44,13 @@ type FAddMessageReq struct {
 	Speed    int    `json:"speed"`
 }
 
+// 注意校验用 binding 而不是 validate: 本项目没有注册自定义 validator, Gin 只认 binding tag
 type FAddCommentReq struct {
 	ReplyUserId int    `json:"reply_user_id" form:"reply_user_id"`
 	TopicId     int    `json:"topic_id" form:"topic_id"`
-	Content     string `json:"content" form:"content"`
+	Content     string `json:"content" form:"content" binding:"required"`
 	ParentId    int    `json:"parent_id" form:"parent_id"`
-	Type        int    `json:"type" form:"type" validate:"required,min=1,max=3" label:"评论类型"`
+	Type        int    `json:"type" form:"type" binding:"required,min=1,max=3"`
 }
 
 type FCommentQuery struct {
@@ -106,7 +107,7 @@ func (*Front) GetHomeInfo(c *gin.Context) {
 // @Success 0 {object} Response[[]model.TagVO]
 // @Router /front/tag/list [get]
 func (*Front) GetTagList(c *gin.Context) {
-	list, _, err := model.GetTagList(GetDB(c), 1, 1000, "")
+	list, _, err := model.GetTagList(GetDB(c), 1, model.PageSizeAll, "")
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
@@ -121,7 +122,7 @@ func (*Front) GetTagList(c *gin.Context) {
 // @Success 0 {object} Response[[]model.CategoryVO]
 // @Router /front/category/list [get]
 func (*Front) GetCategoryList(c *gin.Context) {
-	list, _, err := model.GetCategoryList(GetDB(c), 1, 1000, "")
+	list, _, err := model.GetCategoryList(GetDB(c), 1, model.PageSizeAll, "")
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
@@ -137,7 +138,7 @@ func (*Front) GetCategoryList(c *gin.Context) {
 // @Router /front/message/list [get]
 func (*Front) GetMessageList(c *gin.Context) {
 	isReview := true
-	list, _, err := model.GetMessageList(GetDB(c), 1, 1000, "", &isReview)
+	list, _, err := model.GetMessageList(GetDB(c), 1, model.PageSizeAll, "", &isReview)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
@@ -152,7 +153,7 @@ func (*Front) GetMessageList(c *gin.Context) {
 // @Success 0 {object} Response[[]model.FriendLink]
 // @Router /front/link/list [get]
 func (*Front) GetLinkList(c *gin.Context) {
-	list, _, err := model.GetLinkList(GetDB(c), 1, 1000, "")
+	list, _, err := model.GetLinkList(GetDB(c), 1, model.PageSizeAll, "")
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
@@ -276,16 +277,24 @@ func (*Front) GetCommentList(c *gin.Context) {
 		return
 	}
 
+	// 顶层评论和它们的回复一起取点赞数: 以前只取了顶层的,
+	// 回复的 like_count 恒为 0, 展开更多之后又会变成真实值
 	ids := make([]int, 0, len(data))
-	for _, comment := range data {
-		ids = append(ids, comment.ID)
-	}
-	likeCountMap := hashCounts(rdb, g.COMMENT_LIKE_COUNT, ids)
 	for i := range data {
 		if len(data[i].ReplyList) > 3 {
 			data[i].ReplyList = data[i].ReplyList[:3] // 只显示 3 条回复
 		}
+		ids = append(ids, data[i].ID)
+		for _, reply := range data[i].ReplyList {
+			ids = append(ids, reply.ID)
+		}
+	}
+	likeCountMap := hashCounts(rdb, g.COMMENT_LIKE_COUNT, ids)
+	for i := range data {
 		data[i].LikeCount = likeCountMap[data[i].ID]
+		for j := range data[i].ReplyList {
+			data[i].ReplyList[j].LikeCount = likeCountMap[data[i].ReplyList[j].ID]
+		}
 	}
 
 	ReturnSuccess(c, PageResult[model.CommentVO]{

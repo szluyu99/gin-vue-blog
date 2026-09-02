@@ -78,3 +78,33 @@ func TestRoleAPI(t *testing.T) {
 	decodeData(t, resp.Data, &page)
 	assert.Equal(t, int64(0), page.Total)
 }
+
+// 新增角色时带上的资源与菜单要保存下来, 以前这两个字段在新增分支被丢弃了
+func TestRoleCreateKeepsRelations(t *testing.T) {
+	env := newTestEnv(t)
+	api := Role{}
+	env.engine.POST("/role", api.SaveOrUpdate)
+	env.engine.GET("/role/list", api.GetTreeList)
+
+	resource, err := model.AddResource(env.db, "文章列表", "/article/list", "GET", false)
+	assert.Nil(t, err)
+	menu := model.Menu{Name: "文章管理", Path: "/article"}
+	assert.Nil(t, env.db.Create(&menu).Error)
+
+	resp := env.do(t, http.MethodPost, "/role", map[string]any{
+		"name": "editor", "label": "编辑",
+		"resource_ids": []int{resource.ID}, "menu_ids": []int{menu.ID},
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var page PageResult[model.RoleVO]
+	decodeData(t, env.do(t, http.MethodGet, "/role/list?page_num=1&page_size=10", nil).Data, &page)
+	assert.Equal(t, int64(1), page.Total)
+	assert.Equal(t, []int{resource.ID}, page.List[0].ResourceIds)
+	assert.Equal(t, []int{menu.ID}, page.List[0].MenuIds)
+
+	// 新角色立刻就有权限, 不需要再编辑一次
+	pass, err := model.CheckRoleAuth(env.db, page.List[0].ID, "/article/list", "GET")
+	assert.Nil(t, err)
+	assert.True(t, pass)
+}

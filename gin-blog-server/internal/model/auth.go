@@ -286,13 +286,18 @@ func GetRoleIdsByUserId(db *gorm.DB, userAuthId int) (ids []int, err error) {
 	return ids, result.Error
 }
 
-func SaveRole(db *gorm.DB, name, label string) error {
+func SaveRole(db *gorm.DB, name, label string, resourceIds, menuIds []int) error {
 	role := Role{
 		Name:  name,
 		Label: label,
 	}
-	result := db.Create(&role)
-	return result.Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&role).Error; err != nil {
+			return err
+		}
+		// 新建时以前会把 resourceIds / menuIds 丢掉, 新角色一个权限都没有
+		return replaceRoleRelations(tx, role.ID, resourceIds, menuIds)
+	})
 }
 
 func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourceIds, menuIds []int) error {
@@ -307,28 +312,38 @@ func UpdateRole(db *gorm.DB, id int, name, label string, isDisable bool, resourc
 		if err := tx.Model(&role).Select("name", "label", "is_disable").Updates(&role).Error; err != nil {
 			return err
 		}
-
-		// role_resource
-		if err := tx.Delete(&RoleResource{}, "role_id = ?", id).Error; err != nil {
-			return err
-		}
-		for _, rid := range resourceIds {
-			if err := tx.Create(&RoleResource{RoleId: role.ID, ResourceId: rid}).Error; err != nil {
-				return err
-			}
-		}
-
-		// role_menu
-		if err := tx.Delete(&RoleMenu{}, "role_id = ?", id).Error; err != nil {
-			return err
-		}
-		for _, mid := range menuIds {
-			if err := tx.Create(&RoleMenu{RoleId: role.ID, MenuId: mid}).Error; err != nil {
-				return err
-			}
-		}
-		return nil
+		return replaceRoleRelations(tx, role.ID, resourceIds, menuIds)
 	})
+}
+
+// 用给定的 id 列表整体替换角色的资源与菜单关联, 必须在事务里调用
+func replaceRoleRelations(tx *gorm.DB, roleId int, resourceIds, menuIds []int) error {
+	if err := tx.Delete(&RoleResource{}, "role_id = ?", roleId).Error; err != nil {
+		return err
+	}
+	if len(resourceIds) > 0 {
+		rows := make([]RoleResource, 0, len(resourceIds))
+		for _, rid := range resourceIds {
+			rows = append(rows, RoleResource{RoleId: roleId, ResourceId: rid})
+		}
+		if err := tx.Create(&rows).Error; err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Delete(&RoleMenu{}, "role_id = ?", roleId).Error; err != nil {
+		return err
+	}
+	if len(menuIds) > 0 {
+		rows := make([]RoleMenu, 0, len(menuIds))
+		for _, mid := range menuIds {
+			rows = append(rows, RoleMenu{RoleId: roleId, MenuId: mid})
+		}
+		if err := tx.Create(&rows).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // 删除角色: 事务删除 role, role_resource, role_menu

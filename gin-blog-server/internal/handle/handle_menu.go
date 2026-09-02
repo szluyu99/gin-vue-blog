@@ -111,7 +111,12 @@ func (*Menu) Delete(c *gin.Context) {
 	db := GetDB(c)
 
 	// 检查要删除的菜单是否被角色使用
-	use, _ := model.CheckMenuInUse(db, menuId)
+	// 这里不能忽略 error: 查询失败时 use 是 false, 会把仍被角色引用的菜单删掉
+	use, err := model.CheckMenuInUse(db, menuId)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
+		return
+	}
 	if use {
 		ReturnError(c, g.ErrMenuUsedByRole, nil)
 		return
@@ -130,7 +135,11 @@ func (*Menu) Delete(c *gin.Context) {
 
 	// 一级菜单下有子菜单, 不允许删除
 	if menu.ParentId == 0 {
-		has, _ := model.CheckMenuHasChild(db, menuId)
+		has, err := model.CheckMenuHasChild(db, menuId)
+		if err != nil {
+			ReturnError(c, g.ErrDbOp, err)
+			return
+		}
 		if has {
 			ReturnError(c, g.ErrMenuHasChildren, nil)
 			return

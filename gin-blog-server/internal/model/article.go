@@ -113,6 +113,8 @@ func GetBlogArticleList(db *gorm.DB, page, size, categoryId, tagId int) (data []
 }
 
 func GetArticleList(db *gorm.DB, page, size int, title string, isDelete *bool, status, typ, categoryId, tagId int) (list []Article, total int64, err error) {
+	// 零行时 gorm 会把 list 留成 nil, 调用方容易把"查不到"误判成出错, 这里统一给空切片
+	list = make([]Article, 0)
 	db = db.Model(Article{})
 
 	if title != "" {

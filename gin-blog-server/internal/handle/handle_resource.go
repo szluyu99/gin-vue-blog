@@ -171,7 +171,12 @@ func (*Resource) Delete(c *gin.Context) {
 	db := GetDB(c)
 
 	// 检查该资源是否被角色使用
-	use, _ := model.CheckResourceInUse(db, resourceId)
+	// 这里不能忽略 error: 查询失败时 use 是 false, 会把仍被角色引用的资源删掉
+	use, err := model.CheckResourceInUse(db, resourceId)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
+		return
+	}
 	if use {
 		ReturnError(c, g.ErrResourceUsedByRole, nil)
 		return
@@ -190,7 +195,11 @@ func (*Resource) Delete(c *gin.Context) {
 
 	// 如果作为模块, 检查模块下是否有子资源
 	if resource.ParentId == 0 {
-		hasChild, _ := model.CheckResourceHasChild(db, resourceId)
+		hasChild, err := model.CheckResourceHasChild(db, resourceId)
+		if err != nil {
+			ReturnError(c, g.ErrDbOp, err)
+			return
+		}
 		if hasChild {
 			ReturnError(c, g.ErrResourceHasChildren, nil)
 			return

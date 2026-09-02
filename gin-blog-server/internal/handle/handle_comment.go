@@ -32,13 +32,16 @@ func (*Comment) Delete(c *gin.Context) {
 		return
 	}
 
-	result := GetDB(c).Delete(model.Comment{}, "id in ?", ids)
-	if result.Error != nil {
-		ReturnError(c, g.ErrDbOp, result.Error)
+	rows, deletedIds, err := model.DeleteComments(GetDB(c), ids)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
-	ReturnSuccess(c, result.RowsAffected)
+	// 与文章删除保持一致: 清掉点赞计数, 否则新评论复用 id 会继承旧数据
+	cleanCommentCounters(GetRDB(c), deletedIds)
+
+	ReturnSuccess(c, rows)
 }
 
 // @Summary 修改评论审核（批量）

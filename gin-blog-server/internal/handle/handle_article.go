@@ -260,7 +260,7 @@ func (*Article) GetList(c *gin.Context) {
 	rdb := GetRDB(c)
 
 	list, total, err := model.GetArticleList(db, query.Page, query.Size, query.Title, query.IsDelete, query.Status, query.Type, query.CategoryId, query.TagId)
-	if err != nil || list == nil {
+	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}

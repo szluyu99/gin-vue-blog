@@ -121,8 +121,8 @@ func TestResourceCRUD(t *testing.T) {
 
 func TestRoleListAndOption(t *testing.T) {
 	db := newModelDB(t)
-	assert.Nil(t, SaveRole(db, "admin", "管理员"))
-	assert.Nil(t, SaveRole(db, "user", "普通用户"))
+	assert.Nil(t, SaveRole(db, "admin", "管理员", nil, nil))
+	assert.Nil(t, SaveRole(db, "user", "普通用户", nil, nil))
 
 	options, err := GetRoleOption(db)
 	assert.Nil(t, err)
@@ -138,6 +138,30 @@ func TestRoleListAndOption(t *testing.T) {
 	list, _, _ = GetRoleList(db, 1, 10, "adm")
 	assert.Equal(t, "超级管理员", list[0].Label)
 	assert.True(t, list[0].IsDisable)
+}
+
+// 新建角色: 资源与菜单关联要一起写进去, 以前这两个参数被丢掉, 新角色一个权限都没有
+func TestSaveRoleWithResourceAndMenu(t *testing.T) {
+	db := newModelDB(t)
+	res1, err := AddResource(db, "api_1", "/api_1", "GET", false)
+	assert.Nil(t, err)
+	res2, err := AddResource(db, "api_2", "/api_2", "POST", false)
+	assert.Nil(t, err)
+	menu := seedMenu(t, db, "首页", "/home", 0)
+
+	assert.Nil(t, SaveRole(db, "admin", "管理员", []int{res1.ID, res2.ID}, []int{menu.ID}))
+
+	list, _, err := GetRoleList(db, 1, 10, "admin")
+	assert.Nil(t, err)
+	assert.Len(t, list, 1)
+
+	resourceIds, err := GetResourceIdsByRoleId(db, list[0].ID)
+	assert.Nil(t, err)
+	assert.ElementsMatch(t, []int{res1.ID, res2.ID}, resourceIds)
+
+	menuIds, err := GetMenuIdsByRoleId(db, list[0].ID)
+	assert.Nil(t, err)
+	assert.Equal(t, []int{menu.ID}, menuIds)
 }
 
 // 更新角色: 资源与菜单关联整体替换
@@ -173,8 +197,8 @@ func TestUpdateRoleWithResourceAndMenu(t *testing.T) {
 func TestCreateNewUser(t *testing.T) {
 	db := newModelDB(t)
 	// 注册的用户默认挂到 id 为 2 的角色上, 先把角色造出来
-	assert.Nil(t, SaveRole(db, "admin", "管理员"))
-	assert.Nil(t, SaveRole(db, "user", "普通用户"))
+	assert.Nil(t, SaveRole(db, "admin", "管理员", nil, nil))
+	assert.Nil(t, SaveRole(db, "user", "普通用户", nil, nil))
 
 	auth, info, userRole, err := CreateNewUser(db, "newbie", "123456")
 	assert.Nil(t, err)
@@ -193,8 +217,8 @@ func TestCreateNewUser(t *testing.T) {
 
 func TestUserListAndUpdate(t *testing.T) {
 	db := newModelDB(t)
-	assert.Nil(t, SaveRole(db, "admin", "管理员"))
-	assert.Nil(t, SaveRole(db, "user", "普通用户"))
+	assert.Nil(t, SaveRole(db, "admin", "管理员", nil, nil))
+	assert.Nil(t, SaveRole(db, "user", "普通用户", nil, nil))
 
 	u1 := UserAuth{Username: "zhangsan", Password: "x", LoginType: 1, UserInfo: &UserInfo{Nickname: "张三"}}
 	u2 := UserAuth{Username: "lisi", Password: "x", LoginType: 2, UserInfo: &UserInfo{Nickname: "李四"}}

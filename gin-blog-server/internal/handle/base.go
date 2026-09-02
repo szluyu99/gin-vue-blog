@@ -78,9 +78,10 @@ func ReturnError(c *gin.Context, r g.Result, data any) {
 
 // 分页获取数据
 type PageQuery struct {
-	Page    int    `form:"page_num"`  // 当前页数（从1开始）
-	Size    int    `form:"page_size"` // 每页条数
-	Keyword string `form:"keyword"`   // 搜索关键字
+	Page int `form:"page_num"` // 当前页数（从1开始）
+	// 每页条数; 限制成正数, 避免请求参数传进 model.PageSizeAll 变成全表查询
+	Size    int    `form:"page_size" binding:"omitempty,min=1"`
+	Keyword string `form:"keyword"` // 搜索关键字
 }
 
 // 分页响应数据

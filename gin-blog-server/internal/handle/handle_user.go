@@ -222,9 +222,14 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 		return
 	}
 
-	hashPassword, _ := utils.BcryptHash(req.NewPassword)
-	err := model.UpdateUserPassword(GetDB(c), auth.ID, hashPassword)
+	// 不能忽略这里的 error: 写入空 hash 会让 BcryptCheck 永远不匹配, 账号被锁死
+	hashPassword, err := utils.BcryptHash(req.NewPassword)
 	if err != nil {
+		ReturnError(c, g.FailResult, err)
+		return
+	}
+
+	if err := model.UpdateUserPassword(GetDB(c), auth.ID, hashPassword); err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
@@ -237,8 +242,8 @@ func (*User) UpdateCurrentPassword(c *gin.Context) {
 // TODO: 修改普通用户密码（管理员可以直接修改）
 // func (*User) UpdatePassword(c *gin.Context) {
 // 	type UpdatePasswordForm struct {
-// 		Username string `json:"username" validate:"required" label:"用户名"`
-// 		Password string `json:"password" validate:"required" label:"密码"`
+// 		Username string `json:"username" binding:"required"`
+// 		Password string `json:"password" binding:"required"`
 // 	}
 
 // 	var form UpdatePasswordForm

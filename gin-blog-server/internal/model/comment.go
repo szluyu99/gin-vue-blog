@@ -192,3 +192,39 @@ func GetArticleCommentCount(db *gorm.DB, articleId int) (count int64, err error)
 		Count(&count)
 	return count, result.Error
 }
+
+// 删除评论, 同时删掉挂在它们下面的回复, 返回实际删掉的所有评论 id
+//
+// 回复不一起删的话会变成孤儿数据: parent_id 指向已经不存在的评论,
+// 但 GetCommentReplyList 仍然能把它们查出来。
+// 返回的 id 交给调用方清理 Redis 里的点赞计数, 否则新评论复用 id 会继承旧的计数。
+func DeleteComments(db *gorm.DB, ids []int) (rows int64, deletedIds []int, err error) {
+	if len(ids) == 0 {
+		return 0, []int{}, nil
+	}
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		var replyIds []int
+		if err := tx.Model(&Comment{}).
+			Where("parent_id IN ?", ids).
+			Pluck("id", &replyIds).Error; err != nil {
+			return err
+		}
+
+		all := make([]int, 0, len(ids)+len(replyIds))
+		all = append(all, ids...)
+		all = append(all, replyIds...)
+
+		result := tx.Where("id IN ?", all).Delete(&Comment{})
+		if result.Error != nil {
+			return result.Error
+		}
+		rows = result.RowsAffected
+		deletedIds = all
+		return nil
+	})
+	if err != nil {
+		return 0, nil, err
+	}
+	return rows, deletedIds, nil
+}
