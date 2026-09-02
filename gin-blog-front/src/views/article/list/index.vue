@@ -28,7 +28,7 @@ onMounted(async () => {
     <div class="grid grid-cols-12 gap-4">
       <div v-for="article of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
         <!-- 卡片 -->
-        <div class="animate-zoom-in animate-duration-650 rounded-xl bg-white pb-2 shadow-md transition-300 hover:shadow-2xl">
+        <div class="animate-zoom-in animate-duration-650 rounded-xl bg-surface pb-2 shadow-md transition-300 hover:shadow-2xl">
           <!-- 图片 -->
           <div class="overflow-hidden">
             <RouterLink :to="`/article/${article.id}`">
@@ -52,7 +52,7 @@ onMounted(async () => {
                 </span>
                 <!-- 分类 -->
                 <RouterLink :to="`/categories/${article.category_id}?name=${article.category?.name}`">
-                  <div class="flex items-center text-#4c4948 transition-300 hover:color-violet">
+                  <div class="flex items-center text-main transition-300 hover:color-violet">
                     <span class="i-ic:outline-bookmark mr-1" />
                     <span> {{ article.category?.name }} </span>
                   </div>
@@ -60,7 +60,7 @@ onMounted(async () => {
               </div>
             </div>
             <!-- divider -->
-            <div class="my-2 h-0.5 bg-gray-200" />
+            <div class="my-2 h-0.5 bg-surface-soft" />
             <!-- 标签 -->
             <div class="px-3 space-x-1.5">
               <RouterLink v-for="tag of article.tags" :key="tag.id" :to="`/tags/${tag.id}?name=${tag.name}`">

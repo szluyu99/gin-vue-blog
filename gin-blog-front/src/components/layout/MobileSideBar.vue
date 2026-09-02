@@ -65,7 +65,7 @@ async function logout() {
         </div>
       </div>
       <!-- 分隔线 -->
-      <hr class="my-4 border-2 border-color-#d2ebfd border-dashed">
+      <hr class="my-4 border-2 border-color-divider border-dashed">
       <!-- 菜单 -->
       <div v-for="item of menuOptions" :key="item.text" class="m-2 p-1">
         <RouterLink :to="item.path" class="flex items-center" @click="appStore.setCollapsed(false)">

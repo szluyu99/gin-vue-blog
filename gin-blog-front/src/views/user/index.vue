@@ -62,7 +62,7 @@ async function updateUserInfo() {
             </div>
             <input
               v-model="form[item.key]" required :placeholder="`请输入${item.label}`"
-              class="block w-full border-0 rounded-md p-2 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+              class="block w-full border-0 rounded-md p-2 text-main shadow-sm outline-none ring-1 ring-line ring-inset placeholder:text-muted focus:ring-2 focus:ring-emerald"
             >
           </div>
         </div>

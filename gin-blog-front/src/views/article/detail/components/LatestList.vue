@@ -15,7 +15,7 @@ const { articleList } = defineProps({
         <span class="ml-2"> 最新文章 </span>
       </div>
       <ul class="space-y-1">
-        <li v-for="item of articleList" :key="item.title" class="p-1 hover:bg-gray-200">
+        <li v-for="item of articleList" :key="item.title" class="p-1 hover:bg-surface-soft">
           <RouterLink :to="`/article/${item.id}`" class="border-b-1 border-dashed last:border-none">
             <div class="flex items-center">
               <img :src="convertImgUrl(item.img)" class="h-15 w-15 overflow-hidden">

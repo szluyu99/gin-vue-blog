@@ -1,7 +1,10 @@
 <script setup>
 import { Icon } from '@iconify/vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useAppStore } from '@/store'
+
+const appStore = useAppStore()
 
 const { y } = useWindowScroll()
 const styleVal = ref('')
@@ -9,10 +12,10 @@ watchThrottled(y, () => {
   styleVal.value = (y.value > 20) ? 'opacity: 1; transform: translateX(-40px);' : ''
 }, { throttle: 100 })
 
-const options = [
+const options = computed(() => [
   {
-    icon: 'bi:moon-stars-fill',
-    fn: () => window.$message?.info('黑夜模式开发中...'),
+    icon: appStore.isDark ? 'bi:sun-fill' : 'bi:moon-stars-fill',
+    fn: () => appStore.toggleTheme(),
   },
   {
     icon: 'uiw:setting',
@@ -22,7 +25,7 @@ const options = [
     icon: 'fluent:arrow-up-12-filled',
     fn: () => window.scrollTo({ behavior: 'smooth', top: 0 }),
   },
-]
+])
 </script>
 
 <template>

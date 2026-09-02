@@ -40,6 +40,19 @@ export default defineConfig({
   shortcuts: [
     ['f-c-c', 'flex justify-center items-center'],
   ],
+  // 语义色都指向 CSS 变量, 变量在 styles/index.css 里按 html.dark 切换,
+  // 这样切主题只改根元素 class, 不用给每个类名都写一遍 dark: 变体
+  theme: {
+    colors: {
+      'primary': '#49b1f5',
+      'surface': 'var(--c-surface)',
+      'surface-soft': 'var(--c-surface-soft)',
+      'main': 'var(--c-text)',
+      'muted': 'var(--c-text-muted)',
+      'line': 'var(--c-border)',
+      'divider': 'var(--c-divider)',
+    },
+  },
   presets: [
     presetUno(),
     presetIcons({ warn: true, collections: iconCollections }),

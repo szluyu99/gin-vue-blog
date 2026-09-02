@@ -72,6 +72,9 @@ async function logout() {
       </RouterLink>
       <!-- 右上角图标 -->
       <div class="flex items-center gap-2 text-2xl">
+        <button :title="appStore.isDark ? '切换浅色模式' : '切换深色模式'" @click="appStore.toggleTheme()">
+          <Icon :icon="appStore.isDark ? 'mdi:weather-sunny' : 'mdi:weather-night'" />
+        </button>
         <button @click="appStore.setSearchFlag(true)">
           <Icon icon="ic:round-search" />
         </button>
@@ -123,6 +126,12 @@ async function logout() {
               </ul>
             </div>
           </div>
+          <!-- 主题切换 -->
+          <div class="menus-item">
+            <a class="menu-btn flex items-center" :title="appStore.isDark ? '切换浅色模式' : '切换深色模式'" @click="appStore.toggleTheme()">
+              <Icon :icon="appStore.isDark ? 'mdi:weather-sunny' : 'mdi:weather-night'" class="text-xl" />
+            </a>
+          </div>
           <!-- 登录 -->
           <div class="menus-item">
             <a v-if="!userStore.userId" class="menu-btn" @click="appStore.setLoginFlag(true)">
@@ -170,6 +179,13 @@ async function logout() {
   }
 }
 
+/* 滚动后导航栏是实底的, 深色模式下要跟着变暗, 否则一片白 */
+html.dark .nav-fixed {
+  color: var(--c-text);
+  background: rgba(24, 26, 31, 0.85) !important;
+  box-shadow: 0 5px 6px -5px rgba(0, 0, 0, 0.8);
+}
+
 .menus-item {
   position: relative;
   display: inline-block;
@@ -207,7 +223,7 @@ async function logout() {
   width: max-content;
   margin-top: 8px;
   box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.5);
-  background-color: #fff;
+  background-color: var(--c-surface);
   animation: submenu 0.3s 0.1s ease both;
 
   &::before {
@@ -220,13 +236,14 @@ async function logout() {
   }
   a {
     line-height: 2;
-    color: #4c4948 !important;
+    color: var(--c-text) !important;
     text-shadow: none;
     display: block;
     padding: 6px 14px;
   }
   a:hover {
     background: #4ab1f4;
+    color: #fff !important;
   }
 }
 

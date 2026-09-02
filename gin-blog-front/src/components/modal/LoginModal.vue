@@ -78,14 +78,14 @@ function openForget() {
           <span class="mr-4 inline-block w-16 text-right"> 用户名 </span>
           <input
             v-model="form.username" required placeholder="用户名"
-            class="block w-full border-0 rounded-md p-2 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+            class="block w-full border-0 rounded-md p-2 text-main shadow-sm outline-none ring-1 ring-line ring-inset placeholder:text-muted focus:ring-2 focus:ring-emerald"
           >
         </div>
         <div class="flex items-center">
           <span class="mr-4 inline-block w-16 text-right"> 密码 </span>
           <input
             v-model="form.password" type="password" placeholder="密码"
-            class="block w-full border-0 rounded-md p-2 text-gray-900 shadow-sm outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-emerald"
+            class="block w-full border-0 rounded-md p-2 text-main shadow-sm outline-none ring-1 ring-line ring-inset placeholder:text-muted focus:ring-2 focus:ring-emerald"
           >
         </div>
       </div>

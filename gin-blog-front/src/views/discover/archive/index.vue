@@ -58,14 +58,14 @@ onMounted(() => {
     <template v-for="(item, idx) of archiveList" :key="item.id">
       <div class="flex items-center gap-2">
         <div class="i-mdi:circle bg-blue text-sm" />
-        <span class="text-sm color-#666 lg:text-base">
+        <span class="text-sm color-muted lg:text-base">
           {{ dayjs(item.created_at).format('YYYY-MM-DD') }}
         </span>
-        <a class="color-#666 lg:text-lg hover:text-orange" @click="router.push(`/article/${item.id}`)">
+        <a class="color-muted lg:text-lg hover:text-orange" @click="router.push(`/article/${item.id}`)">
           {{ item.title }}
         </a>
       </div>
-      <hr v-if="idx !== archiveList.length - 1" class="my-4 border-1 border-color-#d2ebfd border-dashed">
+      <hr v-if="idx !== archiveList.length - 1" class="my-4 border-1 border-color-divider border-dashed">
     </template>
 
     <!-- TODO: 分页 -->

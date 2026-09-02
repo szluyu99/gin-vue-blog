@@ -65,7 +65,7 @@ const styleObject = computed(() => {
     </div>
     <div
       v-bind="$attrs"
-      class="fixed z-35 overflow-y-auto bg-white transition-all duration-200"
+      class="fixed z-35 overflow-y-auto bg-surface transition-all duration-200"
       :class="[`duration-${duration}`, {
         '-left-full top-0': placement === 'left' && !modelValue,
         'left-0 top-0': placement === 'left' && modelValue,

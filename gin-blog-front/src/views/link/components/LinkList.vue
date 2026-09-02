@@ -14,7 +14,7 @@ defineProps({
     <!-- 标题 -->
     <p class="flex items-center text-xl">
       <span class="i-mdi:link-variant mr-4 text-blue" />
-      <span class="color-#344c67 font-bold"> 友情链接 </span>
+      <span class="color-main font-bold"> 友情链接 </span>
     </p>
     <!-- 链接列表 -->
     <!-- 友链数量不为 0 -->
