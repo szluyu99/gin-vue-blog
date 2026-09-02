@@ -122,3 +122,89 @@ jobs:
           done
           curl -sf http://127.0.0.1:8765/api/config > /dev/null
           docker logs gvb-server
+
+  # 一键部署的端到端验证: 起完整的 compose 栈, 校验权限种子数据的不变式
+  deploy:
+    name: Deploy (compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Bring up the stack
+        working-directory: deploy
+        run: sh bootstrap.sh
+
+      - name: Wait for backend
+        run: |
+          for i in $(seq 60); do
+            curl -sf http://127.0.0.1:8765/api/config > /dev/null && break
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:8765/api/config > /dev/null
+
+      - name: Web is served
+        run: |
+          curl -sf http://127.0.0.1/ > /dev/null
+          curl -sf http://127.0.0.1/admin/ > /dev/null
+
+      # generate-data 是权限数据的唯一来源, 这里锁住它的结果:
+      # admin 能改配置, guest 不能, 未登录也不能
+      - name: Permission invariants
+        run: |
+          login() {
+            curl -s -X POST http://127.0.0.1:8765/api/login \
+              -H 'Content-Type: application/json' \
+              -d "{\"username\":\"$1\",\"password\":\"123456\"}"
+          }
+          patch_config() {
+            curl -s -X PATCH http://127.0.0.1:8765/api/config \
+              -H 'Content-Type: application/json' \
+              -H "Authorization: Bearer $1" \
+              -d '{"blog_name":"gin-vue-blog"}'
+          }
+
+          admin_token=$(login admin | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["token"])')
+          guest_token=$(login guest | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["token"])')
+
+          admin_resp=$(patch_config "$admin_token")
+          echo "admin: $admin_resp"
+          echo "$admin_resp" | grep -q '"code":0'
+
+          guest_resp=$(patch_config "$guest_token")
+          echo "guest: $guest_resp"
+          echo "$guest_resp" | grep -q '"code":1206'
+
+          # 没有 token 的请求必须被拦住 (资源表中登记的接口)
+          anon_resp=$(curl -s -X PATCH http://127.0.0.1:8765/api/config \
+            -H 'Content-Type: application/json' -d '{}')
+          echo "anonymous: $anon_resp"
+          echo "$anon_resp" | grep -q '"code":1201'
+
+      # 重启后种子数据不能重复写入
+      - name: Seeding is idempotent
+        working-directory: deploy/start
+        run: |
+          # 密码见 deploy/start/.env 的 MYSQL_ROOT_PASSWORD
+          count_resource() {
+            docker exec gvb-mysql mysql -uroot -p12345566 -N -B -e \
+              "SELECT COUNT(*) FROM gvb.resource" 2>/dev/null
+          }
+          before=$(count_resource)
+          docker restart gvb-server
+          for i in $(seq 30); do
+            curl -sf http://127.0.0.1:8765/api/config > /dev/null && break
+            sleep 2
+          done
+          after=$(count_resource)
+          echo "resource: $before -> $after"
+          [ "$before" = "$after" ]
+
+      - name: Dump logs
+        if: failure()
+        working-directory: deploy/start
+        run: docker compose logs --tail 200
+
+      - name: Tear down
+        if: always()
+        working-directory: deploy/start
+        run: docker compose down -v

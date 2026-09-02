@@ -27,9 +27,8 @@ func TestCORSPreflight(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusNoContent, w.Code)
-	// 注意: 配置里 AllowOrigins 是 "*", 所以不会回显 Origin
-	// 与 AllowCredentials: true 同时使用时, 浏览器会拒绝带 cookie 的跨域请求
-	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	// 带凭证的跨域请求必须回显具体 Origin, 不能是 *
+	assert.Equal(t, "http://localhost:3333", w.Header().Get("Access-Control-Allow-Origin"))
 	assert.Equal(t, "true", w.Header().Get("Access-Control-Allow-Credentials"))
 }
 
@@ -46,7 +45,7 @@ func TestCORSSimpleRequest(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "http://localhost:3333", w.Header().Get("Access-Control-Allow-Origin"))
 }
 
 // handler panic 时不能把整个进程带走, 返回 500

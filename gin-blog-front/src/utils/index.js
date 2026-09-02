@@ -21,4 +21,3 @@ export function convertImgUrl(imgUrl) {
 }
 
 export * from './http'
-export * from './local'

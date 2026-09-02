@@ -131,6 +131,8 @@ func PermissionCheck() gin.HandlerFunc {
 		method := c.Request.Method
 
 		slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v, %v, %v\n", auth.Username, url, method))
+		// 任一角色拥有该资源即放行 (OR 语义):
+		// 多角色时不能因为其中一个角色没有权限就拒绝, 否则多加一个弱角色反而会减少权限
 		for _, role := range auth.Roles {
 			slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v\n", role.Name))
 			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
@@ -138,13 +140,13 @@ func PermissionCheck() gin.HandlerFunc {
 				handle.ReturnError(c, g.ErrDbOp, err)
 				return
 			}
-			if !pass {
-				handle.ReturnError(c, g.ErrPermission, nil)
+			if pass {
+				slog.Debug("[middleware-PermissionCheck]: pass")
+				c.Next()
 				return
 			}
 		}
 
-		slog.Debug("[middleware-PermissionCheck]: pass")
-		c.Next()
+		handle.ReturnError(c, g.ErrPermission, nil)
 	}
 }

@@ -41,9 +41,12 @@ func WithGormDB(db *gorm.DB) gin.HandlerFunc {
 }
 
 // CORS 跨域请求
+// 不能用 AllowOrigins: ["*"], 它会让响应头固定为 *,
+// 而带凭证(AllowCredentials)的跨域请求在 * 下会被浏览器拒绝,
+// 前后端分域名部署时 session cookie 就带不过去。
+// 这里用 AllowOriginFunc 放行所有来源, 由 cors 回显具体的 Origin。
 func CORS() gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "POST", "GET", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "X-Requested-With"},
 		ExposeHeaders:    []string{"Content-Type"},

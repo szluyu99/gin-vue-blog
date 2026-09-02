@@ -79,17 +79,29 @@ func TestPermissionCheckWithoutLogin(t *testing.T) {
 }
 
 /*
-多角色时是 AND 语义: 任一角色缺少该资源就会被拒绝。
-按常见 RBAC 的理解应该是 OR (任一角色有权限即可), 这里保持现状是因为
-它 fail closed, 改成 OR 属于放宽权限, 需要单独评估。这条用例用来锁住现状,
-以后要改语义时会先在这里失败。
+多角色是 OR 语义: 任一角色拥有该资源即放行。
+反过来(任一角色缺少就拒绝)会导致给用户多加一个弱角色反而减少权限。
 */
-func TestPermissionCheckMultiRoleIsAnd(t *testing.T) {
+func TestPermissionCheckMultiRoleIsOr(t *testing.T) {
 	e := newMwEnv(t)
 	res := e.seedResource("配置修改", "/config", http.MethodPatch, false)
-	full := e.seedRole("admin", res.ID)
 	limited := e.seedRole("user") // 什么资源都没有
-	user := e.seedUser("test", false, full.ID, limited.ID)
+	full := e.seedRole("admin", res.ID)
+	user := e.seedUser("test", false, limited.ID, full.ID)
+	e.loginId = user.ID
+	e.handle(http.MethodPatch, "/config", PermissionCheck())
+
+	w := e.request(http.MethodPatch, "/api/config", "{}", nil)
+
+	assert.True(t, e.handlerRan, "有一个角色有权限就应该放行")
+	assert.Contains(t, w.Body.String(), `"code":0`)
+}
+
+// 一个角色都没有的用户不能因为"没有角色说不出反对"而被放行
+func TestPermissionCheckWithoutRole(t *testing.T) {
+	e := newMwEnv(t)
+	e.seedResource("配置修改", "/config", http.MethodPatch, false)
+	user := e.seedUser("test", false)
 	e.loginId = user.ID
 	e.handle(http.MethodPatch, "/config", PermissionCheck())
 

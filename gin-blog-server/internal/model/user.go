@@ -82,7 +82,8 @@ func UpdateUserNicknameAndRole(db *gorm.DB, authId int, nickname string, roleIds
 	}
 
 	// 更新用户角色, 清空原本的 user_role 关系, 添加新的关系
-	result = db.Where(UserAuthRole{UserAuthId: userAuth.UserInfoId}).Delete(UserAuthRole{})
+	// 注意这里是 user_auth_id, 用 UserInfoId 会删掉别人的角色并留下自己的旧角色
+	result = db.Where(UserAuthRole{UserAuthId: userAuth.ID}).Delete(UserAuthRole{})
 	if result.Error != nil {
 		return result.Error
 	}
