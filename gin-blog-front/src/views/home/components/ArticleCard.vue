@@ -20,7 +20,7 @@ const isRightClass = computed(() => props.idx % 2 === 0
     <!-- 封面图 -->
     <div :class="isRightClass" class="h-[230px] w-full overflow-hidden md:h-full md:w-45/100">
       <RouterLink :to="`/article/${article.id}`">
-        <img class="h-full w-full transition-600 hover:scale-110" :src="convertImgUrl(article.img)">
+        <img class="h-full w-full transition-600 hover:scale-110" loading="lazy" :src="convertImgUrl(article.img)">
       </RouterLink>
     </div>
     <!-- 文章信息 -->

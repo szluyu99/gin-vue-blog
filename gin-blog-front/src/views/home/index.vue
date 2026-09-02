@@ -1,7 +1,4 @@
 <script setup>
-// Markdown => Html
-import { marked } from 'marked'
-
 // 无限轮播图
 import InfiniteLoading from 'v3-infinite-loading'
 
@@ -9,6 +6,7 @@ import { onMounted, reactive, ref } from 'vue'
 
 import api from '@/api'
 import AppFooter from '@/components/layout/AppFooter.vue'
+import { stripMarkdown } from '@/utils'
 import Announcement from './components/Announcement.vue'
 import ArticleCard from './components/ArticleCard.vue'
 import AuthorInfo from './components/AuthorInfo.vue'
@@ -31,10 +29,8 @@ async function getArticlesInfinite($state) {
         $state.complete()
         return
       }
-      // 非首次加载, 都是往列表中添加数据
-      articleList.value.push(...resp.data)
-      // 过滤 Markdown 符号
-      articleList.value.forEach(e => e.content = filterMdSymbol(e.content))
+      // 非首次加载, 都是往列表中添加数据 (摘要去掉 Markdown 记号)
+      articleList.value.push(...resp.data.map(e => ({ ...e, content: stripMarkdown(e.content) })))
       params.page_num++
       $state.loaded()
     }
@@ -48,20 +44,10 @@ onMounted(async () => {
   loading.value = true
   // 首次加载
   const resp = await api.getArticles(params)
-  articleList.value = resp.data
-  // 过滤 Markdown 符号
-  articleList.value.forEach(e => e.content = filterMdSymbol(e.content))
+  articleList.value = resp.data.map(e => ({ ...e, content: stripMarkdown(e.content) }))
   params.page_num++
   loading.value = false
 })
-
-// 过滤 Markdown 符号: 先转 Html 再去除 Html 标签
-function filterMdSymbol(md) {
-  return marked(md) // 转 HTML
-    .replace(/<[^>]*>/g, '') // 正则去除 Html 标签
-    .replace(/\|*\n/, '')
-    .replace(/&npsp;/gi, '')
-}
 
 function backTop() {
   window.scrollTo({ behavior: 'smooth', top: 0 })

@@ -26,7 +26,7 @@ defineProps({
         <a :href="link.address" target="_blank" class="flex flex-row p-1 hover:text-white">
           <!-- 头像 -->
           <div class="z-10 mr-5 w-[120px] f-c-c">
-            <img :src="convertImgUrl(link.avatar)" class="w-[65px] rounded-full duration-600 group-hover:rotate-360">
+            <img :src="convertImgUrl(link.avatar)" class="w-[65px] rounded-full duration-600 group-hover:rotate-360" loading="lazy">
           </div>
           <!-- 描述 -->
           <div class="z-10 h-[95px] w-[260px] f-c-c">
@@ -40,7 +40,7 @@ defineProps({
     </div>
     <!-- 友链数量为 0 -->
     <div v-else class="text-center">
-      <img class="inline h-[260px]" src="/images/empty_friend_link.svg" alt="暂无友情链接">
+      <img class="inline h-[260px]" src="/images/empty_friend_link.svg" alt="暂无友情链接" loading="lazy">
       <div class="mt-1 space-y-1">
         <p class="text-3xl">
           暂无友情链接

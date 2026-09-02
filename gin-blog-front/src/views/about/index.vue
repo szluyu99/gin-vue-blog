@@ -10,6 +10,7 @@ import api from '@/api'
 
 import BannerPage from '@/components/BannerPage.vue'
 import { useAppStore } from '@/store'
+import { typesetMath } from '@/utils/mathjax'
 import 'highlight.js/styles/a11y-dark.css'
 
 hljs.registerLanguage('go', go)
@@ -27,8 +28,8 @@ onMounted(async () => {
   await nextTick()
   // higlight.js 代码高亮
   document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
-  // MathJax 渲染公式
-  window.MathJax.typeset()
+  // 内容里有公式才加载 MathJax
+  await typesetMath(html.value)
 })
 </script>
 

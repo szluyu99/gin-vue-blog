@@ -12,6 +12,7 @@ import api from '@/api'
 import Comment from '@/components/comment/Comment.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { convertImgUrl } from '@/utils'
+import { typesetMath } from '@/utils/mathjax'
 import BannerInfo from './components/BannerInfo.vue'
 import Catalogue from './components/Catalogue.vue'
 import Copyright from './components/Copyright.vue'
@@ -62,8 +63,8 @@ onMounted(async () => {
     await nextTick()
     // highlight.js 代码高亮
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
-    // MathJax 渲染公式
-    window.MathJax.typeset()
+    // 正文里有公式才加载 MathJax
+    await typesetMath(data.value.content)
   }
   catch (err) {
     console.error(err)

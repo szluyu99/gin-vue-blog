@@ -118,7 +118,7 @@ const coverStyle = computed(() => {
       >
         <template #dm="{ danmu }">
           <div class="flex items-center rounded-3xl bg-#00000060 px-2 py-1 text-white lg:px-4 lg:py-2">
-            <img class="h-[28px] rounded-full" :src="convertImgUrl(danmu.avatar)" alt="avatar">
+            <img class="h-[28px] rounded-full" :src="convertImgUrl(danmu.avatar)" alt="avatar" loading="lazy">
             <span class="ml-2 text-sm"> {{ `${danmu.nickname} : ${danmu.content}` }}</span>
           </div>
         </template>

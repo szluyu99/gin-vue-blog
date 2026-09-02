@@ -185,7 +185,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       </p>
       <!-- 评论列表 -->
       <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-1 flex">
-        <img :src="convertImgUrl(comment.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+        <img :src="convertImgUrl(comment.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360" loading="lazy">
         <div class="ml-3 flex flex-1 flex-col">
           <!-- 评论人名称: 根据是否有 website 显示不同效果 -->
           <div>
@@ -220,7 +220,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           <div class="my-1" v-html="comment.content" />
           <!-- 评论回复 start -->
           <div v-for="reply of comment.reply_list" :key="reply.id" class="mt-2 flex">
-            <img :src="convertImgUrl(reply.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360">
+            <img :src="convertImgUrl(reply.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360" loading="lazy">
             <div class="ml-2 flex flex-1 flex-col">
               <!-- 回复人名称 -->
               <div>
