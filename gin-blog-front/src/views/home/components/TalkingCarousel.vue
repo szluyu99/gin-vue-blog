@@ -1,12 +1,14 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import { getOneSentence } from '@/utils'
 
 const sentence = ref('书山有路勤为径，学海无涯苦作舟。')
 
-onMounted(() => {
-  fetch('https://v1.hitokoto.cn?c=i')
-    .then(res => res.json())
-    .then(data => sentence.value = data.hitokoto)
+onMounted(async () => {
+  const one = await getOneSentence()
+  if (one) {
+    sentence.value = one
+  }
 })
 </script>
 

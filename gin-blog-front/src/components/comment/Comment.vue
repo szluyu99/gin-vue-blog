@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import api from '@/api'
@@ -11,7 +11,6 @@ import ULoading from '@/components/ui/ULoading.vue'
 import { useAppStore, useUserStore } from '@/store'
 
 import { convertImgUrl } from '@/utils'
-// import EmojiList from '@/assets/emoji'
 import CommentField from './CommentField.vue'
 // 评论 / 回复 框
 import Paging from './Paging.vue'
@@ -36,13 +35,17 @@ const commentCount = ref(0) // 评论总数量
 const listLoading = ref(false) // 列表加载状态
 const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId }) // 加载评论的参数
 
+// 延时定时器: 卸载时清掉, 否则会在组件销毁后改状态
+let loadTimer = null
+onUnmounted(() => clearTimeout(loadTimer))
+
 async function getComments() {
   listLoading.value = true
   try {
     const resp = await api.getComments(params)
 
     // * 全局加载更多, 0.8s 延时
-    setTimeout(() => {
+    loadTimer = setTimeout(() => {
       params.page_num === 1
         ? commentList.value = resp.data.page_data
         : commentList.value.push(...resp.data.page_data)
@@ -52,9 +55,12 @@ async function getComments() {
     }, 800)
   }
   catch (err) {
+    // 不复位 listLoading 的话, "点击加载更多" (v-if="!listLoading") 会永久消失
+    listLoading.value = false
     console.error(err)
   }
 }
+
 // 重新加载评论(提交评论以后)
 function reloadComments() {
   params.page_num = 1 // 页数重置
@@ -295,8 +301,8 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
             :topic-id="topicId"
             @after-submit="reloadReplies(idx)"
           />
-          <!-- 分隔线: 注意最后一个评论没有线 -->
-          <div v-if="(idx + 1) !== commentCount" class="my-2.5 h-0.5 bg-light-500" />
+          <!-- 分隔线: 注意最后一个评论没有线 (比的是已加载条数, 不是总数) -->
+          <div v-if="(idx + 1) !== commentList.length" class="my-2.5 h-0.5 bg-light-500" />
         </div>
       </div>
       <!-- 加载更多 -->

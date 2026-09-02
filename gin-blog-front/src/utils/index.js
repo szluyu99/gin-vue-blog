@@ -50,4 +50,22 @@ export function stripMarkdown(md) {
     .trim()
 }
 
+/**
+ * 取一句"一言", 失败返回 null (由调用方决定兜底文案)
+ *
+ * 首页的 HomeBanner 和 TalkingCarousel 都要用, 以前各自 fetch 一次, 同一个接口请求了两遍;
+ * 这里缓存 Promise, 一次页面加载只请求一次。这个接口在部分网络下不通, 所以内部吃掉异常。
+ * @returns {Promise<string | null>}
+ */
+let sentencePromise = null
+export function getOneSentence() {
+  if (!sentencePromise) {
+    sentencePromise = fetch('https://v1.hitokoto.cn?c=i')
+      .then(res => res.json())
+      .then(data => data?.hitokoto || null)
+      .catch(() => null)
+  }
+  return sentencePromise
+}
+
 export * from './http'

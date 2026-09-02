@@ -69,15 +69,19 @@ export const useUserStore = defineStore('user', {
         return Promise.reject(error)
       }
     },
+    // 注意要写 userInfo 里的数组, 不能写 commentLikeSet / articleLikeSet 这两个 getter:
+    // 底层数组为空时 getter 返回的是新建的 [], push 进去的东西会被丢掉
     commentLike(commentId) {
-      this.commentLikeSet.includes(commentId)
-        ? this.commentLikeSet.splice(this.commentLikeSet.indexOf(commentId), 1)
-        : this.commentLikeSet.push(commentId)
+      const set = (this.userInfo.commentLikeSet ??= [])
+      set.includes(commentId)
+        ? set.splice(set.indexOf(commentId), 1)
+        : set.push(commentId)
     },
     articleLike(articleId) {
-      this.articleLikeSet.includes(articleId)
-        ? this.articleLikeSet.splice(this.articleLikeSet.indexOf(articleId), 1)
-        : this.articleLikeSet.push(articleId)
+      const set = (this.userInfo.articleLikeSet ??= [])
+      set.includes(articleId)
+        ? set.splice(set.indexOf(articleId), 1)
+        : set.push(articleId)
     },
   },
 })

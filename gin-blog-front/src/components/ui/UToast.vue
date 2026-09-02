@@ -19,6 +19,10 @@ const props = defineProps({
   closeable: { type: Boolean, default: false },
 })
 
+// 自增 id: 用 Date.now() 时同一毫秒内的两条提示 id 相同,
+// remove 按 id 过滤会一起删掉, TransitionGroup 的 key 也会重复
+let seq = 0
+
 const flux = reactive({
   /** @type { Array<{ show, id, content, type }> } */
   events: [],
@@ -36,7 +40,7 @@ const flux = reactive({
       flux.events = []
 
     setTimeout(() => {
-      const event = { id: Date.now(), content, type }
+      const event = { id: ++seq, content, type }
       flux.events.push(event)
       setTimeout(() => flux.remove(event), props.timeout)
     }, 100)

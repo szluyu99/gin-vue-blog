@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 
 import { computed, onMounted, reactive } from 'vue'
 import { useAppStore } from '@/store'
+import { getOneSentence } from '@/utils'
 
 const { pageList, blogConfig } = storeToRefs(useAppStore())
 
@@ -20,15 +21,14 @@ const typer = reactive({
 })
 
 onMounted(() => {
-  getOneSentence()
+  startTyper()
 })
 
-function getOneSentence() {
-  // 一言 + 打字机特效
-  fetch('https://v1.hitokoto.cn?c=i')
-    .then(res => res.json())
-    .then(data => new EasyTyper(typer, data.hitokoto, () => {}, () => {}))
-    .catch(() => new EasyTyper(typer, '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {}))
+async function startTyper() {
+  // 一言 + 打字机特效, 拿不到就用固定文案
+  const one = await getOneSentence()
+  // EasyTyper 靠构造函数直接开始打字, 返回实例只是为了不写成裸 new
+  return new EasyTyper(typer, one ?? '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {})
 }
 
 function scrollDown() {

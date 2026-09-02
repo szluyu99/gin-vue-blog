@@ -119,13 +119,18 @@ export const router = createRouter({
 
 router.afterEach((to) => {
   document.title = `${to.meta?.title ?? import.meta.env.VITE_APP_TITLE}`
+  NProgress.done()
 })
 
 NProgress.configure({ showSpinner: false })
 
+// 路由组件是懒加载的, 进度条要跟着导航结束(afterEach / onError)收尾。
+// 以前是 start() 之后固定 setTimeout 300ms 就 done(), 网速慢时进度条早走完了 chunk 还在下载
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  for (let i = 0; i < 5; i++) NProgress.inc()
-  setTimeout(() => NProgress.done(), 300)
   next()
+})
+
+router.onError(() => {
+  NProgress.done()
 })

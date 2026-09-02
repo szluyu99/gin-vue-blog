@@ -96,6 +96,19 @@ describe('useUserStore', () => {
     expect(store.commentLikeSet).toEqual([])
   })
 
+  it('底层点赞数组缺失时也能写入', () => {
+    const store = useUserStore()
+    // getter 在底层数组为空时会返回新建的 [], 写 getter 的话这次 push 会被丢掉
+    store.userInfo.articleLikeSet = undefined
+    store.userInfo.commentLikeSet = undefined
+
+    store.articleLike(10)
+    store.commentLike(5)
+
+    expect(store.articleLikeSet).toEqual([10])
+    expect(store.commentLikeSet).toEqual([5])
+  })
+
   it('logout 会调接口并清空状态', async () => {
     api.logout.mockResolvedValue({ code: 0 })
 

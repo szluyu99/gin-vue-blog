@@ -25,9 +25,14 @@ const danmus = ref([{
 }])
 
 onMounted(async () => {
-  const resp = await api.getMessages()
-  await nextTick()
-  danmus.value = [...danmus.value, ...resp.data]
+  try {
+    const resp = await api.getMessages()
+    await nextTick()
+    danmus.value = [...danmus.value, ...(resp.data ?? [])]
+  }
+  catch (err) {
+    console.error(err)
+  }
 })
 
 async function send() {

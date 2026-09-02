@@ -56,7 +56,7 @@ async function logout() {
   if (route.name === 'User') {
     router.push('/')
   }
-  window.$notify.success('退出登录成功!')
+  window.$notify?.success('退出登录成功!')
 }
 
 // const blogTitle = import.meta.env.VITE_APP_TITLE

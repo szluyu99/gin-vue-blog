@@ -43,16 +43,8 @@ async function handleLogin() {
   }
 
   doLogin(username, password)
-  // if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {
-  // // 腾讯滑块验证码 (在 index.html 中引入 js 文件)
-  //   const captcha = new window.TencentCaptcha(config.TENCENT_CAPTCHA, async (res) => {
-  //     res.ret === 0 && doLogin(username, password)
-  //   })
-  //   captcha.show()
-  // }
-  // else {
-  // doLogin(username, password)
-  // }
+  // 腾讯滑块验证码曾经在这里接入 (index.html 里引入 TCaptcha.js, VITE_USE_CAPTCHA 控制开关),
+  // 依赖的 AppID 是原作者的, 已随 assets/config.js 一起删掉, 需要时自己配 env 再接回来。
 }
 
 // 立即注册

@@ -91,4 +91,31 @@ describe('http 拦截器', () => {
     expect(appStore.loginFlag).toBe(true)
     expect(window.$message.error).toHaveBeenCalledWith('当前没有登录，请先登录！')
   })
+
+  it('超时和断网会给出对应提示', async () => {
+    baseRequest.defaults.adapter = () =>
+      Promise.reject(Object.assign(new Error('timeout'), { code: 'ECONNABORTED' }))
+    await expect(baseRequest.get('/config')).rejects.toThrow('timeout')
+    expect(window.$message.error).toHaveBeenCalledWith('请求超时，请稍后重试')
+
+    baseRequest.defaults.adapter = () =>
+      Promise.reject(Object.assign(new Error('offline'), { code: 'ERR_NETWORK' }))
+    await expect(baseRequest.get('/config')).rejects.toThrow('offline')
+    expect(window.$message.error).toHaveBeenCalledWith('网络异常，请检查网络连接')
+  })
+
+  it('带状态码的请求失败会把状态码带进提示', async () => {
+    baseRequest.defaults.adapter = () =>
+      Promise.reject(Object.assign(new Error('boom'), { code: 'ERR_BAD_RESPONSE', response: { status: 502 } }))
+
+    await expect(baseRequest.get('/config')).rejects.toThrow('boom')
+    expect(window.$message.error).toHaveBeenCalledWith('请求失败 (502)')
+  })
+
+  it('$message 还没挂载时不会抛 TypeError', async () => {
+    window.$message = undefined
+    responseBody = { code: 9004, message: '数据库操作异常', data: null }
+
+    await expect(baseRequest.get('/config')).rejects.toMatchObject({ code: 9004 })
+  })
 })

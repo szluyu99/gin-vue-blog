@@ -73,7 +73,8 @@ function responseSuccess(response) {
       const userStore = useUserStore()
       userStore.resetLoginState()
     }
-    window.$message.error(message)
+    // $message 在 App.vue 的 onMounted 里才挂上, 早期失败的请求可能取不到
+    window.$message?.error(message)
     return Promise.reject(responseData)
   }
   return Promise.resolve(responseData)
@@ -85,8 +86,9 @@ function responseSuccess(response) {
  */
 function responseFail(error) {
   const { code, message } = error
+  // 401 只可能来自 requestSuccess 里自己构造的 AxiosError(没有 token)
   if (code === 401) {
-    window.$message.error(message)
+    window.$message?.error(message)
     // 移除 token
     const userStore = useUserStore()
     userStore.resetLoginState()
@@ -94,5 +96,24 @@ function responseFail(error) {
     const appStore = useAppStore()
     appStore.setLoginFlag(true)
   }
+  else {
+    // 超时(ECONNABORTED)、断网(ERR_NETWORK)、5xx 等以前只进 console, 用户看不到任何反馈
+    window.$message?.error(networkErrorText(error))
+  }
   return Promise.reject(error)
+}
+
+/**
+ * 把 axios 的错误翻译成给用户看的文案
+ * @param {any} error
+ */
+function networkErrorText(error) {
+  if (error?.code === 'ECONNABORTED') {
+    return '请求超时，请稍后重试'
+  }
+  if (error?.code === 'ERR_NETWORK') {
+    return '网络异常，请检查网络连接'
+  }
+  const status = error?.response?.status
+  return status ? `请求失败 (${status})` : '请求失败，请稍后重试'
 }
