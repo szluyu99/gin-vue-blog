@@ -42,6 +42,7 @@
 前台（`gin-blog-front`）：
 
 - 界面参考 Hexo 主题 Butterfly，响应式适配移动端
+- 暗色模式：首次访问跟随系统偏好，可手动切换并记住选择，刷新无闪屏
 - 文章详情支持目录锚点、推荐文章
 - 评论 + 回复，留言弹幕墙
 - 点赞、访客统计（Redis）
@@ -128,24 +129,42 @@ cd gin-vue-blog/deploy
 >
 > Docker 部署需要把 `gin-blog-server/internal/utils/email.go` 中 `GetEmailVerifyURL` 的 localhost 换成自己的域名。
 
+## 测试与 CI
+
+```bash
+cd gin-blog-server && go test ./...   # 后端: model 层 + handle 层接口级测试
+cd gin-blog-front  && pnpm test       # 前端: vitest
+cd gin-blog-admin  && pnpm test
+```
+
+`.github/workflows/ci.yml` 在 push 和 PR 时跑四组任务：
+
+- Server：`gofmt` / `go vet` / `go test`，并校验 `docs/` 与 Swagger 注解是否一致
+- Frontend：两个前端各跑 `pnpm lint` / `pnpm test` / `pnpm build`
+- Docker：构建 web 与 server 镜像并启动做健康检查
+- Deploy：起完整的 compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦，重复执行不新增资源）
+
 ## 后续计划
 
 功能：
 
-- 黑夜模式（后台已有基础，前台待支持）
 - 前台侧边信息收缩
 - 说说、相册、音乐播放器
 - 第三方登录：QQ、微信、Github
 - 评论表情选择（参考 Valine）
 - 前台搜索集成 ElasticSearch（当前为数据库模糊查询）
+- 评论、留言的通知
+- RSS / sitemap / robots.txt
 - 国际化
 
 工程：
 
-- 补齐后端单元测试，当前覆盖率很低且集中在 model 层
 - 后端日志切割
 - 后台首页重新设计（目前内容较少）
-- 前端打包体积优化（后台存在超过 1MB 的 chunk）
+- 前端组件级测试（当前只覆盖 store 和 utils）
+- 前台自托管 Inter 字体，去掉对 rsms.me 的外部依赖
+- 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求
+- 邮件模块整理：SMTP 密码不再进日志、`config.docker.yml` 的键名与结构体对齐、启动时校验配置
 - 引入 Dependabot 持续跟进依赖更新
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档

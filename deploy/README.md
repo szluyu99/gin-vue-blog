@@ -1,10 +1,12 @@
 最新版：有以下几个脚本
-- `build_web.sh`：本地打包 Web 项目（需要有 node 环境）并将静态资源移到容器构建目录
+- `bootstrap.sh`：一键部署，用 docker 里的 node 打包前端静态资源
+- `bootstrap.sh dev`：一键部署，改用本机的 pnpm 打包前端静态资源（内部会调 `build_web.sh`）
+- `build_web.sh`：用本机的 pnpm 打包两个前端项目，产物分别放到 `build/web/dist_blog` 和 `build/web/dist_admin`
 - `clean_docker.sh`：清理本项目相关的旧 Docker 容器
-- `bootstrap.sh`：使用 docker node 打包静态资源
-- `bootstrap.sh dev`：使用本机的 pnpm 打包前端静态资源
 
 一般来说，直接运行 `bootstrap.sh` 即可，每次自动清理旧容器，打包最新代码，并构建新容器。第一次会比较耗时，但是后面会有缓存就会快很多
+
+> `bootstrap.sh` 会自动判断本机是 `docker compose`（插件，新版）还是 `docker-compose`（独立命令，旧版），不用手动区分。
 
 ---
 
@@ -82,23 +84,15 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo docker run hello-world
 ```
 
-#### 3. 安装 Docker Compose
+#### 3. 确认 Docker Compose 可用
 
-> 最新参考官方文档：[Install the Compose standalone](https://docs.docker.com/compose/install/other/)
-
-1. 下载
+上一步的 `docker-compose-plugin` 已经带上了 Compose V2，验证一下：
 
 ```bash
-sudo curl -SL https://github.com/docker/compose/releases/download/v2.14.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-# 上面的速度太慢可以尝试换源
-# sudo curl -SL https://get.daocloud.io/docker/compose/releases/download/v2.14.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+docker compose version
 ```
 
-2. 授权
-
-```bash
-sudo chmod +x /usr/local/bin/docker-compose
-```
+> 如果用的是很旧的 Docker，只有独立命令 `docker-compose`，`bootstrap.sh` 也能正常工作，它会自动回退。
 
 # 2、开始运行
 
@@ -121,17 +115,16 @@ cd deploy
 
 修改 gin-blog-server 后端源码，不需要额外做什么，因为后端构建镜像时直接依赖 gin-blog-server 中的 Dockerfile
 
-修改 gin-blog-admin 后台源码后，需要将打包后静态资源覆盖 build/web/dist_admin
+前端源码同理，直接重新执行 `bootstrap.sh` 就会用容器里的 node 重新打包。
 
-修改 gin-blog-front 前台源码后，需要将打包后静态资源覆盖 build/web/dist_blog
+如果想用本机的 pnpm 打包（更快，但需要本机有 node），执行 `bootstrap.sh dev`，它会调 `build_web.sh`
+把 gin-blog-front 的产物放到 `build/web/dist_blog`、gin-blog-admin 的产物放到 `build/web/dist_admin`。
 
-执行以上操作后，在 start 目录重新构建运行：
+只想重启容器不重新打包，可以进 start 目录：
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
-
-以上操作我放在 `build_web.sh` 中了，直接执行该脚本即可
 
 ## 线上部署的注意事项
 
@@ -139,7 +132,7 @@ docker-compose up -d --build
 
 > 如果你不在乎安全性，可以忽略这些建议，直接部署项目。
 
-1、执行 `docker-compose up -d` 前建议修改 `.env` 文件中的环境变量
+1、执行 `docker compose up -d` 前建议修改 `.env` 文件中的环境变量
 
 为了保证安全性，以下几项建议修改：
 - `REDIS_PASSWORD` Redis 连接密码 
@@ -174,18 +167,14 @@ gvb-web 的日志中报错如下：
 '：No such file or directory
 ```
 
-如果是 Windows 系统，需要先执行以下指令，否则 Docker 过程会出 BUG。
-
-或者直接下载 ZIP 而不是通过 git clone 克隆项目。
-
-Linux 和 Mac 不需要进行该操作。
-
-> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 ctlf，经过测试，构建过程会产生 BUG。
+如果是 Windows 系统，clone 前先执行下面这条指令，或者直接下载 ZIP 而不是通过 git clone 克隆项目。Linux 和 Mac 不需要。
 
 ```bash
 # 防止 git 自动将换行符转换为 crlf
 git config --global core.autocrlf false
 ```
+
+> 原因是该项目开发时基于 Linux，本项目规范使用 lf 换行符。而 Windows 的 git 在自动拉取项目时会将项目文件中换行符转换为 crlf，经过测试，构建过程会产生 BUG。
 
 ## 如果已经运行过，又修改了 .env 中的数据库密码重新运行
 

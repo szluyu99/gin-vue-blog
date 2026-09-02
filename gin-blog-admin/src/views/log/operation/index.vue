@@ -1,5 +1,7 @@
 <script setup>
 import { useClipboard } from '@vueuse/core'
+import hljs from 'highlight.js/lib/core'
+import json from 'highlight.js/lib/languages/json'
 import { NButton, NCode, NForm, NFormItem, NInput, NPopconfirm, NTag } from 'naive-ui'
 import { h, onMounted, ref } from 'vue'
 
@@ -13,6 +15,9 @@ import { useCRUD } from '@/composables'
 import { formatDate } from '@/utils'
 
 defineOptions({ name: '操作日志' })
+
+// NCode 需要 highlight.js 实例, 只有本页用到, 所以不放在 App.vue 的 NConfigProvider 上
+hljs.registerLanguage('json', json)
 
 // 请求方法对应不同类型的标签 (计算属性传参)
 function tagType(type) {
@@ -211,6 +216,7 @@ function copyFormatCode(code) {
             :code="modalForm.opt_method"
             code-wrap
             language="json"
+            :hljs="hljs"
           />
         </NFormItem>
         <NFormItem label="操作人员: " path="nickname">
@@ -221,6 +227,7 @@ function copyFormatCode(code) {
             class="word-wrap cursor-pointer p-7"
             :code="JSON.stringify(JSON.parse(modalForm.request_param), null, 2)"
             language="json"
+            :hljs="hljs"
             @click="copyFormatCode(modalForm.request_param)"
           />
         </NFormItem>
@@ -229,6 +236,7 @@ function copyFormatCode(code) {
             class="cursor-pointer p-7"
             :code="JSON.stringify(JSON.parse(modalForm.response_data), null, 2)"
             language="json"
+            :hljs="hljs"
             @click="copyFormatCode(modalForm.response_data)"
           />
         </NFormItem>

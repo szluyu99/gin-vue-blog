@@ -14,6 +14,10 @@ export default defineConfig((configEnv) => {
       alias: {
         '@': path.resolve(path.resolve(process.cwd()), 'src'),
         '~': path.resolve(process.cwd()),
+        // v3-infinite-loading 的 browser 字段指向 UMD 产物, 里面 require('vue') 会
+        // 解析到带编译器的完整版 Vue, 白白往首页 chunk 塞进 150KB 的 compiler-core。
+        // 这里强制走它的 ESM 产物。
+        'v3-infinite-loading': 'v3-infinite-loading/lib/v3-infinite-loading.es.js',
       },
     },
     plugins: [

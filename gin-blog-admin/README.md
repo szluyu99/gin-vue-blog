@@ -60,6 +60,17 @@ VITE_SERVER_URL = 'http://localhost:8765'
 ```bash
 pnpm build    # 生产构建
 pnpm lint     # 代码检查
+pnpm test     # 单元测试 (vitest)
 ```
 
 代码风格使用 [antfu/eslint-config](https://github.com/antfu/eslint-config)，不使用 Prettier。
+
+## 打包体积
+
+体积大的依赖都做了按需加载，改动时注意别把它们拉回首屏 chunk：
+
+- `exceljs`（gzip 约 250KB）在 `CrudTable.vue` 里用动态 `import()`，点击导出才加载
+- `md-editor-v3` + CodeMirror 只被文章编辑页和「关于」页引入
+- `highlight.js` 只有操作日志页的 `NCode` 需要，在该页引入后通过 `:hljs` 传入，不要挂到 `App.vue` 的 `NConfigProvider` 上
+
+`pnpm build` 会生成 `stats.html`（rollup-plugin-visualizer），可以直接打开看各 chunk 的构成。

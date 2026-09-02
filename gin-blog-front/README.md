@@ -52,4 +52,14 @@ VITE_BACKEND_URL = 'http://localhost:8765'
 ```bash
 pnpm build    # 生产构建
 pnpm lint     # 代码检查
+pnpm test     # 单元测试 (vitest, 覆盖 store 和 utils)
 ```
+
+## 暗色模式
+
+主题状态在 `src/store/app.js`：首次访问读 `localStorage` 的 `blog-theme`，没有则跟随 `prefers-color-scheme`。
+`index.html` 里有一段内联脚本在渲染前给 `<html>` 加 `dark` 类，避免刷新闪屏。
+
+颜色不要写死，用 `uno.config.js` 里的语义色（`surface` / `main` / `muted` / `line` 等），它们指向 `src/styles/index.css` 中的 CSS 变量，`:root` 和 `html.dark` 各一套。
+
+> 改完 `uno.config.js` 需要重启 dev server，UnoCSS 不会热更配置。

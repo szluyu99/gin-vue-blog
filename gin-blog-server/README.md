@@ -54,11 +54,27 @@ redis-cli -n 7 del page
 
 博客前台和后台都内置了 Mock 模式，把对应目录 `.env.development` 中的 `VITE_USE_MOCK` 设为 `true` 即可完全脱离后端运行，详见各自的 README。
 
+## 测试
+
+```bash
+go test ./...              # model 层 + handle 层接口级测试
+go test ./... -cover       # 看覆盖率
+```
+
+测试用 SQLite 内存库和 [miniredis](https://github.com/alicebob/miniredis)，不需要真实的 MySQL / Redis。
+
 ## 其他
 
 ```bash
-cd cmd
-sh run_swag.sh    # swag init 生成 Swagger 文档, 之后会直接启动服务
+./swag_init.sh    # swag init 生成 Swagger 文档到 docs/
 ```
 
+`docs/` 是生成产物但需要一起提交，CI 会校验它和代码里的注解是否一致。没有 `swag` 命令时先
+`go install github.com/swaggo/swag/cmd/swag@v1.16.6`。
+
+> 注意：给 model 结构体的字段加注释会被 swag 当成该字段的 description 写进文档，容易覆盖掉原有说明。
+
+`cmd/run_swag.sh` 是生成文档后顺便启动服务的便捷脚本，只想生成文档用上面的 `swag_init.sh`。
+
 目录约定：`internal/model` 返回 error，`internal/handle` 负责错误码与响应；JSON 字段统一 **小写 + 下划线**，Go 结构体用驼峰。
+
