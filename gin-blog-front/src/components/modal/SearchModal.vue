@@ -56,7 +56,7 @@ async function handleSearch() {
                 <span class="border-b-1 border-#999 border-solid text-lg" @click="searchFlag = false" v-html="item.title" />
               </RouterLink>
               <div class="ell-4 mt-1">
-                <p clsas="color-muted cursor-pointer" v-html="item.content" />
+                <p class="cursor-pointer color-muted" v-html="item.content" />
               </div>
               <hr class="my-3 border-1 border-divider border-dashed">
             </li>

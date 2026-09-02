@@ -204,6 +204,24 @@ func GetNewestList(db *gorm.DB, n int) (data []RecommendArticleVO, err error) {
 }
 
 /*
+前台搜索文章: 标题或正文命中关键字
+
+只取渲染搜索结果需要的字段并限制条数, 以前是 SELECT * 且不限条数,
+命中多少篇就把多少篇的完整正文全查回来, 只为截取关键字附近的一小段。
+*/
+func SearchArticle(db *gorm.DB, keyword string, limit int) (list []Article, err error) {
+	like := "%" + keyword + "%"
+	result := db.Model(&Article{}).
+		Select("id", "title", "content").
+		Where("is_delete = ? AND status = ? AND (title LIKE ? OR content LIKE ?)",
+			false, STATUS_PUBLIC, like, like).
+		Order("id DESC").
+		Limit(limit).
+		Find(&list)
+	return list, result.Error
+}
+
+/*
 物理删除文章, 同时删除 [文章-标签] 关联 和 文章下的评论
 
 返回被删除的行数和被删掉的评论 id:

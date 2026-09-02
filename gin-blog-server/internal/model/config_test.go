@@ -40,17 +40,26 @@ func TestUpdateConfigMap(t *testing.T) {
 		"name":    "Alice",
 		"age":     "15",
 		"enabled": "false",
-		"dump":    "dump", // 无效数据
+		"new_key": "new_value", // 表里还没有的配置项
 	}
 	err := CheckConfigMap(db, m)
 	assert.Nil(t, err)
 
 	data, err := GetConfigMap(db)
 	assert.Nil(t, err)
-	assert.Len(t, data, 3)
 	assert.Equal(t, "Alice", data["name"])
 	assert.Equal(t, "15", data["age"])
 	assert.Equal(t, "false", data["enabled"])
+	// 走 upsert: 表里没有的键要插进去, 而不是像以前那样静默丢掉
+	assert.Len(t, data, 4)
+	assert.Equal(t, "new_value", data["new_key"])
+
+	// 重复保存不会插出第二行
+	assert.Nil(t, CheckConfigMap(db, map[string]string{"new_key": "changed"}))
+	data, err = GetConfigMap(db)
+	assert.Nil(t, err)
+	assert.Len(t, data, 4)
+	assert.Equal(t, "changed", data["new_key"])
 }
 
 func TestConfigSetGet(t *testing.T) {

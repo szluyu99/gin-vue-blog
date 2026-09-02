@@ -4,6 +4,7 @@ import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
 	"net/http"
+	"net/url"
 	"strconv"
 	"testing"
 	"time"
@@ -297,6 +298,35 @@ func TestFrontSearchArticle(t *testing.T) {
 	// 没有命中
 	decodeData(t, env.do(t, http.MethodGet, "/front/article/search?keyword=不存在的词", nil).Data, &result)
 	assert.Empty(t, result)
+}
+
+// 搜索结果前台是用 v-html 渲染的, 关键字和正文都必须转义后再插高亮标签
+func TestFrontSearchArticleEscapesHTML(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/front/article/search", (&Front{}).SearchArticle)
+
+	assert.Nil(t, env.db.Create(&model.Article{
+		Title:   "<b>加粗标题</b> 注入测试",
+		Content: "正文里也有 <script>alert(1)</script> 这样的内容",
+		Status:  model.STATUS_PUBLIC,
+	}).Error)
+
+	var result []ArticleSearchVO
+
+	// 文章自带的标签要被转义
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/search?keyword=注入测试", nil).Data, &result)
+	assert.Len(t, result, 1)
+	assert.NotContains(t, result[0].Title, "<b>")
+	assert.Contains(t, result[0].Title, "&lt;b&gt;")
+	assert.Contains(t, result[0].Title, "<span style='color:#f47466'>注入测试</span>", "高亮标签本身要保留")
+	assert.NotContains(t, result[0].Content, "<script>")
+
+	// 关键字自身带标签时, 不能被当成 HTML 输出
+	decodeData(t, env.do(t, http.MethodGet,
+		"/front/article/search?keyword="+url.QueryEscape("<script>alert(1)</script>"), nil).Data, &result)
+	assert.Len(t, result, 1)
+	assert.NotContains(t, result[0].Content, "<script>")
+	assert.Contains(t, result[0].Content, "&lt;script&gt;alert(1)&lt;/script&gt;")
 }
 
 // 登录用户的昵称等信息, 生产环境由 JWTAuth 预加载

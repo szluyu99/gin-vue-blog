@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Config struct {
@@ -28,10 +29,20 @@ func GetConfigMap(db *gorm.DB) (map[string]string, error) {
 	return m, nil
 }
 
+/*
+批量保存配置
+
+用 upsert 而不是 Update: 配置表里没有这一行时 Update 影响 0 行且不报错,
+后台设置页新增的配置项会静默保存失败(is_message_review 就吃过这个亏)。
+*/
 func CheckConfigMap(db *gorm.DB, m map[string]string) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 		for k, v := range m {
-			result := tx.Model(Config{}).Where("key", k).Update("value", v)
+			config := Config{Key: k, Value: v}
+			result := tx.Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "key"}},
+				DoUpdates: clause.AssignmentColumns([]string{"value"}),
+			}).Create(&config)
 			if result.Error != nil {
 				return result.Error
 			}

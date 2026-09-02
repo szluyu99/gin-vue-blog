@@ -18,6 +18,25 @@ type Front struct{}
 // 同一访客对同一篇文章的浏览量计数间隔
 const articleViewInterval = time.Hour
 
+// 搜索最多返回多少条
+const searchResultLimit = 20
+
+/*
+把命中的关键字包上高亮标签
+
+前台是用 v-html 渲染搜索结果的, 而 keyword 直接来自 query string,
+所以必须先整体转义再插标签, 否则搜一段 <img onerror=...> 就会在浏览器里执行。
+*/
+func highlightKeyword(text, keyword string) string {
+	escaped := template.HTMLEscapeString(text)
+	escapedKeyword := template.HTMLEscapeString(keyword)
+	if escapedKeyword == "" {
+		return escaped
+	}
+	return strings.ReplaceAll(escaped, escapedKeyword,
+		"<span style='color:#f47466'>"+escapedKeyword+"</span>")
+}
+
 type FAddMessageReq struct {
 	Nickname string `json:"nickname" binding:"required"`
 	Avatar   string `json:"avatar"`
@@ -563,19 +582,13 @@ func (*Front) SearchArticle(c *gin.Context) {
 
 	db := GetDB(c)
 
-	articleList, err := model.List(db, []model.Article{}, "*", "",
-		"is_delete = 0 AND status = 1 AND (title LIKE ? OR content LIKE ?)",
-		"%"+keyword+"%", "%"+keyword+"%")
+	articleList, err := model.SearchArticle(db, keyword, searchResultLimit)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
 	for _, article := range articleList {
-		// 高亮标题中的关键字
-		title := strings.ReplaceAll(article.Title, keyword,
-			"<span style='color:#f47466'>"+keyword+"</span>")
-
 		content := article.Content
 		// 关键字在内容中的起始位置
 		keywordStartIndex := unicodeIndex(content, keyword)
@@ -586,7 +599,6 @@ func (*Front) SearchArticle(c *gin.Context) {
 			}
 			// 防止中文截取出乱码 (中文在 golang 是 3 个字符, 使用 rune 中文占一个数组下标)
 			preText := substring(content, preIndex, keywordStartIndex)
-			// string([]rune(content[preIndex:keywordStartIndex]))
 
 			// 关键字在内容中的结束位置
 			keywordEndIndex := keywordStartIndex + unicodeLen(keyword)
@@ -596,17 +608,14 @@ func (*Front) SearchArticle(c *gin.Context) {
 			} else {
 				afterIndex = keywordEndIndex + afterLength
 			}
-			// afterText := string([]rune(content)[keywordStartIndex:afterIndex])
 			afterText := substring(content, keywordStartIndex, afterIndex)
-			// 高亮内容中的关键字
-			content = strings.ReplaceAll(preText+afterText, keyword,
-				"<span style='color:#f47466'>"+keyword+"</span>")
+			content = preText + afterText
 		}
 
 		result = append(result, ArticleSearchVO{
 			ID:      article.ID,
-			Title:   title,
-			Content: content,
+			Title:   highlightKeyword(article.Title, keyword),
+			Content: highlightKeyword(content, keyword),
 		})
 	}
 
