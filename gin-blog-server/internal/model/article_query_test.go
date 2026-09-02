@@ -185,6 +185,26 @@ func TestDeleteArticleRemovesComments(t *testing.T) {
 		"其他文章的评论和友链留言不受影响")
 }
 
+// 迁移要真的把热点查询的索引建出来, 漏掉就是全表扫描
+func TestHotQueryIndexesCreated(t *testing.T) {
+	db := newModelDB(t)
+	m := db.Migrator()
+
+	cases := []struct {
+		model any
+		index string
+	}{
+		{&Article{}, "idx_article_list"},     // is_delete + status
+		{&Article{}, "idx_article_category"}, // 按分类筛选
+		{&Comment{}, "idx_comment_topic"},    // type + topic_id
+		{&Comment{}, "idx_comment_parent"},   // 查回复
+		{&Resource{}, "idx_resource_api"},    // url + method, 每个请求都要查
+	}
+	for _, c := range cases {
+		assert.True(t, m.HasIndex(c.model, c.index), "缺少索引: "+c.index)
+	}
+}
+
 // 导入 markdown: 分类和标签不存在时自动创建
 func TestImportArticle(t *testing.T) {
 	db := newModelDB(t)

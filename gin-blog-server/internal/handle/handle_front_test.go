@@ -326,13 +326,22 @@ func TestFrontSaveMessage(t *testing.T) {
 	decodeData(t, resp.Data, &message)
 	assert.Equal(t, "测试昵称", message.Nickname, "昵称取自登录用户, 不信前端传的")
 	assert.NotContains(t, message.Content, "<script>", "内容要转义, 防 XSS")
-	assert.False(t, message.IsReview, "默认没开审核")
+	assert.False(t, message.IsReview, "没有配置时按需要审核处理")
 
-	// 开启评论审核后, 新留言需要审核
+	// 评论的审核开关不能影响留言
 	assert.Nil(t, env.db.Create(&model.Config{Key: g.CONFIG_IS_COMMENT_REVIEW, Value: "true"}).Error)
 	resp = env.do(t, http.MethodPost, "/front/message", map[string]any{
 		"nickname": "测试昵称",
 		"content":  "第二条留言",
+	})
+	decodeData(t, resp.Data, &message)
+	assert.False(t, message.IsReview, "留言只看 is_message_review")
+
+	// is_message_review 为 true 表示留言免审核, 直接展示 (与后台设置页的选项对应)
+	assert.Nil(t, env.db.Create(&model.Config{Key: g.CONFIG_IS_MESSAGE_REVIEW, Value: "true"}).Error)
+	resp = env.do(t, http.MethodPost, "/front/message", map[string]any{
+		"nickname": "测试昵称",
+		"content":  "第三条留言",
 	})
 	decodeData(t, resp.Data, &message)
 	assert.True(t, message.IsReview)
@@ -399,10 +408,11 @@ func TestFrontGetCommentList(t *testing.T) {
 	user := model.UserAuth{Username: "u", Password: "x", UserInfo: &model.UserInfo{Nickname: "n"}}
 	assert.Nil(t, env.db.Create(&user).Error)
 
-	top, err := model.AddComment(env.db, user.ID, 1, article.ID, "顶级评论", false)
+	// 前台只展示审核通过的评论, 所以这里造的数据都是已审核的
+	top, err := model.AddComment(env.db, user.ID, 1, article.ID, "顶级评论", true)
 	assert.Nil(t, err)
 	for i := 0; i < 4; i++ {
-		_, err = model.ReplyComment(env.db, user.ID, user.ID, top.ID, "回复"+itoa(i), false)
+		_, err = model.ReplyComment(env.db, user.ID, user.ID, top.ID, "回复"+itoa(i), true)
 		assert.Nil(t, err)
 	}
 	env.rdb.HSet(rctx, g.COMMENT_LIKE_COUNT, itoa(top.ID), 5)
@@ -426,4 +436,12 @@ func TestFrontGetCommentList(t *testing.T) {
 	// 非法的评论 id
 	resp = env.do(t, http.MethodGet, "/front/comment/replies/abc", nil)
 	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
+
+	// 未审核的评论不出现在前台
+	_, err = model.AddComment(env.db, user.ID, 1, article.ID, "待审核", false)
+	assert.Nil(t, err)
+	decodeData(t, env.do(t, http.MethodGet,
+		"/front/comment/list?page_num=1&page_size=10&topic_id="+itoa(article.ID)+"&type=1", nil).Data, &page)
+	assert.Equal(t, int64(1), page.Total)
+	assert.Len(t, page.List, 1)
 }

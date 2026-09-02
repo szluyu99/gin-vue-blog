@@ -172,7 +172,8 @@ func (*Front) SaveMessage(c *gin.Context) {
 
 	ipAddress := utils.IP.GetIpAddress(c)
 	ipSource := utils.IP.GetIpSource(ipAddress)
-	isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
+	// 留言要读留言自己的审核开关, 之前读的是评论的开关, 后台设置里的 is_message_review 根本没人用
+	isReview := model.GetConfigBool(db, g.CONFIG_IS_MESSAGE_REVIEW)
 
 	info := auth.UserInfo
 	message, err := model.SaveMessage(db, info.Nickname, info.Nickname, req.Content, ipAddress, ipSource, req.Speed, isReview)
@@ -256,12 +257,16 @@ func (*Front) GetCommentList(c *gin.Context) {
 		return
 	}
 
-	likeCountMap := rdb.HGetAll(rctx, g.COMMENT_LIKE_COUNT).Val()
-	for i, comment := range data {
+	ids := make([]int, 0, len(data))
+	for _, comment := range data {
+		ids = append(ids, comment.ID)
+	}
+	likeCountMap := hashCounts(rdb, g.COMMENT_LIKE_COUNT, ids)
+	for i := range data {
 		if len(data[i].ReplyList) > 3 {
 			data[i].ReplyList = data[i].ReplyList[:3] // 只显示 3 条回复
 		}
-		data[i].LikeCount, _ = strconv.Atoi(likeCountMap[strconv.Itoa(comment.ID)])
+		data[i].LikeCount = likeCountMap[data[i].ID]
 	}
 
 	ReturnSuccess(c, PageResult[model.CommentVO]{
@@ -303,14 +308,17 @@ func (*Front) GetReplyListByCommentId(c *gin.Context) {
 		return
 	}
 
-	likeCountMap := rdb.HGetAll(rctx, g.COMMENT_LIKE_COUNT).Val()
-
-	data := make([]model.CommentVO, 0)
+	ids := make([]int, 0, len(replyList))
 	for _, reply := range replyList {
-		like, _ := strconv.Atoi(likeCountMap[strconv.Itoa(reply.ID)])
+		ids = append(ids, reply.ID)
+	}
+	likeCountMap := hashCounts(rdb, g.COMMENT_LIKE_COUNT, ids)
+
+	data := make([]model.CommentVO, 0, len(replyList))
+	for _, reply := range replyList {
 		data = append(data, model.CommentVO{
 			Comment:   reply,
-			LikeCount: like,
+			LikeCount: likeCountMap[reply.ID],
 		})
 	}
 
