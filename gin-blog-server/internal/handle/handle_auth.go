@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -37,8 +38,36 @@ type LoginVO struct {
 	Token          string   `json:"token"`
 }
 
+const (
+	loginMaxFail    = 5                // 同一 用户名+IP 允许的连续失败次数
+	loginFailWindow = 15 * time.Minute // 失败计数的有效期, 也就是达到上限后的冷却时长
+)
+
+// 是否已经达到失败上限
+func loginLocked(rdb *redis.Client, failKey string) (bool, error) {
+	fails, err := rdb.Get(rctx, failKey).Int()
+	if errors.Is(err, redis.Nil) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return fails >= loginMaxFail, nil
+}
+
+// 记一次登录失败: 每次失败都会重置有效期, 也就是持续尝试会一直被锁住
+func recordLoginFail(rdb *redis.Client, failKey string) {
+	if err := rdb.Incr(rctx, failKey).Err(); err != nil {
+		slog.Warn("累加登录失败次数出错", "err", err)
+		return
+	}
+	if err := rdb.Expire(rctx, failKey, loginFailWindow).Err(); err != nil {
+		slog.Warn("设置登录失败次数有效期出错", "err", err)
+	}
+}
+
 // @Summary 登录
-// @Description 用户名密码登录, 成功后返回 JWT Token
+// @Description 用户名密码登录, 成功后返回 JWT Token; 同一 用户名+IP 连续失败 5 次后锁定 15 分钟
 // @Tags UserAuth
 // @Accept json
 // @Produce json
@@ -55,10 +84,22 @@ func (*UserAuth) Login(c *gin.Context) {
 	db := GetDB(c)
 	rdb := GetRDB(c)
 
+	// 同一 用户名+IP 连续失败太多次就先拒掉, 挡住暴力撞库
+	failKey := g.LOGIN_FAIL + utils.MD5(req.Username+"|"+clientIP(c))
+	if locked, err := loginLocked(rdb, failKey); err != nil {
+		slog.Warn("读取登录失败次数出错, 本次跳过限制", "err", err)
+	} else if locked {
+		slog.Warn("登录失败次数过多, 暂时拒绝", "username", req.Username, "ip", clientIP(c))
+		ReturnError(c, g.ErrLoginLocked, nil)
+		return
+	}
+
 	userAuth, err := model.GetUserAuthInfoByName(db, req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ReturnError(c, g.ErrUserNotExist, nil)
+			// 不能返回"用户不存在", 否则错误码本身就是一个用户名枚举接口
+			recordLoginFail(rdb, failKey)
+			ReturnError(c, g.ErrLoginFail, nil)
 			return
 		}
 		ReturnError(c, g.ErrDbOp, err)
@@ -67,8 +108,14 @@ func (*UserAuth) Login(c *gin.Context) {
 
 	// 检查密码是否正确
 	if !utils.BcryptCheck(req.Password, userAuth.Password) {
-		ReturnError(c, g.ErrPassword, nil)
+		recordLoginFail(rdb, failKey)
+		ReturnError(c, g.ErrLoginFail, nil)
 		return
+	}
+
+	// 登录成功, 清掉失败计数
+	if err := rdb.Del(rctx, failKey).Err(); err != nil {
+		slog.Warn("清理登录失败次数出错", "err", err)
 	}
 
 	// 获取 IP 相关信息 FIXME: 好像无法读取到 ip 信息

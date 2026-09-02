@@ -152,16 +152,8 @@ func CurrentUserAuth(c *gin.Context) (*model.UserAuth, error) {
 
 /*
 访客指纹: IP + 浏览器 + 操作系统 的哈希, 用于同一访客的去重统计
-
-注意 RemoteAddr 形如 "1.2.3.4:54321", 端口每次请求都变, 不剥掉的话
-同一个访客会被当成无数个新访客, 去重就完全失效了。
 */
 func visitorFingerprint(c *gin.Context) string {
-	ipAddress := utils.IP.GetIpAddress(c)
-	if host, _, err := net.SplitHostPort(ipAddress); err == nil {
-		ipAddress = host
-	}
-
 	// 非浏览器(如 curl)或没有 User-Agent 时, 解析结果为 nil, 不能直接取字段
 	var browser, os string
 	if ua := utils.IP.GetUserAgent(c); ua != nil {
@@ -169,5 +161,19 @@ func visitorFingerprint(c *gin.Context) string {
 		os = ua.OS + " " + ua.OSVersion.String()
 	}
 
-	return utils.MD5(ipAddress + browser + os)
+	return utils.MD5(clientIP(c) + browser + os)
+}
+
+/*
+客户端 IP, 已剥掉端口
+
+RemoteAddr 形如 "1.2.3.4:54321", 端口每次请求都变, 不剥掉的话按 IP 做的
+去重和限流都会失效(同一个来源被当成无数个新来源)。
+*/
+func clientIP(c *gin.Context) string {
+	ipAddress := utils.IP.GetIpAddress(c)
+	if host, _, err := net.SplitHostPort(ipAddress); err == nil {
+		return host
+	}
+	return ipAddress
 }
