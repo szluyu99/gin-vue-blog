@@ -69,7 +69,7 @@ function close() {
       <div class="min-h-full flex items-center justify-center p-3">
         <div
           v-bind="$attrs"
-          class="relative inline-block w-full rounded-lg bg-white shadow-xl transition-all dark:bg-gray-900"
+          class="relative inline-block w-full rounded-lg bg-surface shadow-xl transition-all"
           :class="[
             padded ? 'p-4 lg:py-5 lg:px-7' : 'p-1',
             isOpen
@@ -82,7 +82,7 @@ function close() {
         >
           <button
             v-if="dismissButton"
-            class="absolute right-5 top-5 h-6 w-6 rounded-full bg-gray-100 p-1 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            class="absolute right-5 top-5 h-6 w-6 rounded-full bg-surface-soft p-1 text-main hover:bg-line focus:outline-none focus:ring-2 focus:ring-gray-500"
             @click="close"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">

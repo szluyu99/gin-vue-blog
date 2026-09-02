@@ -38,7 +38,7 @@ onMounted(async () => {
       <img :src="blogConfig.website_avatar" class="w-25 duration-600 hover:rotate-360" alt="avatar">
     </div>
     <div class="flex justify-center">
-      <article class="max-w-none prose prose-truegray">
+      <article class="max-w-none prose prose-truegray dark:prose-invert">
         <div v-html="html" />
       </article>
     </div>

@@ -202,7 +202,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           </div>
           <!-- 楼层 + 时间 + 点赞 + 回复按钮 -->
           <div class="flex justify-between text-sm">
-            <div class="flex items-center gap-2 py-1 color-#b3b3b3">
+            <div class="flex items-center gap-2 py-1 color-muted">
               <span> {{ commentCount - idx }}楼 </span>
               <span> {{ dayjs(comment.created_at).format('YYYY-MM-DD') }} </span>
               <button
@@ -238,7 +238,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
               </div>
               <!-- 时间 + 点赞 + 回复按钮 -->
               <div class="flex justify-between text-sm">
-                <div class="flex items-center gap-2 py-1 color-#b3b3b3">
+                <div class="flex items-center gap-2 py-1 color-muted">
                   <span> {{ dayjs(reply.created_at).format('YYYY-MM-DD') }} </span>
                   <button
                     class="i-mdi:thumb-up hover-bg-red"
@@ -272,7 +272,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           <div
             v-show="comment.reply_count > 3"
             ref="checkRefs"
-            class="mt-4 text-[13px] color-#6d757a"
+            class="mt-4 text-[13px] color-muted"
           >
             共 <b> {{ comment.reply_count }} </b>  条回复
             <button class="color-#00a1d6" @click="checkReplies(idx, comment)">

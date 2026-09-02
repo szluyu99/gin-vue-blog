@@ -19,6 +19,17 @@
   <!-- mathjax -->
   <script src="/js/mathjax.js"></script>
   <script id="Ma thJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- 主题要在首屏渲染前定好, 否则深色模式下会先闪一下白底 -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('blog-theme')
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.classList.toggle('dark', dark)
+      } catch (e) { /* localStorage 被禁用时保持默认浅色 */ }
+    })()
+  </script>
 </head>
 
 

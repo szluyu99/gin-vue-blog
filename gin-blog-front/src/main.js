@@ -4,6 +4,7 @@ import App from './App.vue'
 import { router } from './router'
 
 import { pinia } from './store'
+import { useAppStore } from './store/app'
 import { setupMock } from './utils/http'
 // custom style
 import './styles/index.css'
@@ -21,6 +22,7 @@ async function bootstrap() {
   const app = createApp(App)
   app.use(router)
   app.use(pinia)
+  useAppStore(pinia).initTheme() // index.html 已经加过 class, 这里把 store 状态对齐
   app.mount('#app')
 }
 

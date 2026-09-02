@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import BackToTop from '@/components/BackTop.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import GlobalModal from '@/components/modal/index.vue'
+import SideTools from '@/components/SideTools.vue'
 import UToast from '@/components/ui/UToast.vue'
 
 import { useAppStore, useUserStore } from '@/store'
@@ -44,8 +44,8 @@ onMounted(() => {
       </RouterView>
     </article>
   </div>
-  <!-- 回到顶部 -->
-  <BackToTop />
+  <!-- 右下角悬浮工具条: 主题切换 / 回到顶部 -->
+  <SideTools />
   <!-- 全局弹窗 -->
   <GlobalModal />
 </template>

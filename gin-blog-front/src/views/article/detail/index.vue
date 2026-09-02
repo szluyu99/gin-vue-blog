@@ -93,7 +93,7 @@ const styleVal = computed(() =>
         <!-- 文章内容 -->
         <article
           ref="previewRef"
-          class="max-w-none prose prose-truegray lg:mx-10"
+          class="max-w-none prose prose-truegray lg:mx-10 dark:prose-invert"
           v-html="data.content"
         />
         <!-- 版权声明 -->
@@ -118,7 +118,7 @@ const styleVal = computed(() =>
           class="mt-7 lg:mx-5"
         />
         <!-- 分隔线 -->
-        <hr class="my-10 border-2 border-color-#d2ebfd border-dashed lg:mx-5">
+        <hr class="my-10 border-2 border-color-divider border-dashed lg:mx-5">
         <!-- 文章评论 -->
         <Comment :type="1" class="lg:mx-5" />
       </div>

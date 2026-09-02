@@ -15,6 +15,8 @@ describe('useAppStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
+    localStorage.clear()
+    document.documentElement.classList.remove('dark')
   })
 
   it('弹框开关只改对应字段', () => {
@@ -75,5 +77,53 @@ describe('useAppStore', () => {
     expect(store.pageList[0].cover).toBe('http://test-server/public/uploaded/home.png')
     // 已经是完整 URL 的不动
     expect(store.pageList[1].cover).toBe('https://cdn.com/archive.png')
+  })
+
+  it('toggleTheme 同时改 store、localStorage 和 html 的 class', () => {
+    const store = useAppStore()
+
+    store.toggleTheme()
+    expect(store.theme).toBe('dark')
+    expect(store.isDark).toBe(true)
+    expect(localStorage.getItem('blog-theme')).toBe('dark')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+
+    store.toggleTheme()
+    expect(store.theme).toBe('light')
+    expect(localStorage.getItem('blog-theme')).toBe('light')
+    expect(document.documentElement.classList.contains('dark')).toBe(false)
+  })
+
+  it('initTheme 优先用存过的偏好', () => {
+    localStorage.setItem('blog-theme', 'dark')
+
+    const store = useAppStore()
+    store.initTheme()
+
+    expect(store.theme).toBe('dark')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+  })
+
+  it('initTheme 没有偏好时跟随系统', () => {
+    // jsdom 没有实现 matchMedia, 直接塞一个假的
+    const matchMedia = vi.fn().mockReturnValue({ matches: true })
+    vi.stubGlobal('matchMedia', matchMedia)
+
+    const store = useAppStore()
+    store.initTheme()
+
+    expect(matchMedia).toHaveBeenCalledWith('(prefers-color-scheme: dark)')
+    expect(store.theme).toBe('dark')
+    vi.unstubAllGlobals()
+  })
+
+  it('setTheme 遇到非法值回落到浅色', () => {
+    const store = useAppStore()
+
+    store.setTheme('dark')
+    store.setTheme('rainbow')
+
+    expect(store.theme).toBe('light')
+    expect(document.documentElement.classList.contains('dark')).toBe(false)
   })
 })

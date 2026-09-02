@@ -51,8 +51,8 @@ async function handleFileChange() {
 
 <template>
   <!-- TODO: 拖拽文件上传 -->
-  <main class="flex items-center justify-center bg-gray-100 font-sans">
-    <label for="dropzone-file" class="mx-auto max-w-[300px] w-full cursor-pointer items-center border-1 border-blue-400 rounded-xl border-dashed bg-white p-2 text-center">
+  <main class="flex items-center justify-center bg-surface-soft font-sans">
+    <label for="dropzone-file" class="mx-auto max-w-[300px] w-full cursor-pointer items-center border-1 border-blue-400 rounded-xl border-dashed bg-surface p-2 text-center">
       <template v-if="previewImg">
         <div class="group relative">
           <img class="lg:h-[160px] lg:w-[160px]" :src="imgUrl" alt="user avatar">

@@ -44,11 +44,11 @@ async function handleSearch() {
           </div>
           <input
             v-model="keyword"
-            class="block w-full border-0 rounded-full py-2 pl-8 pr-5 text-gray-900 outline-none ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-green-300"
+            class="block w-full border-0 rounded-full py-2 pl-8 pr-5 text-main outline-none ring-1 ring-line ring-inset placeholder:text-muted focus:ring-2 focus:ring-green-300"
             placeholder="输入文章标题或内容..."
           >
         </div>
-        <hr class="my-4 border-1.5 border-color-#d2ebfd border-dashed">
+        <hr class="my-4 border-1.5 border-color-divider border-dashed">
         <div class="h-[420px] overflow-y-auto">
           <ul v-if="articleList.length">
             <li v-for="item of articleList" :key="item.id" class="text-sm">
@@ -56,9 +56,9 @@ async function handleSearch() {
                 <span class="border-b-1 border-#999 border-solid text-lg" @click="searchFlag = false" v-html="item.title" />
               </RouterLink>
               <div class="ell-4 mt-1">
-                <p clsas="color-#555 cursor-pointer" v-html="item.content" />
+                <p clsas="color-muted cursor-pointer" v-html="item.content" />
               </div>
-              <hr class="my-3 border-1 border-#d2ebfd border-dashed">
+              <hr class="my-3 border-1 border-divider border-dashed">
             </li>
           </ul>
           <div v-else-if="keyword">
