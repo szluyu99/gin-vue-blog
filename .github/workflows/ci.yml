@@ -76,6 +76,10 @@ jobs:
         working-directory: ${{ matrix.project }}
         run: pnpm lint
 
+      - name: Test
+        working-directory: ${{ matrix.project }}
+        run: pnpm test
+
       - name: Build
         working-directory: ${{ matrix.project }}
         run: pnpm build

@@ -72,9 +72,9 @@ request.interceptors.response.use(
   // 响应失败拦截
   (error) => {
     // 主要使用业务状态码决定状态, 一般不根据 HTTP 状态码进行操作
-    const responseData = error.response?.data
-    const { message, data } = responseData
-    if (error.response.status === 500) {
+    // 网络异常 / 超时的时候没有 response, 不能直接解构
+    const { message, data } = error.response?.data ?? {}
+    if (error.response?.status === 500) {
       if (message && data) {
         window.$message.error(`${message} ${data}`)
       }

@@ -127,10 +127,10 @@ export const useTagStore = defineStore('tag', {
     async reloadTag() {
       window.$loadingBar.start()
 
-      // 配合 v-if="reloadFlag" 实现白屏效果
-      this.reloadFlag = false
+      // 配合 v-if="reloading" 实现白屏效果, 见 layout/index.vue
+      this.reloading = false
       await nextTick() // 将回调延迟到下次 DOM 更新循环之后执行
-      this.reloadFlag = true
+      this.reloading = true
 
       // 滚动到顶部, 模拟刷新
       setTimeout(() => {

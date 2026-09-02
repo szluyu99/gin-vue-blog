@@ -4,6 +4,8 @@
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build": "vite build",
     "build:mock": "vite build --mode mock",
     "preview": "vite preview",
@@ -32,11 +34,13 @@
     "@unocss/reset": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "eslint": "^10.9.1",
+    "jsdom": "^30.0.1",
     "rollup-plugin-visualizer": "^7.1.1",
     "sass": "^1.69.5",
     "taze": "^21.1.0",
     "unocss": "^66.8.1",
     "vite": "^8.2.2",
-    "vite-plugin-compression": "^0.5.1"
+    "vite-plugin-compression": "^0.5.1",
+    "vitest": "^4.1.11"
   }
 }
