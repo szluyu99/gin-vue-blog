@@ -7,6 +7,7 @@ const (
 	// DELETE       = "delete:"      //? 记录强制下线用户?
 	ONLINE_USER  = "online_user:"  // 在线用户
 	OFFLINE_USER = "offline_user:" // 强制下线用户
+	LOGIN_FAIL   = "login_fail:"   // 登录连续失败次数 (login_fail:<用户名+IP 的哈希>), 带 TTL
 	VISITOR_AREA = "visitor_area"  // 地域统计
 	VIEW_COUNT   = "view_count"    // 访问数量
 

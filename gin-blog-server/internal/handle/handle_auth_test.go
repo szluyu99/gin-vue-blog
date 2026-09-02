@@ -77,17 +77,78 @@ func TestAuthLoginFailed(t *testing.T) {
 	resp := env.do(t, http.MethodPost, "/login", map[string]any{"username": "admin@qq.com"})
 	assert.Equal(t, g.ErrRequest.Code(), resp.Code)
 
-	// 用户不存在
+	// 用户不存在与密码错误返回同一个错误码, 否则可以靠错误码枚举用户名
 	resp = env.do(t, http.MethodPost, "/login", map[string]any{
 		"username": "nobody@qq.com", "password": "123456",
 	})
-	assert.Equal(t, g.ErrUserNotExist.Code(), resp.Code)
+	assert.Equal(t, g.ErrLoginFail.Code(), resp.Code)
 
-	// 密码错误
 	resp = env.do(t, http.MethodPost, "/login", map[string]any{
 		"username": "admin@qq.com", "password": "wrong",
 	})
-	assert.Equal(t, g.ErrPassword.Code(), resp.Code)
+	assert.Equal(t, g.ErrLoginFail.Code(), resp.Code)
+}
+
+// 连续失败达到上限后直接拒绝, 即使密码正确
+func TestAuthLoginLockedAfterTooManyFails(t *testing.T) {
+	withJWTConf(t)
+
+	env := newTestEnv(t)
+	env.engine.POST("/login", (&UserAuth{}).Login)
+
+	createUser(t, env, "admin@qq.com", "管理员", "123456")
+	wrong := map[string]any{"username": "admin@qq.com", "password": "wrong"}
+
+	for i := 0; i < loginMaxFail; i++ {
+		resp := env.do(t, http.MethodPost, "/login", wrong)
+		assert.Equal(t, g.ErrLoginFail.Code(), resp.Code, "第 %d 次失败", i+1)
+	}
+
+	// 密码正确也被拦住
+	resp := env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.ErrLoginLocked.Code(), resp.Code)
+
+	// 换一个 IP 不受影响: 计数是按 用户名+IP 记的
+	resp = env.doWithHeader(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	}, map[string]string{"X-Real-IP": "10.0.0.9"})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	// 冷却时间过后可以再登录
+	env.mr.FastForward(loginFailWindow + time.Second)
+	resp = env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+}
+
+// 登录成功要清掉之前的失败计数, 否则攒够 5 次后正常用户也会被锁
+func TestAuthLoginSuccessResetsFailCount(t *testing.T) {
+	withJWTConf(t)
+
+	env := newTestEnv(t)
+	env.engine.POST("/login", (&UserAuth{}).Login)
+
+	createUser(t, env, "admin@qq.com", "管理员", "123456")
+
+	for i := 0; i < loginMaxFail-1; i++ {
+		env.do(t, http.MethodPost, "/login", map[string]any{
+			"username": "admin@qq.com", "password": "wrong",
+		})
+	}
+
+	resp := env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	// 计数被清掉, 之后再失败一次也不会触发锁定
+	resp = env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "wrong",
+	})
+	assert.Equal(t, g.ErrLoginFail.Code(), resp.Code)
 }
 
 func TestAuthLogout(t *testing.T) {

@@ -1479,7 +1479,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "用户名密码登录, 成功后返回 JWT Token",
+                "description": "用户名密码登录, 成功后返回 JWT Token; 同一 用户名+IP 连续失败 5 次后锁定 15 分钟",
                 "consumes": [
                     "application/json"
                 ],

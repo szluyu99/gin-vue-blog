@@ -65,6 +65,9 @@ var (
 	ErrPassword     = RegisterResult(1002, "密码错误")
 	ErrUserNotExist = RegisterResult(1003, "该用户不存在")
 	ErrOldPassword  = RegisterResult(1010, "旧密码不正确")
+	// 登录失败统一返回这个, 不区分"用户不存在"和"密码错误", 否则靠错误码就能枚举用户名
+	ErrLoginFail   = RegisterResult(1004, "用户名或密码错误")
+	ErrLoginLocked = RegisterResult(1005, "登录失败次数过多, 请稍后再试")
 
 	ErrTokenNotExist    = RegisterResult(1201, "TOKEN 不存在，请重新登陆")
 	ErrTokenRuntime     = RegisterResult(1202, "TOKEN 已过期，请重新登陆")
