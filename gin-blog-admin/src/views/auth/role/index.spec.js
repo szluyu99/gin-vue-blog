@@ -83,4 +83,45 @@ describe('角色管理', () => {
     expect(api.getMenuOption).toHaveBeenCalledTimes(1)
     expect(api.getResourceOption).toHaveBeenCalledTimes(1)
   })
+
+  // 回归 A15: 开关原来写死 checkedValue: 1 / uncheckedValue: 0, 而后端 is_disable 是布尔值,
+  // 已禁用的角色也一直显示成关闭
+  it('禁用开关按布尔值渲染', () => {
+    const wrapper = mountPage()
+    const column = wrapper.vm.columns.find(e => e.key === 'is_disable')
+    const vnode = column.render({ id: 1, is_disable: true })
+
+    expect(vnode.props.value).toBe(true)
+    expect(vnode.props.checkedValue).toBeUndefined()
+    expect(vnode.props.uncheckedValue).toBeUndefined()
+  })
+
+  it('切换禁用会带上原有的资源与菜单权限', async () => {
+    const wrapper = mountPage()
+    const row = { id: 3, name: '编辑', label: 'editor', is_disable: false, resource_ids: [11], menu_ids: [1, 2] }
+
+    await wrapper.vm.handleUpdateDisable(row)
+
+    // 后端 UpdateRole 会整体替换关联, 不带上这两个字段等于清空该角色的权限
+    expect(api.saveOrUpdateRole).toHaveBeenCalledWith({
+      id: 3,
+      name: '编辑',
+      label: 'editor',
+      is_disable: true,
+      resource_ids: [11],
+      menu_ids: [1, 2],
+    })
+    expect(row.is_disable).toBe(true)
+  })
+
+  it('切换禁用失败时不改变本地状态', async () => {
+    api.saveOrUpdateRole.mockRejectedValue(new Error('boom'))
+    const wrapper = mountPage()
+    const row = { id: 3, name: '编辑', label: 'editor', is_disable: false }
+
+    await wrapper.vm.handleUpdateDisable(row)
+
+    expect(row.is_disable).toBe(false)
+    expect(row.publishing).toBe(false)
+  })
 })

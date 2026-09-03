@@ -68,7 +68,8 @@ function responseSuccess(response) {
   const responseData = response.data
   const { code, message } = responseData
   if (code !== 0) { // 与后端约定业务状态码
-    if (code === 1203) {
+    // 1203-token 不正确, 1209-账号被禁用: 本地登录态已经无效, 清掉
+    if (code === 1203 || code === 1209) {
       // 移除 token
       const userStore = useUserStore()
       userStore.resetLoginState()

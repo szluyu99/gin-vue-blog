@@ -88,6 +88,12 @@ func JWTAuth(requireLogin bool) gin.HandlerFunc {
 			return
 		}
 
+		// 禁用是即时生效的: 只在登录时校验, 已经签发的 token 还能一直用到过期
+		if user.IsDisable {
+			handle.ReturnError(c, g.ErrUserDisabled, nil)
+			return
+		}
+
 		// session: 每次请求都刷新一次, 避免 10 分钟后失效
 		session := sessions.Default(c)
 		session.Set(g.CTX_USER_AUTH, claims.UserId)
@@ -126,6 +132,11 @@ func PermissionCheck() gin.HandlerFunc {
 		// 任一角色拥有该资源即放行 (OR 语义):
 		// 多角色时不能因为其中一个角色没有权限就拒绝, 否则多加一个弱角色反而会减少权限
 		for _, role := range auth.Roles {
+			// 被禁用的角色不参与鉴权, 否则后台的角色禁用开关只是改个字段, 权限照旧
+			if role.IsDisable {
+				slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] role %v disabled, skip\n", role.Name))
+				continue
+			}
 			slog.Debug(fmt.Sprintf("[middleware-PermissionCheck] %v\n", role.Name))
 			pass, err := model.CheckRoleAuth(db, role.ID, url, method)
 			if err != nil {

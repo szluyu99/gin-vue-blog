@@ -113,6 +113,12 @@ func (*UserAuth) Login(c *gin.Context) {
 		return
 	}
 
+	// 被禁用的账号不允许登录: 以前 is_disable 只有写入没有读取, 后台的禁用开关等于没生效
+	if userAuth.IsDisable {
+		ReturnError(c, g.ErrUserDisabled, nil)
+		return
+	}
+
 	// 登录成功, 清掉失败计数
 	if err := rdb.Del(rctx, failKey).Err(); err != nil {
 		slog.Warn("清理登录失败次数出错", "err", err)

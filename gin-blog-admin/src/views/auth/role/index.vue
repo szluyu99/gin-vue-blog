@@ -72,6 +72,37 @@ async function handleAddRole() {
   handleAdd()
 }
 
+// 禁用/启用角色: 以前开关写死 checkedValue: 1 / uncheckedValue: 0, 而后端 is_disable 是布尔值,
+// 所以已禁用的角色也一直显示成关闭, 点了只弹「暂时还不支持」
+// 注意必须带上 resource_ids / menu_ids: 后端 UpdateRole 会整体替换角色的资源与菜单关联,
+// 不传就等于把这个角色的权限全清空
+async function handleUpdateDisable(row) {
+  if (!row.id) {
+    return
+  }
+  row.publishing = true
+  const isDisable = !row.is_disable
+  try {
+    await api.saveOrUpdateRole({
+      id: row.id,
+      name: row.name,
+      label: row.label,
+      is_disable: isDisable,
+      resource_ids: row.resource_ids ?? [],
+      menu_ids: row.menu_ids ?? [],
+    })
+    row.is_disable = isDisable
+    $message?.success(isDisable ? '已禁用该角色' : '已启用该角色')
+    $table.value?.handleSearch()
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    row.publishing = false
+  }
+}
+
 const columns = [
   {
     type: 'selection',
@@ -115,9 +146,7 @@ const columns = [
         rubberBand: false,
         value: row.is_disable,
         loading: !!row.publishing, // 修改 ing 动画
-        checkedValue: 1,
-        uncheckedValue: 0,
-        onUpdateValue: () => $message.info('这个功能暂时还不支持~'),
+        onUpdateValue: () => handleUpdateDisable(row),
       })
     },
   },

@@ -89,6 +89,22 @@ func TestAuthLoginFailed(t *testing.T) {
 	assert.Equal(t, g.ErrLoginFail.Code(), resp.Code)
 }
 
+// 被禁用的账号不能登录: 后台的禁用开关以前只写库不读, 等于完全没生效
+func TestAuthLoginDisabledUser(t *testing.T) {
+	withJWTConf(t)
+
+	env := newTestEnv(t)
+	env.engine.POST("/login", (&UserAuth{}).Login)
+
+	user := createUser(t, env, "admin@qq.com", "管理员", "123456")
+	assert.Nil(t, model.UpdateUserDisable(env.db, user.ID, true))
+
+	resp := env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.ErrUserDisabled.Code(), resp.Code)
+}
+
 // 连续失败达到上限后直接拒绝, 即使密码正确
 func TestAuthLoginLockedAfterTooManyFails(t *testing.T) {
 	withJWTConf(t)

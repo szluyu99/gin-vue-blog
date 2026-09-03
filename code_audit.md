@@ -6,9 +6,9 @@
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
-当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S8
-全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
-admin 的 A1–A14 已修复，A15–A21（P2）待处理（A21 经测试确认当前无实际影响，已加回归护栏）。
+当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S3、S5–S8
+全部暂缓（项目初期，安全要求不高，上线前必须回来处理），S4 已修复；潜在问题 P1 已修复。
+admin 的 A1–A15 已修复，A16–A21（P2）待处理（A21 经测试确认当前无实际影响，已加回归护栏）。
 front 的 FE1–FE4 已修复。
 
 ## 安全
@@ -49,12 +49,24 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
 
 修法：来源白名单走配置。
 
-### S4 `is_disable` 只写不读，封禁功能是空的 — 暂缓
+### S4 `is_disable` 只写不读，封禁功能是空的 — 已修复
 
 写入：`internal/handle/handle_user.go:190` → `internal/model/user.go:132`。
 全仓库没有任何读取处：`handle_auth.go` 的 `Login` 与 `middleware/auth.go` 都不查。
 被禁用的用户照样登录，旧 token 照样有效。角色的 `is_disable`（`handle_role.go:19`）
 同样从未进入 `PermissionCheck`。
+
+已改为：
+
+- 新增业务码 `ErrUserDisabled = 1209`（`internal/global/result.go`）。
+- `Login` 在密码校验通过后拒绝 `IsDisable` 的账号。
+- `JWTAuth` 取到用户后同样拒绝，已签发的 token 立即失效（不必等过期）。
+- `PermissionCheck` 跳过 `IsDisable` 的角色，只靠该角色拿到的权限会被收回。
+- 前端把 1209 归入「踢下线」分支：admin `utils/http.js` 走 `forceOffline`，
+  front `utils/http.js` 走 `resetLoginState`。
+
+回归测试：`TestAuthLoginDisabledUser`、`TestJWTAuthRejectsDisabledUser`、
+`TestJWTAuthOptionalLoginRejectsDisabledUser`、`TestPermissionCheckSkipsDisabledRole`。
 
 ### S5 操作日志把请求体原文永久落库，含明文密码 — 暂缓
 
@@ -606,9 +618,12 @@ P1（特定路径下会坏）：
 
 P2（展示问题 / 潜在 / 清理）：
 
-- **A15** `src/views/auth/role/index.vue:93-97`：`value: row.is_disable` 配
+- **A15（已修复）** `src/views/auth/role/index.vue:93-97`：`value: row.is_disable` 配
   `checkedValue: 1, uncheckedValue: 0`，后端字段是 `bool`，开关永远显示关闭。
   目前只是展示，`onUpdateValue` 只弹「这个功能暂时还不支持~」。与 S4 一起处理。
+  已去掉 `checkedValue/uncheckedValue`，`onUpdateValue` 调 `saveOrUpdateRole` 真正落库。
+  注意提交时必须带上 `resource_ids` / `menu_ids`：后端 `UpdateRole` 会整体替换角色的
+  资源与菜单关联，不传就等于清空该角色的全部权限。
 - **A16** `src/views/message/comment/index.vue`：`:81` 列 key 还是老的 `reply_nick_name`
   （render 函数正常，只有接上 `handleExport` 才会导出空列，`CrudTable.vue:136` 按
   `item[key]` 取值）；`:132` `commentTypeMap[row.type].tag` 没守卫；`:63-78`「评论类型」

@@ -1,11 +1,28 @@
 package middleware
 
 import (
+	"gin-blog/internal/model"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// 被禁用的角色不参与鉴权: 只靠这个角色拿到的权限要被收回
+func TestPermissionCheckSkipsDisabledRole(t *testing.T) {
+	e := newMwEnv(t)
+	res := e.seedResource("配置修改", "/config", http.MethodPatch, false)
+	role := e.seedRole("admin", res.ID)
+	assert.Nil(t, e.db.Model(&model.Role{}).Where("id", role.ID).Update("is_disable", true).Error)
+	user := e.seedUser("test", false, role.ID)
+	e.loginId = user.ID
+	e.handle(http.MethodPatch, "/config", PermissionCheck())
+
+	w := e.request(http.MethodPatch, "/api/config", "{}", nil)
+
+	assert.False(t, e.handlerRan)
+	assert.Contains(t, w.Body.String(), "权限不足")
+}
 
 // 超级管理员不做权限校验
 func TestPermissionCheckSuperAdmin(t *testing.T) {

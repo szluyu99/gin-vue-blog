@@ -59,8 +59,8 @@ request.interceptors.response.use(
       if (code === 1201) { // Token 存在问题
         authStore.toLogin()
       }
-      // 1202-Token 过期
-      else if (code === 1202 || code === 1203 || code === 1207) {
+      // 1202-Token 过期, 1209-账号被禁用: 手上的 token 已经没用了, 直接踢下线
+      else if (code === 1202 || code === 1203 || code === 1207 || code === 1209) {
         authStore.forceOffline()
       }
       // 这里必须 reject: 以前两个鉴权分支直接 return, 等于 resolve(undefined),

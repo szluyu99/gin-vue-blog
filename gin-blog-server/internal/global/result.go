@@ -77,6 +77,7 @@ var (
 	ErrPermission       = RegisterResult(1206, "权限不足")
 	ErrForceOffline     = RegisterResult(1207, "您已被强制下线")
 	ErrForceOfflineSelf = RegisterResult(1208, "不能强制下线自己")
+	ErrUserDisabled     = RegisterResult(1209, "该账号已被禁用")
 
 	ErrFileUpload  = RegisterResult(9100, "文件上传失败")
 	ErrFileReceive = RegisterResult(9101, "文件接收失败")

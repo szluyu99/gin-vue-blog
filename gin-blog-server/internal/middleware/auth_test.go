@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"gin-blog/internal/model"
 	"net/http"
 	"testing"
 
@@ -125,6 +126,39 @@ func TestJWTAuthUserNotExist(t *testing.T) {
 
 	assert.False(t, e.handlerRan)
 	assert.Contains(t, w.Body.String(), "该用户不存在")
+}
+
+// 账号被禁用后, 已经签发的 token 立刻失效
+func TestJWTAuthRejectsDisabledUser(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("admin", true)
+	e.seedResource("配置修改", "/config", http.MethodPatch, false)
+	e.handle(http.MethodPatch, "/config", JWTAuth(true))
+
+	headers := bearer(t, user.ID, 24)
+	assert.Nil(t, model.UpdateUserDisable(e.db, user.ID, true))
+
+	w := e.request(http.MethodPatch, "/api/config", "{}", headers)
+
+	assert.False(t, e.handlerRan)
+	assert.Contains(t, w.Body.String(), "该账号已被禁用")
+}
+
+// 前台接口带的 token 属于被禁用的账号: 同样拒绝, 不能降级成匿名继续
+func TestJWTAuthOptionalLoginRejectsDisabledUser(t *testing.T) {
+	withJWTConf(t)
+	e := newMwEnv(t)
+	user := e.seedUser("tester", false)
+	e.handle(http.MethodPost, "/front/upload", JWTAuth(false))
+
+	headers := bearer(t, user.ID, 24)
+	assert.Nil(t, model.UpdateUserDisable(e.db, user.ID, true))
+
+	w := e.request(http.MethodPost, "/api/front/upload", "{}", headers)
+
+	assert.False(t, e.handlerRan)
+	assert.Contains(t, w.Body.String(), "该账号已被禁用")
 }
 
 // 前台接口带了有效 token: 即使接口没登记在资源表里, 也要识别出当前用户
