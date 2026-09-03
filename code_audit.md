@@ -8,7 +8,7 @@
 
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S3、S5–S8
 全部暂缓（项目初期，安全要求不高，上线前必须回来处理），S4 已修复；潜在问题 P1 已修复。
-admin 的 A1–A15 已修复，A16–A21（P2）待处理（A21 经测试确认当前无实际影响，已加回归护栏）。
+admin 的 A1–A20 已修复，A21 已加回归护栏（经测试确认当前无实际影响）。
 front 的 FE1–FE4 已修复。
 
 ## 安全
@@ -624,21 +624,23 @@ P2（展示问题 / 潜在 / 清理）：
   已去掉 `checkedValue/uncheckedValue`，`onUpdateValue` 调 `saveOrUpdateRole` 真正落库。
   注意提交时必须带上 `resource_ids` / `menu_ids`：后端 `UpdateRole` 会整体替换角色的
   资源与菜单关联，不传就等于清空该角色的全部权限。
-- **A16** `src/views/message/comment/index.vue`：`:81` 列 key 还是老的 `reply_nick_name`
+- **A16（已修复）** `src/views/message/comment/index.vue`：`:81` 列 key 还是老的 `reply_nick_name`
   （render 函数正常，只有接上 `handleExport` 才会导出空列，`CrudTable.vue:136` 按
   `item[key]` 取值）；`:132` `commentTypeMap[row.type].tag` 没守卫；`:63-78`「评论类型」
   和 `:124-136`「来源」是同一字段渲染两遍且前者 `key: ''`；`:275` typo `filterablec`；
-  `handleUpdateReview` 无 try/catch。
-- **A17** `.then()` 无 `.catch`：`views/article/list/index.vue:45-46`、
+  `handleUpdateReview` 无 try/catch。已删掉重复的「评论类型」列、key 改 `reply_user`、
+  类型映射取不到时退化成「未知」、typo 修正、审核失败不再误报成功。
+- **A17（已修复）** `.then()` 无 `.catch`：`views/article/list/index.vue:45-46`、
   `views/article/write/index.vue:39,42`、`views/user/list/index.vue:40`。
-  拦截器已弹过错误提示，只剩控制台的 unhandled rejection 噪音。
-- **A18** `src/assets/config.js` 里导出的 `config` 对象（原作者的 QQ / 微博 APP_ID、
-  腾讯验证码 ID）全仓库无引用，可删。**注意同文件的 `loginTypeMap` / `articleTypeMap` /
+  拦截器已弹过错误提示，只剩控制台的 unhandled rejection 噪音。四处都补了 `.catch`。
+- **A18（已修复）** `src/assets/config.js` 里导出的 `config` 对象（原作者的 QQ / 微博 APP_ID、
+  腾讯验证码 ID）全仓库无引用，已删。**注意同文件的 `loginTypeMap` / `articleTypeMap` /
   `commentTypeMap` 及对应 Options 被 4 个页面引用，不是死代码**（和 front 那份不同）。
-- **A19** `views/article/list/index.vue:302` 自己实现了一份 `downloadFile`，
-  `utils/index.js:40` 已有同名导出，重复。
-- **A20** `views/article/list/index.vue:281` 的 `beforeUpload` 只放行 `.md`，
+- **A19（已修复）** `views/article/list/index.vue:302` 自己实现了一份 `downloadFile`，
+  `utils/index.js:40` 已有同名导出，重复。已删掉局部实现，改为从 `@/utils` 引入。
+- **A20（已修复）** `views/article/list/index.vue:281` 的 `beforeUpload` 只放行 `.md`，
   后端 F9 之后同时接受 `.md` 和 `.markdown`，两边不一致（偏严，不影响正确性）。
+  已改为两种后缀都放行且忽略大小写。
 - **A21** `src/layout/tags/index.vue:16,42` 的 `v-for` 模板 ref 数组顺序没有保证，
   `tabRefs.value[activeIndex]` 可能取错元素。后果只是激活标签滚动位置偶尔不对。
 

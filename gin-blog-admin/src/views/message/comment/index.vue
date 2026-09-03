@@ -61,24 +61,9 @@ const columns = [
   },
   // TODO: 合理的显示评论的文章信息
   {
-    title: '评论类型',
-    key: '',
-    width: 50,
-    align: 'center',
-    render(row) {
-      if (row.type === 1) { // 文章
-        return [
-          h(NTag, { type: 'info' }, { default: () => '文章' }),
-        ]
-      }
-      if (row.type === 2) { // 友链
-        return h(NTag, { type: 'success' }, { default: () => '友链' })
-      }
-    },
-  },
-  {
     title: '回复对象',
-    key: 'reply_nick_name',
+    // 这里的 key 只用于导出(CrudTable 按 item[key] 取值), 展示走 render
+    key: 'reply_user',
     width: 50,
     align: 'center',
     render(row) {
@@ -127,10 +112,12 @@ const columns = [
     width: 50,
     align: 'center',
     render(row) {
+      // 后端新增评论类型时前端的映射表可能还没跟上, 不能直接取 .tag
+      const type = commentTypeMap[row.type]
       return h(
         NTag,
-        { type: commentTypeMap[row.type].tag },
-        { default: () => commentTypeMap[row.type].name },
+        { type: type?.tag ?? 'default' },
+        { default: () => type?.name ?? '未知' },
       )
     },
   },
@@ -193,7 +180,14 @@ async function handleUpdateReview(ids, is_review) {
     window.$message.info('请选择要审核的数据')
     return
   }
-  await api.updateCommentReview(ids, is_review)
+  // 失败时拦截器已经弹过提示, 这里只要别让列表刷新和成功提示误报
+  try {
+    await api.updateCommentReview(ids, is_review)
+  }
+  catch (err) {
+    console.error(err)
+    return
+  }
   window.$message?.success(is_review ? '审核成功' : '撤下成功')
   $table.value?.handleSearch()
 }
@@ -272,7 +266,7 @@ function handleChangeTab(value) {
           <NSelect
             v-model:value="queryItems.type"
             clearable
-            filterablec
+            filterable
             placeholder="请选择评论来源"
             :options="commentTypeOptions"
             @update:value="$table?.handleSearch()"

@@ -11,7 +11,7 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
 import { useAuthStore } from '@/store'
-import { convertImgUrl, formatDate, parseJson } from '@/utils'
+import { convertImgUrl, downloadFile, formatDate, parseJson } from '@/utils'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
@@ -45,8 +45,9 @@ const { handleDelete } = useCRUD({
 })
 
 onMounted(() => {
-  api.getCategoryOption().then(res => (categoryOptions.value = res.data))
-  api.getTagOption().then(res => (tagOptions.value = res.data))
+  // 拦截器已经弹过错误提示, 这里补 catch 只是别留下 unhandled rejection
+  api.getCategoryOption().then(res => (categoryOptions.value = res.data)).catch(err => console.error(err))
+  api.getTagOption().then(res => (tagOptions.value = res.data)).catch(err => console.error(err))
   handleChangeTab('all') // 默认查看全部
 })
 
@@ -284,8 +285,10 @@ function handleChangeTab(value) {
 
 // 文件上传前检查类型
 function beforeUpload(data) {
-  if (!data.file.name.endsWith('.md')) {
-    $message.error('只能上传 .md 格式的文件，请重新上传')
+  // 后端 F9 之后同时接受 .md 与 .markdown, 两边保持一致
+  const name = data.file.name.toLowerCase()
+  if (!name.endsWith('.md') && !name.endsWith('.markdown')) {
+    $message.error('只能上传 .md / .markdown 格式的文件，请重新上传')
     return false
   }
   return true
@@ -302,20 +305,6 @@ function afterUpload({ event }) {
   else {
     $message.error(res?.message || '文章导入失败！')
   }
-}
-
-function downloadFile(content, fileName) {
-  const aEle = document.createElement('a') // 创建下载链接
-  aEle.download = fileName // 设置下载的名称
-  aEle.style.display = 'none'// 隐藏的可下载链接
-  // 字符内容转变成 blob 地址
-  const blob = new Blob([content])
-  aEle.href = URL.createObjectURL(blob)
-  // 绑定点击时间
-  document.body.appendChild(aEle)
-  aEle.click()
-  // 然后移除
-  document.body.removeChild(aEle)
 }
 </script>
 

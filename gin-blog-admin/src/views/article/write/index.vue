@@ -36,13 +36,14 @@ onActivated(async () => {
 
 async function fetchData() {
   getArticleInfo()
+  // 拦截器已经弹过错误提示, 这里补 catch 只是别留下 unhandled rejection
   api.getCategoryOption().then((resp) => {
     categoryOptions.value = resp.data.map(e => ({ value: e.label, label: e.label }))
-  })
+  }).catch(err => console.error(err))
   api.getTagOption().then((resp) => {
     tagOptions.value = resp.data.map(e => ({ value: e.label, label: e.label }))
     backTagOptions = tagOptions.value
-  })
+  }).catch(err => console.error(err))
   await nextTick()
 }
 

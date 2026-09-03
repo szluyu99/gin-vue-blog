@@ -37,7 +37,8 @@ const {
 const roleOptions = ref([])
 
 onMounted(() => {
-  api.getRoleOption().then(resp => roleOptions.value = resp.data)
+  // 拦截器已经弹过错误提示, 这里补 catch 只是别留下 unhandled rejection
+  api.getRoleOption().then(resp => roleOptions.value = resp.data).catch(err => console.error(err))
   $table.value?.handleSearch()
 })
 

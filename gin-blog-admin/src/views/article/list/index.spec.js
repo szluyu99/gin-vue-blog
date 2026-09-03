@@ -69,4 +69,15 @@ describe('文章列表', () => {
     expect(ret).toBeInstanceOf(Promise)
     await expect(ret).resolves.toMatchObject({ code: 0 })
   })
+
+  it('导入放行 .md 与 .markdown, 拦住其他后缀', async () => {
+    // 回归 A20: 后端 F9 之后同时接受两种后缀, 前端只放行 .md
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: [], total: 0 } })
+    const wrapper = mountPage()
+
+    expect(wrapper.vm.beforeUpload({ file: { name: 'a.md' } })).toBe(true)
+    expect(wrapper.vm.beforeUpload({ file: { name: 'a.markdown' } })).toBe(true)
+    expect(wrapper.vm.beforeUpload({ file: { name: 'a.MD' } })).toBe(true)
+    expect(wrapper.vm.beforeUpload({ file: { name: 'a.txt' } })).toBe(false)
+  })
 })
