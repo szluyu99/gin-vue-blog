@@ -114,14 +114,18 @@ jobs:
           docker run -d --name gvb-redis redis:7.0-alpine
           redis_ip=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' gvb-redis)
           # 用 sqlite 起, 不依赖 MySQL 容器
+          # config.docker.yml 是 release 模式, 必须注入签名密钥, 否则启动就被拒绝 (S1)
           docker run -d --name gvb-server -p 8765:8765 \
-            -e SERVER_DBTYPE=sqlite -e REDIS_ADDR="$redis_ip:6379" gvb-server:ci
+            -e SERVER_DBTYPE=sqlite -e SQLITE_DSN=/tmp/gvb-ci.db \
+            -e JWT_SECRET=ci-only-jwt-secret -e SESSION_SALT=ci-only-session-salt \
+            -e REDIS_ADDR="$redis_ip:6379" gvb-server:ci
           for i in $(seq 15); do
             curl -sf http://127.0.0.1:8765/api/config > /dev/null && break
             sleep 1
           done
-          curl -sf http://127.0.0.1:8765/api/config > /dev/null
+          # 先打日志: 健康检查失败时日志才是有用的那部分
           docker logs gvb-server
+          curl -sf http://127.0.0.1:8765/api/config > /dev/null
 
   # 一键部署的端到端验证: 起完整的 compose 栈, 校验权限种子数据的不变式
   deploy:

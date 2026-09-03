@@ -35,7 +35,8 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
   `Server.Mode == "release"` 时空值或示例值直接 panic；debug 模式只打 `[警告]`，
   不打断本地开发（仓库自带的 `config.yml` 就是示例值）。
 - `envBindings` 增加 `jwt.secret` → `JWT_SECRET`、`session.salt` → `SESSION_SALT`，
-  部署时不必改源码里的配置文件。
+  部署时不必改源码里的配置文件。CI 的 Docker 冒烟测试也要注入这两个（它用的是
+  `config.docker.yml`，release 模式）。
 - `deploy/bootstrap.sh` 首次运行时生成 `deploy/start/.env.secrets`（两个 32 字节随机
   hex），已加入 `deploy/.gitignore`；`docker-compose.yml` 的 `gvb-server` 用 `env_file`
   引入。`config.docker.yml` 是 release 模式，所以不跑 bootstrap 直接 `docker compose up`
@@ -417,6 +418,12 @@ env -u EMAIL:      Email = {From: Host:smtp.qq.com Port:465 SmtpPass: SmtpUser:}
 只绑定 `deploy/start/docker-compose.yml` 里实际用到的 8 个 key（`SERVER_PORT`、`MYSQL_HOST`、
 `MYSQL_PORT`、`MYSQL_DBNAME`、`MYSQL_USERNAME`、`MYSQL_PASSWORD`、`REDIS_ADDR`、
 `REDIS_PASSWORD`）。这样父路径遮蔽消失，compose 的变量名也不用改。
+
+补充（发现于 CI）：白名单化之后 CI 的 Docker 冒烟测试挂了 —— 它靠
+`-e SERVER_DBTYPE=sqlite` 让后端不连 MySQL，而这个 key 没在白名单里，`AutomaticEnv`
+一去掉就失效，容器起来后一直去连 `127.0.0.1:3306`。白名单补了
+`SERVER_DBTYPE` 与 `SQLITE_DSN`。教训：改成白名单时要把仓库里所有传环境变量的地方
+（compose、CI、脚本）都过一遍，不能只看 compose。
 
 验证（临时探针，跑完已删）：
 

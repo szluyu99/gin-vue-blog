@@ -94,8 +94,10 @@ func GetConfig() *Config {
 // 任何一段配置撞上同名环境变量都会被静默吃掉, 所以改成白名单。
 var envBindings = map[string]string{
 	"server.port":    "SERVER_PORT",
+	"server.dbtype":  "SERVER_DBTYPE",
 	"jwt.secret":     "JWT_SECRET",
 	"session.salt":   "SESSION_SALT",
+	"sqlite.dsn":     "SQLITE_DSN",
 	"mysql.host":     "MYSQL_HOST",
 	"mysql.port":     "MYSQL_PORT",
 	"mysql.dbname":   "MYSQL_DBNAME",
