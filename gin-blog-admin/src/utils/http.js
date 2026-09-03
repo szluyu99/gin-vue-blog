@@ -58,13 +58,13 @@ request.interceptors.response.use(
       const authStore = useAuthStore()
       if (code === 1201) { // Token 存在问题
         authStore.toLogin()
-        return
       }
       // 1202-Token 过期
-      if (code === 1202 || code === 1203 || code === 1207) {
+      else if (code === 1202 || code === 1203 || code === 1207) {
         authStore.forceOffline()
-        return
       }
+      // 这里必须 reject: 以前两个鉴权分支直接 return, 等于 resolve(undefined),
+      // 调用方的 const { data } = await ... / resp.data.token 会二次抛错
       return Promise.reject(responseData)
     }
     return Promise.resolve(responseData)

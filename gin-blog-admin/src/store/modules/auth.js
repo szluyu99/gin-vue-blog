@@ -34,7 +34,14 @@ export const useAuthStore = defineStore('auth', {
      * 主动退出登录
      */
     async logout() {
-      await api.logout()
+      // 退出接口失败也要清掉本地登录态并跳登录页, 否则 token 留在 localStorage 里、
+      // 页面不跳转也没有提示, 用户会以为还登录着
+      try {
+        await api.logout()
+      }
+      catch (err) {
+        console.error(err)
+      }
       this.resetLoginState()
       this.toLogin()
       window.$message.success('您已经退出登录！')

@@ -109,18 +109,28 @@ func UpdateUserPassword(db *gorm.DB, id int, password string) error {
 	return result.Error
 }
 
+// 更新用户资料
+//
+// 只更新传进来的非空字段: 原来是 Select("nickname","avatar","intro","website").Updates(...),
+// 显式 Select 会把零值一起写库, 调用方漏传一个字段就等于把它清空
+// (前台个人中心表单没同步时, 只改昵称提交会把头像/简介/网站全清掉)
 func UpdateUserInfo(db *gorm.DB, id int, nickname, avatar, intro, website string) error {
-	userInfo := UserInfo{
-		Model:    Model{ID: id},
-		Nickname: nickname,
-		Avatar:   avatar,
-		Intro:    intro,
-		Website:  website,
+	updates := map[string]any{}
+	for column, value := range map[string]string{
+		"nickname": nickname,
+		"avatar":   avatar,
+		"intro":    intro,
+		"website":  website,
+	} {
+		if value != "" {
+			updates[column] = value
+		}
+	}
+	if len(updates) == 0 {
+		return nil
 	}
 
-	result := db.
-		Select("nickname", "avatar", "intro", "website").
-		Updates(userInfo)
+	result := db.Model(&UserInfo{Model: Model{ID: id}}).Updates(updates)
 	return result.Error
 }
 

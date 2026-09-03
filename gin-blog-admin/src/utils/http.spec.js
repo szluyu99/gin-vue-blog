@@ -90,8 +90,9 @@ describe('http 拦截器', () => {
     const { router } = await import('@/router')
     responseBody = { code: 1201, message: 'token 不存在', data: null }
 
-    // 这里没有 reject, 调用方拿到的是 undefined
-    await expect(request.get('/user/info')).resolves.toBeUndefined()
+    // 跳登录页的同时必须 reject: resolve(undefined) 会让调用方的
+    // const { data } = await ... / resp.data.token 二次抛错
+    await expect(request.get('/user/info')).rejects.toEqual(responseBody)
     expect(router.replace).toHaveBeenCalledWith({ path: '/login', query: {} })
   })
 
@@ -100,7 +101,7 @@ describe('http 拦截器', () => {
     authStore.setToken('expired-token')
     responseBody = { code: 1202, message: 'token 已过期', data: null }
 
-    await expect(request.get('/user/info')).resolves.toBeUndefined()
+    await expect(request.get('/user/info')).rejects.toEqual(responseBody)
     expect(authStore.token).toBeNull()
   })
 

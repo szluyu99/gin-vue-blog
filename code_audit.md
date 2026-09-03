@@ -6,10 +6,10 @@
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
-当前进度：server 功能 BUG F1–F10 全部已修复；F11 已修复、F12 待处理；server 安全 S1–S8
+当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S8
 全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 未处理。
-admin 的 A1–A6（P0）已修复，A7–A14（P1）与 A15+（P2）待处理。
-front 的 FE1–FE3 已修复。
+admin 的 A1–A6（P0）与 A7–A9 已修复，A10–A14（P1 剩余）与 A15+（P2）待处理。
+front 的 FE1–FE4 已修复。
 
 ## 安全
 
@@ -277,6 +277,18 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 （删掉 `user_auth_role` 表制造第三步失败，断言前两张表都回滚）、
 `TestAuthVerifyCodeKeepsTokenWhenCreateFails`（断言建用户失败后验证链接仍然有效、库里没有半个用户）。
 
+### F13 `UpdateUserInfo` 会把零值写库 — 已修复
+
+`internal/model/user.go` 原来是 `Select("nickname","avatar","intro","website").Updates(userInfo)`。
+显式 `Select` 会让 GORM 把零值一起写进去，所以调用方漏传一个字段就等于把它清空。
+这是 FE1 那次数据丢失的后端一半：前台表单没同步时只改昵称提交，头像/简介/网站全被清成空串。
+
+修复：只把非空字段放进 map 更新，全空时直接返回不发 SQL。
+
+测试：`internal/model/user_update_test.go` 的 `TestUpdateUserInfoKeepsEmptyFields`。
+接口级验证（`PUT /front/user/info`）：先写满四个字段，再只传 nickname、其余留空，
+返回 `code 0` 且 `GET` 读回来头像/简介/网站都还在。
+
 ## 潜在问题（当前打不到）
 ### F11 注册强依赖邮件，`Captcha.SendEmail` 是死开关 — 已修复
 
@@ -299,7 +311,7 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 顺带修正 `config.docker.yml` 的 Email 段键名：原来写的 `IsSSL` / `Secret` / `Nickname` 和
 `g.Config.Email` 的字段对不上（结构体要的是 `SmtpPass` / `SmtpUser`），即使填了也绑定不上。
 
-### F12 `AutomaticEnv` 让同名环境变量吃掉整段配置 — 待处理
+### F12 `AutomaticEnv` 让同名环境变量吃掉整段配置 — 已修复
 
 `internal/global/config.go:93` 的 `v.AutomaticEnv()` 会让 viper 在解析每个 key 时先查环境变量。
 如果环境里存在和某个顶层配置段同名的变量，`Get("Email")` 返回的是那个**字符串**而不是 yaml 里的
@@ -315,9 +327,19 @@ env -u EMAIL:      Email = {From: Host:smtp.qq.com Port:465 SmtpPass: SmtpUser:}
 后果是 SMTP 拨号变成 `dial tcp :0: connect: connection refused`，报错完全指不到原因。
 `Server` / `Captcha` 这些没有同名环境变量的段不受影响，所以只有邮件这一处发作。
 
-这不只影响邮件：任何一段配置只要撞上同名环境变量都会被静默吃掉。建议改成显式白名单绑定
-（`v.BindEnv("email.host", "GVB_EMAIL_HOST")`）或加前缀 `v.SetEnvPrefix("GVB")`。
-当前因为邮件功能已关闭，不影响实际使用，故记录待处理。
+这不只影响邮件：任何一段配置只要撞上同名环境变量都会被静默吃掉。
+
+修复：去掉 `AutomaticEnv()` 与 `SetEnvKeyReplacer`，改成 `envBindings` 白名单显式 `BindEnv`，
+只绑定 `deploy/start/docker-compose.yml` 里实际用到的 8 个 key（`SERVER_PORT`、`MYSQL_HOST`、
+`MYSQL_PORT`、`MYSQL_DBNAME`、`MYSQL_USERNAME`、`MYSQL_PASSWORD`、`REDIS_ADDR`、
+`REDIS_PASSWORD`）。这样父路径遮蔽消失，compose 的变量名也不用改。
+
+验证（临时探针，跑完已删）：
+
+```
+EMAIL=someone@example.com 时  Email = {From: Host:smtp.qq.com Port:465 ...}   不再被吃掉
+REDIS_ADDR=1.2.3.4:6379 时    Redis.Addr = "1.2.3.4:6379"                     覆盖仍生效
+```
 
 ## 潜在问题（当前打不到）
 ### P1 本地上传的路径穿越防护恒真 — 潜在
@@ -392,8 +414,8 @@ DB: (3, '只改昵称', '', '', '')   ← 头像/简介/网站被清空
 个人中心把它当表单初值，点「修改」就把带域名的绝对地址写回数据库——换域名或换环境就全失效。
 这是 admin A12 的前台孪生。
 
-修复：store 只存原始相对路径，拼接留给展示层。已确认所有 img src 都已经套了
-`convertImgUrl`（`AppHeader.vue:144`、`CommentField.vue:83`、`Comment.vue:194,229`、
+修复：store 只存原始相对路径，转成可访问地址留给展示层的 `convertImgUrl`。已确认所有 img src
+都已经套了 `convertImgUrl`（`AppHeader.vue:144`、`CommentField.vue:83`、`Comment.vue:194,229`、
 `LinkList.vue:29`、`message/index.vue:126`），所以改成相对路径不影响显示。
 `avatar` getter 的默认值判断从 `??` 改成 `||`：头像为空串时也要退回默认图，
 否则 `convertImgUrl('')` 会给出已失效的 `dummyimage.com` 占位图。
@@ -401,8 +423,32 @@ DB: (3, '只改昵称', '', '', '')   ← 头像/简介/网站被清空
 测试：`store/user.spec.js` 原来断言的是「相对路径会被拼上后端地址」，即旧的错误行为，
 已改为断言存原始路径，并新增「后端头像为空时退回默认图」。
 
-### FE3 头像尺寸只在 lg 断点生效 — 已修复
+### FE4 图片地址拼 localhost, 远程访问必然裂图 — 已修复
 
+这是「上传头像不显示」的真正原因，前面 FE1/FE2 只是同一个页面上的另外两个问题。
+
+`convertImgUrl` 原来把 `VITE_BACKEND_URL`（前台）/ `VITE_SERVER_URL`（后台）拼进图片地址，
+而这两个变量在 `.env.development` 里写的是 `http://localhost:8765`。从服务器本机以外的浏览器
+访问页面时，`localhost` 指的是浏览器所在的机器，图片必然加载失败。
+
+排查时的教训：在服务器上 `curl http://localhost:8765/public/uploaded/xxx.jpg` 得到
+`200 image/jpeg`，据此判断链路正常是错的 —— curl 跑在服务器本机，`localhost` 恰好指对了。
+故障环境是远程浏览器，验证环境必须一致。
+
+修法不是把 localhost 换成具体 IP（换 IP 或上域名又会失效），而是改成根相对路径：
+`deploy/build/web/default.conf.template:20` 的 nginx 本来就有 `location /public/uploaded`
+转发到后端，生产环境的设计就是根相对，只有 dev 模式漏了这条代理才被迫拼绝对地址。
+
+- 两个 `utils/index.js` 的 `convertImgUrl` 返回 `/public/uploaded/xxx.jpg`，并归一化前导 `/`；
+  `http` 开头的外链仍原样返回
+- 两个 `vite.config.js` 各加一条 `/public` 代理，target 沿用原来的后端地址
+- `VITE_BACKEND_URL` / `VITE_SERVER_URL` 现在只作为代理目标，不再进入页面里的 URL
+
+验证：经两个 dev server 代理取图都是 `200 image/jpeg 35217`。
+测试里四处断言旧行为的地方已改（`front/utils/index.spec.js`、`front/store/app.spec.js` 两条、
+`admin/utils/index.spec.js`）。
+
+### FE3 头像尺寸只在 lg 断点生效 — 已修复
 `views/user/UploadOne.vue:58` 的 `class="lg:h-[160px] lg:w-[160px]"` 在 1024px 以下不生效，
 图片按原始尺寸撑开（父容器只有 `max-w-[300px]`），布局会炸。改成
 `h-[160px] w-[160px] object-cover`。注意这一条不是上面那次故障的原因——
@@ -474,15 +520,15 @@ DB: (3, '只改昵称', '', '', '')   ← 头像/简介/网站被清空
 
 P1（特定路径下会坏）：
 
-- **A7** `src/utils/http.js:59-67`：`code === 1201` 与 `1202/1203/1207` 两个分支直接
+- **A7（已修复）** `src/utils/http.js:59-67`：`code === 1201` 与 `1202/1203/1207` 两个分支直接
   `return`，等于 `Promise.resolve(undefined)`，导致 `CrudTable.vue:78` 的
   `const { data } = await ...`、`Login.vue:55` 的 `resp.data.token`、
   `permission.js:24` 的 `buildRoutes(resp.data)` 二次抛错。应 `return Promise.reject(responseData)`。
   1201 分支还没清 token。
-- **A8** `src/views/Login.vue:39,60`：`const isRemember = useStorage('isRemember', false)` 是
+- **A8（已修复）** `src/views/Login.vue:39,60`：`const isRemember = useStorage('isRemember', false)` 是
   Ref，恒为真，取消勾选也会把用户名密码写进 localStorage，`removeLocal` 分支永远走不到。
   少一个 `.value`。（`local.js:47` 只是 base64，不是加密。）
-- **A9** `src/store/modules/auth.js:36-41` + `layout/header/components/UserAvatar.vue:32`：
+- **A9（已修复）** `src/store/modules/auth.js:36-41` + `layout/header/components/UserAvatar.vue:32`：
   `logout` 既不 await 也不 catch，`/logout` 失败时 token 留在 localStorage、不跳转、不提示。
 - **A10** `src/layout/index.vue:18-22`：`computed(() => router.getRoutes()...)` 没有响应式
   依赖，永久缓存首次结果；登录后动态添加的路由不在 `<KeepAlive :include>` 里，刷新才生效。
@@ -490,8 +536,10 @@ P1（特定路径下会坏）：
   `modalAction === 'edit'` 下渲染，`:47-49` 的 option 预取还注释着。F6 之后后端
   `model.SaveRole` 已支持新建时一并写入，现在只剩前端在逼用户走两趟。
 - **A12** `src/views/profile/index.vue:14,22-27,33`：`infoForm.avatar = userStore.avatar` 是
-  跑过 `convertImgUrl` 的展示地址（会拼 `VITE_SERVER_URL`，或是占位图
-  `http://dummyimage.com/400x400`），再 `api.updateCurrent` 存回库。应发原始 `userInfo.avatar`。
+  跑过 `convertImgUrl` 的展示地址，再 `api.updateCurrent` 存回库。FE4 之后它不再是带域名的
+  绝对地址（改成了根相对路径），但仍会多出前导 `/`，头像为空时还会把占位图
+  `http://dummyimage.com/400x400` 写进库。应发原始 `userInfo.avatar`。
+  另外 F13 之后后端已不再把空值写库，所以这条的破坏面比原来小了。
 - **A13** `src/components/UploadOne.vue:20,26-28`：`const { token } = useAuthStore()` 解构后
   失去响应性；`JSON.parse(respStr)` 无保护（可用新加的 `parseJson`）。
 - **A14** `src/components/common/ScrollX.vue:33,51`：用了废弃的 `e.wheelDelta`，Firefox 下

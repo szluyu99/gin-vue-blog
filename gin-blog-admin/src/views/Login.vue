@@ -57,7 +57,9 @@ async function handleLogin() {
       await userStore.getUserInfo()
       await addDynamicRoutes()
 
-      isRemember ? setLocal('loginInfo', { username, password }) : removeLocal('loginInfo')
+      // isRemember 是 useStorage 返回的 Ref, 必须取 .value:
+      // 直接判断 Ref 恒为真, 取消勾选也会把账号密码存进 localStorage
+      isRemember.value ? setLocal('loginInfo', { username, password }) : removeLocal('loginInfo')
       $message.success('登录成功')
 
       // 页面跳转: 根据 URL 中的 redirect 进行跳转
@@ -75,7 +77,8 @@ async function handleLogin() {
     }
   }
 
-  doLogin(username, password)
+  // doLogin 里只有 try/finally, 失败时的 rejection 需要在这里兜住
+  doLogin(username, password).catch(err => console.error(err))
 
   // 判断是否需要验证码
   // if (JSON.parse(import.meta.env.VITE_USE_CAPTCHA)) {

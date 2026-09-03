@@ -3,7 +3,6 @@ package g
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -86,12 +85,34 @@ func GetConfig() *Config {
 	return Conf
 }
 
+// 允许用环境变量覆盖的配置项 (deploy/start/docker-compose.yml 里用到的那些)
+//
+// 这里必须显式绑定, 不能用 v.AutomaticEnv():
+// AutomaticEnv 下 viper 解析 email.host 时会先检查父路径是否被环境变量遮蔽
+// (isPathShadowedInAutoEnv), 只要环境里存在同名的 EMAIL 变量 (Linux 上 git 相关
+// 工具常设), 整个 Email 段就会反序列化成零值, 表现为 SMTP 拨号 dial tcp :0。
+// 任何一段配置撞上同名环境变量都会被静默吃掉, 所以改成白名单。
+var envBindings = map[string]string{
+	"server.port":    "SERVER_PORT",
+	"mysql.host":     "MYSQL_HOST",
+	"mysql.port":     "MYSQL_PORT",
+	"mysql.dbname":   "MYSQL_DBNAME",
+	"mysql.username": "MYSQL_USERNAME",
+	"mysql.password": "MYSQL_PASSWORD",
+	"redis.addr":     "REDIS_ADDR",
+	"redis.password": "REDIS_PASSWORD",
+}
+
 // 从指定路径读取配置文件
 func ReadConfig(path string) *Config {
 	v := viper.New()
 	v.SetConfigFile(path)
-	v.AutomaticEnv()                                   // 允许使用环境变量
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // SERVER_APPMODE => SERVER.APPMODE
+
+	for key, env := range envBindings {
+		if err := v.BindEnv(key, env); err != nil {
+			panic("绑定环境变量失败: " + err.Error())
+		}
+	}
 
 	if err := v.ReadInConfig(); err != nil {
 		panic("配置文件读取失败: " + err.Error())
