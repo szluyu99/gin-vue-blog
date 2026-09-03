@@ -15,10 +15,14 @@ const tagStore = useTagStore()
 const router = useRouter()
 
 // 缓存的路由名
+// router.getRoutes() 不是响应式的, 单靠它这个 computed 会永久缓存首次结果,
+// 登录后动态添加的路由进不了 KeepAlive, 必须刷新页面才生效。
+// 这里挂上 tagStore.tags 做依赖: 访问过的页面一定先进标签栏, 再需要被缓存
 const keepAliveRouteNames = computed(() => {
-  const allRoutes = router.getRoutes()
-  const names = allRoutes.filter(route => route.meta?.keepAlive).map(route => route.name)
-  return names
+  void tagStore.tags.length
+  return router.getRoutes()
+    .filter(route => route.meta?.keepAlive)
+    .map(route => route.name)
 })
 </script>
 

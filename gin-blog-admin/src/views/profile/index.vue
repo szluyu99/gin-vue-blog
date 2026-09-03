@@ -11,7 +11,9 @@ const userStore = useUserStore()
 
 const infoFormRef = ref(null)
 const infoForm = ref({
-  avatar: userStore.avatar,
+  // 用原始 avatar 而不是 userStore.avatar 这个 getter:
+  // getter 跑过 convertImgUrl, 提交时会把展示用的地址(空头像时是占位图)写回库
+  avatar: userStore.userInfo.avatar,
   nickname: userStore.nickname,
   intro: userStore.intro,
   website: userStore.website,
@@ -20,7 +22,7 @@ const infoForm = ref({
 onMounted(async () => {
   await userStore.getUserInfo()
   infoForm.value = {
-    avatar: userStore.avatar,
+    avatar: userStore.userInfo.avatar,
     nickname: userStore.nickname,
     intro: userStore.intro,
     website: userStore.website,

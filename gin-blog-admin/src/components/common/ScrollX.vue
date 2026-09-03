@@ -30,7 +30,9 @@ const refreshIsOverflow = debounce(() => {
 }, 200)
 
 function handleMouseWheel(e) {
-  const { wheelDelta } = e
+  // wheelDelta 已废弃, Firefox 上是 undefined, 会让 translateX 变成 NaN。
+  // deltaY 的符号与 wheelDelta 相反(下滚为正), 取负保持原来的方向语义
+  const wheelDelta = -e.deltaY
   const wrapperWidth = wrapper.value?.offsetWidth
   const contentWidth = content.value?.offsetWidth
   /**

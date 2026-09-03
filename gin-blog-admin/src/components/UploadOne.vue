@@ -2,7 +2,7 @@
 import { NIcon, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '@/store'
-import { convertImgUrl } from '@/utils'
+import { convertImgUrl, parseJson } from '@/utils'
 
 const props = defineProps({
   preview: {
@@ -17,17 +17,18 @@ const props = defineProps({
 
 const emit = defineEmits(['update:preview'])
 
-const { token } = useAuthStore()
+// 不解构 token: 解构后失去响应性, 重新登录仍会用旧值
+const authStore = useAuthStore()
 const previewImg = ref(props.preview)
 
 watch(() => props.preview, val => previewImg.value = val)
 
 // 上传图片
 function handleImgUpload({ event }) {
-  const respStr = (event?.target).response
-  const res = JSON.parse(respStr)
-  if (res.code !== 0) {
-    $message?.error(res.message)
+  // 网关拦截或鉴权失败时响应不是 JSON, 不能直接 JSON.parse
+  const res = parseJson(event?.target?.response)
+  if (res?.code !== 0) {
+    $message?.error(res?.message || '图片上传失败')
     return
   }
   previewImg.value = res.data
@@ -45,7 +46,7 @@ defineExpose({ previewImg })
   <div>
     <NUpload
       action="/api/upload"
-      :headers="{ Authorization: `Bearer ${token}` }"
+      :headers="{ Authorization: `Bearer ${authStore.token}` }"
       accept="image/jpeg,image/png,image/gif,image/webp,image/bmp"
       :show-file-list="false"
       @finish="handleImgUpload"

@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -56,12 +57,29 @@ func (*Local) UploadFile(file *multipart.FileHeader) (filePath, fileName string,
 }
 
 // 从本地删除文件
+//
+// key 来自调用方, 可能包含 ../, 必须先规整再判断是否仍在 StorePath 之内。
+// 原来的写法是 strings.Contains(p, StorePath): p 由 StorePath 拼接而来, 这个条件恒真,
+// 等于没有防护, key 传 "../../config.yml" 也能删。
 func (*Local) DeleteFile(key string) error {
-	p := g.GetConfig().Upload.StorePath + "/" + key
-	if strings.Contains(p, g.GetConfig().Upload.StorePath) {
-		if err := os.Remove(p); err != nil {
-			return errors.New("本地文件删除失败, err:" + err.Error())
-		}
+	storePath := g.GetConfig().Upload.StorePath
+	root, err := filepath.Abs(storePath)
+	if err != nil {
+		return errors.New("上传目录解析失败, err:" + err.Error())
+	}
+
+	p, err := filepath.Abs(filepath.Join(root, key))
+	if err != nil {
+		return errors.New("文件路径解析失败, err:" + err.Error())
+	}
+
+	// 必须是 root 的子路径, 前缀比较时带上分隔符, 避免 /data/uploaded-evil 混过去
+	if p != root && !strings.HasPrefix(p, root+string(os.PathSeparator)) {
+		return errors.New("非法的文件路径: " + key)
+	}
+
+	if err := os.Remove(p); err != nil {
+		return errors.New("本地文件删除失败, err:" + err.Error())
 	}
 	return nil
 }
