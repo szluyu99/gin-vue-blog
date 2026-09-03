@@ -8,7 +8,7 @@
 
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S4、S8 已修复，
 S2、S3、S5、S6、S7 暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
-admin 的 A1–A20 已修复，A21 已加回归护栏（经测试确认当前无实际影响）。
+admin 的 A1–A21 已全部修复。
 front 的 FE1–FE5 已修复。
 
 ## 安全
@@ -351,8 +351,8 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页
-- `gin-blog-admin/src/layout/tags/index.spec.js` — A21 `tabRefs` 顺序与 `tags` 一致
-  （目前是一致的，这条作为回归护栏；顺序一旦错位激活标签的滚动定位就会指错）、
+- `gin-blog-admin/src/layout/tags/index.spec.js` — A21 滚动定位取的是激活标签自己的元素
+  （按 path 存元素, 与渲染顺序无关）、标签移除后不再持有它的元素、
   关闭当前标签跳左边、关闭第一个标签跳第二个
 
 写这类测试的两个坑：
@@ -695,8 +695,13 @@ P2（展示问题 / 潜在 / 清理）：
 - **A20（已修复）** `views/article/list/index.vue:281` 的 `beforeUpload` 只放行 `.md`，
   后端 F9 之后同时接受 `.md` 和 `.markdown`，两边不一致（偏严，不影响正确性）。
   已改为两种后缀都放行且忽略大小写。
-- **A21** `src/layout/tags/index.vue:16,42` 的 `v-for` 模板 ref 数组顺序没有保证，
+- **A21（已修复）** `src/layout/tags/index.vue:16,42` 的 `v-for` 模板 ref 数组顺序没有保证，
   `tabRefs.value[activeIndex]` 可能取错元素。后果只是激活标签滚动位置偶尔不对。
+  改成函数式 ref 按 `path` 存元素（`tabEls` Map），watch 从 `activeIndex` 换成 `activeTag`，
+  与渲染顺序无关；标签卸载时从 Map 中删掉。顺带把模板里的全局 `$route` 换成
+  `useRoute()` 拿到的 `route`（同一个东西原来两种写法混用）。
+  测试：`layout/tags/index.spec.js` 用桩 ScrollX + 手造几何值，断言滚动用的是激活标签
+  自己的元素、标签移除后不再持有它（回退到旧实现两条都红）。
 
 ### admin 排查过但不是问题的
 

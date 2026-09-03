@@ -13,7 +13,17 @@ const router = useRouter()
 const tagStore = useTagStore()
 
 const scrollXRef = ref(null)
-const tabRefs = ref([])
+// 按 path 存标签元素: v-for 上的模板 ref 数组 Vue 不保证顺序与 tags 一致,
+// 原来是 tabRefs.value[activeIndex], 顺序一旦错位滚动定位就指到别的标签上
+const tabEls = new Map()
+function setTabRef(path, el) {
+  if (el) {
+    tabEls.set(path, el.$el ?? el)
+  }
+  else {
+    tabEls.delete(path)
+  }
+}
 
 const contextMenuOption = reactive({
   show: false,
@@ -36,10 +46,10 @@ watch(
 
 // 监听当前激活的标签, 标签滚动到让其显示的位置
 watch(
-  () => tagStore.activeIndex,
-  async (activeIndex) => {
+  () => tagStore.activeTag,
+  async (activePath) => {
     await nextTick()
-    const activeTabElement = tabRefs.value[activeIndex]?.$el
+    const activeTabElement = tabEls.get(activePath)
     if (activeTabElement) {
       const { offsetLeft: x, offsetWidth: width } = activeTabElement
       scrollXRef.value?.handleScroll(x + width, width)
@@ -85,7 +95,7 @@ function handleRefresh(tag) {
   <ScrollX ref="scrollXRef" class="bg-white dark:bg-dark!">
     <NTag
       v-for="tag in tagStore.tags" :key="tag.path"
-      ref="tabRefs"
+      :ref="el => setTabRef(tag.path, el)"
       class="mx-1 hover:border-blue hover:border-red hover:text-primary"
       :type="tagStore.activeTag === tag.path ? 'primary' : 'default'"
       :closable="tagStore.tags.length > 1"
@@ -94,7 +104,8 @@ function handleRefresh(tag) {
       @contextmenu.prevent="handleContextMenu($event, tag)"
     >
       <template #icon>
-        <div :class="{ 'cursor-pointer': $route.name === tag.name }" @click="handleRefresh(tag)">
+        <!-- 用 useRoute() 拿到的 route, 不再混用模板里的全局 $route -->
+        <div :class="{ 'cursor-pointer': route.name === tag.name }" @click="handleRefresh(tag)">
           <TheIcon v-if="tag.icon" :icon="tag.icon" :size="16" />
           <i v-else class="i-mdi:refresh" />
         </div>
