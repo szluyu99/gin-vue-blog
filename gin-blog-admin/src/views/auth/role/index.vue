@@ -31,7 +31,7 @@ const {
   modalFormRef,
 } = useCRUD({
   name: '角色',
-  initForm: {},
+  initForm: { name: '', label: '', menu_ids: [], resource_ids: [] },
   doCreate: api.saveOrUpdateRole,
   doDelete: api.deleteRole,
   doUpdate: api.saveOrUpdateRole,
@@ -45,9 +45,32 @@ const menuOption = ref([]) // 菜单选项
 
 onMounted(() => {
   $table.value?.handleSearch()
-  // api.getResourceOption().then(res => (resourceOption.value = res.data))
-  // api.getMenuOption().then(res => (menuOption.value = res.data))
 })
+
+// 拉取菜单/资源选项, 已经拉过就不重复请求
+async function loadOptions() {
+  const tasks = []
+  if (!menuOption.value.length) {
+    tasks.push(api.getMenuOption().then(resp => (menuOption.value = resp.data ?? [])))
+  }
+  if (!resourceOption.value.length) {
+    tasks.push(api.getResourceOption().then(resp => (resourceOption.value = resp.data ?? [])))
+  }
+  await Promise.all(tasks)
+}
+
+// 新建角色: 后端 SaveRole 已经支持一并写入 role_resource / role_menu,
+// 所以这里把两棵树都给出来, 不用再走「先建角色, 再编辑权限」两趟
+async function handleAddRole() {
+  try {
+    await loadOptions()
+  }
+  catch (err) {
+    console.error(err)
+    return
+  }
+  handleAdd()
+}
 
 const columns = [
   {
@@ -172,7 +195,7 @@ const columns = [
 <template>
   <CommonPage title="角色管理">
     <template #action>
-      <NButton type="primary" @click="handleAdd">
+      <NButton type="primary" @click="handleAddRole">
         <template #icon>
           <i class="i-material-symbols:add" />
         </template>
@@ -229,8 +252,26 @@ const columns = [
         <NFormItem label="角色标签" path="name">
           <NInput v-model:value="modalForm.label" placeholder="请输入角色标签" />
         </NFormItem>
-        <!-- TODO: 新增时可以选择菜单和资源权限 -->
-        <template v-if="modalAction === 'edit'">
+        <!-- 新增时两棵树都给出; 编辑时按入口按钮只展示对应的那棵 -->
+        <template v-if="modalAction === 'add'">
+          <NFormItem label="菜单权限" path="menu_ids">
+            <NTree
+              :data="menuOption"
+              :checked-keys="modalForm.menu_ids"
+              checkable expand-on-click block-line
+              @update:checked-keys="(v) => (modalForm.menu_ids = v)"
+            />
+          </NFormItem>
+          <NFormItem label="资源权限" path="resource_ids">
+            <NTree
+              :data="resourceOption"
+              :checked-keys="modalForm.resource_ids"
+              block-line checkable expand-on-click cascade accordion
+              @update:checked-keys="(v) => (modalForm.resource_ids = v)"
+            />
+          </NFormItem>
+        </template>
+        <template v-else-if="modalAction === 'edit'">
           <NFormItem v-if="showMenu" label="菜单权限" path="menu_ids">
             <NTree
               :data="menuOption"

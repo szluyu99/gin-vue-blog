@@ -8,7 +8,7 @@
 
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S8
 全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
-admin 的 A1–A14 已修复，A15–A21（P2）待处理。
+admin 的 A1–A14 已修复，A15–A21（P2）待处理（A21 经测试确认当前无实际影响，已加回归护栏）。
 front 的 FE1–FE4 已修复。
 
 ## 安全
@@ -309,6 +309,8 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   FE2 提交发原始相对路径、未登录跳首页
 - `gin-blog-admin/src/views/Login.spec.js` — A8 不勾选「记住我」不保存账号密码、勾选则保存、
   登录失败时 loading 复位且不产生未捕获 rejection、账号密码为空直接提示
+- `gin-blog-admin/src/views/auth/role/index.spec.js` — A11 新建时预取两个选项、
+  `menu_ids`/`resource_ids` 是数组、勾选的权限会一起提交、选项不重复请求
 - `gin-blog-admin/src/layout/tags/index.spec.js` — A21 `tabRefs` 顺序与 `tags` 一致
   （目前是一致的，这条作为回归护栏；顺序一旦错位激活标签的滚动定位就会指错）、
   关闭当前标签跳左边、关闭第一个标签跳第二个
@@ -582,9 +584,16 @@ P1（特定路径下会坏）：
   `logout` 既不 await 也不 catch，`/logout` 失败时 token 留在 localStorage、不跳转、不提示。
 - **A10（已修复）** `src/layout/index.vue:18-22`：`computed(() => router.getRoutes()...)` 没有响应式
   依赖，永久缓存首次结果；登录后动态添加的路由不在 `<KeepAlive :include>` 里，刷新才生效。
-- **A11** `src/views/auth/role/index.vue:232-233`：菜单 / 资源权限树只在
-  `modalAction === 'edit'` 下渲染，`:47-49` 的 option 预取还注释着。F6 之后后端
-  `model.SaveRole` 已支持新建时一并写入，现在只剩前端在逼用户走两趟。
+- **A11（已修复）** `src/views/auth/role/index.vue`：菜单 / 资源权限树原来只在
+  `modalAction === 'edit'` 下渲染，option 预取还被注释着，F6 之后后端 `model.SaveRole`
+  已支持新建时一并写入，只剩前端在逼用户走「先建角色再编辑权限」两趟。
+  现在新建入口改为 `handleAddRole()`：先并发拉取两个选项（已拉过则跳过），再打开弹窗，
+  弹窗在 `modalAction === 'add'` 时同时给出两棵树；编辑流程保持原样（按入口按钮只展示对应那棵）。
+  `initForm` 也补齐成 `{ name: '', label: '', menu_ids: [], resource_ids: [] }`，
+  避免 `NTree` 的 `checked-keys` 拿到 undefined。
+  测试 `src/views/auth/role/index.spec.js` 4 条；接口级验证：新建角色带
+  `menu_ids:[1,2] / resource_ids:[1]`，`role_menu` 与 `role_resource` 均正确写入，
+  删除角色后关联无残留。
 - **A12（已修复）** `src/views/profile/index.vue:14,22-27,33`：`infoForm.avatar = userStore.avatar` 是
   跑过 `convertImgUrl` 的展示地址，再 `api.updateCurrent` 存回库。FE4 之后它不再是带域名的
   绝对地址（改成了根相对路径），但仍会多出前导 `/`，头像为空时还会把占位图
