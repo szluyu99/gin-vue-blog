@@ -60,7 +60,7 @@ VITE_SERVER_URL = 'http://localhost:8765'
 ```bash
 pnpm build    # 生产构建
 pnpm lint     # 代码检查
-pnpm test     # 单元测试 (vitest)
+pnpm test     # 单元测试 (vitest + @vue/test-utils, 覆盖 store / utils / CrudTable / 文章页)
 ```
 
 代码风格使用 [antfu/eslint-config](https://github.com/antfu/eslint-config)，不使用 Prettier。

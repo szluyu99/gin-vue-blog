@@ -7,8 +7,8 @@
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S8
-全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 未处理。
-admin 的 A1–A6（P0）与 A7–A9 已修复，A10–A14（P1 剩余）与 A15+（P2）待处理。
+全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
+admin 的 A1–A14 已修复，A15–A21（P2）待处理。
 front 的 FE1–FE4 已修复。
 
 ## 安全
@@ -289,6 +289,32 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 接口级验证（`PUT /front/user/info`）：先写满四个字段，再只传 nickname、其余留空，
 返回 `code 0` 且 `GET` 读回来头像/简介/网站都还在。
 
+## 组件测试
+
+2026-09-03 两个前端都接入了 `@vue/test-utils@2.5.0`。此前只有 store 和 utils 有测试，
+组件内部的状态问题（表单快照没同步、模板 ref 拿错、render 函数空指针）全靠读代码推断，
+浏览器行为也无法自测（playwright 在本机起不来，见 `project_env_docker` 记忆）。
+
+已覆盖的回归点（每条都验证过：把修复回退后测试会红）：
+
+- `gin-blog-admin/src/components/crud/CrudTable.spec.js` — A6 翻页只发一次请求、
+  `pagination` 上不再挂 `onChange`、请求失败清空数据
+- `gin-blog-admin/src/views/article/list/index.spec.js` — A1 分类为 null 不崩表且展示「无」、
+  A3 `updateOrDeleteArticles` 返回 Promise
+- `gin-blog-admin/src/views/article/write/index.spec.js` — A5 新建时 `tag_names` 是数组、
+  编辑导入草稿（无分类无标签）不崩
+- `gin-blog-front/src/views/user/UploadOne.spec.js` — FE1 `props.preview` 后到也能显示、
+  FE4 根相对路径
+- `gin-blog-front/src/views/user/index.spec.js` — FE1 表单在 `getUserInfo` 后同步、
+  FE2 提交发原始相对路径、未登录跳首页
+
+写这类测试的两个坑：
+
+- `vi.mock('vue-router', ...)` 不能整个模块替换，`src/router/index.js` 里的 `createRouter`
+  会变成 undefined。要 `async importOriginal => ({ ...await importOriginal(), useRoute, useRouter })`
+- naive-ui 组件用 `findComponent({ name: 'NDataTable' })` 找不到，要直接传组件引用
+  `findComponent(NDataTable)`
+
 ## 潜在问题（当前打不到）
 ### F11 注册强依赖邮件，`Captcha.SendEmail` 是死开关 — 已修复
 
@@ -342,7 +368,7 @@ REDIS_ADDR=1.2.3.4:6379 时    Redis.Addr = "1.2.3.4:6379"                     �
 ```
 
 ## 潜在问题（当前打不到）
-### P1 本地上传的路径穿越防护恒真 — 潜在
+### P1 本地上传的路径穿越防护恒真 — 已修复
 
 `internal/utils/upload/local.go:60`
 
@@ -352,7 +378,15 @@ if strings.Contains(p, g.GetConfig().Upload.StorePath) {
 ```
 
 `p` 由拼接而来，必然包含 `StorePath`，`key` 传 `../../config.yml` 也能通过。
-目前 `DeleteFile` 全仓库没有调用方，只在 `upload/oss.go:11` 的接口里声明，所以是潜在问题。
+目前 `DeleteFile` 全仓库没有调用方，只在 `upload/oss.go:11` 的接口里声明，所以一直是潜在问题。
+
+修复：改成 `filepath.Abs` 规整后判断是否仍在 `StorePath` 之内，前缀比较带上路径分隔符
+（避免 `/data/uploaded-evil` 混过去），越界直接返回错误而不是静默跳过。
+测试 `internal/utils/upload/local_delete_test.go`：`../outside.txt` 被拒且文件仍在、
+`../uploaded-evil/x.jpg` 被拒、正常 key 能删。
+
+注意 `local.go` 的 `UploadFile` 里有个局部变量叫 `filepath`，会在该函数内遮蔽新导入的
+`path/filepath` 包，以后在那个函数里用 `filepath.Xxx` 要留意。
 
 ## 排查过但不是问题的
 
@@ -530,19 +564,19 @@ P1（特定路径下会坏）：
   少一个 `.value`。（`local.js:47` 只是 base64，不是加密。）
 - **A9（已修复）** `src/store/modules/auth.js:36-41` + `layout/header/components/UserAvatar.vue:32`：
   `logout` 既不 await 也不 catch，`/logout` 失败时 token 留在 localStorage、不跳转、不提示。
-- **A10** `src/layout/index.vue:18-22`：`computed(() => router.getRoutes()...)` 没有响应式
+- **A10（已修复）** `src/layout/index.vue:18-22`：`computed(() => router.getRoutes()...)` 没有响应式
   依赖，永久缓存首次结果；登录后动态添加的路由不在 `<KeepAlive :include>` 里，刷新才生效。
 - **A11** `src/views/auth/role/index.vue:232-233`：菜单 / 资源权限树只在
   `modalAction === 'edit'` 下渲染，`:47-49` 的 option 预取还注释着。F6 之后后端
   `model.SaveRole` 已支持新建时一并写入，现在只剩前端在逼用户走两趟。
-- **A12** `src/views/profile/index.vue:14,22-27,33`：`infoForm.avatar = userStore.avatar` 是
+- **A12（已修复）** `src/views/profile/index.vue:14,22-27,33`：`infoForm.avatar = userStore.avatar` 是
   跑过 `convertImgUrl` 的展示地址，再 `api.updateCurrent` 存回库。FE4 之后它不再是带域名的
   绝对地址（改成了根相对路径），但仍会多出前导 `/`，头像为空时还会把占位图
   `http://dummyimage.com/400x400` 写进库。应发原始 `userInfo.avatar`。
   另外 F13 之后后端已不再把空值写库，所以这条的破坏面比原来小了。
-- **A13** `src/components/UploadOne.vue:20,26-28`：`const { token } = useAuthStore()` 解构后
+- **A13（已修复）** `src/components/UploadOne.vue:20,26-28`：`const { token } = useAuthStore()` 解构后
   失去响应性；`JSON.parse(respStr)` 无保护（可用新加的 `parseJson`）。
-- **A14** `src/components/common/ScrollX.vue:33,51`：用了废弃的 `e.wheelDelta`，Firefox 下
+- **A14（已修复）** `src/components/common/ScrollX.vue:33,51`：用了废弃的 `e.wheelDelta`，Firefox 下
   为 undefined，`translateX` 变 `NaN`，横向滚动失效。应换 `e.deltaY`。
 
 P2（展示问题 / 潜在 / 清理）：

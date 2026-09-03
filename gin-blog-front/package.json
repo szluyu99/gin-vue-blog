@@ -33,6 +33,7 @@
     "@unocss/eslint-config": "^66.8.1",
     "@unocss/reset": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.5.0",
     "eslint": "^10.9.1",
     "jsdom": "^30.0.1",
     "rollup-plugin-visualizer": "^7.1.1",
