@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import api from '@/api'
@@ -67,72 +67,66 @@ function reloadComments() {
   getComments()
 }
 
-// * 解决新增评论后刷新数据, 点击回复的顺序错乱问题
-const refresh = ref(true) // 重新刷新整个评论列表
-watch(commentList, () => {
-  refresh.value = false
-  nextTick(() => {
-    refresh.value = true
-  })
-}, { deep: false }) // deep = false 防止 "查看更多" 时刷新整个数据
+// 回复相关的状态一律按评论 id 记, 不再按 v-for 下标访问模板 ref:
+// Vue 不保证模板 ref 数组的顺序与源数组一致, 新增评论后刷新列表就会点到别人的回复框
+// (原来靠 watch commentList + nextTick 整体重建列表来打补丁, 现在不需要了)
+const activeReply = ref(null) // 当前打开的回复框 { commentId, nickname, replyUserId, parentId }
+const expandedIds = reactive(new Set()) // 已经点过"查看更多回复"的评论 id
+const replyPages = reactive({}) // 评论 id -> 回复列表当前页
 
-// 回复相关
-// ! 可以获取 v-for 循环中的 DOM 数组
-const replyFieldRefs = ref(null)
-// 回复评论
-function replyComment(idx, obj) {
-  // 关闭所有回复框
-  replyFieldRefs.value.forEach(e => e.setReply(false))
-  // 打开当前点击的回复框
-  const curRef = replyFieldRefs.value[idx]
-  if (curRef) {
-    curRef.setReply(true)
-    // * 将值传给回复框
-    curRef.data.nickname = obj.nickname // 用户昵称
-    curRef.data.reply_user_id = obj.user_id // 回复用户 id
-    curRef.data.parent_id = commentList.value[idx].id // 父评论 id
+// 回复评论: target 可能是评论本身, 也可能是某条回复
+function replyComment(comment, target) {
+  activeReply.value = {
+    commentId: comment.id,
+    // 原来取的是 obj.nickname, 而接口返回的昵称在 user.info.nickname 下,
+    // 所以回复框一直拿不到昵称, 既没有 "回复 @xxx" 提示也没有取消按钮
+    nickname: target.user?.info?.nickname ?? '',
+    replyUserId: target.user_id,
+    parentId: comment.id,
   }
 }
 
-// 提交回复后, 重新加载评论回复
-const pageRefs = ref([]) // 分页
-const checkRefs = ref([]) // 查看
-async function reloadReplies(idx) {
-  const { data } = await api.getCommentReplies(
-    commentList.value[idx].id,
-    { page_size: 5, page_num: pageRefs.value[idx].current },
-  )
-  // * 局部更新某个评论的回复
-  commentList.value[idx].reply_list = data
-  commentList.value[idx].reply_count++ // 数量 + 1
-  // 回复大于 5 条展示评论分页
-  commentList.value[idx].reply_count > 5 && (pageRefs.value[idx].setShow(true))
-  // 直接隐藏查看
-  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+// 提交回复后, 重新加载该评论的回复
+async function reloadReplies(comment) {
+  try {
+    const { data } = await api.getCommentReplies(
+      comment.id,
+      { page_size: 5, page_num: replyPages[comment.id] ?? 1 },
+    )
+    // * 局部更新某个评论的回复
+    comment.reply_list = data
+    comment.reply_count++ // 数量 + 1
+    expandedIds.add(comment.id)
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 // "点击查看" 显示更多回复
-async function checkReplies(idx, obj) {
-  // 查第一页 (5 条数据)
-  const { data } = await api.getCommentReplies(
-    obj.id,
-    { page_num: 1, page_size: 5 },
-  )
-  // 更新对应楼评论的回复列表
-  obj.reply_list = data
-  // 超过 5 条数据显示分页
-  obj.reply_count > 5 && (pageRefs.value[idx].setShow(true))
-  // 隐藏 "点击查看"
-  checkRefs.value[idx].style.display = 'none' // * dom 操作隐藏 "查看"
+async function checkReplies(comment) {
+  try {
+    // 查第一页 (5 条数据)
+    const { data } = await api.getCommentReplies(comment.id, { page_num: 1, page_size: 5 })
+    comment.reply_list = data
+    replyPages[comment.id] = 1
+    expandedIds.add(comment.id)
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 // 修改回复分页中当前页数
-async function changeReplyCurrent(pageNum, idx, commentId) {
-  const { data } = await api.getCommentReplies(
-    commentId,
-    { page_num: pageNum, page_size: 5 },
-  )
-  commentList.value[idx].reply_list = data
+async function changeReplyCurrent(comment, pageNum) {
+  try {
+    const { data } = await api.getCommentReplies(comment.id, { page_num: pageNum, page_size: 5 })
+    comment.reply_list = data
+    replyPages[comment.id] = pageNum
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 // TODO: 点赞
@@ -179,7 +173,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
       @after-submit="reloadComments"
     />
     <!-- 评论详情 -->
-    <div v-if="commentCount && refresh">
+    <div v-if="commentCount">
       <!-- 评论数量 -->
       <p class="mb-4 mt-7 flex items-center text-xl font-bold">
         <span> {{ commentCount }} 评论 </span>
@@ -218,7 +212,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
               />
               <span v-show="comment.like_count"> {{ comment.like_count }} </span>
             </div>
-            <button class="color-#ef2f11" @click="replyComment(idx, comment)">
+            <button class="color-#ef2f11" @click="replyComment(comment, comment)">
               回复
             </button>
           </div>
@@ -253,7 +247,7 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
                   />
                   <span v-show="reply.like_count"> {{ reply.like_count }} </span>
                 </div>
-                <button class="color-#ef2f11" @click="replyComment(idx, reply)">
+                <button class="color-#ef2f11" @click="replyComment(comment, reply)">
                   回复
                 </button>
               </div>
@@ -276,30 +270,32 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
 
           <!-- 回复数量 -->
           <div
-            v-show="comment.reply_count > 3"
-            ref="checkRefs"
+            v-show="comment.reply_count > 3 && !expandedIds.has(comment.id)"
             class="mt-4 text-[13px] color-muted"
           >
             共 <b> {{ comment.reply_count }} </b>  条回复
-            <button class="color-#00a1d6" @click="checkReplies(idx, comment)">
+            <button class="color-#00a1d6" @click="checkReplies(comment)">
               ，点击查看
             </button>
           </div>
-          <!-- 回复分页 -->
+          <!-- 回复分页: 展开后且回复超过 5 条才有分页 -->
           <Paging
-            ref="pageRefs"
+            v-if="expandedIds.has(comment.id) && comment.reply_count > 5"
             :page-total="Math.ceil(comment.reply_count / 5)"
-            :index="idx"
-            :comment-id="comment.id"
-            @change-current="changeReplyCurrent"
+            :current="replyPages[comment.id] ?? 1"
+            @change-current="page => changeReplyCurrent(comment, page)"
           />
-          <!-- 回复框 -->
+          <!-- 回复框: 同一时刻只打开一个 -->
           <CommentField
-            ref="replyFieldRefs"
-            :show="false"
+            v-if="activeReply?.commentId === comment.id"
+            :show="true"
             :type="type"
             :topic-id="topicId"
-            @after-submit="reloadReplies(idx)"
+            :nickname="activeReply.nickname"
+            :reply-user-id="activeReply.replyUserId"
+            :parent-id="activeReply.parentId"
+            @cancel="activeReply = null"
+            @after-submit="reloadReplies(comment)"
           />
           <!-- 分隔线: 注意最后一个评论没有线 (比的是已加载条数, 不是总数) -->
           <div v-if="(idx + 1) !== commentList.length" class="my-2.5 h-0.5 bg-light-500" />

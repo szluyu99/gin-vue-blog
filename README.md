@@ -162,7 +162,6 @@ cd gin-blog-admin  && pnpm test
 - 后台首页重新设计（目前内容较少）
 - 扩大前端组件测试覆盖（已接入 `@vue/test-utils`，目前只覆盖修过 bug 的几个组件，见 `code_audit.md` 组件测试一节）
 - 补齐安全项：CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、邮件模块的日志与 TLS。见 `code_audit.md` 的 S2、S3、S5、S6、S7
-- 重构前台 `components/comment/Comment.vue`：`replyFieldRefs` / `pageRefs` / `checkRefs` 三个 `v-for` 模板 ref 都按下标访问，但 Vue 不保证 ref 数组顺序与源数组一致（文件里 `refresh` + `nextTick` 那段 hack 就是它的补丁），并且用 `style.display` 直接盖掉 `v-show`
 - 后台 `layout/tags/index.vue` 的模板 ref 同类问题（`code_audit.md` A21，当前只影响激活标签的滚动位置）
 - 前台自托管 Inter 字体，去掉对 rsms.me 的外部依赖
 - 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求

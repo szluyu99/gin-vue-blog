@@ -9,7 +9,7 @@
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S4、S8 已修复，
 S2、S3、S5、S6、S7 暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
 admin 的 A1–A20 已修复，A21 已加回归护栏（经测试确认当前无实际影响）。
-front 的 FE1–FE4 已修复。
+front 的 FE1–FE5 已修复。
 
 ## 安全
 
@@ -348,6 +348,9 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-admin/src/views/message/comment/index.spec.js` — A16 评论类型只有一列、
   未知类型不抛异常、「回复对象」列 key 指向真实字段、审核失败不误报成功也不刷新列表
 - `gin-blog-admin/src/views/article/list/index.spec.js` — 另含 A20 导入放行 `.md` / `.markdown`
+- `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
+  点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
+  「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页
 - `gin-blog-admin/src/layout/tags/index.spec.js` — A21 `tabRefs` 顺序与 `tags` 一致
   （目前是一致的，这条作为回归护栏；顺序一旦错位激活标签的滚动定位就会指错）、
   关闭当前标签跳左边、关闭第一个标签跳第二个
@@ -542,6 +545,32 @@ DB: (3, '只改昵称', '', '', '')   ← 头像/简介/网站被清空
 图片按原始尺寸撑开（父容器只有 `max-w-[300px]`），布局会炸。改成
 `h-[160px] w-[160px] object-cover`。注意这一条不是上面那次故障的原因——
 报告时是 1920×1080 最大化窗口，`lg:` 是生效的。
+
+### FE5 评论回复靠 v-for 模板 ref 下标操作，顺序不保证 — 已修复
+
+`components/comment/Comment.vue` 原来有三组按下标访问的模板 ref：
+`replyFieldRefs`（回复框，`setReply` + 直接改子组件的 `data`）、
+`pageRefs`（分页，`setShow` + 读 `current`）、`checkRefs`（「点击查看」，
+`checkRefs.value[idx].style.display = 'none'` 直接改 DOM）。
+
+Vue 不保证 `v-for` 的模板 ref 数组顺序与源数组一致，文件里那段
+`watch(commentList)` → `refresh = false` → `nextTick` 重建整个列表就是给它打的补丁。
+
+改成按评论 id 记状态，模板 ref 全部去掉：
+
+- `activeReply`（`{ commentId, nickname, replyUserId, parentId }`）决定哪条评论下渲染回复框，
+  同一时刻只有一个；回复对象通过 props 传给 `CommentField`，不再由父组件改子组件内部状态
+- `expandedIds`（Set）记录已展开的评论，替代 `style.display` 的 DOM 操作
+- `replyPages`（id → 页码）持有回复列表当前页，`Paging` 改成受控组件
+  （`current` 由 props 传入，只 `emit('changeCurrent', page)`），不再持有 `show` / `current`
+- `CommentField` 不再 `defineExpose({ data, setReply })`，改为 props 入参 + `emit('cancel')`
+- 顺带修掉一个旧 bug：`replyComment` 原来取 `obj.nickname`，而昵称在 `user.info.nickname` 下，
+  所以回复框一直没有「回复 @xxx」提示也没有取消按钮
+- 三个 `getCommentReplies` 调用补上了 `catch`
+
+测试见「组件测试」一节的 `Comment.spec.js`（5 条，回退到重构前全红）。
+端到端只验到接口层（发评论 → 发 7 条回复 → 分页两页取回 5 + 2 条 → 删除清理），
+浏览器交互本机无法自测（playwright 起不来）。
 
 ## gin-blog-admin
 后台管理端的全量审查。A1–A6 是「当前就会坏」的，已修复；A7 之后待处理。

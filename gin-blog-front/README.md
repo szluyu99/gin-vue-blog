@@ -52,7 +52,7 @@ VITE_BACKEND_URL = 'http://localhost:8765'
 ```bash
 pnpm build    # 生产构建
 pnpm lint     # 代码检查
-pnpm test     # 单元测试 (vitest + @vue/test-utils, 覆盖 store / utils / 个人中心组件)
+pnpm test     # 单元测试 (vitest + @vue/test-utils, 覆盖 store / utils / 个人中心组件 / 评论列表)
 ```
 
 ## 暗色模式
