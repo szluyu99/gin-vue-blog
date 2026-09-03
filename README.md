@@ -154,7 +154,6 @@ cd gin-blog-admin  && pnpm test
 - 第三方登录：QQ、微信、Github
 - 前台搜索集成 ElasticSearch（当前为数据库模糊查询）
 - 评论、留言的通知
-- RSS / sitemap / robots.txt
 - 国际化
 
 工程：
@@ -162,9 +161,7 @@ cd gin-blog-admin  && pnpm test
 - 后台首页重新设计（目前内容较少）
 - 扩大前端组件测试覆盖（已接入 `@vue/test-utils`，目前只覆盖修过 bug 的几个组件，见 `code_audit.md` 组件测试一节）
 - 补齐安全项：CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、邮件模块的日志与 TLS。见 `code_audit.md` 的 S2、S3、S5、S6、S7
-- 前台自托管 Inter 字体，去掉对 rsms.me 的外部依赖
 - 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求
 - 邮件模块整理：SMTP 密码不再进日志、不再 `InsecureSkipVerify`、启动时校验配置（见 `code_audit.md` S7）
-- 引入 Dependabot 持续跟进依赖更新
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档

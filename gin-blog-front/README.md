@@ -63,3 +63,10 @@ pnpm test     # 单元测试 (vitest + @vue/test-utils, 覆盖 store / utils / �
 颜色不要写死，用 `uno.config.js` 里的语义色（`surface` / `main` / `muted` / `line` 等），它们指向 `src/styles/index.css` 中的 CSS 变量，`:root` 和 `html.dark` 各一套。
 
 > 改完 `uno.config.js` 需要重启 dev server，UnoCSS 不会热更配置。
+
+## 字体
+
+Inter 自托管，字体文件来自 `@fontsource-variable/inter`，`@font-face` 写在 `src/styles/index.css`，
+跟着构建产物一起发，没有运行时外部请求（原来是 `index.html` 里 `<link>` 到 `rsms.me`）。
+只声明了拉丁与拉丁扩展两个子集，中文走系统字体回退；需要别的子集时从
+`@fontsource-variable/inter/files/` 下按同样写法再加一段 `@font-face` 即可。

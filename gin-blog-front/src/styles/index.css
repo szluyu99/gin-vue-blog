@@ -1,8 +1,31 @@
 @charset "UTF-8";
 
-/* Inter Font */
+/*
+ * Inter 字体自托管: 原来在 index.html 里 <link> 到 https://rsms.me/inter/inter.css,
+ * 每次访问都要打一次外部请求, 该站点挂了页面字体就退化。
+ * 现在字体文件来自 @fontsource-variable/inter, 跟着构建产物一起发。
+ * 只声明拉丁子集: 正文中文走系统字体回退, 其他子集(西里尔/希腊/越南语)用不到。
+ */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
 :root {
-  font-family: Inter, sans-serif;
+  font-family: 'Inter Variable', Inter, sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
 
   /* 主题色板: 深色模式在 html.dark 下整体覆盖 */
@@ -25,10 +48,6 @@ html.dark {
   --c-border: #3d434c;
   --c-divider: #363c45;
   --c-body-bg: linear-gradient(90deg, #16181d 0, #1b1e24 50%, #16181d 100%);
-}
-
-@supports (font-variation-settings: normal) {
-  :root { font-family: InterVariable, sans-serif; }
 }
 
 html, body, #app {
