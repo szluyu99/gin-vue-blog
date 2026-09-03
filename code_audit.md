@@ -307,6 +307,11 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   FE4 根相对路径
 - `gin-blog-front/src/views/user/index.spec.js` — FE1 表单在 `getUserInfo` 后同步、
   FE2 提交发原始相对路径、未登录跳首页
+- `gin-blog-admin/src/views/Login.spec.js` — A8 不勾选「记住我」不保存账号密码、勾选则保存、
+  登录失败时 loading 复位且不产生未捕获 rejection、账号密码为空直接提示
+- `gin-blog-admin/src/layout/tags/index.spec.js` — A21 `tabRefs` 顺序与 `tags` 一致
+  （目前是一致的，这条作为回归护栏；顺序一旦错位激活标签的滚动定位就会指错）、
+  关闭当前标签跳左边、关闭第一个标签跳第二个
 
 写这类测试的两个坑：
 
@@ -314,6 +319,17 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   会变成 undefined。要 `async importOriginal => ({ ...await importOriginal(), useRoute, useRouter })`
 - naive-ui 组件用 `findComponent({ name: 'NDataTable' })` 找不到，要直接传组件引用
   `findComponent(NDataTable)`
+- `vi.mock` 的工厂会被提升到文件顶部，工厂里引用的 `vi.fn()` 必须用
+  `const { push } = vi.hoisted(() => ({ push: vi.fn() }))`，否则报
+  `Cannot access 'push' before initialization`
+- `store/modules/tag.js` 用的是 `@/router` 导出的 `router` 实例，不是 `useRouter()`，
+  测跳转要 mock `@/router`
+- `layout/tags/index.vue` 模板里同时用了 `useRoute()` 和全局属性 `$route`，
+  不装 router 插件时后者是 undefined，要 `global.mocks.$route`
+- `<script setup>` 的绑定在测试里可以从 `wrapper.vm` 访问，且 ref 已自动解包
+  （`wrapper.vm.isRemember = false`，不要写 `.value`）
+- mock 的 api 函数要在 `beforeEach` 里 `mockReset()` 再重新设实现，
+  否则调用次数会跨用例累计
 
 ## 潜在问题（当前打不到）
 ### F11 注册强依赖邮件，`Captcha.SendEmail` 是死开关 — 已修复
