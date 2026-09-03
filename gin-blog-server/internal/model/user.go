@@ -28,10 +28,15 @@ func GetUserInfoById(db *gorm.DB, id int) (*UserInfo, error) {
 	return &userInfo, result.Error
 }
 
+// 按用户名精确查询用户认证信息
+//
+// 这里必须是等值匹配: 原来写的 `username LIKE ?`, 虽然没拼 %,
+// 但 MySQL 下 LIKE 的模式串里 `%` / `_` 仍然是通配符, 注册一个含 `_` 的
+// 用户名(如 `admi_`)就能匹配到别人(`admin`), 登录时拿到的是别人的记录
 func GetUserAuthInfoByName(db *gorm.DB, name string) (*UserAuth, error) {
 	var userauth UserAuth
 
-	result := db.Model(&userauth).Where("username LIKE ?", name).First(&userauth)
+	result := db.Model(&userauth).Where("username = ?", name).First(&userauth)
 	if result.Error != nil && errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, result.Error
 	}

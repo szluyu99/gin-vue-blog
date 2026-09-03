@@ -126,6 +126,8 @@ cd deploy
 docker compose up -d --build
 ```
 
+> 前提是 `start/.env.secrets` 已经存在（第一次跑 `bootstrap.sh` 时生成），否则 compose 会报错。
+
 ## 线上部署的注意事项
 
 线上部署，其实就是在服务器上运行起这个项目，有两个地方的参数推荐调整一下。
@@ -139,6 +141,12 @@ docker compose up -d --build
 - `MYSQL_ROOT_PASSWORD` MySQL 连接密码
 
 其他根据需求修改，一般不用动
+
+> JWT 密钥和 session 盐不在 `.env` 里：`bootstrap.sh` 第一次运行会生成 `start/.env.secrets`
+> （已在 `.gitignore` 中），compose 通过 `env_file` 注入给后端。`config.docker.yml` 是 release
+> 模式，后端启动时会拒绝空值和仓库里的示例密钥，所以第一次部署必须走 `bootstrap.sh`，
+> 直接在 `start` 目录 `docker compose up` 会因为缺 `.env.secrets` 报错。
+> 换掉这两个值会让所有已签发的 token 和 session 立即失效。
 
 2、后端镜像的构建直接依赖于 gin-blog-server 中的源码，构建时加载的是 gin-blog-server/config.docker.yml 配置文件。
 

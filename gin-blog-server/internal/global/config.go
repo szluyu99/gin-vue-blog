@@ -94,6 +94,8 @@ func GetConfig() *Config {
 // 任何一段配置撞上同名环境变量都会被静默吃掉, 所以改成白名单。
 var envBindings = map[string]string{
 	"server.port":    "SERVER_PORT",
+	"jwt.secret":     "JWT_SECRET",
+	"session.salt":   "SESSION_SALT",
 	"mysql.host":     "MYSQL_HOST",
 	"mysql.port":     "MYSQL_PORT",
 	"mysql.dbname":   "MYSQL_DBNAME",
@@ -102,6 +104,13 @@ var envBindings = map[string]string{
 	"redis.addr":     "REDIS_ADDR",
 	"redis.password": "REDIS_PASSWORD",
 }
+
+// 仓库里配置文件自带的示例密钥, 谁都能从 GitHub 上读到,
+// 用它签发的 token / session 等于没有签名
+const (
+	sampleJWTSecret   = "abc123321"
+	sampleSessionSalt = "salt"
+)
 
 // 从指定路径读取配置文件
 func ReadConfig(path string) *Config {
@@ -122,8 +131,41 @@ func ReadConfig(path string) *Config {
 		panic("配置文件反序列化失败: " + err.Error())
 	}
 
+	CheckSecrets(Conf)
+
 	log.Println("配置文件内容加载成功: ", path)
 	return Conf
+}
+
+// 校验签名密钥: 以前完全不校验, 空值直接跑起来(任何人都能自签 token),
+// 示例值又原样躺在仓库里, 部署的人往往不知道要改
+//
+// release 模式下空值或示例值直接 panic; debug 模式只告警, 不打断本地开发
+func CheckSecrets(conf *Config) {
+	release := conf.Server.Mode == "release"
+
+	for _, item := range []struct {
+		name, value, sample, env string
+	}{
+		{"JWT.Secret", conf.JWT.Secret, sampleJWTSecret, "JWT_SECRET"},
+		{"Session.Salt", conf.Session.Salt, sampleSessionSalt, "SESSION_SALT"},
+	} {
+		var reason string
+		switch {
+		case item.value == "":
+			reason = "为空"
+		case item.value == item.sample:
+			reason = "还是仓库里的示例值"
+		default:
+			continue
+		}
+
+		msg := fmt.Sprintf("%s %s, 请在配置文件中修改, 或用环境变量 %s 注入", item.name, reason, item.env)
+		if release {
+			panic(msg)
+		}
+		log.Println("[警告] " + msg)
+	}
 }
 
 // 数据库类型

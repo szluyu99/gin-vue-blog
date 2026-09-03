@@ -59,6 +59,11 @@ services:
         condition: service_healthy
     volumes:
       - ${DATA_DIRECTORY}/file/uploaded:/gvb/public/uploaded
+    # JWT_SECRET / SESSION_SALT: 由 deploy/bootstrap.sh 生成, 不进仓库
+    # config.docker.yml 是 release 模式, 后端启动时会拒绝空值和仓库里的示例密钥
+    # 缺这个文件 compose 会直接报错, 先在 deploy 目录跑一次 bootstrap.sh
+    env_file:
+      - .env.secrets
     environment:
       # 以下环境变量会覆盖后端源码中 config.docker.yml 中的配置
       - TZ=Asia/Shanghai

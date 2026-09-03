@@ -94,6 +94,7 @@ cd gin-blog-admin && pnpm install && pnpm dev
 - **`pnpm install` 报 `ERR_PNPM_IGNORED_BUILDS`**：pnpm 10+ 默认禁止依赖执行安装脚本，两个前端项目已在 `pnpm-workspace.yaml` 的 `allowBuilds` 中批准，如仍报错执行 `pnpm approve-builds` 并把选项全部设为 `true`。
 - **前台页面空白、没有文章**：`generate_data.sh` 只生成系统基础数据，不含文章/分类/标签等内容数据，需要在后台自行添加。
 - **注册用户要不要配邮箱**：不用。`config.yml` 的 `Captcha.SendEmail` 默认 `false`，注册请求直接把用户建出来。想改成邮箱验证注册，把它设为 `true` 并把 `Email` 段（`Host` / `Port` / `From` / `SmtpPass` / `SmtpUser`）配全，否则注册会返回 `6101 发送邮件失败`。另外注意环境里若存在 `EMAIL` 变量会让整个 `Email` 段读不到（见 `code_audit.md` F12）。
+- **启动日志出现 `[警告] JWT.Secret 还是仓库里的示例值`**：本地开发可以忽略。`Server.Mode: release` 时这两项（`JWT.Secret` / `Session.Salt`）为空或仍是示例值会直接拒绝启动，用环境变量 `JWT_SECRET` / `SESSION_SALT` 注入即可；Docker 部署由 `deploy/bootstrap.sh` 自动生成。
 - **改了数据库但接口仍返回旧数据**：页面封面等缓存在 Redis 且无过期时间，执行 `redis-cli -n 7 del page` 清除。
 
 更多细节见各子项目的 README。

@@ -1,6 +1,9 @@
 # 容器文件映射到本地, 不上传仓库
 start/gvb
 
+# bootstrap.sh 生成的本机签名密钥 (JWT / session)
+start/.env.secrets
+
 # dist
 build/web/dist_admin
 build/web/dist_blog

@@ -6,8 +6,8 @@
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
-当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1–S3、S5–S8
-全部暂缓（项目初期，安全要求不高，上线前必须回来处理），S4 已修复；潜在问题 P1 已修复。
+当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S4、S8 已修复，
+S2、S3、S5、S6、S7 暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
 admin 的 A1–A20 已修复，A21 已加回归护栏（经测试确认当前无实际影响）。
 front 的 FE1–FE4 已修复。
 
@@ -15,7 +15,7 @@ front 的 FE1–FE4 已修复。
 
 按项目当前阶段（初期，安全要求不高）整体**暂缓**，但风险是真实的，上线前必须回来处理。
 
-### S1 JWT 密钥与 Session 盐是仓库里的固定值，启动不校验 — 暂缓
+### S1 JWT 密钥与 Session 盐是仓库里的固定值，启动不校验 — 已修复
 
 `config.yml:8` `Secret: "abc123321"`、`config.yml:26` `Salt: "salt"`，`config.docker.yml` 相同。
 `internal/global/config.go` 的 `ReadConfig` 没有任何校验。
@@ -28,6 +28,22 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
 伪造 cookie 即可通过所有 `/api/front/*`（走的是 `JWTAuth(false)`）。
 
 修法：启动时若这两个值为空或等于仓库默认值，直接 fatal。
+
+已改为：
+
+- `internal/global/config.go` 新增 `CheckSecrets`，在 `ReadConfig` 反序列化后调用。
+  `Server.Mode == "release"` 时空值或示例值直接 panic；debug 模式只打 `[警告]`，
+  不打断本地开发（仓库自带的 `config.yml` 就是示例值）。
+- `envBindings` 增加 `jwt.secret` → `JWT_SECRET`、`session.salt` → `SESSION_SALT`，
+  部署时不必改源码里的配置文件。
+- `deploy/bootstrap.sh` 首次运行时生成 `deploy/start/.env.secrets`（两个 32 字节随机
+  hex），已加入 `deploy/.gitignore`；`docker-compose.yml` 的 `gvb-server` 用 `env_file`
+  引入。`config.docker.yml` 是 release 模式，所以不跑 bootstrap 直接 `docker compose up`
+  会因为缺这个文件报错——这是刻意的，避免用示例密钥上线。
+
+测试：`internal/global/config_test.go`（release 下四种弱密钥组合都 panic、真实密钥通过、
+debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注入环境变量后正常启动；
+本机 debug 启动打出两条 `[警告]`。
 
 ### S2 X-Real-IP 可伪造，登录锁定被绕过 — 暂缓
 
@@ -93,7 +109,7 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
 - `internal/utils/email.go:129` `slog.Info("User:" + User + "  Pass:" + Pass + ...)` 把 SMTP 密码打进日志
 - `internal/utils/email.go:160` `d.TLSConfig = &tls.Config{InsecureSkipVerify: true}`，SMTP 凭证可被中间人截获
 
-### S8 登录查用户用 `LIKE` 而非 `=` — 暂缓
+### S8 登录查用户用 `LIKE` 而非 `=` — 已修复
 
 `internal/model/user.go:34` `db.Model(&userauth).Where("username LIKE ?", name).First(&userauth)`。
 `Login`（`handle_auth.go:97`）与注册查重（`:244`）都走它。
@@ -101,6 +117,11 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
 `_` 与 `%` 是 SQL 通配符：提交 `%` 会命中主键最小的用户（`First` 按主键排序，通常是 admin）；
 含下划线的合法邮箱可能命中另一个账号，然后用那个账号的 hash 去校验密码。
 密码仍需匹配，所以不是直接绕过，但这是认证路径上的错误运算符，也让"邮箱已注册"判断不准。
+
+已改为等值匹配 `Where("username = ?", name)`。测试：
+`internal/model/user_update_test.go` 的 `TestGetUserAuthInfoByNameIsExactMatch`
+（`admi_` / `adm%` / `%` / `_____` 都必须查不到 admin，回退成 LIKE 后四条全红）。
+端到端：这四个用户名登录都返回 1004，`admin` 正常登录。
 
 ## 功能 BUG
 
