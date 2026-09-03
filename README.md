@@ -46,14 +46,15 @@
 - 文章详情支持目录锚点、推荐文章
 - 评论 + 回复，留言弹幕墙
 - 点赞、访客统计（Redis）
-- 邮箱注册 + 邮件验证码
+- 用户注册：默认直接建号，可开启邮箱验证码注册（`config.yml` 的 `Captcha.SendEmail`）
 
 后台（`gin-blog-admin`）：
 
 - JWT 鉴权 + 基于角色的权限控制，菜单和接口权限均可在后台动态配置
 - 前端菜单由后端下发（动态路由）
-- Markdown 文章编辑，支持 `.md` 导入导出
+- Markdown 文章编辑，支持 `.md` / `.markdown` 导入、`.md` 导出
 - 操作日志、在线用户监听与强制下线
+- 用户与角色可禁用：禁用后登录被拒、已签发的 token 立即失效、只靠该角色拿到的权限被收回
 - 文件上传支持本地和七牛云
 - CRUD 操作封装为通用 Hook
 
@@ -127,12 +128,12 @@ cd gin-vue-blog/deploy
 
 > Windows 下 clone 前建议执行 `git config --global core.autocrlf false`，本项目使用 lf 换行符，crlf 会导致 Docker 构建异常。
 >
-> Docker 部署需要把 `gin-blog-server/internal/utils/email.go` 中 `GetEmailVerifyURL` 的 localhost 换成自己的域名。
+> Docker 部署若开启了邮箱验证注册（`Captcha.SendEmail: true`），需要把 `gin-blog-server/internal/utils/email.go` 中 `GetEmailVerifyURL` 的 localhost 换成自己的域名。
 
 ## 测试与 CI
 
 ```bash
-cd gin-blog-server && go test ./...   # 后端: model 层 + handle 层接口级测试
+cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层测试
 cd gin-blog-front  && pnpm test       # 前端: vitest
 cd gin-blog-admin  && pnpm test
 ```
@@ -161,11 +162,12 @@ cd gin-blog-admin  && pnpm test
 - 后端日志切割
 - 后台首页重新设计（目前内容较少）
 - 扩大前端组件测试覆盖（已接入 `@vue/test-utils`，目前只覆盖修过 bug 的几个组件，见 `code_audit.md` 组件测试一节）
-- 后台待办项 A7–A21（鉴权拦截器、角色新增权限树、头像回写等），见 `code_audit.md` 的 gin-blog-admin 一节
+- 补齐安全项：JWT 密钥与 session 盐改成必填配置、CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、登录查询用等值匹配。见 `code_audit.md` 的 S1–S3、S5–S8
 - 重构前台 `components/comment/Comment.vue`：`replyFieldRefs` / `pageRefs` / `checkRefs` 三个 `v-for` 模板 ref 都按下标访问，但 Vue 不保证 ref 数组顺序与源数组一致（文件里 `refresh` + `nextTick` 那段 hack 就是它的补丁），并且用 `style.display` 直接盖掉 `v-show`
+- 后台 `layout/tags/index.vue` 的模板 ref 同类问题（`code_audit.md` A21，当前只影响激活标签的滚动位置）
 - 前台自托管 Inter 字体，去掉对 rsms.me 的外部依赖
 - 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求
-- 邮件模块整理：SMTP 密码不再进日志、启动时校验配置、config 改成显式环境变量绑定（见 `code_audit.md` F12）
+- 邮件模块整理：SMTP 密码不再进日志、不再 `InsecureSkipVerify`、启动时校验配置（见 `code_audit.md` S7）
 - 引入 Dependabot 持续跟进依赖更新
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档

@@ -57,7 +57,7 @@ redis-cli -n 7 del page
 ## 测试
 
 ```bash
-go test ./...              # model 层 + handle 层接口级测试
+go test ./...              # model / handle / middleware 层测试
 go test ./... -cover       # 看覆盖率
 ```
 

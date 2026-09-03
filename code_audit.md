@@ -322,7 +322,11 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-admin/src/views/Login.spec.js` — A8 不勾选「记住我」不保存账号密码、勾选则保存、
   登录失败时 loading 复位且不产生未捕获 rejection、账号密码为空直接提示
 - `gin-blog-admin/src/views/auth/role/index.spec.js` — A11 新建时预取两个选项、
-  `menu_ids`/`resource_ids` 是数组、勾选的权限会一起提交、选项不重复请求
+  `menu_ids`/`resource_ids` 是数组、勾选的权限会一起提交、选项不重复请求；
+  A15 禁用开关按布尔值渲染、切换时带上原有资源与菜单权限、失败不改本地状态
+- `gin-blog-admin/src/views/message/comment/index.spec.js` — A16 评论类型只有一列、
+  未知类型不抛异常、「回复对象」列 key 指向真实字段、审核失败不误报成功也不刷新列表
+- `gin-blog-admin/src/views/article/list/index.spec.js` — 另含 A20 导入放行 `.md` / `.markdown`
 - `gin-blog-admin/src/layout/tags/index.spec.js` — A21 `tabRefs` 顺序与 `tags` 一致
   （目前是一致的，这条作为回归护栏；顺序一旦错位激活标签的滚动定位就会指错）、
   关闭当前标签跳左边、关闭第一个标签跳第二个
