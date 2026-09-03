@@ -50,7 +50,7 @@ describe('useAppStore', () => {
     expect(store.articleCount).toBe(3)
     expect(store.tagCount).toBe(5)
     expect(store.viewCount).toBe(100)
-    expect(store.blogConfig.website_avatar).toBe('http://test-server/public/uploaded/avatar.png')
+    expect(store.blogConfig.website_avatar).toBe('/public/uploaded/avatar.png')
   })
 
   it('getBlogInfo 遇到业务错误码时 reject, 不写脏数据', async () => {
@@ -74,7 +74,7 @@ describe('useAppStore', () => {
     await store.getPageList()
 
     expect(store.pageList).toHaveLength(2)
-    expect(store.pageList[0].cover).toBe('http://test-server/public/uploaded/home.png')
+    expect(store.pageList[0].cover).toBe('/public/uploaded/home.png')
     // 已经是完整 URL 的不动
     expect(store.pageList[1].cover).toBe('https://cdn.com/archive.png')
   })

@@ -35,6 +35,11 @@ export default defineConfig((configEnv) => {
           target: env.VITE_BACKEND_URL,
           changeOrigin: true,
         },
+        // 本地上传的图片由后端静态服务提供, 走代理才能从别的机器访问页面时正常加载
+        '/public': {
+          target: env.VITE_BACKEND_URL,
+          changeOrigin: true,
+        },
       },
     },
     // https://cn.vitejs.dev/guide/api-javascript.html#build

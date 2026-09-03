@@ -55,11 +55,34 @@ describe('useUserStore', () => {
     await store.getUserInfo()
 
     expect(store.nickname).toBe('阵雨')
-    // 相对路径的头像会被拼上后端地址
-    expect(store.avatar).toBe('http://test-server/public/uploaded/a.png')
+    // 头像存原始相对路径, 拼后端地址是展示时才做的事:
+    // 存绝对 URL 会被个人中心当表单初值写回库
+    expect(store.avatar).toBe('public/uploaded/a.png')
     // 点赞集合从字符串转成数字, 便于前端 includes 判断
     expect(store.articleLikeSet).toEqual([1, 2])
     expect(store.commentLikeSet).toEqual([3])
+  })
+
+  it('后端头像为空时 avatar 退回默认图', async () => {
+    api.getUser.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 1,
+        nickname: '阵雨',
+        avatar: '',
+        website: '',
+        intro: '',
+        email: '',
+        article_like_set: [],
+        comment_like_set: [],
+      },
+    })
+
+    const store = useUserStore()
+    store.setToken('fake-token')
+    await store.getUserInfo()
+
+    expect(store.avatar).toContain('bing.com')
   })
 
   it('getUserInfo 遇到业务错误码时 reject', async () => {

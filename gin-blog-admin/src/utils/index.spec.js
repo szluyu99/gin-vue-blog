@@ -14,8 +14,9 @@ describe('convertImgUrl', () => {
   })
 
   it('相对地址拼上服务器地址', () => {
-    // VITE_SERVER_URL 在 vitest.config.js 里固定为 http://test-server
-    expect(convertImgUrl('article/a.png')).toBe('http://test-server/article/a.png')
+    // 返回根相对路径, 由 dev proxy / nginx 转发, 不拼 VITE_SERVER_URL:
+    // 拼上 localhost 后从别的机器访问页面时图片会裂
+    expect(convertImgUrl('article/a.png')).toBe('/article/a.png')
   })
 })
 

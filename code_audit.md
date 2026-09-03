@@ -9,6 +9,7 @@
 当前进度：server 功能 BUG F1–F10 全部已修复；F11 已修复、F12 待处理；server 安全 S1–S8
 全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 未处理。
 admin 的 A1–A6（P0）已修复，A7–A14（P1）与 A15+（P2）待处理。
+front 的 FE1–FE3 已修复。
 
 ## 安全
 
@@ -355,8 +356,59 @@ if strings.Contains(p, g.GetConfig().Upload.StorePath) {
   `GetLinkList` 都不返回 total，前端也没有分页。数据量大了之后一次全量返回会变慢，
   届时要么加分页要么加缓存。
 
-## gin-blog-admin
+## gin-blog-front
 
+### FE1 个人中心头像与资料显示为默认值, 只改昵称会清空其他字段 — 已修复
+
+现象：前台登录后在个人中心上传头像，接口返回 `code 0` 且文件正常落盘、URL 直接访问是
+`200 image/jpeg`，但页面刷新后头像仍是默认图，四个输入框也是空的。
+
+原因是两层「拷贝一次」：
+
+1. `views/user/index.vue:14-20` 在 setup 阶段用 `reactive({ avatar: userStore.avatar, ... })`
+   把 store 的值拷成快照，而 `getUserInfo()` 是在 `onMounted` 里异步取的，此刻 store 还是默认值。
+2. `views/user/UploadOne.vue:14` 又 `ref(props.preview)` 拷一次，且没有 `watch` props
+   （admin 的同名组件 `:23` 有），所以父组件后来拿到真实头像也传不进来。
+
+上传后能看到正确的 src，是因为 `previewImg.value = responseJSON.data` 是组件内部直接赋值，
+那条路径本来是通的；一刷新就回到默认值。
+
+连带的数据丢失路径（已实测）：表单没同步时四个框都是空的，全空提交会被
+`UpdateCurrentUserReq.Nickname` 的 `binding:"required"` 挡住（`9001`），但只要只填昵称就提交，
+`model.UpdateUserInfo` 用的是 `Select("nickname","avatar","intro","website").Updates(...)`，
+显式 `Select` 会把零值一起写进去：
+
+```
+PUT /front/user/info {"nickname":"只改昵称","avatar":"","intro":"","website":""} → code 0
+DB: (3, '只改昵称', '', '', '')   ← 头像/简介/网站被清空
+```
+
+修复：`onMounted` 里 `getUserInfo()` 返回后 `Object.assign(form, ...)` 重新同步；
+`UploadOne.vue` 补 `watch(() => props.preview, ...)`。
+
+### FE2 store 存的是绝对头像 URL, 会被写回库 — 已修复
+
+`store/user.js:55` 原来存 `convertImgUrl(data.avatar)`，即 `http://localhost:8765/...`。
+个人中心把它当表单初值，点「修改」就把带域名的绝对地址写回数据库——换域名或换环境就全失效。
+这是 admin A12 的前台孪生。
+
+修复：store 只存原始相对路径，拼接留给展示层。已确认所有 img src 都已经套了
+`convertImgUrl`（`AppHeader.vue:144`、`CommentField.vue:83`、`Comment.vue:194,229`、
+`LinkList.vue:29`、`message/index.vue:126`），所以改成相对路径不影响显示。
+`avatar` getter 的默认值判断从 `??` 改成 `||`：头像为空串时也要退回默认图，
+否则 `convertImgUrl('')` 会给出已失效的 `dummyimage.com` 占位图。
+
+测试：`store/user.spec.js` 原来断言的是「相对路径会被拼上后端地址」，即旧的错误行为，
+已改为断言存原始路径，并新增「后端头像为空时退回默认图」。
+
+### FE3 头像尺寸只在 lg 断点生效 — 已修复
+
+`views/user/UploadOne.vue:58` 的 `class="lg:h-[160px] lg:w-[160px]"` 在 1024px 以下不生效，
+图片按原始尺寸撑开（父容器只有 `max-w-[300px]`），布局会炸。改成
+`h-[160px] w-[160px] object-cover`。注意这一条不是上面那次故障的原因——
+报告时是 1920×1080 最大化窗口，`lg:` 是生效的。
+
+## gin-blog-admin
 后台管理端的全量审查。A1–A6 是「当前就会坏」的，已修复；A7 之后待处理。
 
 ### A1 文章列表分类为 null 导致整表 render 抛异常 — 已修复

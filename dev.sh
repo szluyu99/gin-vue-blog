@@ -66,11 +66,29 @@ spawn() {
   [ -s "$pf" ] || die "$name 启动失败, 看日志: ./dev.sh logs $name"
 }
 
+# 查端口被谁占着, 返回 "pid/命令" 或空串
+port_owner() {
+  local port=$1 out=''
+  if command -v ss >/dev/null 2>&1; then
+    out="$(ss -ltnpH "sport = :$port" 2>/dev/null | grep -o 'pid=[0-9]*,fd=[0-9]*' | head -1 | cut -d= -f2 | cut -d, -f1)"
+  fi
+  if [ -z "$out" ] && command -v lsof >/dev/null 2>&1; then
+    out="$(lsof -ti "tcp:$port" -sTCP:LISTEN 2>/dev/null | head -1)"
+  fi
+  [ -z "$out" ] && return 1
+  echo "$out/$(ps -p "$out" -o comm= 2>/dev/null)"
+}
+
 # 端口被别的进程占着就直接报错, 否则 vite 会自动换端口, 联调地址对不上
 ensure_free() {
-  local port=$1 name=$2
+  local port=$1 name=$2 owner
   if port_open "$port" && ! alive "$name"; then
-    die "端口 $port 已被占用($name 要用), 先处理掉再启动"
+    owner="$(port_owner "$port" || true)"
+    if [ -n "$owner" ]; then
+      die "端口 $port 已被 $owner 占用($name 要用), 处理掉再启动, 或 ./dev.sh stop --force"
+    fi
+    # 查不到占用者: 端口在本机可见但进程不在当前 PID 命名空间里(例如容器内外混用)
+    die "端口 $port 已被占用但查不到进程($name 要用), 可能不在当前 PID 命名空间, 需到对应环境里停掉"
   fi
 }
 
@@ -142,6 +160,24 @@ do_stop() {
   stop_one front
   stop_one server
   stop_one redis
+  # pid 文件丢了(手动删过, 或进程是别的环境起的)时按端口兜底,
+  # 会杀掉占着这四个端口的任意进程, 所以要显式加 --force
+  if [ "${1:-}" = "--force" ]; then
+    local owner pid
+    for port in "$ADMIN_PORT" "$FRONT_PORT" "$SERVER_PORT"; do
+      port_open "$port" || continue
+      owner="$(port_owner "$port" || true)"
+      pid="${owner%%/*}"
+      if [ -n "$pid" ]; then
+        kill -TERM "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null
+        sleep 1
+        kill -KILL "-$pid" 2>/dev/null
+        info "已强制停止占用 $port 的进程 $owner"
+      else
+        warn "端口 $port 仍被占用但查不到进程, 可能不在当前 PID 命名空间"
+      fi
+    done
+  fi
   if [ -f "$RUN_DIR/redis.docker" ]; then
     docker rm -f "$REDIS_CONTAINER" >/dev/null 2>&1 && info "已停止 Redis 容器"
     rm -f "$RUN_DIR/redis.docker"
@@ -207,9 +243,9 @@ do_status() {
 
 case "${1:-start}" in
   start) do_start ;;
-  stop) do_stop ;;
+  stop) do_stop "${2:-}" ;;
   restart)
-    do_stop
+    do_stop "${2:-}"
     do_start
     ;;
   status) do_status ;;
@@ -221,6 +257,7 @@ case "${1:-start}" in
     ;;
   *)
     echo "用法: ./dev.sh [start|stop|restart|status|seed|logs <name>]"
+    echo "      stop / restart 可加 --force: pid 文件丢了时按端口强杀占用进程"
     exit 1
     ;;
 esac

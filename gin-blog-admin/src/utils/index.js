@@ -7,10 +7,11 @@ export * from './http'
 export * from './local'
 export * from './naiveTool'
 
-// 相对图片地址 => 完整的图片路径, 用于本地文件上传
-// 如果包含 http 说明是 Web 图片资源
-// 否则是服务器上的图片，需要拼接服务器路径
-const SERVER_URL = import.meta.env.VITE_SERVER_URL
+// 相对图片地址 => 可访问的图片路径, 用于本地文件上传
+// 如果包含 http 说明是 Web 图片资源, 原样返回
+// 否则是后端服务器上的图片, 返回根相对路径, 由 vite dev proxy / nginx 转发到后端
+// 不能拼 VITE_SERVER_URL: 那里写的是 localhost, 从别的机器访问页面时
+// localhost 指的是浏览器所在的机器, 图片必然裂开
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {
     return 'http://dummyimage.com/400x400'
@@ -19,7 +20,7 @@ export function convertImgUrl(imgUrl) {
   if (imgUrl.startsWith('http')) {
     return imgUrl
   }
-  return `${SERVER_URL}/${imgUrl}`
+  return `/${imgUrl.replace(/^\/+/, '')}`
 }
 
 /**

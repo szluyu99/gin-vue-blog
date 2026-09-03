@@ -15,8 +15,10 @@ describe('convertImgUrl', () => {
   })
 
   it('相对路径拼接后端地址', () => {
-    // VITE_BACKEND_URL 在 vitest.config.js 里固定为 http://test-server
-    expect(convertImgUrl('public/uploaded/a.png')).toBe('http://test-server/public/uploaded/a.png')
+    // 返回根相对路径, 由 dev proxy / nginx 转发, 不拼 VITE_BACKEND_URL:
+    // 拼上 localhost 后从别的机器访问页面时图片会裂
+    expect(convertImgUrl('public/uploaded/a.png')).toBe('/public/uploaded/a.png')
+    expect(convertImgUrl('/public/uploaded/a.png')).toBe('/public/uploaded/a.png')
   })
 })
 

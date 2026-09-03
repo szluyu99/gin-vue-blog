@@ -1,12 +1,12 @@
-// 相对图片地址 => 完整的图片路径, 用于本地文件上传
-// - 如果包含 http 说明是 Web 图片资源
-// - 否则是服务器上的图片，需要拼接服务器路径
-const SERVER_URL = import.meta.env.VITE_BACKEND_URL
-
+// 相对图片地址 => 可访问的图片路径, 用于本地文件上传
+// - 如果包含 http 说明是 Web 图片资源, 原样返回
+// - 否则是后端服务器上的图片, 返回根相对路径, 由 vite dev proxy / nginx 转发到后端
+//   不能拼 VITE_BACKEND_URL: 那里写的是 localhost, 从别的机器访问页面时
+//   localhost 指的是浏览器所在的机器, 图片必然裂开
 /**
- * 将相对地址转换为完整的图片路径
+ * 将相对地址转换为可访问的图片路径
  * @param {string} imgUrl
- * @returns {string} 完整的图片路径
+ * @returns {string} 图片路径
  */
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {
@@ -16,8 +16,8 @@ export function convertImgUrl(imgUrl) {
   if (imgUrl.startsWith('http')) {
     return imgUrl
   }
-  // 服务器资源
-  return `${SERVER_URL}/${imgUrl}`
+  // 后端服务器资源: /public/uploaded/xxx.jpg
+  return `/${imgUrl.replace(/^\/+/, '')}`
 }
 
 /**
