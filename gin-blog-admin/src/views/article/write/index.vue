@@ -69,8 +69,9 @@ async function getArticleInfo() {
   const id = route.params.id // 路由中获取参数
 
   // 没有 id, 表示是新增文章
+  // 必须带上 tag_names 和 category_name, 否则 watch tag_names 的回调会拿到 undefined
   if (!id) {
-    formModel.value = { status: 1, is_top: false, title: '', type: 1 }
+    formModel.value = { status: 1, is_top: false, title: '', type: 1, tag_names: [], category_name: '' }
     return
   }
 
@@ -80,8 +81,9 @@ async function getArticleInfo() {
     const resp = await api.getArticleById(id)
     const { category, tags } = resp.data
     formModel.value = resp.data
-    formModel.value.tag_names = tags.map(e => e.name)
-    formModel.value.category_name = category.name
+    // 导入生成的草稿没有分类和标签, category 为 null
+    formModel.value.tag_names = tags?.map(e => e.name) ?? []
+    formModel.value.category_name = category?.name ?? ''
     window.$loadingBar?.finish()
   }
   catch {

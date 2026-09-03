@@ -1,12 +1,14 @@
 # 代码审查记录
 
-针对 `gin-blog-server` 的一次全量审查（handle / model / middleware / utils / global）。
+针对 `gin-blog-server` 的一次全量审查（handle / model / middleware / utils / global），
+以及针对 `gin-blog-admin` 的一次全量审查（views / components / store / utils / layout）。
 每条给出文件与行号、问题原因、当前状态。行号以审查时的代码为准，后续改动可能偏移。
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
-当前进度：功能 BUG F1–F10 全部已修复；安全 S1–S8 全部暂缓（项目初期，安全要求不高，
-上线前必须回来处理）；潜在问题 P1 未处理。
+当前进度：server 功能 BUG F1–F10 全部已修复；F11 已修复、F12 待处理；server 安全 S1–S8
+全部暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 未处理。
+admin 的 A1–A6（P0）已修复，A7–A14（P1）与 A15+（P2）待处理。
 
 ## 安全
 
@@ -275,7 +277,48 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 `TestAuthVerifyCodeKeepsTokenWhenCreateFails`（断言建用户失败后验证链接仍然有效、库里没有半个用户）。
 
 ## 潜在问题（当前打不到）
+### F11 注册强依赖邮件，`Captcha.SendEmail` 是死开关 — 已修复
 
+现象：博客前台注册用户提示「发送邮件失败」（`6101`）。两层原因：
+
+1. `config.yml` 的 `Email.From` / `SmtpPass` / `SmtpUser` 都是空串，没有可用的 SMTP 凭据。
+2. `Captcha.SendEmail` 这个开关只在 `internal/global/config.go:59` 定义过，**全仓库没有任何地方读它**，
+   `handle_auth.go` 的 `Register` 无条件调用 `utils.SendEmail`，所以改成 false 也不会跳过发邮件。
+
+修复：让开关真正生效。`Register` 在查重之后加一个分支，`Captcha.SendEmail` 为 false 时直接
+`model.CreateNewUser` 建号并返回成功，不写 Redis 验证 token、不发邮件；为 true 时保持原来的
+邮箱验证流程。`config.yml` 与 `config.docker.yml` 都改为 `SendEmail: false`。
+前台 `RegisterModal.vue` 的提示从「邮件已发送」改成「注册成功, 请登录」并自动切到登录弹窗，
+同时给 `api.register` 补上 `catch`（原来是裸 await，失败会产生 unhandled rejection）。
+
+测试：`TestAuthRegisterWithoutEmail`（注册即建号、Redis 里没有验证 token、重复注册被挡）。
+`testenv_test.go` 的 `newTestEnv` 现在会初始化 `g.Conf`，注意它不能直接覆盖 —— `withJWTConf` /
+`withUploadConf` 可能已经在同一个测试里设过，覆盖会让 `TestAuthLogin` 拿不到 JWT 密钥。
+
+顺带修正 `config.docker.yml` 的 Email 段键名：原来写的 `IsSSL` / `Secret` / `Nickname` 和
+`g.Config.Email` 的字段对不上（结构体要的是 `SmtpPass` / `SmtpUser`），即使填了也绑定不上。
+
+### F12 `AutomaticEnv` 让同名环境变量吃掉整段配置 — 待处理
+
+`internal/global/config.go:93` 的 `v.AutomaticEnv()` 会让 viper 在解析每个 key 时先查环境变量。
+如果环境里存在和某个顶层配置段同名的变量，`Get("Email")` 返回的是那个**字符串**而不是 yaml 里的
+map，于是整段反序列化成零值。
+
+实测（本机环境里有 `EMAIL=xxx@xxx.com`，Linux 上 git 相关工具常设）：
+
+```
+有 EMAIL 环境变量:  Email = {From: Host: Port:0 SmtpPass: SmtpUser:}
+env -u EMAIL:      Email = {From: Host:smtp.qq.com Port:465 SmtpPass: SmtpUser:}
+```
+
+后果是 SMTP 拨号变成 `dial tcp :0: connect: connection refused`，报错完全指不到原因。
+`Server` / `Captcha` 这些没有同名环境变量的段不受影响，所以只有邮件这一处发作。
+
+这不只影响邮件：任何一段配置只要撞上同名环境变量都会被静默吃掉。建议改成显式白名单绑定
+（`v.BindEnv("email.host", "GVB_EMAIL_HOST")`）或加前缀 `v.SetEnvPrefix("GVB")`。
+当前因为邮件功能已关闭，不影响实际使用，故记录待处理。
+
+## 潜在问题（当前打不到）
 ### P1 本地上传的路径穿越防护恒真 — 潜在
 
 `internal/utils/upload/local.go:60`
@@ -311,3 +354,128 @@ if strings.Contains(p, g.GetConfig().Upload.StorePath) {
 - `internal/handle/handle_front.go` 的 `GetTagList` / `GetCategoryList` / `GetMessageList` /
   `GetLinkList` 都不返回 total，前端也没有分页。数据量大了之后一次全量返回会变慢，
   届时要么加分页要么加缓存。
+
+## gin-blog-admin
+
+后台管理端的全量审查。A1–A6 是「当前就会坏」的，已修复；A7 之后待处理。
+
+### A1 文章列表分类为 null 导致整表 render 抛异常 — 已修复
+
+`src/views/article/list/index.vue:86` 原为 `h('div', row.category.name || '无')`。
+后端 `model.Article.Category` 是指针，`category_id = 0` 时序列化为 `null`。
+这条以前打不到，但 F9（导入文章为草稿、不建分类和标签）之后必然产生这种数据，
+只要导入过一篇，整张表格的 render 就会抛异常。改为 `row.category?.name`。
+
+同一个根因还有 `src/views/article/write/index.vue:84`：编辑页 `category.name` 和
+`tags.map(...)` 都没有守卫，打开一篇导入生成的草稿会直接白屏。已改为
+`tags?.map(e => e.name) ?? []` 和 `category?.name ?? ''`。
+
+### A2 后台批量导入文章不带 Authorization，必然 401 — 已修复
+
+`src/views/article/list/index.vue` 的 `<NUpload action="/api/article/import">` 没有带
+认证头，而 `/article/import` 挂在 `JWTAuth(true)` 下，非 mock 构建 100% 失败。
+参照 `components/UploadOne.vue` 补 `:headers="{ Authorization: \`Bearer ${authStore.token}\` }"`。
+注意这里用 `useAuthStore()` 实例而不是解构出 `token`，否则重新登录后拿到的是旧值
+（`UploadOne.vue:20` 就是解构的，属于 A13，未处理）。
+
+顺带修了 `afterUpload` 里裸的 `JSON.parse(event.target.response)`：鉴权失败或被网关
+拦截时响应不是 JSON，会抛在 naive-ui 的 `@finish` 回调里。现在走 `utils/parseJson`。
+
+### A3 删除文章不提示成功、失败无法捕获 — 已修复
+
+`src/views/article/list/index.vue:214` 的 `updateOrDeleteArticles` 少一个 `return`。
+`composables/useCRUD.js:110` 里 `data = await doDelete(...)` 拿到 `undefined`，于是
+`data?.code === 0` 不成立，删成功也不弹提示；失败时因为 promise 没被 await，
+外层 `try/catch` 兜不住，变成 unhandled rejection，同时 `refresh()` 照跑当成功。
+
+### A4 操作日志详情弹窗 `JSON.parse('')` 抛在 render 里 — 已修复
+
+`src/views/log/operation/index.vue:228,237,147` 三处 `JSON.stringify(JSON.parse(x), null, 2)`。
+`request_param` 对 `POST /user/offline/:id`、`DELETE /menu/:id`、`DELETE /resource/:id`
+是空串，点开详情即崩。新增 `utils/formatJson`（解析不了就原样返回），三处都换过去。
+
+### A5 写文章页新建时 `tag_names` 为 undefined — 已修复
+
+`src/views/article/write/index.vue:73` 新建分支重置成
+`{ status: 1, is_top: false, title: '', type: 1 }`，漏了 `tag_names`；
+`:63-65` 的 watcher 紧接着 `newVal.includes(...)` → TypeError。
+现在重置对象补齐 `tag_names: []` 和 `category_name: ''`。
+
+### A6 CrudTable 每次翻页发两次请求 — 已修复
+
+`src/components/crud/CrudTable.vue` 里 `pagination.onChange` 调 `handleQuery()`，
+模板上的 `@update:page="onPageChange"` 又调一次。对照装好的 naive-ui 源码
+`es/data-table/src/use-table-data.mjs:166-181`：`mergedOnUpdatePage` 先
+`call(onChange, page)`，再 `doUpdatePage(page)` 触发组件的 `onUpdate:page`，所以两个
+回调每次翻页都会各发一次请求；两个请求没有排序或取消，慢的那个能覆盖新的。
+`onUpdatePageSize` 没有双绑，不受影响。
+修法是删掉 `pagination.onChange`，只留 `@update:page` 一个入口
+（`onPageChange` 里有 `props.remote &&` 判断，前端分页模式下不会多发请求）。
+
+### 测试
+
+`src/utils/index.spec.js` 新增 `parseJson` / `formatJson` 的 9 个断言，覆盖 A4 与 A2 的
+空串、非法 JSON、HTML 响应场景。A1/A3/A5/A6 都在组件内部，要验证需要
+`@vue/test-utils`（当前未引入），暂时只靠 `pnpm build` + 人工点检。
+
+### 待处理
+
+P1（特定路径下会坏）：
+
+- **A7** `src/utils/http.js:59-67`：`code === 1201` 与 `1202/1203/1207` 两个分支直接
+  `return`，等于 `Promise.resolve(undefined)`，导致 `CrudTable.vue:78` 的
+  `const { data } = await ...`、`Login.vue:55` 的 `resp.data.token`、
+  `permission.js:24` 的 `buildRoutes(resp.data)` 二次抛错。应 `return Promise.reject(responseData)`。
+  1201 分支还没清 token。
+- **A8** `src/views/Login.vue:39,60`：`const isRemember = useStorage('isRemember', false)` 是
+  Ref，恒为真，取消勾选也会把用户名密码写进 localStorage，`removeLocal` 分支永远走不到。
+  少一个 `.value`。（`local.js:47` 只是 base64，不是加密。）
+- **A9** `src/store/modules/auth.js:36-41` + `layout/header/components/UserAvatar.vue:32`：
+  `logout` 既不 await 也不 catch，`/logout` 失败时 token 留在 localStorage、不跳转、不提示。
+- **A10** `src/layout/index.vue:18-22`：`computed(() => router.getRoutes()...)` 没有响应式
+  依赖，永久缓存首次结果；登录后动态添加的路由不在 `<KeepAlive :include>` 里，刷新才生效。
+- **A11** `src/views/auth/role/index.vue:232-233`：菜单 / 资源权限树只在
+  `modalAction === 'edit'` 下渲染，`:47-49` 的 option 预取还注释着。F6 之后后端
+  `model.SaveRole` 已支持新建时一并写入，现在只剩前端在逼用户走两趟。
+- **A12** `src/views/profile/index.vue:14,22-27,33`：`infoForm.avatar = userStore.avatar` 是
+  跑过 `convertImgUrl` 的展示地址（会拼 `VITE_SERVER_URL`，或是占位图
+  `http://dummyimage.com/400x400`），再 `api.updateCurrent` 存回库。应发原始 `userInfo.avatar`。
+- **A13** `src/components/UploadOne.vue:20,26-28`：`const { token } = useAuthStore()` 解构后
+  失去响应性；`JSON.parse(respStr)` 无保护（可用新加的 `parseJson`）。
+- **A14** `src/components/common/ScrollX.vue:33,51`：用了废弃的 `e.wheelDelta`，Firefox 下
+  为 undefined，`translateX` 变 `NaN`，横向滚动失效。应换 `e.deltaY`。
+
+P2（展示问题 / 潜在 / 清理）：
+
+- **A15** `src/views/auth/role/index.vue:93-97`：`value: row.is_disable` 配
+  `checkedValue: 1, uncheckedValue: 0`，后端字段是 `bool`，开关永远显示关闭。
+  目前只是展示，`onUpdateValue` 只弹「这个功能暂时还不支持~」。与 S4 一起处理。
+- **A16** `src/views/message/comment/index.vue`：`:81` 列 key 还是老的 `reply_nick_name`
+  （render 函数正常，只有接上 `handleExport` 才会导出空列，`CrudTable.vue:136` 按
+  `item[key]` 取值）；`:132` `commentTypeMap[row.type].tag` 没守卫；`:63-78`「评论类型」
+  和 `:124-136`「来源」是同一字段渲染两遍且前者 `key: ''`；`:275` typo `filterablec`；
+  `handleUpdateReview` 无 try/catch。
+- **A17** `.then()` 无 `.catch`：`views/article/list/index.vue:45-46`、
+  `views/article/write/index.vue:39,42`、`views/user/list/index.vue:40`。
+  拦截器已弹过错误提示，只剩控制台的 unhandled rejection 噪音。
+- **A18** `src/assets/config.js` 里导出的 `config` 对象（原作者的 QQ / 微博 APP_ID、
+  腾讯验证码 ID）全仓库无引用，可删。**注意同文件的 `loginTypeMap` / `articleTypeMap` /
+  `commentTypeMap` 及对应 Options 被 4 个页面引用，不是死代码**（和 front 那份不同）。
+- **A19** `views/article/list/index.vue:302` 自己实现了一份 `downloadFile`，
+  `utils/index.js:40` 已有同名导出，重复。
+- **A20** `views/article/list/index.vue:281` 的 `beforeUpload` 只放行 `.md`，
+  后端 F9 之后同时接受 `.md` 和 `.markdown`，两边不一致（偏严，不影响正确性）。
+- **A21** `src/layout/tags/index.vue:16,42` 的 `v-for` 模板 ref 数组顺序没有保证，
+  `tabRefs.value[activeIndex]` 可能取错元素。后果只是激活标签滚动位置偶尔不对。
+
+### admin 排查过但不是问题的
+
+- `src/store/modules/tag.js:66-77` `removeTag` 的负数索引：进入该分支的前提是
+  `path === this.activeTag`，而 `path` 必然来自 `tags` 中的某一项，所以 `activeIndex >= 0`。
+  sessionStorage 只持久化 `tags`（`pick: ['tags']`），刷新后 `activeTag === ''`，此时
+  `if` 不成立也不会崩。`ContextMenu.vue:30` 还额外用 `tags.length <= 1` 禁用了「关闭」。
+- 后台评论列表不显示点赞 / 回复数，不依赖 `CommentVO.LikeCount`，F8 与 admin 无关。
+- `Paginate` 的 100 条上限在 admin 里打不到，`CrudTable` 的 `pageSizes` 是 `[5, 10, 20]`。
+- `api.deleteArticle(ids)` 收到的是 `JSON.stringify(array)` 字符串而 `softDeleteArticle`
+  收到的是数组，两边不对称但都能用：`handle_article.go:159` 的 `ShouldBindJSON` 不看
+  Content-Type，`"[1,2]"` 作为请求体也能正确解析成 `[]int`。

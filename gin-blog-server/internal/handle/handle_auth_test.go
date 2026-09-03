@@ -207,6 +207,33 @@ func TestAuthRegisterInvalid(t *testing.T) {
 	assert.Equal(t, g.ErrUserExist.Code(), resp.Code)
 }
 
+// Captcha.SendEmail 为 false 时不发邮件, 注册请求直接把用户建出来
+func TestAuthRegisterWithoutEmail(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.POST("/register", (&UserAuth{}).Register)
+
+	// 游客角色, CreateNewUser 里固定关联 role_id = 2
+	env.db.Create(&model.Role{Model: model.Model{ID: 2}, Name: "游客"})
+
+	resp := env.do(t, http.MethodPost, "/register", map[string]any{
+		"email": "new@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var auth model.UserAuth
+	assert.Nil(t, env.db.Where("username", "new@qq.com").First(&auth).Error)
+	assert.True(t, utils.BcryptCheck("123456", auth.Password))
+
+	// 没有写入邮箱验证 token
+	assert.Empty(t, env.mr.Keys())
+
+	// 重复注册被挡住
+	resp = env.do(t, http.MethodPost, "/register", map[string]any{
+		"email": "new@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.ErrUserExist.Code(), resp.Code)
+}
+
 // 邮箱验证链接: info 由注册时写入 Redis, 命中后才真正创建用户
 func TestAuthVerifyCode(t *testing.T) {
 	env := newTestEnv(t)

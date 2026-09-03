@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import api from '@/api'
-import { convertImgUrl } from '@/utils'
 
 export const useUserStore = defineStore('user', {
   persist: {
@@ -52,7 +51,9 @@ export const useUserStore = defineStore('user', {
           this.userInfo = {
             id: data.id,
             nickname: data.nickname,
-            avatar: data.avatar ? convertImgUrl(data.avatar) : 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+            // 存原始相对路径, 展示时才 convertImgUrl:
+            // 否则个人中心会把带域名的绝对地址当表单初值写回库
+            avatar: data.avatar ?? '',
             website: data.website,
             intro: data.intro,
             email: data.email,

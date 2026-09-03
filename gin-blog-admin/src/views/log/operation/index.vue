@@ -12,7 +12,7 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import { formatDate } from '@/utils'
+import { formatDate, formatJson } from '@/utils'
 
 defineOptions({ name: '操作日志' })
 
@@ -144,7 +144,7 @@ const columns = [
 
 function copyFormatCode(code) {
   const { copy } = useClipboard()
-  copy(JSON.stringify(JSON.parse(code), null, 2))
+  copy(formatJson(code))
   window.$message.success('内容已复制到剪切板!')
 }
 </script>
@@ -225,7 +225,7 @@ function copyFormatCode(code) {
         <NFormItem label="请求参数: " path="request_param">
           <NCode
             class="word-wrap cursor-pointer p-7"
-            :code="JSON.stringify(JSON.parse(modalForm.request_param), null, 2)"
+            :code="formatJson(modalForm.request_param)"
             language="json"
             :hljs="hljs"
             @click="copyFormatCode(modalForm.request_param)"
@@ -234,7 +234,7 @@ function copyFormatCode(code) {
         <NFormItem label="返回数据: " path="response_data">
           <NCode
             class="cursor-pointer p-7"
-            :code="JSON.stringify(JSON.parse(modalForm.response_data), null, 2)"
+            :code="formatJson(modalForm.response_data)"
             language="json"
             :hljs="hljs"
             @click="copyFormatCode(modalForm.response_data)"

@@ -24,3 +24,5 @@ node_modules
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+# 本地联调脚本产物 (dev.sh)
+.dev/

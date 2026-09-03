@@ -10,13 +10,16 @@ import CommonPage from '@/components/common/CommonPage.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import { convertImgUrl, formatDate } from '@/utils'
+import { useAuthStore } from '@/store'
+import { convertImgUrl, formatDate, parseJson } from '@/utils'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
 
 const route = useRoute()
 const router = useRouter()
+// 不解构, 否则重新登录后拿到的还是旧 token
+const authStore = useAuthStore()
 
 const categoryOptions = ref([])
 const tagOptions = ref([])
@@ -83,7 +86,8 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('div', row.category.name || '无')
+      // 导入的文章是草稿且不带分类, category 为 null, 不能直接取 name
+      return h('div', row.category?.name || '无')
     },
   },
   {
@@ -212,7 +216,8 @@ const columns = [
 ]
 
 function updateOrDeleteArticles(ids) {
-  extraParams.value.is_delete
+  // 必须 return, 否则 useCRUD 里 await 到 undefined: 删除成功不提示, 失败也无法捕获
+  return extraParams.value.is_delete
     ? api.deleteArticle(ids)
     : api.softDeleteArticle(JSON.parse(ids), true)
 }
@@ -288,14 +293,14 @@ function beforeUpload(data) {
 
 // 文件上传后的操作
 function afterUpload({ event }) {
-  const respStr = (event?.target).response
-  const res = JSON.parse(respStr)
-  if (res.code === 0) {
+  // 网关拦截或鉴权失败时响应不是 JSON, 不能直接 JSON.parse
+  const res = parseJson(event?.target?.response)
+  if (res?.code === 0) {
     $table.value?.handleSearch()
     $message.success('文章导入成功！')
   }
   else {
-    $message.error('文章导入失败！')
+    $message.error(res?.message || '文章导入失败！')
   }
 }
 
@@ -346,6 +351,7 @@ function downloadFile(content, fileName) {
       <div class="inline-block">
         <NUpload
           action="/api/article/import"
+          :headers="{ Authorization: `Bearer ${authStore.token}` }"
           :show-file-list="false"
           multiple
           @before-upload="beforeUpload"

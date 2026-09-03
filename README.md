@@ -161,10 +161,11 @@ cd gin-blog-admin  && pnpm test
 - 后端日志切割
 - 后台首页重新设计（目前内容较少）
 - 前端组件级测试（当前只覆盖 store 和 utils）
+- 后台待办项 A7–A21（鉴权拦截器、角色新增权限树、头像回写等），见 `code_audit.md` 的 gin-blog-admin 一节
 - 重构前台 `components/comment/Comment.vue`：`replyFieldRefs` / `pageRefs` / `checkRefs` 三个 `v-for` 模板 ref 都按下标访问，但 Vue 不保证 ref 数组顺序与源数组一致（文件里 `refresh` + `nextTick` 那段 hack 就是它的补丁），并且用 `style.display` 直接盖掉 `v-show`
 - 前台自托管 Inter 字体，去掉对 rsms.me 的外部依赖
 - 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求
-- 邮件模块整理：SMTP 密码不再进日志、`config.docker.yml` 的键名与结构体对齐、启动时校验配置
+- 邮件模块整理：SMTP 密码不再进日志、启动时校验配置、config 改成显式环境变量绑定（见 `code_audit.md` F12）
 - 引入 Dependabot 持续跟进依赖更新
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档

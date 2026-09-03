@@ -50,6 +50,16 @@ func newTestEnv(t *testing.T) *testEnv {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 
+	// handler 里读配置的地方(如注册是否走邮箱验证)需要 g.Conf 已初始化。
+	// 注意不能直接覆盖: withJWTConf / withUploadConf 可能已经在本测试里设过了
+	if g.Conf == nil {
+		old := g.Conf
+		g.Conf = &g.Config{}
+		t.Cleanup(func() { g.Conf = old })
+	}
+	g.Conf.Captcha.SendEmail = false
+	g.Conf.Captcha.ExpireTime = 15
+
 	// cache=shared + 每个测试独立的库名: file::memory: 会让连接池里的每条连接
 	// 各自持有一个空库, 事务里换连接就会报 "no such table"
 	dsn := "file:" + strings.NewReplacer("/", "_", " ", "_").Replace(t.Name()) +

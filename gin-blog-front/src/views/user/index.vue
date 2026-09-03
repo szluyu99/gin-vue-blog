@@ -23,7 +23,17 @@ onMounted(async () => {
   await userStore.getUserInfo()
   if (!userStore.userId) {
     router.push('/')
+    return
   }
+  // form 是在 setup 阶段拷的一次性快照, getUserInfo 返回后必须重新同步,
+  // 否则页面显示默认头像和空表单, 只改昵称提交还会把头像/简介/网站清空
+  Object.assign(form, {
+    avatar: userStore.avatar,
+    nickname: userStore.nickname,
+    intro: userStore.intro,
+    website: userStore.website,
+    email: userStore.email,
+  })
 })
 
 async function updateUserInfo() {

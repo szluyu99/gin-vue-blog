@@ -36,6 +36,31 @@ export function renderIcon(icon, props = { size: 12 }) {
   return () => h(NIcon, props, { default: () => h(Icon, { icon }) })
 }
 
+/**
+ * 安全解析 JSON 字符串, 解析失败或非字符串时返回 fallback
+ * 后端部分操作日志的 request_param 是空串, 上传接口被网关拦截时也可能返回 HTML
+ */
+export function parseJson(str, fallback = null) {
+  if (typeof str !== 'string' || !str.trim()) {
+    return fallback
+  }
+  try {
+    return JSON.parse(str)
+  }
+  catch {
+    return fallback
+  }
+}
+
+/**
+ * 格式化 JSON 字符串用于展示, 无法解析时原样返回, 不抛异常
+ */
+const PARSE_FAILED = Symbol('parseFailed')
+export function formatJson(str) {
+  const parsed = parseJson(str, PARSE_FAILED)
+  return parsed === PARSE_FAILED ? (str ?? '') : JSON.stringify(parsed, null, 2)
+}
+
 // 前端导出, 传入文件内容和文件名称
 export function downloadFile(content, fileName) {
   const aEle = document.createElement('a') // 创建下载链接

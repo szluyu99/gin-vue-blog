@@ -36,8 +36,10 @@ Email:
   SmtpPass: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
   SmtpUser: "" # 发件人昵称, 通常为自己的邮箱名
 Captcha:
-  SendEmail: true # 通过邮箱发送验证码
-  ExpireTime: 15  # 过期时间 (分钟)
+  # false: 注册直接创建用户, 不发邮件, 也不需要配上面的 Email 段
+  # true: 注册只发验证邮件, 用户点击链接后才真正创建, 必须先把 Email 段配全
+  SendEmail: false
+  ExpireTime: 15  # 验证链接过期时间 (分钟)
 Upload:
   OssType: "local" # local | qiniu
   Path: "public/uploaded"      # 本地文件访问路径: OssType="local" 生效

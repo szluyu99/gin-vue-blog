@@ -33,9 +33,16 @@ async function handleRegister() {
   }
 
   // 发送注册请求
-  await api.register({ email, password })
-  window.$message?.success('邮件已发送，请在邮箱中确认以完成注册')
+  // 后端 Captcha.SendEmail 为 false, 注册即建号, 不再发验证邮件
+  try {
+    await api.register({ email, password })
+  }
+  catch {
+    return // 失败提示由 http 拦截器统一弹出
+  }
+  window.$message?.success('注册成功, 请登录')
   form.value = { email: '', password: '' }
+  openLogin()
 }
 
 // 登录

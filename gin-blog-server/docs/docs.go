@@ -2007,7 +2007,7 @@ const docTemplate = `{
         },
         "/register": {
             "post": {
-                "description": "校验邮箱是否已注册, 通过后发送验证邮件, 待验证后才真正创建用户",
+                "description": "校验邮箱是否已注册; Captcha.SendEmail 为 false 时直接创建用户, 为 true 时发送验证邮件, 待验证后才创建",
                 "consumes": [
                     "application/json"
                 ],

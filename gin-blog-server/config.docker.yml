@@ -33,12 +33,14 @@ Email:
   Host: "smtp.163.com" # 服务器地址, 例如 smtp.qq.com 前往要发邮件的邮箱查看其 smtp 协议
   Port: 465 # 前往要发邮件的邮箱查看其 smtp 协议端口, 大多为 465
   From: "" # 发件人 (邮箱)
-  IsSSL: true # 是否开启 SSL
-  Secret: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
-  Nickname: "" # 发件人昵称, 通常为自己的邮箱名
+  # 下面两个键名必须和 g.Config.Email 对齐, 原来写的 Secret / Nickname 不会被绑定上
+  SmtpPass: "" # 密钥, 不是邮箱登录密码, 是开启 smtp 服务后获取的一串验证码
+  SmtpUser: "" # 发件人昵称, 通常为自己的邮箱名
 Captcha:
-  SendEmail: true # 通过邮箱发送验证码
-  ExpireTime: 15  # 过期时间 (分钟)
+  # false: 注册直接创建用户, 不发邮件, 也不需要配上面的 Email 段
+  # true: 注册只发验证邮件, 用户点击链接后才真正创建, 必须先把 Email 段配全
+  SendEmail: false
+  ExpireTime: 15  # 验证链接过期时间 (分钟)
 Upload:
   OssType: "local" # local | qiniu
   Path: "public/uploaded"      # 本地文件访问路径 (OssType="local" 才生效)

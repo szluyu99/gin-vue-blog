@@ -224,7 +224,7 @@ func (*UserAuth) Logout(c *gin.Context) {
 // 首先检查用户名是否存在，避免重复注册；其次把用户输入的信息加密保存在redis中，等待验证
 // 在以下情况下会出错：1. 用户邮箱已经注册过 2.用户邮箱无效等原因导致的发送邮件失败
 // @Summary 注册
-// @Description 校验邮箱是否已注册, 通过后发送验证邮件, 待验证后才真正创建用户
+// @Description 校验邮箱是否已注册; Captcha.SendEmail 为 false 时直接创建用户, 为 true 时发送验证邮件, 待验证后才创建
 // @Tags UserAuth
 // @Accept json
 // @Produce json
@@ -255,6 +255,22 @@ func (*UserAuth) Register(c *gin.Context) {
 
 	if auth != nil {
 		ReturnError(c, g.ErrUserExist, err)
+		return
+	}
+
+	// Captcha.SendEmail 为 false 时不走邮箱验证, 直接建用户
+	// 这个开关以前是死配置(定义了但没人读), 现在让它真正生效:
+	// 本地开发和自部署不必配 SMTP 也能注册
+	if !g.GetConfig().Captcha.SendEmail {
+		if _, _, _, err := model.CreateNewUser(GetDB(c), regreq.Username, regreq.Password); err != nil {
+			if errors.Is(err, model.ErrUsernameTaken) {
+				ReturnError(c, g.ErrUserExist, err)
+				return
+			}
+			ReturnError(c, g.ErrDbOp, err)
+			return
+		}
+		ReturnSuccess(c, nil)
 		return
 	}
 

@@ -43,15 +43,13 @@ const tableData = ref([]) // 表格数据
 const initQuery = { ...props.queryItems }
 
 // 分页配置
+// ! 翻页只能有一个入口: naive-ui 内部的 mergedOnUpdatePage 会先调 pagination.onChange
+// ! 再触发组件的 onUpdate:page, 两处都发请求的话每次翻页会请求两次, 且慢的响应会覆盖新的
 const pagination = reactive({
   page: 1,
   pageSize: 10,
   showSizePicker: true,
   pageSizes: [5, 10, 20],
-  onChange: (page) => {
-    pagination.page = page
-    handleQuery()
-  },
   onUpdatePageSize: (pageSize) => {
     pagination.page = 1
     pagination.pageSize = pageSize
