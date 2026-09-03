@@ -385,6 +385,9 @@ func GetUserAuthInfoById(db *gorm.DB, id int) (*UserAuth, error) {
 	return &userAuth, nil
 }
 
+// 新注册用户的默认头像: 原来是 bing 的一张外链图, 换成本仓库 images/ 下的图片
+const DefaultAvatar = "https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/user_avatar.jpeg"
+
 // 注册新用户
 //
 // 三张表必须一起成功: 以前没有事务, 中途失败会留下孤儿 user_info,
@@ -398,7 +401,7 @@ func CreateNewUser(db *gorm.DB, username, password string) (*UserAuth, *UserInfo
 
 	userinfo := &UserInfo{
 		Email:  username,
-		Avatar: "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
+		Avatar: DefaultAvatar,
 	}
 	userauth := &UserAuth{}
 	userRole := &UserAuthRole{}

@@ -42,7 +42,7 @@ const columns = [
         'height': 40,
         'imgProps': { style: { 'border-radius': '3px' } },
         'src': convertImgUrl(row.avatar),
-        'fallback-src': 'http://dummyimage.com/400x400', // 加载失败
+        'fallback-src': 'https://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
     },

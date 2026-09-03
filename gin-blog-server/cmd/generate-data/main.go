@@ -15,6 +15,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// 种子数据里的图片: 原来指向 cdn.hahacode.cn, 该图床已经失效(连接超时),
+// 换成本仓库 images/ 目录下的图片, 由 GitHub 直接提供
+const imgBase = "https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images"
+
 func main() {
 	configPath := flag.String("c", "../../config.yml", "配置文件路径")
 	typeName := flag.String("t", "all", "要初始化的数据类型: config | auth | page | all")
@@ -61,17 +65,17 @@ func generateDefaultPages(db *gorm.DB) {
 	slog.Info("-----初始化博客页面 start-----")
 
 	pages := []model.Page{
-		{Name: "首页", Label: "home", Cover: "https://cdn.hahacode.cn/page/home.jpg"},
-		{Name: "归档", Label: "archive", Cover: "https://cdn.hahacode.cn/page/archive.png"},
-		{Name: "分类", Label: "category", Cover: "https://cdn.hahacode.cn/page/category.png"},
-		{Name: "标签", Label: "tag", Cover: "https://cdn.hahacode.cn/page/tag.png"},
-		{Name: "友链", Label: "link", Cover: "https://cdn.hahacode.cn/page/link.jpg"},
-		{Name: "关于", Label: "about", Cover: "https://cdn.hahacode.cn/page/about.jpg"},
-		{Name: "留言", Label: "message", Cover: "https://cdn.hahacode.cn/page/message.jpeg"},
-		{Name: "个人中心", Label: "user", Cover: "https://cdn.hahacode.cn/page/user.jpg"},
-		{Name: "相册", Label: "album", Cover: "https://cdn.hahacode.cn/page/album.png"},
-		{Name: "错误页面", Label: "404", Cover: "https://cdn.hahacode.cn/page/404.jpg"},
-		{Name: "文章列表", Label: "article_list", Cover: "https://cdn.hahacode.cn/page/article_list.jpg"},
+		{Name: "首页", Label: "home", Cover: imgBase + "/page/home.jpg"},
+		{Name: "归档", Label: "archive", Cover: imgBase + "/page/archive.png"},
+		{Name: "分类", Label: "category", Cover: imgBase + "/page/category.png"},
+		{Name: "标签", Label: "tag", Cover: imgBase + "/page/tag.png"},
+		{Name: "友链", Label: "link", Cover: imgBase + "/page/link.jpg"},
+		{Name: "关于", Label: "about", Cover: imgBase + "/page/about.jpg"},
+		{Name: "留言", Label: "message", Cover: imgBase + "/page/message.jpeg"},
+		{Name: "个人中心", Label: "user", Cover: imgBase + "/page/user.jpg"},
+		{Name: "相册", Label: "album", Cover: imgBase + "/page/album.png"},
+		{Name: "错误页面", Label: "404", Cover: imgBase + "/page/404.jpg"},
+		{Name: "文章列表", Label: "article_list", Cover: imgBase + "/page/article_list.jpg"},
 	}
 
 	for _, page := range pages {
@@ -92,7 +96,7 @@ func generateDefaultConfigs(db *gorm.DB) {
 	slog.Info("-----初始化博客配置 start-----")
 
 	configs := []model.Config{
-		{Key: "website_avatar", Value: "https://foruda.gitee.com/avatar/1677041571085433939/5221991_szluyu99_1614389421.png", Desc: "网站头像"},
+		{Key: "website_avatar", Value: imgBase + "/common/header.jpeg", Desc: "网站头像"},
 		{Key: "website_name", Value: "阵雨的个人博客", Desc: "网站名称"},
 		{Key: "website_author", Value: "阵雨", Desc: "网站作者"},
 		{Key: "website_intro", Value: "往事随风而去", Desc: "网站介绍"},
@@ -102,9 +106,9 @@ func generateDefaultConfigs(db *gorm.DB) {
 		{Key: "qq", Value: "123456789", Desc: "QQ"},
 		{Key: "github", Value: "https://github.com/szluyu99", Desc: "github"},
 		{Key: "gitee", Value: "https://gitee.com/szluyu99", Desc: "gitee"},
-		{Key: "tourist_avatar", Value: "https://cdn.hahacode.cn/config/tourist_avatar.png", Desc: "默认游客头像"},
-		{Key: "user_avatar", Value: "https://cdn.hahacode.cn/config/user_avatar.png", Desc: "默认用户头像"},
-		{Key: "article_cover", Value: "https://cdn.hahacode.cn/config/default_article_cover.png", Desc: "默认文章封面"},
+		{Key: "tourist_avatar", Value: imgBase + "/config/tourist_avatar.jpeg", Desc: "默认游客头像"},
+		{Key: "user_avatar", Value: imgBase + "/config/user_avatar.jpeg", Desc: "默认用户头像"},
+		{Key: "article_cover", Value: imgBase + "/config/default_article_cover.png", Desc: "默认文章封面"},
 		{Key: "is_comment_review", Value: "true", Desc: "评论默认审核"},
 		{Key: "is_message_review", Value: "true", Desc: "留言默认审核"},
 	}
@@ -150,7 +154,7 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 			Password: pwd,
 			UserInfo: &model.UserInfo{
 				Nickname: "admin",
-				Avatar:   "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
+				Avatar:   imgBase + "/config/user_avatar.jpeg",
 			},
 		},
 		{
@@ -158,7 +162,7 @@ func generateDefaultRolesAndUsers(db *gorm.DB) {
 			Password: pwd,
 			UserInfo: &model.UserInfo{
 				Nickname: "guest",
-				Avatar:   "https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png",
+				Avatar:   imgBase + "/config/user_avatar.jpeg",
 			},
 		},
 	}

@@ -82,7 +82,7 @@ describe('useUserStore', () => {
     store.setToken('fake-token')
     await store.getUserInfo()
 
-    expect(store.avatar).toContain('bing.com')
+    expect(store.avatar).toContain('/images/config/user_avatar.jpeg')
   })
 
   it('getUserInfo 遇到业务错误码时 reject', async () => {
@@ -102,7 +102,7 @@ describe('useUserStore', () => {
     const store = useUserStore()
     store.setToken('fake-token')
     await store.getUserInfo()
-    expect(store.avatar).toContain('bing.com')
+    expect(store.avatar).toContain('/images/config/user_avatar.jpeg')
   })
 
   it('articleLike / commentLike 是切换语义, 重复调用会取消', () => {

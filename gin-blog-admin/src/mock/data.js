@@ -1,7 +1,9 @@
 // Mock 数据源: 无后端时供 mock 适配器使用
 // menus / resources / roles / pages / config 与后端初始化的默认数据保持一致, 保证动态路由和权限页面可用
 
-export const SAMPLE_IMG = 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg'
+// 图片用本仓库 images/ 目录下的图片(GitHub 直接提供), 不依赖第三方示例图站点
+const IMG_BASE = 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images'
+export const SAMPLE_IMG = `${IMG_BASE}/common/header.jpeg`
 
 // 菜单 (动态路由数据源, 字段与 /menu/list 一致)
 export const menus = [
@@ -117,22 +119,22 @@ export const roles = [
 
 // 页面封面
 export const pages = [
-  { id: 1, name: '首页', label: 'home', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 2, name: '归档', label: 'archive', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 3, name: '分类', label: 'category', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 4, name: '标签', label: 'tag', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 5, name: '友链', label: 'link', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 6, name: '关于', label: 'about', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 7, name: '留言', label: 'message', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 8, name: '个人中心', label: 'user', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 9, name: '相册', label: 'album', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 10, name: '错误页面', label: '404', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
-  { id: 11, name: '文章列表', label: 'article_list', cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg' },
+  { id: 1, name: '首页', label: 'home', cover: `${IMG_BASE}/page/home.jpg` },
+  { id: 2, name: '归档', label: 'archive', cover: `${IMG_BASE}/page/archive.png` },
+  { id: 3, name: '分类', label: 'category', cover: `${IMG_BASE}/page/category.png` },
+  { id: 4, name: '标签', label: 'tag', cover: `${IMG_BASE}/page/tag.png` },
+  { id: 5, name: '友链', label: 'link', cover: `${IMG_BASE}/page/link.jpg` },
+  { id: 6, name: '关于', label: 'about', cover: `${IMG_BASE}/page/about.jpg` },
+  { id: 7, name: '留言', label: 'message', cover: `${IMG_BASE}/page/message.jpeg` },
+  { id: 8, name: '个人中心', label: 'user', cover: `${IMG_BASE}/page/user.jpg` },
+  { id: 9, name: '相册', label: 'album', cover: `${IMG_BASE}/page/album.png` },
+  { id: 10, name: '错误页面', label: '404', cover: `${IMG_BASE}/page/404.jpg` },
+  { id: 11, name: '文章列表', label: 'article_list', cover: `${IMG_BASE}/page/article_list.jpg` },
 ]
 
 // 网站配置
 export const config = {
-  website_avatar: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg',
+  website_avatar: `${IMG_BASE}/common/header.jpeg`,
   website_name: '阵雨的个人博客 (Mock)',
   website_author: '阵雨',
   website_intro: '当前为 Mock 模式, 数据均为本地假数据',
@@ -142,9 +144,9 @@ export const config = {
   qq: '123456789',
   github: 'https://github.com/szluyu99',
   gitee: 'https://gitee.com/szluyu99',
-  tourist_avatar: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg',
-  user_avatar: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg',
-  article_cover: 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg',
+  tourist_avatar: `${IMG_BASE}/config/tourist_avatar.jpeg`,
+  user_avatar: `${IMG_BASE}/config/user_avatar.jpeg`,
+  article_cover: `${IMG_BASE}/config/default_article_cover.png`,
   is_comment_review: 'true',
   is_message_review: 'true',
 }

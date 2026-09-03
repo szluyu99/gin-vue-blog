@@ -21,17 +21,17 @@ const form = ref({
   qq: '123456789',
   github: 'https://github.com/szluyu99',
   gitee: 'https://gitee.com/szluyu99',
-  tourist_avatar: 'https://cdn.hahacode.cn/16815451239215dc82548dcadcd578a5bbc8d5deaa.jpg',
-  user_avatar: 'https://cdn.hahacode.cn/2299fc4d14c94e6183b082973b35855d.png',
-  article_cover: 'https://cdn.hahacode.cn/1679461519cc592408198d67faf1290ff8969dc614.png',
+  tourist_avatar: 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/tourist_avatar.jpeg',
+  user_avatar: 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/user_avatar.jpeg',
+  article_cover: 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/default_article_cover.png',
   is_comment_review: 1,
   is_message_review: 1,
   // is_email_notice: 0,
   // social_login_list: [],
   // social_url_list: [],
   // is_reward: 0,
-  // wechat_qrcode: 'http://dummyimage.com/100x100',
-  // alipay_ode: 'http://dummyimage.com/100x100',
+  // wechat_qrcode: 'https://dummyimage.com/100x100',
+  // alipay_ode: 'https://dummyimage.com/100x100',
 })
 
 onMounted(async () => {

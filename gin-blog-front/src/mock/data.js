@@ -1,10 +1,11 @@
 // Mock 数据源: 无后端时供 mock 适配器使用
-// 图片统一使用外部示例图, 避免依赖后端静态资源服务和已失效的 CDN
-const SAMPLE_IMG = 'https://samplelib.com/jpeg/sample-photo-1920x1080.jpg'
+// 图片用本仓库 images/ 目录下的图片(GitHub 直接提供), 不依赖后端静态资源服务,
+// 也不再依赖第三方示例图站点
+const IMG_BASE = 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images'
 
-const COVER = SAMPLE_IMG
-const AVATAR = SAMPLE_IMG
-const TOURIST_AVATAR = SAMPLE_IMG
+const COVER = `${IMG_BASE}/page/article_list.jpg`
+const AVATAR = `${IMG_BASE}/common/header.jpeg`
+const TOURIST_AVATAR = `${IMG_BASE}/config/tourist_avatar.jpeg`
 
 export const blogConfig = {
   website_name: 'Gin Vue Blog (Mock)',
@@ -25,17 +26,17 @@ export const blogConfig = {
 }
 
 export const pages = [
-  { id: 1, name: '首页', label: 'home', cover: SAMPLE_IMG },
-  { id: 2, name: '归档', label: 'archive', cover: SAMPLE_IMG },
-  { id: 3, name: '分类', label: 'category', cover: SAMPLE_IMG },
-  { id: 4, name: '标签', label: 'tag', cover: SAMPLE_IMG },
-  { id: 5, name: '友链', label: 'link', cover: SAMPLE_IMG },
-  { id: 6, name: '关于', label: 'about', cover: SAMPLE_IMG },
-  { id: 7, name: '留言', label: 'message', cover: SAMPLE_IMG },
-  { id: 8, name: '个人中心', label: 'user', cover: SAMPLE_IMG },
-  { id: 9, name: '相册', label: 'album', cover: SAMPLE_IMG },
-  { id: 10, name: '错误页面', label: '404', cover: SAMPLE_IMG },
-  { id: 11, name: '文章列表', label: 'article_list', cover: SAMPLE_IMG },
+  { id: 1, name: '首页', label: 'home', cover: `${IMG_BASE}/page/home.jpg` },
+  { id: 2, name: '归档', label: 'archive', cover: `${IMG_BASE}/page/archive.png` },
+  { id: 3, name: '分类', label: 'category', cover: `${IMG_BASE}/page/category.png` },
+  { id: 4, name: '标签', label: 'tag', cover: `${IMG_BASE}/page/tag.png` },
+  { id: 5, name: '友链', label: 'link', cover: `${IMG_BASE}/page/link.jpg` },
+  { id: 6, name: '关于', label: 'about', cover: `${IMG_BASE}/page/about.jpg` },
+  { id: 7, name: '留言', label: 'message', cover: `${IMG_BASE}/page/message.jpeg` },
+  { id: 8, name: '个人中心', label: 'user', cover: `${IMG_BASE}/page/user.jpg` },
+  { id: 9, name: '相册', label: 'album', cover: `${IMG_BASE}/page/album.png` },
+  { id: 10, name: '错误页面', label: '404', cover: `${IMG_BASE}/page/404.jpg` },
+  { id: 11, name: '文章列表', label: 'article_list', cover: `${IMG_BASE}/page/article_list.jpg` },
 ]
 
 export const categories = [
@@ -96,10 +97,10 @@ export const messages = [
 
 // 友链
 export const links = [
-  { id: 1, name: 'Gin', avatar: SAMPLE_IMG, address: 'https://gin-gonic.com', intro: 'Go 的 HTTP Web 框架' },
-  { id: 2, name: 'Vue', avatar: SAMPLE_IMG, address: 'https://cn.vuejs.org', intro: '渐进式 JavaScript 框架' },
-  { id: 3, name: 'Vite', avatar: SAMPLE_IMG, address: 'https://cn.vitejs.dev', intro: '下一代前端工具链' },
-  { id: 4, name: 'UnoCSS', avatar: SAMPLE_IMG, address: 'https://unocss.dev', intro: '即时按需原子 CSS 引擎' },
+  { id: 1, name: 'Gin', avatar: AVATAR, address: 'https://gin-gonic.com', intro: 'Go 的 HTTP Web 框架' },
+  { id: 2, name: 'Vue', avatar: AVATAR, address: 'https://cn.vuejs.org', intro: '渐进式 JavaScript 框架' },
+  { id: 3, name: 'Vite', avatar: AVATAR, address: 'https://cn.vitejs.dev', intro: '下一代前端工具链' },
+  { id: 4, name: 'UnoCSS', avatar: AVATAR, address: 'https://unocss.dev', intro: '即时按需原子 CSS 引擎' },
 ]
 
 export const about = '## 关于本站\n\n这是 Mock 模式下的关于页面内容, 可以在 `src/mock/data.js` 中修改。\n\n- 技术栈: Vue3 + Vite + UnoCSS\n- 后端: Gin + GORM\n'

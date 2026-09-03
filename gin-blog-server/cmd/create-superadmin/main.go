@@ -64,7 +64,7 @@ func createSuperAdmin(db *gorm.DB, username, password string) {
 			IsSuper:  true,
 			UserInfo: &model.UserInfo{
 				Nickname: username,
-				Avatar:   "https://cdn.hahacode.cn/config/superadmin_avatar.jpg",
+				Avatar:   "https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/superadmin_avatar.jpg",
 				Intro:    "这个人很懒，什么都没有留下",
 				Website:  "https://www.hahacode.cn",
 			},

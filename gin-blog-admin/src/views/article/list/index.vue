@@ -68,7 +68,7 @@ const columns = [
       return h(NImage, {
         imgProps: { style: { 'border-radius': '2px', 'height': '100%', 'width': '100%' } },
         src: convertImgUrl(row.img),
-        fallbackSrc: 'http://dummyimage.com/400x400',
+        fallbackSrc: 'https://dummyimage.com/400x400',
         showToolbarTooltip: true,
       })
     },

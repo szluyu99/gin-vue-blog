@@ -8,7 +8,7 @@
     <blockquote class="border-l-3 border-color-#49b1f5 rounded-l-5 bg-#ecf7fe px-4 py-3 leading-7 dark:bg-#1d2a33">
       <p>名称：阵、雨的个人博客</p>
       <p>简介：往事随风而去</p>
-      <p>头像：https://foruda.gitee.com/avatar/1677041571085433939/5221991_szluyu99_1614389421.png</p>
+      <p>头像：https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/common/header.jpeg</p>
     </blockquote>
     <p>
       需要交换友链的在下方留言💖:

@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import api from '@/api'
 
+// 默认头像: 原来是 bing 的一张外链图, 换成本仓库 images/ 下的图片
+const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/user_avatar.jpeg'
+
 export const useUserStore = defineStore('user', {
   persist: {
     key: 'gvb_blog_user',
@@ -10,7 +13,7 @@ export const useUserStore = defineStore('user', {
     userInfo: {
       id: '',
       nickname: '',
-      avatar: 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+      avatar: DEFAULT_AVATAR,
       website: '',
       intro: '',
       email: '',
@@ -23,8 +26,8 @@ export const useUserStore = defineStore('user', {
     userId: state => state.userInfo.id ?? '',
     nickname: state => state.userInfo.nickname ?? '',
     // 用 || 而不是 ??: 头像为空串时也要退回默认图,
-    // 否则 convertImgUrl('') 会给出已失效的 dummyimage.com 占位图
-    avatar: state => state.userInfo.avatar || 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+    // 否则 convertImgUrl('') 会给出 dummyimage.com 的占位图而不是头像
+    avatar: state => state.userInfo.avatar || DEFAULT_AVATAR,
     website: state => state.userInfo.website ?? '',
     intro: state => state.userInfo.intro ?? '',
     email: state => state.userInfo.email ?? '',

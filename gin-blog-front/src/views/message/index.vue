@@ -19,7 +19,7 @@ const isLoop = ref(false) // 循环播放
 
 // 弹幕列表
 const danmus = ref([{
-  avatar: 'https://www.bing.com/rp/ar_9isCNU2Q-VG1yEDDHnx8HAFQ.png',
+  avatar: 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/config/user_avatar.jpeg',
   content: '大家好，我是作者，欢迎给我点一颗 Star!',
   nickname: '阵、雨',
 }])
@@ -58,7 +58,7 @@ const coverStyle = computed(() => {
   const page = pageList.value.find(e => e.label === 'message')
   return page
     ? `background: url('${page?.cover}') center center / cover no-repeat;`
-    : 'background: url("https://static.talkxj.com/config/83be0017d7f1a29441e33083e7706936.jpg") center center / cover no-repeat;'
+    : 'background: url("https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/images/page/message.jpeg") center center / cover no-repeat;'
 })
 </script>
 

@@ -10,7 +10,7 @@
  */
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {
-    return 'http://dummyimage.com/400x400'
+    return 'https://dummyimage.com/400x400'
   }
   // 网络资源
   if (imgUrl.startsWith('http')) {

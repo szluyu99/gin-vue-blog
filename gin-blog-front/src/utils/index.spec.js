@@ -4,9 +4,9 @@ import { hasMath } from '@/utils/mathjax'
 
 describe('convertImgUrl', () => {
   it('没有图片时返回占位图', () => {
-    expect(convertImgUrl('')).toBe('http://dummyimage.com/400x400')
-    expect(convertImgUrl(null)).toBe('http://dummyimage.com/400x400')
-    expect(convertImgUrl(undefined)).toBe('http://dummyimage.com/400x400')
+    expect(convertImgUrl('')).toBe('https://dummyimage.com/400x400')
+    expect(convertImgUrl(null)).toBe('https://dummyimage.com/400x400')
+    expect(convertImgUrl(undefined)).toBe('https://dummyimage.com/400x400')
   })
 
   it('网络图片原样返回', () => {

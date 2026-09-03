@@ -14,7 +14,7 @@ export * from './naiveTool'
 // localhost 指的是浏览器所在的机器, 图片必然裂开
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {
-    return 'http://dummyimage.com/400x400'
+    return 'https://dummyimage.com/400x400'
   }
   // 网络资源
   if (imgUrl.startsWith('http')) {
