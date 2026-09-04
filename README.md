@@ -44,6 +44,8 @@
 - 界面参考 Hexo 主题 Butterfly，响应式适配移动端
 - 暗色模式：首次访问跟随系统偏好，可手动切换并记住选择，刷新无闪屏
 - 文章详情支持目录锚点、推荐文章
+- 阅读体验：顶部阅读进度条、代码块一键复制、超过 90 天的文章提示内容可能过时
+- 文章列表分页（分类 / 标签下同样分页）
 - 评论 + 回复，留言弹幕墙
 - 点赞、访客统计（Redis）
 - 用户注册：默认直接建号，可开启邮箱验证码注册（`config.yml` 的 `Captcha.SendEmail`）
@@ -114,6 +116,8 @@ gin-blog-server
 
 **本地开发见 [quick_start.md](./quick_start.md)**，含 Mock 模式（不启动后端）和完整启动两种方式、访问地址、默认账号和常见问题。
 
+初始化数据只含系统基础数据（菜单 / 接口 / 角色 / 配置），不含文章。要一批能点得动的内容（分类、标签、15 篇文章、评论与回复、留言、友链）用 `./dev.sh fresh --demo`，或 `cd gin-blog-server/cmd/generate-data && go run main.go -t demo`。
+
 只想看效果，用 Docker Compose 一键运行（需要 Docker + Docker Compose，Windows 请用 GitBash）：
 
 ```bash
@@ -133,10 +137,12 @@ cd gin-vue-blog/deploy
 ## 测试与 CI
 
 ```bash
-cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层测试
-cd gin-blog-front  && pnpm test       # 前端: vitest
-cd gin-blog-admin  && pnpm test
+cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
+cd gin-blog-front  && pnpm test       # 前台: vitest, 19 个文件 120 条
+cd gin-blog-admin  && pnpm test       # 后台: vitest, 26 个文件 144 条
 ```
+
+前端测试以回归为主：每条都验证过「把修复回退后会变红」，覆盖的具体缺陷见 `code_audit.md` 的「组件测试」一节。
 
 `.github/workflows/ci.yml` 在 push 和 PR 时跑四组任务：
 
@@ -151,19 +157,18 @@ cd gin-blog-admin  && pnpm test
 
 功能：
 
+- 前台「说说 / 相册」两个占位页（目前点进去是空的）
 - 前台侧边信息收缩
-- 说说、相册、音乐播放器
-- 第三方登录：QQ、微信、Github
-- 前台搜索集成 ElasticSearch（当前为数据库模糊查询）
-- 评论、留言的通知
-- 国际化
+- 评论、留言的站内通知
+- 后台首页做成仪表盘（目前内容较少）
 
 工程：
 
-- 后台首页重新设计（目前内容较少）
-- 扩大前端组件测试覆盖（已接入 `@vue/test-utils`，目前只覆盖修过 bug 的几个组件，见 `code_audit.md` 组件测试一节）
-- 补齐安全项：CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、邮件模块的日志与 TLS。见 `code_audit.md` 的 S2、S3、S5、S6、S7
-- 前台把 `@iconify/vue` 的 `<Icon>` 换成 UnoCSS 图标类，去掉运行时图标请求
-- 邮件模块整理：SMTP 密码不再进日志、不再 `InsecureSkipVerify`、启动时校验配置（见 `code_audit.md` S7）
+- 补齐安全项：X-Real-IP 可伪造、CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、邮件模块的日志与 TLS。见 `code_audit.md` 的 S2、S3、S5、S6、S7，均已评估为暂缓
+- 缓存加 TTL 并主动失效（改了数据库还得手动 `redis-cli del`）
+- CI 自动发布镜像到 GHCR（现在只构建验证、不发布）
+- 极简前端错误上报（`window.onerror` + `unhandledrejection` 落一张表）
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档
+
+明确不做的（理由见 [roadmap.md](./roadmap.md)）：ElasticSearch 搜索、SSR / SSG、第三方登录、国际化、RSS / sitemap、后端日志切割、把 `@iconify/vue` 换成 UnoCSS 图标类。
