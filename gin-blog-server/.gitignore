@@ -21,3 +21,5 @@ public/markdown/
 
 # Redis 持久化文件, 本地运行时生成
 *.rdb
+# dev.sh fresh 备份出来的旧库
+*.db.bak

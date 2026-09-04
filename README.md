@@ -142,7 +142,7 @@ cd gin-blog-admin  && pnpm test
 
 - Server：`gofmt` / `go vet` / `go test`，并校验 `docs/` 与 Swagger 注解是否一致
 - Frontend：两个前端各跑 `pnpm lint` / `pnpm test` / `pnpm build`
-- Docker：构建 web 与 server 镜像并启动做健康检查
+- Docker：构建 web 与 server 镜像并启动做健康检查。web 镜像直接用 Frontend job 的产物 + `deploy/build/web/Dockerfile`（不在容器里重新打包前端），server 镜像走 buildx + GitHub Actions 缓存
 - Deploy：起完整的 compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦，重复执行不新增资源）
 
 ## 后续计划
