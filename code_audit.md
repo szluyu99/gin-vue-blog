@@ -376,6 +376,11 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   都不让内容变成 null、保存提交当前内容、失败不提示成功且 loading 复位
 - `gin-blog-admin/src/views/article/category/index.spec.js` — 新增走空表单、编辑带原数据、
   行内删除不弹二次确认、批量删除空选中只提示、保存失败不提示成功(结构与标签页一致)
+- `gin-blog-admin/src/views/home/index.spec.js` — 统计数据填充、接口失败与空数据都不让
+  homeInfo 变成 null、用户信息后到也能显示在问候语里(原来解构 store 失去响应性)、
+  一言接口挂了走兜底文案
+- `gin-blog-admin/src/views/article/tag/index.spec.js` — 与分类页同构的 CRUD 回归:
+  新增走空表单、编辑带原数据、删除文案、批量删除空选中、保存失败不提示成功
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页

@@ -6,7 +6,8 @@ import api from '@/api'
 import AppPage from '@/components/common/AppPage.vue'
 import { useUserStore } from '@/store'
 
-const { nickname, avatar } = useUserStore()
+// 不解构 store: 解构后失去响应性, getUserInfo() 回来后这里的昵称和头像不会更新
+const userStore = useUserStore()
 
 const homeInfo = ref({
   view_count: 0,
@@ -17,8 +18,17 @@ const homeInfo = ref({
 
 onMounted(async () => {
   getOneSentence()
-  const res = await api.getHomeInfo()
-  homeInfo.value = res.data
+  // 裸 await 会在接口失败时留下未捕获的 rejection;
+  // data 为空时也不能让 homeInfo 变成 null, 模板里要取它的字段
+  try {
+    const res = await api.getHomeInfo()
+    if (res.data) {
+      homeInfo.value = res.data
+    }
+  }
+  catch (err) {
+    console.error(err)
+  }
 })
 
 // 一言
@@ -36,9 +46,9 @@ async function getOneSentence() {
     <div class="flex-1">
       <NCard>
         <div class="flex items-center">
-          <NAvatar round :size="60" :src="avatar" />
+          <NAvatar round :size="60" :src="userStore.avatar" />
           <div class="ml-5">
-            <p> Hello, {{ nickname }} </p>
+            <p> Hello, {{ userStore.nickname }} </p>
             <NGradientText class="mt-1 op-60" gradient="linear-gradient(90deg, red 0%, green 50%, blue 100%)">
               {{ sentence }}
             </NGradientText>
