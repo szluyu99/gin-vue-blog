@@ -64,27 +64,67 @@ const CONTENT = {
   6: `## 前端工程化里那些容易被忽略的细节\n\n1. lockfile 一定要提交, 并且注意包管理器版本\n2. 依赖升级要看 CHANGELOG 的 breaking change\n3. 环境变量区分 \`.env\` / \`.env.development\` / \`.env.production\`\n\n> 一次不受控的依赖升级, 可以让整个应用白屏。\n`,
 }
 
-// 文章: 列表 / 详情 / 归档 / 搜索 共用
-export const articles = [
+// 手写的几篇: 正文各不相同, 用来看 Markdown / 代码高亮 / 公式渲染
+const HANDWRITTEN = [
   { id: 6, title: '前端工程化里那些容易被忽略的细节', created_at: '2024-01-05T10:20:00.000Z', category_id: 2, tag_ids: [5, 2], is_top: 0 },
   { id: 5, title: 'Vue3 组合式 API 的取舍', created_at: '2024-01-03T15:30:00.000Z', category_id: 2, tag_ids: [2, 5], is_top: 0 },
   { id: 4, title: 'Gin 中间件是怎么串起来的', created_at: '2024-01-01T09:00:00.000Z', category_id: 1, tag_ids: [1, 4], is_top: 0 },
   { id: 3, title: '项目介绍', created_at: '2023-12-27T22:48:43.727Z', category_id: 3, tag_ids: [1, 2], is_top: 1 },
   { id: 2, title: '学习有捷径', created_at: '2023-12-27T22:47:47.513Z', category_id: 4, tag_ids: [3], is_top: 0 },
   { id: 1, title: '项目运行成功', created_at: '2023-12-27T22:46:36.066Z', category_id: 3, tag_ids: [1, 2], is_top: 0 },
-].map(e => ({
-  ...e,
-  updated_at: e.created_at,
-  desc: '',
-  content: CONTENT[e.id],
-  img: COVER,
-  type: 1,
-  status: 1,
-  is_delete: false,
-  original_url: '',
-  like_count: (e.id * 7) % 23,
-  view_count: e.id * 31,
+]
+
+// 手写 6 篇翻不动页: 首页无限滚动一页 8 条, 文章列表页一页 9 条。
+// 剩下的按模板批量生成, 只有标题和分类标签不同, 免得 data.js 变成一大坨正文
+const FILLER_TITLES = [
+  'GORM 的预加载与 N+1 查询',
+  '为什么不要在 handler 里写 SQL',
+  'JWT 与 Session 各自适合什么场景',
+  'Redis 做计数器时的原子性问题',
+  '接口幂等性的几种实现',
+  'Go 的 context 到底传了什么',
+  '错误处理: sentinel error 还是 error wrapping',
+  'sync.Pool 什么时候真的有用',
+  'Pinia 的 store 该拆到多细',
+  'Vue Router 的动态路由怎么落地',
+  '组件测试和端到端测试的分工',
+  'UnoCSS 的 preset 与 shortcut',
+  '为什么我的 CSS 类名没生成',
+  '前端如何优雅地处理接口错误',
+  'Docker 多阶段构建能省多少体积',
+  'Nginx 反向代理里最常写错的三行',
+  'CI 跑得慢, 时间都花在哪了',
+  '写文档这件事的投入产出',
+]
+
+const FILLER = FILLER_TITLES.map((title, i) => ({
+  id: 7 + i,
+  title,
+  // 从 2024-01-08 起每篇隔 3 天, 归档页能分出多个月份
+  created_at: new Date(Date.UTC(2024, 0, 8 + i * 3, 10, 0, 0)).toISOString(),
+  category_id: (i % 4) + 1,
+  tag_ids: [(i % 5) + 1, ((i + 2) % 5) + 1],
+  is_top: 0,
+  content: `## ${title}\n\n这是 Mock 模式下批量生成的样例文章, 用来验证列表分页和首页滚动加载。\n\n- 结论先写在前面\n- 代码片段尽量能直接跑\n- 需要注意的坑单独列出来\n\n\`\`\`go\nfmt.Println("mock article ${7 + i}")\n\`\`\`\n\n> ${title}\n`,
 }))
+
+// 文章: 列表 / 详情 / 归档 / 搜索 共用
+// 按时间倒序: 详情页的上一篇/下一篇直接按数组下标取, 顺序不能乱
+export const articles = [...HANDWRITTEN, ...FILLER]
+  .map(e => ({
+    ...e,
+    updated_at: e.created_at,
+    desc: '',
+    content: e.content ?? CONTENT[e.id],
+    img: COVER,
+    type: 1,
+    status: 1,
+    is_delete: false,
+    original_url: '',
+    like_count: (e.id * 7) % 23,
+    view_count: e.id * 31,
+  }))
+  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
 // 留言 (弹幕)
 export const messages = [

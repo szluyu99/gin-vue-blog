@@ -89,11 +89,29 @@ describe('前台文章列表', () => {
     expect(window.scrollTo).toHaveBeenCalled()
   })
 
+  // 之前这里写的是 <NPagination>, 但前台没装 naive-ui, 组件解析不到,
+  // 分页器一个像素都渲染不出来。上面那条用例直接改 vm.current, 所以没抓到
+  it('多于一页时真的把分页器渲染出来', async () => {
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: articles, total: 25 } })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.total).toBe(25))
+    await wrapper.vm.$nextTick()
+
+    const pager = wrapper.find('nav[aria-label="分页"]')
+    expect(pager.exists()).toBe(true)
+    expect(pager.find('[aria-current="page"]').text()).toBe('1')
+
+    // 点分页器上的「2」要真的翻页, 而不是只有 vm.current 能改
+    await pager.findAll('button').find(b => b.text() === '2').trigger('click')
+    await vi.waitFor(() => expect(api.getArticles).toHaveBeenCalledWith(expect.objectContaining({ page_num: 2 })))
+  })
+
   it('只有一页时不渲染分页器', async () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.total).toBe(2))
 
     expect(wrapper.vm.pageCount).toBe(1)
+    expect(wrapper.find('nav[aria-label="分页"]').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('这里还没有文章')
   })
 

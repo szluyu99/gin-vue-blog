@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 
 import api from '@/api'
 import BannerPage from '@/components/BannerPage.vue'
+import UPagination from '@/components/ui/UPagination.vue'
 import { convertImgUrl } from '@/utils'
 
 const route = useRoute()
@@ -102,7 +103,7 @@ onMounted(() => {
     </div>
     <!-- 分页 -->
     <div v-if="pageCount > 1" class="mt-8 flex justify-center">
-      <NPagination v-model:page="current" :page-count="pageCount" />
+      <UPagination v-model:page="current" :page-count="pageCount" />
     </div>
     <!-- 空列表提示: 以前没有数据时页面是一片空白 -->
     <div v-if="!loading && !articleList.length" class="py-20 text-center color-muted">
