@@ -57,9 +57,23 @@ const loading = ref(true)
 onMounted(async () => {
   try {
     const resp = await api.getArticleDetail(route.params.id)
-    data.value = resp.data
-    // marked 解析 markdown 文本
-    data.value.content = await marked.parse(resp.data.content, { async: true })
+    if (!resp.data) {
+      return
+    }
+    // 后端这些字段可能是 null(未分类、没有上一篇、没有推荐), 子组件里直接取 .length / .name,
+    // 所以在这里统一退化成默认值, 而不是把 resp.data 整个盖上去
+    data.value = {
+      ...data.value,
+      ...resp.data,
+      tags: resp.data.tags ?? [],
+      newest_articles: resp.data.newest_articles ?? [],
+      recommend_articles: resp.data.recommend_articles ?? [],
+      category: resp.data.category ?? {},
+      last_article: resp.data.last_article ?? {},
+      next_article: resp.data.next_article ?? {},
+      // marked 解析 markdown 文本, 正文为空时不能直接丢给 marked
+      content: await marked.parse(resp.data.content ?? '', { async: true }),
+    }
     await nextTick()
     // highlight.js 代码高亮
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))

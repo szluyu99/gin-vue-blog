@@ -388,6 +388,12 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   接口失败 loading 复位、空数据不抛(以前直接取 `resp.data.page_data`)
 - `gin-blog-front/src/views/link/index.spec.js` — 列表渲染、失败时 loading 复位、
   空数据不给 LinkList 传 null(它内部直接取 `linkList.length`)
+- `gin-blog-front/src/views/home/index.spec.js` — 首屏加载与摘要去 Markdown 记号、
+  首屏失败时 loading 复位(无限加载靠 `!loading` 才继续请求, 停在 true 等于首页不再加载)、
+  无限加载的三条分支(有数据/空数据完成/失败), 返回 null 也算完成
+- `gin-blog-front/src/views/article/detail/index.spec.js` — markdown 解析、封面转换与
+  无封面兜底、可空字段(tags/category/上下篇/推荐)为 null 时退化成默认值、
+  接口失败与空数据都不破坏默认结构
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页

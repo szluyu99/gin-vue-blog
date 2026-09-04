@@ -24,13 +24,14 @@ async function getArticlesInfinite($state) {
   if (!loading.value) {
     try {
       const resp = await api.getArticles(params)
+      const list = resp.data ?? []
       // 加载完成
-      if (!resp.data.length) {
+      if (!list.length) {
         $state.complete()
         return
       }
       // 非首次加载, 都是往列表中添加数据 (摘要去掉 Markdown 记号)
-      articleList.value.push(...resp.data.map(e => ({ ...e, content: stripMarkdown(e.content) })))
+      articleList.value.push(...list.map(e => ({ ...e, content: stripMarkdown(e.content) })))
       params.page_num++
       $state.loaded()
     }
@@ -42,11 +43,19 @@ async function getArticlesInfinite($state) {
 
 onMounted(async () => {
   loading.value = true
-  // 首次加载
-  const resp = await api.getArticles(params)
-  articleList.value = resp.data.map(e => ({ ...e, content: stripMarkdown(e.content) }))
-  params.page_num++
-  loading.value = false
+  // 首屏失败时 loading 必须复位: 无限加载靠 !loading.value 才会继续请求,
+  // 停在 true 就等于首页彻底不再加载文章
+  try {
+    const resp = await api.getArticles(params)
+    articleList.value = (resp.data ?? []).map(e => ({ ...e, content: stripMarkdown(e.content) }))
+    params.page_num++
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    loading.value = false
+  }
 })
 
 function backTop() {
