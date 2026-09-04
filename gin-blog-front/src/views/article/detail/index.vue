@@ -96,11 +96,14 @@ onMounted(async () => {
 const { y } = useWindowScroll()
 const { height: windowHeight } = useWindowSize()
 const readProgress = computed(() => {
+  // y 必须在提前 return 之前读: 首屏正文还没渲染完时页面撑不出滚动条,
+  // 一旦先 return 就没把 y 记成依赖, 之后滚动也不会重算, 进度条会永远停在 0
+  const scrolled = y.value
   const total = document.documentElement.scrollHeight - windowHeight.value
   if (total <= 0) {
     return 0
   }
-  return Math.min(100, Math.max(0, (y.value / total) * 100))
+  return Math.min(100, Math.max(0, (scrolled / total) * 100))
 })
 
 // 太久没更新的文章给个提示: 技术文章过期得快, 免得读者照着老内容踩坑
@@ -123,8 +126,8 @@ const styleVal = computed(() =>
 <template>
   <!-- 阅读进度 -->
   <div
-    class="fixed inset-x-0 top-0 z-999 h-0.5 bg-#49b1f5 transition-[width] duration-100"
-    :style="{ width: `${readProgress}%` }"
+    class="fixed inset-x-0 top-0 z-999 h-0.5 bg-#49b1f5"
+    :style="{ width: `${readProgress}%`, transition: 'width .1s linear' }"
   />
   <!-- 头部 -->
   <div :style="styleVal" class="banner-fade-down absolute inset-x-0 top-0 h-[360px] f-c-c lg:h-[400px]">

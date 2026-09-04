@@ -14,6 +14,8 @@ const CODE_HTML = '<pre><code>go build ./...</code></pre><pre><code>pnpm dev</co
 describe('代码块复制按钮', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
+    // 用例之间要清掉: 有的用例会把它换成 mock
+    Reflect.deleteProperty(document, 'execCommand')
     // jsdom 默认没有 clipboard
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
@@ -36,13 +38,13 @@ describe('代码块复制按钮', () => {
 
     const btn = root.querySelector('[data-copy-btn]')
     expect(btn.style.position).toBe('absolute')
-    expect(btn.style.opacity).toBe('0')
+    expect(btn.style.opacity).toBe('0.45')
     expect(btn.className).toBe('')
     // 按钮要定位在代码块内, pre 得是定位父级
     expect(root.querySelector('pre').style.position).toBe('relative')
   })
 
-  it('鼠标移入代码块时按钮才显形', () => {
+  it('鼠标移入代码块时按钮变清晰', () => {
     const root = makeArticle(CODE_HTML)
     addCopyButtons(root)
     const pre = root.querySelector('pre')
@@ -51,7 +53,7 @@ describe('代码块复制按钮', () => {
     pre.dispatchEvent(new MouseEvent('mouseenter'))
     expect(btn.style.opacity).toBe('1')
     pre.dispatchEvent(new MouseEvent('mouseleave'))
-    expect(btn.style.opacity).toBe('0')
+    expect(btn.style.opacity).toBe('0.45')
   })
 
   // 正文重新渲染时会重复调用
@@ -74,6 +76,7 @@ describe('代码块复制按钮', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('go build ./...')
   })
 
+  // clipboard API 和 execCommand 都不行才算失败
   it('复制失败时提示失败而不是假装成功', async () => {
     navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error('denied'))
     const root = makeArticle(CODE_HTML)
@@ -83,13 +86,50 @@ describe('代码块复制按钮', () => {
     await vi.waitFor(() => expect(root.querySelector('[data-copy-btn]').textContent).toBe('复制失败'))
   })
 
-  // 非 https 或旧浏览器下没有剪贴板 API, 加了按钮点了也没反应
-  it('没有剪贴板 API 时不加按钮', () => {
+  // 用局域网 IP 走 http 打开时 navigator.clipboard 是 undefined(非安全上下文),
+  // 曾经这种情况下直接不加按钮, 结果表现成"这功能根本不存在"
+  it('没有剪贴板 API 时照样加按钮, 退回 execCommand', async () => {
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true, writable: true })
-    const root = makeArticle(CODE_HTML)
+    const execCommand = vi.fn().mockReturnValue(true)
+    document.execCommand = execCommand
 
-    expect(addCopyButtons(root)).toBe(0)
-    expect(root.querySelectorAll('[data-copy-btn]')).toHaveLength(0)
+    const root = makeArticle(CODE_HTML)
+    expect(addCopyButtons(root)).toBe(2)
+
+    const btn = root.querySelector('[data-copy-btn]')
+    btn.click()
+    await vi.waitFor(() => expect(btn.textContent).toBe('已复制'))
+
+    expect(execCommand).toHaveBeenCalledWith('copy')
+    // 兜底用的 textarea 不能留在页面上
+    expect(document.querySelectorAll('textarea')).toHaveLength(0)
+  })
+
+  // clipboard API 存在但被权限策略拒掉(页面没聚焦等), 仍然要能复制成功
+  it('clipboard API 报错时退回 execCommand', async () => {
+    navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error('NotAllowedError'))
+    const execCommand = vi.fn().mockReturnValue(true)
+    document.execCommand = execCommand
+
+    const root = makeArticle(CODE_HTML)
+    addCopyButtons(root)
+    const btn = root.querySelector('[data-copy-btn]')
+    btn.click()
+
+    await vi.waitFor(() => expect(btn.textContent).toBe('已复制'))
+    expect(execCommand).toHaveBeenCalledWith('copy')
+  })
+
+  it('execCommand 也失败时提示失败', async () => {
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true, writable: true })
+    document.execCommand = vi.fn().mockReturnValue(false)
+
+    const root = makeArticle(CODE_HTML)
+    addCopyButtons(root)
+    root.querySelector('[data-copy-btn]').click()
+
+    await vi.waitFor(() => expect(root.querySelector('[data-copy-btn]').textContent).toBe('复制失败'))
+    expect(document.querySelectorAll('textarea')).toHaveLength(0)
   })
 
   it('容器为 null 或没有代码块时返回 0', () => {

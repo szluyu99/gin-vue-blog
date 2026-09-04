@@ -126,6 +126,37 @@ describe('文章详情', () => {
     expect(wrapper.find('[data-copy-btn]').exists()).toBe(true)
   })
 
+  // 曾经的 bug: readProgress 在读 y 之前就因为"页面还撑不出滚动条"提前 return 0,
+  // y 没被记成依赖, 之后滚动再也不会重算, 进度条永远停在 0 宽
+  it('滚动后阅读进度条跟着变宽', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+
+    const bar = wrapper.find('.z-999')
+    expect(bar.exists()).toBe(true)
+    expect(bar.attributes('style')).toContain('width: 0%')
+
+    // jsdom 里 scrollHeight 恒为 0, 手动撑出一个可滚动的页面。
+    // 注意不要动 innerHeight: 那是 readProgress 的另一个依赖, 改它会顺带
+    // 触发重算, 就算漏了 y 也会算对, 这个用例就抓不到 bug 了
+    const half = Math.round(window.innerHeight / 2)
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      value: window.innerHeight * 3,
+      configurable: true,
+    })
+    // vueuse 的 useWindowScroll 底层读的是滚动元素的 scrollTop
+    document.documentElement.scrollTop = half * 2
+    window.dispatchEvent(new Event('scroll'))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.readProgress).toBeCloseTo(50)
+    expect(wrapper.find('.z-999').attributes('style')).toContain('width: 50%')
+
+    // scrollHeight / scrollTop 是全局的, 留着会影响同文件后面的用例
+    Reflect.deleteProperty(document.documentElement, 'scrollHeight')
+    document.documentElement.scrollTop = 0
+  })
+
   // 技术文章过期得快, 太久没更新要提醒读者
   it('文章太久没更新时给出提示', async () => {
     const old = new Date(Date.now() - 200 * 86400000).toISOString()
