@@ -14,8 +14,14 @@ const aboutContent = ref('')
 const btnLoading = ref(false)
 
 onMounted(async () => {
-  const resp = await api.getAbout()
-  aboutContent.value = resp.data
+  // 裸 await 会在接口失败时留下未捕获的 rejection
+  try {
+    const resp = await api.getAbout()
+    aboutContent.value = resp.data ?? ''
+  }
+  catch (err) {
+    console.error(err)
+  }
 })
 
 async function handleSave() {
@@ -23,6 +29,9 @@ async function handleSave() {
     btnLoading.value = true
     await api.updateAbout({ content: aboutContent.value })
     window.$message.success('更新成功')
+  }
+  catch (err) {
+    console.error(err)
   }
   finally {
     btnLoading.value = false

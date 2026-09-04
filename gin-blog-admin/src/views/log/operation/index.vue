@@ -142,8 +142,9 @@ const columns = [
   },
 ]
 
+// copy 在 setup 里创建一次: 原来每次点击都新建一个 useClipboard 实例
+const { copy } = useClipboard()
 function copyFormatCode(code) {
-  const { copy } = useClipboard()
   copy(formatJson(code))
   window.$message.success('内容已复制到剪切板!')
 }

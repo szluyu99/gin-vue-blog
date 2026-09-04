@@ -10,9 +10,12 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import { formatDate } from '@/utils'
+import { convertImgUrl, formatDate } from '@/utils'
 
 defineOptions({ name: '友链管理' })
+
+// 在 setup 里创建一次: 原来写在列的 render 里, 每次点击都新建一个实例
+const { copy } = useClipboard()
 
 const $table = ref(null)
 const queryItems = ref({
@@ -53,7 +56,8 @@ const columns = [
       return h(NImage, {
         'height': 40,
         'imgProps': { style: { 'border-radius': '3px' } },
-        'src': row.avatar,
+        // 本地上传的头像存的是相对路径, 不转换直接给 img 会裂图
+        'src': convertImgUrl(row.avatar),
         'fallback-src': 'https://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -80,7 +84,6 @@ const columns = [
           // href: row.address,
           // target: '_blank',
           onClick: () => {
-            const { copy } = useClipboard()
             copy(row.address)
             $message.info('链接已经复制到剪切板!')
           },
@@ -138,7 +141,7 @@ const columns = [
               { size: 'small', type: 'error', style: 'margin-left: 15px;' },
               { default: () => '删除', icon: () => h('i', { class: 'i-material-symbols:delete-outline' }) },
             ),
-            default: () => h('div', {}, '确定删除该分类吗?'),
+            default: () => h('div', {}, '确定删除该友链吗?'),
           },
         ),
       ]

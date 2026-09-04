@@ -93,7 +93,8 @@ const columns = [
   },
   {
     title: '匿名访问',
-    key: 'is_hidden',
+    // key 只用于导出(CrudTable 按 item[key] 取值), 以前写的是不存在的 is_hidden
+    key: 'is_anonymous',
     width: 50,
     align: 'center',
     fixed: 'left',
@@ -203,9 +204,25 @@ function handleEditModule(row) {
   modalForm.value = { ...row }
   moduleModalVisible.value = true
 }
+// 保存模块
+//
+// 以前是 handleSave() 不 await 紧接着关掉弹窗: 请求还没回来弹窗就关了,
+// 保存失败也一样关, 用户以为成功了
 async function handleModuleSave() {
-  handleSave()
-  moduleModalVisible.value = false
+  try {
+    modalLoading.value = true
+    await modalFormRef.value?.validate()
+    await api.saveOrUpdateResource(modalForm.value)
+    $message.success(modalAction.value === 'add' ? '新增成功' : '编辑成功')
+    moduleModalVisible.value = false
+    $table.value?.handleSearch()
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    modalLoading.value = false
+  }
 }
 </script>
 
@@ -277,7 +294,7 @@ async function handleModuleSave() {
     <CrudModal
       v-model:visible="moduleModalVisible"
       :title="`${modalAction === 'add' ? '新增' : '编辑'}模块`"
-      :loading="modalVisible"
+      :loading="modalLoading"
       @save="handleModuleSave"
     >
       <NForm

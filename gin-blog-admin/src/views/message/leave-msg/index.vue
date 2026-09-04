@@ -165,7 +165,14 @@ async function handleUpdateReview(ids, is_review) {
     return
   }
 
-  await api.updateMessageReview(ids, is_review)
+  // 失败时拦截器已经弹过提示, 这里只要别让成功提示和列表刷新误报
+  try {
+    await api.updateMessageReview(ids, is_review)
+  }
+  catch (err) {
+    console.error(err)
+    return
+  }
   $message?.success(is_review ? '审核成功' : '撤下成功')
   $table.value?.handleSearch()
 }

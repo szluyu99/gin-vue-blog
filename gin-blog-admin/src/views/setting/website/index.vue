@@ -39,8 +39,17 @@ onMounted(async () => {
 })
 
 async function fetchData() {
-  const resp = await api.getConfig()
-  form.value = resp.data
+  // 以前是裸 await + 直接赋值: 接口失败会产生未捕获的 rejection,
+  // 配置表为空时后端返回 {}, 直接赋值又会把表单里的默认值清空
+  try {
+    const resp = await api.getConfig()
+    if (resp.data && Object.keys(resp.data).length) {
+      form.value = resp.data
+    }
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 function handleSave() {

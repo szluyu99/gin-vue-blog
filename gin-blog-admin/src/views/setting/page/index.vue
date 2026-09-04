@@ -40,12 +40,22 @@ onMounted(async () => {
 })
 
 async function fetchData() {
-  const resp = await api.getPages()
-  pageList.value = resp.data
+  // 裸 await 会在接口失败时产生未捕获的 rejection; data 为空时也不能让 pageList 变成 undefined
+  try {
+    const resp = await api.getPages()
+    pageList.value = resp.data ?? []
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 // 根据输入的链接刷新预览图片
 function refreshImg(img) {
+  // 弹窗未打开时 UploadOne 还没挂载, 直接取 .previewImg 会抛异常
+  if (!uploadOneRef.value) {
+    return
+  }
   reloadFlag.value = true
   uploadOneRef.value.previewImg = img
   setTimeout(() => reloadFlag.value = false, 600)

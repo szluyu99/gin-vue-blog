@@ -31,10 +31,17 @@ onMounted(async () => {
 
 async function updateProfile() {
   infoFormRef.value?.validate(async (err) => {
-    if (!err) {
+    if (err) {
+      return
+    }
+    // 以前是裸 await: 更新失败会留下未捕获的 rejection
+    try {
       await api.updateCurrent(infoForm.value)
       $message.success('更新成功!')
-      userStore.getUserInfo()
+      await userStore.getUserInfo()
+    }
+    catch (err) {
+      console.error(err)
     }
   })
 }
@@ -58,9 +65,17 @@ const passwordForm = ref({
 
 function updatePassword() {
   passwordFormRef.value?.validate(async (err) => {
-    if (!err) {
+    if (err) {
+      return
+    }
+    try {
       await api.updateCurrentPassword(passwordForm.value)
       $message.success('修改成功!')
+      // 改成功后清空, 否则旧密码留在框里, 再点一次会用已经失效的旧密码请求
+      passwordForm.value = { old_password: '', new_password: '', confirm_password: '' }
+    }
+    catch (err) {
+      console.error(err)
     }
   })
 }

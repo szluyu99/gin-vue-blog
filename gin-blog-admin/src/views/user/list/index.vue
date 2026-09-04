@@ -181,14 +181,14 @@ const columns = [
             type: 'primary',
             onClick: () => {
               row.nickname = row.info?.nickname
-              // roles => role_ids
-              row.role_ids = row.roles.map(e => e.id)
+              // roles => role_ids, 没有任何角色的用户 roles 可能是 null
+              row.role_ids = row.roles?.map(e => e.id) ?? []
               handleEdit(row)
             },
           },
           {
             default: () => '编辑',
-            icon: () => h('i', { class: 'i-material-symbols:delete-outline' }),
+            icon: () => h('i', { class: 'i-material-symbols:edit-outline' }),
           },
         ),
       ]

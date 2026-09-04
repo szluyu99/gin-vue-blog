@@ -349,6 +349,33 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-admin/src/views/message/comment/index.spec.js` — A16 评论类型只有一列、
   未知类型不抛异常、「回复对象」列 key 指向真实字段、审核失败不误报成功也不刷新列表
 - `gin-blog-admin/src/views/article/list/index.spec.js` — 另含 A20 导入放行 `.md` / `.markdown`
+- `gin-blog-admin/src/views/setting/website/index.spec.js` — 配置拉取后填充表单、
+  后端返回空配置时保留默认值(以前直接赋值会把表单清空)、拉取失败不产生未捕获 rejection、
+  保存提交当前表单、保存失败不误报成功
+- `gin-blog-admin/src/views/auth/menu/index.spec.js` — 顶部新增(父 id 0/目录/Layout)与
+  行内新增子菜单(父 id 为该行/非目录/组件路径清空)互不污染、保活与隐藏开关失败回滚、
+  目录行不展示跳转与组件路径
+- `gin-blog-admin/src/views/auth/resource/index.spec.js` — 模块保存成功才关弹窗并刷新、
+  失败不关不误报成功、编辑模块带上原数据、匿名开关失败回滚、模块行不展示路径/请求方式/开关
+- `gin-blog-admin/src/views/setting/link/index.spec.js` — 头像列走 `convertImgUrl`
+  (本地上传的友链头像是相对路径, 以前直接给 img 会裂图)、点击地址复制到剪贴板、
+  删除确认文案(原来复制自分类页写的是「该分类」)、编辑带上原行数据
+- `gin-blog-admin/src/views/user/list/index.spec.js` — 角色选项拉取失败不抛、
+  编辑把 roles 映射成 role_ids、没有角色的用户点编辑不抛异常(以前直接 `.map`)、
+  禁用开关失败回滚
+- `gin-blog-admin/src/views/setting/page/index.spec.js` — 列表渲染、拉取失败与空数据
+  都不让 pageList 变成 undefined、下拉菜单编辑/删除、弹窗未打开时刷新预览图不抛异常
+- `gin-blog-admin/src/views/profile/index.spec.js` — 挂载后同步表单、A12 表单里的头像是
+  原始相对路径而非展示地址、保存失败不提示成功、改密码成功后清空表单、失败不清空
+- `gin-blog-admin/src/views/log/operation/index.spec.js` — A4 复制的是格式化后的 JSON、
+  空串与非 JSON 内容不抛异常、请求方式标签颜色映射(未知方法退回 info)、查看与删除
+- `gin-blog-admin/src/views/message/leave-msg/index.spec.js` — 头像走 `convertImgUrl`、
+  空选中不发请求、审核成功后刷新、审核失败不误报成功也不刷新(与评论页 A16 同类)、
+  标签页切换改查询参数
+- `gin-blog-admin/src/views/setting/about/index.spec.js` — 内容填充、拉取失败与 null
+  都不让内容变成 null、保存提交当前内容、失败不提示成功且 loading 复位
+- `gin-blog-admin/src/views/article/category/index.spec.js` — 新增走空表单、编辑带原数据、
+  行内删除不弹二次确认、批量删除空选中只提示、保存失败不提示成功(结构与标签页一致)
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页
