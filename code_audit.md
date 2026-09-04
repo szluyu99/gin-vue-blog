@@ -394,6 +394,18 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-front/src/views/article/detail/index.spec.js` — markdown 解析、封面转换与
   无封面兜底、可空字段(tags/category/上下篇/推荐)为 null 时退化成默认值、
   接口失败与空数据都不破坏默认结构
+- `gin-blog-front/src/views/discover/category/index.spec.js` 与 `.../tag/index.spec.js` —
+  列表与数量渲染、接口失败时 loading 复位(两页原来都只在成功路径复位)、
+  空数据不让列表变成 null(模板里直接取 `.length`)、标签页的随机字号与颜色范围
+- `gin-blog-front/src/views/about/index.spec.js` — markdown 解析、接口失败与空内容
+  都不抛(以前 `marked.parse(null)` 会抛)、站点配置后到也能更新头像
+  (原来 `const { blogConfig } = useAppStore()` 解构 getter, store 整体重新赋值后拿到的是旧对象)
+- `gin-blog-front/src/views/message/index.spec.js` — 默认弹幕 + 接口留言、空数据只留默认、
+  空内容不发请求、发送成功推入弹幕并清空输入框、发送失败不清空也不推入(以前裸 await)、
+  留言页封面兜底与配置生效
+- `gin-blog-front/src/views/article/detail/components/BannerInfo.spec.js` — 字数统计去掉
+  HTML 标签、按 400 字/分钟估算阅读时间、正文为空或缺失时不抛异常(以前直接对
+  `article.content` 调 replace)
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页

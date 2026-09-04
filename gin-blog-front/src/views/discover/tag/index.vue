@@ -7,8 +7,13 @@ const loading = ref(true)
 const tagList = ref([])
 
 onMounted(() => {
+  // 补 catch 并把 loading 放到 finally: 以前失败会留下未捕获的 rejection,
+  // 而且页面永远停在加载态
   api.getTags().then((resp) => {
     tagList.value = resp.data || []
+  }).catch((err) => {
+    console.error(err)
+  }).finally(() => {
     loading.value = false
   })
 })

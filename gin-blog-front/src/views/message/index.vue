@@ -46,8 +46,15 @@ async function send() {
     nickname: userStore.nickname,
     content: content.value,
   }
-  await api.saveMessage(data)
-  dmRef.value.push(data)
+  // 以前是裸 await: 发送失败会留下未捕获的 rejection, 输入框也不该被清空
+  try {
+    await api.saveMessage(data)
+  }
+  catch (err) {
+    console.error(err)
+    return
+  }
+  dmRef.value?.push(data)
   content.value = ''
 }
 

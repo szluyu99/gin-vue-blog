@@ -8,9 +8,18 @@ const loading = ref(true)
 const categoryList = ref([])
 
 onMounted(async () => {
-  const resp = await api.getCategorys()
-  categoryList.value = resp.data
-  loading.value = false
+  // 失败时 loading 也要复位, 否则页面卡在加载态;
+  // data 为空不能让 categoryList 变成 null, 模板里直接取 .length
+  try {
+    const resp = await api.getCategorys()
+    categoryList.value = resp.data ?? []
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    loading.value = false
+  }
 })
 </script>
 

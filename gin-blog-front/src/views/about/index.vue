@@ -18,13 +18,21 @@ hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('json', json)
 hljs.registerLanguage('javascript', javascript)
 
-const { blogConfig } = useAppStore()
+// 不解构: blogConfig 是 getter, store 里 blog_config 是整体重新赋值的,
+// 解构后拿到的是接口回来之前的旧对象, 头像不会更新
+const appStore = useAppStore()
 const html = ref('')
 
 onMounted(async () => {
-  const { data } = await api.about()
-  // marked 解析 markdown 文本
-  html.value = await marked.parse(data, { async: true })
+  try {
+    const { data } = await api.about()
+    // marked 解析 markdown 文本, 内容为空时不能直接丢给 marked
+    html.value = await marked.parse(data ?? '', { async: true })
+  }
+  catch (err) {
+    console.error(err)
+    return
+  }
   await nextTick()
   // higlight.js 代码高亮
   document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
@@ -36,7 +44,7 @@ onMounted(async () => {
 <template>
   <BannerPage label="about" title="关于我" card>
     <div class="flex justify-center">
-      <img :src="blogConfig.website_avatar" class="w-25 duration-600 hover:rotate-360" alt="avatar">
+      <img :src="appStore.blogConfig.website_avatar" class="w-25 duration-600 hover:rotate-360" alt="avatar">
     </div>
     <div class="flex justify-center">
       <article class="max-w-none prose prose-truegray dark:prose-invert">
