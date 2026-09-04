@@ -258,5 +258,14 @@ export const operationLogs = [
   { id: 5, opt_module: '用户模块', opt_type: '修改', opt_url: '/api/user/disable', opt_method: 'handle.(*User).UpdateDisable', opt_desc: '修改用户禁用状态', request_method: 'PUT', request_param: '{"id":2,"is_disable":false}', response_data: '{"code":0}', user_id: 1, nickname: 'admin', ip_address: '127.0.0.1', ip_source: '内网IP', created_at: '2024-01-01T20:00:00.000Z' },
 ]
 
+// 登录日志 (status: 1-成功 2-失败)
+export const loginLogs = [
+  { id: 1, user_id: 1, username: 'admin', nickname: 'admin', ip_address: '127.0.0.1', ip_source: '内网IP', status: 1, message: '', created_at: '2024-01-05T10:00:00.000Z' },
+  { id: 2, user_id: 2, username: 'guest', nickname: 'guest', ip_address: '10.0.0.8', ip_source: '内网IP', status: 1, message: '', created_at: '2024-01-04T18:20:00.000Z' },
+  { id: 3, user_id: 2, username: 'guest', nickname: 'guest', ip_address: '10.0.0.8', ip_source: '内网IP', status: 2, message: '用户名或密码错误', created_at: '2024-01-04T18:19:00.000Z' },
+  { id: 4, user_id: 0, username: 'root', nickname: '', ip_address: '1.2.3.4', ip_source: '美国', status: 2, message: '用户名或密码错误', created_at: '2024-01-03T03:10:00.000Z' },
+  { id: 5, user_id: 0, username: 'root', nickname: '', ip_address: '1.2.3.4', ip_source: '美国', status: 2, message: '登录失败次数过多', created_at: '2024-01-03T03:11:00.000Z' },
+]
+
 // 关于我 (Markdown)
 export const about = '## 关于本站\n\n这是 Mock 模式下的关于页面内容, 可以在后台编辑后立即看到效果 (刷新页面后重置)。\n'

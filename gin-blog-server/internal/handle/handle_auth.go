@@ -66,6 +66,34 @@ func recordLoginFail(rdb *redis.Client, failKey string) {
 	}
 }
 
+// 记一条登录日志
+//
+// message 为空表示登录成功。失败时 userAuth 可能是 nil(用户不存在或被锁定),
+// 这时只有请求里带的用户名可用。写日志失败不能影响登录本身, 只告警。
+func saveLoginLog(c *gin.Context, db *gorm.DB, userAuth *model.UserAuth, username, nickname, message string) {
+	ipAddress := utils.IP.GetIpAddress(c)
+
+	log := model.LoginLog{
+		Username:  username,
+		IpAddress: ipAddress,
+		IpSource:  utils.IP.GetIpSourceSimpleIdle(ipAddress),
+		Status:    model.LOGIN_SUCCESS,
+		Message:   message,
+	}
+	if message != "" {
+		log.Status = model.LOGIN_FAIL
+	}
+	if userAuth != nil {
+		log.UserId = userAuth.ID
+	}
+	// GetUserAuthInfoByName 没有 Preload UserInfo, 昵称只有成功路径上拿到 userInfo 后才有
+	log.Nickname = nickname
+
+	if err := model.AddLoginLog(db, &log); err != nil {
+		slog.Warn("写登录日志失败", "username", username, "err", err)
+	}
+}
+
 // @Summary 登录
 // @Description 用户名密码登录, 成功后返回 JWT Token; 同一 用户名+IP 连续失败 5 次后锁定 15 分钟
 // @Tags UserAuth
@@ -90,6 +118,7 @@ func (*UserAuth) Login(c *gin.Context) {
 		slog.Warn("读取登录失败次数出错, 本次跳过限制", "err", err)
 	} else if locked {
 		slog.Warn("登录失败次数过多, 暂时拒绝", "username", req.Username, "ip", clientIP(c))
+		saveLoginLog(c, db, nil, req.Username, "", "登录失败次数过多")
 		ReturnError(c, g.ErrLoginLocked, nil)
 		return
 	}
@@ -99,6 +128,7 @@ func (*UserAuth) Login(c *gin.Context) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 不能返回"用户不存在", 否则错误码本身就是一个用户名枚举接口
 			recordLoginFail(rdb, failKey)
+			saveLoginLog(c, db, nil, req.Username, "", "用户名或密码错误")
 			ReturnError(c, g.ErrLoginFail, nil)
 			return
 		}
@@ -109,12 +139,14 @@ func (*UserAuth) Login(c *gin.Context) {
 	// 检查密码是否正确
 	if !utils.BcryptCheck(req.Password, userAuth.Password) {
 		recordLoginFail(rdb, failKey)
+		saveLoginLog(c, db, userAuth, req.Username, "", "用户名或密码错误")
 		ReturnError(c, g.ErrLoginFail, nil)
 		return
 	}
 
 	// 被禁用的账号不允许登录: 以前 is_disable 只有写入没有读取, 后台的禁用开关等于没生效
 	if userAuth.IsDisable {
+		saveLoginLog(c, db, userAuth, req.Username, "", "账号已被禁用")
 		ReturnError(c, g.ErrUserDisabled, nil)
 		return
 	}
@@ -180,6 +212,7 @@ func (*UserAuth) Login(c *gin.Context) {
 	}
 
 	slog.Info("用户登录成功: " + userAuth.Username)
+	saveLoginLog(c, db, userAuth, req.Username, userInfo.Nickname, "")
 
 	session := sessions.Default(c)
 	session.Set(g.CTX_USER_AUTH, userAuth.ID)

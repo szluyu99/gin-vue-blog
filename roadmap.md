@@ -33,11 +33,29 @@ ReturnSuccess(c, list)
 （按分页参数请求、切页重新请求并滚动、单页不渲染分页器、空列表提示）。
 端到端：`page_size=2` 翻到第 2 页、越界页码、按分类过滤时 total 为过滤后的数量都验过。
 
-### P2 后台「登录日志」是占位页 — 待做
+### P2 后台「登录日志」是占位页 — 已完成
 
 `generate-data` 里登记了这个菜单，但没有 `login_log` 表和接口，页面只有一个「该页面还在开发中」。
 
-两种选择：做掉（新增表，在 `Login` 成功/失败时写一条，列表页照操作日志页的样式做），或者从种子数据里摘掉菜单。倾向做掉——`user_auth` 里已经有 `ip_address` / `ip_source` / `last_login_time`，只是没有历史记录；做完能和已有的「登录失败次数限制」形成完整一条线。
+选择了做掉——`user_auth` 里已经有 `ip_address` / `ip_source` / `last_login_time`，只是没有历史记录；做完能和已有的「登录失败次数限制」形成完整一条线。
+
+已实现：
+
+- `model.LoginLog`：用户名、昵称、IP、归属地、状态（1-成功 2-失败）、失败原因。
+  **失败的记录同样落库**——只有成功记录看不出撞库
+- `Login` 的五条路径各写一条：成功、密码错误、用户不存在、账号被禁用、失败次数过多。
+  写日志失败只告警，不影响登录本身
+- 失败时拿不到昵称（用户可能都不存在），所以 `nickname` 允许为空，前端显示 `-`；
+  密码错误时用户是存在的，`user_id` 会记下来，用户不存在时是 0
+- 接口 `GET /login/log/list`（关键字匹配用户名/昵称/IP）+ `DELETE /login/log`，
+  在 `seed_resource.go` 登记为「登录日志模块」，权限对账会自动补上
+- 后台 `views/log/login` 从占位页换成真实列表：状态标签、失败原因、精确到秒的登录时间、
+  行内删除与批量删除；admin mock 同步补了数据和路由
+
+测试：`handle_loginlog_test.go`（列表、三种关键字命中、批量删除、请求体非数组）、
+`TestAuthLoginWritesLoginLog`（成功/密码错误/用户不存在三条记录的字段）、
+`TestAuthLoginLogForDisabledUser`；前端 `views/log/login/index.spec.js` 6 条。
+端到端：四种登录路径各造一条记录，字段与关键字过滤都验过。
 
 ### P3 前台「说说 / 相册」是占位页 — 待做
 

@@ -27,6 +27,7 @@ var (
 	menuAPI         handle.Menu         // 菜单
 	blogInfoAPI     handle.BlogInfo     // 博客设置
 	operationLogAPI handle.OperationLog // 操作日志
+	loginLogAPI     handle.LoginLog     // 登录日志
 	pageAPI         handle.Page         // 页面
 
 	// 博客前台接口
@@ -167,6 +168,12 @@ func registerAdminHandler(r *gin.Engine) {
 		role.GET("/option", roleAPI.GetOption) // 角色选项列表(树形)
 	}
 	// 操作日志模块
+	loginLog := auth.Group("/login/log")
+	{
+		loginLog.GET("/list", loginLogAPI.GetList) // 登录日志列表
+		loginLog.DELETE("", loginLogAPI.Delete)    // 删除登录日志
+	}
+
 	operationLog := auth.Group("/operation/log")
 	{
 		operationLog.GET("/list", operationLogAPI.GetList) // 操作日志列表

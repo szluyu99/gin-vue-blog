@@ -144,4 +144,11 @@ var AdminResources = []ResourceModule{
 			{Name: "删除操作日志", Url: "/operation/log", Method: "DELETE"},
 		},
 	},
+	{
+		Name: "登录日志模块",
+		Items: []ResourceItem{
+			{Name: "登录日志列表", Url: "/login/log/list", Method: "GET"},
+			{Name: "删除登录日志", Url: "/login/log", Method: "DELETE"},
+		},
+	},
 }

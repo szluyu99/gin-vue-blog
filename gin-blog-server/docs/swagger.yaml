@@ -444,6 +444,23 @@ definitions:
         description: 总条数
         type: integer
     type: object
+  handle.PageResult-model_LoginLog:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.LoginLog'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
   handle.PageResult-model_Message:
     properties:
       page_data:
@@ -851,6 +868,19 @@ definitions:
       data:
         allOf:
         - $ref: '#/definitions/handle.PageResult-model_FriendLink'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_LoginLog:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_LoginLog'
         description: 响应数据
       message:
         description: 响应消息
@@ -1445,6 +1475,29 @@ definitions:
       view_count:
         description: 访问量
         type: integer
+    type: object
+  model.LoginLog:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ip_address:
+        type: string
+      ip_source:
+        type: string
+      message:
+        type: string
+      nickname:
+        type: string
+      status:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
     type: object
   model.Menu:
     properties:
@@ -2708,6 +2761,60 @@ paths:
       summary: 登录
       tags:
       - UserAuth
+  /login/log:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除登录日志
+      parameters:
+      - description: 登录日志 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除登录日志（批量）
+      tags:
+      - LoginLog
+  /login/log/list:
+    get:
+      description: 关键字匹配用户名、昵称与登录 IP
+      parameters:
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_LoginLog'
+      security:
+      - ApiKeyAuth: []
+      summary: 条件查询登录日志列表
+      tags:
+      - LoginLog
   /logout:
     get:
       description: 清除 session 与 Redis 中的在线状态

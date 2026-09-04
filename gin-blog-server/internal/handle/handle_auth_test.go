@@ -105,6 +105,70 @@ func TestAuthLoginDisabledUser(t *testing.T) {
 	assert.Equal(t, g.ErrUserDisabled.Code(), resp.Code)
 }
 
+// 登录会写日志: 成功一条、各种失败各一条, 便于事后看撞库
+func TestAuthLoginWritesLoginLog(t *testing.T) {
+	withJWTConf(t)
+
+	env := newTestEnv(t)
+	env.engine.POST("/login", (&UserAuth{}).Login)
+
+	user := createUser(t, env, "admin@qq.com", "管理员", "123456")
+
+	// 成功
+	resp := env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var logs []model.LoginLog
+	assert.Nil(t, env.db.Order("id").Find(&logs).Error)
+	assert.Len(t, logs, 1)
+	assert.Equal(t, model.LOGIN_SUCCESS, logs[0].Status)
+	assert.Equal(t, user.ID, logs[0].UserId)
+	assert.Equal(t, "管理员", logs[0].Nickname, "成功时要记下昵称")
+	assert.Empty(t, logs[0].Message)
+
+	// 密码错误
+	env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "wrong",
+	})
+	// 用户不存在
+	env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "nobody@qq.com", "password": "123456",
+	})
+
+	assert.Nil(t, env.db.Order("id").Find(&logs).Error)
+	assert.Len(t, logs, 3)
+	assert.Equal(t, model.LOGIN_FAIL, logs[1].Status)
+	assert.Equal(t, "用户名或密码错误", logs[1].Message)
+	assert.Equal(t, user.ID, logs[1].UserId, "密码错误时用户是存在的, 要记下 id")
+	assert.Equal(t, model.LOGIN_FAIL, logs[2].Status)
+	assert.Equal(t, 0, logs[2].UserId, "用户不存在时没有 id")
+	assert.Equal(t, "nobody@qq.com", logs[2].Username)
+}
+
+// 被禁用的账号登录也要留一条日志, 写明原因
+func TestAuthLoginLogForDisabledUser(t *testing.T) {
+	withJWTConf(t)
+
+	env := newTestEnv(t)
+	env.engine.POST("/login", (&UserAuth{}).Login)
+
+	user := createUser(t, env, "admin@qq.com", "管理员", "123456")
+	assert.Nil(t, model.UpdateUserDisable(env.db, user.ID, true))
+
+	resp := env.do(t, http.MethodPost, "/login", map[string]any{
+		"username": "admin@qq.com", "password": "123456",
+	})
+	assert.Equal(t, g.ErrUserDisabled.Code(), resp.Code)
+
+	var logs []model.LoginLog
+	assert.Nil(t, env.db.Find(&logs).Error)
+	assert.Len(t, logs, 1)
+	assert.Equal(t, model.LOGIN_FAIL, logs[0].Status)
+	assert.Equal(t, "账号已被禁用", logs[0].Message)
+}
+
 // 连续失败达到上限后直接拒绝, 即使密码正确
 func TestAuthLoginLockedAfterTooManyFails(t *testing.T) {
 	withJWTConf(t)

@@ -7,6 +7,7 @@ import {
   comments,
   config,
   links,
+  loginLogs,
   menus,
   messages,
   operationLogs,
@@ -28,6 +29,7 @@ const state = {
   messages: messages.map(e => ({ ...e })),
   links: links.map(e => ({ ...e })),
   logs: operationLogs.map(e => ({ ...e })),
+  loginLogs: loginLogs.map(e => ({ ...e })),
   users: users.map(e => ({ ...e })),
   menus: menus.map(e => ({ ...e })),
   resources: resources.map(e => ({ ...e })),
@@ -308,6 +310,16 @@ const handlers = [
     return ok(paginate(list, params))
   }],
   ['DELETE', /^\/operation\/log$/, (params, body) => removeByIds(state.logs, body)],
+
+  // 登录日志
+  ['GET', /^\/login\/log\/list$/, (params) => {
+    const keyword = params.keyword
+    const list = keyword
+      ? state.loginLogs.filter(e => `${e.username}${e.nickname}${e.ip_address}`.includes(keyword))
+      : state.loginLogs
+    return ok(paginate(list, params))
+  }],
+  ['DELETE', /^\/login\/log$/, (params, body) => removeByIds(state.loginLogs, body)],
 
   // 用户
   ['GET', /^\/user\/info$/, () => {

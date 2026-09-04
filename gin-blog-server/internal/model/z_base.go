@@ -26,6 +26,7 @@ func MakeMigrate(db *gorm.DB) error {
 		&Page{},         // 页面
 		&Config{},       // 网站设置
 		&OperationLog{}, // 操作日志
+		&LoginLog{},     // 登录日志
 		&UserInfo{},     // 用户信息
 
 		&UserAuth{},     // 用户验证

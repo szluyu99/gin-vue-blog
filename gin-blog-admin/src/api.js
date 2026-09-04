@@ -46,6 +46,8 @@ export default {
   // 日志相关接口
   getOperationLogs: (params = {}) => request.get('/operation/log/list', { params }),
   deleteOperationLogs: (data = []) => request.delete('/operation/log', { data }),
+  getLoginLogs: (params = {}) => request.get('/login/log/list', { params }),
+  deleteLoginLogs: (data = []) => request.delete('/login/log', { data }),
 
   // 用户相关接口
   getUserInfo: () => request.get('/user/info'),

@@ -1511,6 +1511,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/login/log": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除登录日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoginLog"
+                ],
+                "summary": "删除登录日志（批量）",
+                "parameters": [
+                    {
+                        "description": "登录日志 ID 数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handle.Response-int64"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/log/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "关键字匹配用户名、昵称与登录 IP",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "LoginLog"
+                ],
+                "summary": "条件查询登录日志列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handle.Response-handle_PageResult-model_LoginLog"
+                        }
+                    }
+                }
+            }
+        },
         "/logout": {
             "get": {
                 "description": "清除 session 与 Redis 中的在线状态",
@@ -3574,6 +3661,30 @@ const docTemplate = `{
                 }
             }
         },
+        "handle.PageResult-model_LoginLog": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.LoginLog"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
         "handle.PageResult-model_Message": {
             "type": "object",
             "properties": {
@@ -4176,6 +4287,27 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/handle.PageResult-model_FriendLink"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handle.Response-handle_PageResult-model_LoginLog": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handle.PageResult-model_LoginLog"
                         }
                     ]
                 },
@@ -5090,6 +5222,41 @@ const docTemplate = `{
                 "view_count": {
                     "description": "访问量",
                     "type": "integer"
+                }
+            }
+        },
+        "model.LoginLog": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "ip_source": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
