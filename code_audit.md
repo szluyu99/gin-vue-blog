@@ -381,6 +381,13 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
   一言接口挂了走兜底文案
 - `gin-blog-admin/src/views/article/tag/index.spec.js` — 与分类页同构的 CRUD 回归:
   新增走空表单、编辑带原数据、删除文案、批量删除空选中、保存失败不提示成功
+- `gin-blog-front/src/views/article/list/index.spec.js` — 卡片渲染与图片转换、
+  分类为 null 不崩、接口失败时 loading 复位(以前只在成功路径复位, 失败页面卡在加载态)、
+  空数据不让列表变成 null
+- `gin-blog-front/src/views/discover/archive/index.spec.js` — 按页拉取与切页重新拉取、
+  接口失败 loading 复位、空数据不抛(以前直接取 `resp.data.page_data`)
+- `gin-blog-front/src/views/link/index.spec.js` — 列表渲染、失败时 loading 复位、
+  空数据不给 LinkList 传 null(它内部直接取 `linkList.length`)
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页

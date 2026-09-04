@@ -14,12 +14,20 @@ const articleList = ref([])
 const name = ref(route.query.name) // 标题上显示的 标签/分类 名称
 
 onMounted(async () => {
-  const resp = await api.getArticles({
-    category_id: route.params.categoryId,
-    tag_id: route.params.tagId,
-  })
-  articleList.value = resp.data
-  loading.value = false
+  // 以前失败时 loading 永远停在 true, 页面卡在加载态; data 为空也不能让列表变成 null
+  try {
+    const resp = await api.getArticles({
+      category_id: route.params.categoryId,
+      tag_id: route.params.tagId,
+    })
+    articleList.value = resp.data ?? []
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    loading.value = false
+  }
 })
 </script>
 

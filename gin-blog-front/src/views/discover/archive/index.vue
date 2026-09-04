@@ -16,13 +16,22 @@ const current = ref(1) // 当前页数
 watch(current, () => getArchives())
 
 async function getArchives() {
-  const resp = await api.getArchives({
-    page_num: current.value,
-    page_size: 50,
-  })
-  archiveList.value = resp.data.page_data
-  total.value = resp.data.total
-  loading.value = false
+  // 以前失败时 loading 永远停在 true, 页面卡在加载态;
+  // resp.data 为空时直接取 .page_data 还会抛
+  try {
+    const resp = await api.getArchives({
+      page_num: current.value,
+      page_size: 50,
+    })
+    archiveList.value = resp.data?.page_data ?? []
+    total.value = resp.data?.total ?? 0
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
