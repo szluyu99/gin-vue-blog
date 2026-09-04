@@ -25,10 +25,10 @@ onMounted(() => {
 })
 
 async function startTyper() {
-  // 一言 + 打字机特效, 拿不到就用固定文案
+  // 一言 + 打字机特效, 接口不通时 getOneSentence 内部会随机取一句内置文案
   const one = await getOneSentence()
   // EasyTyper 靠构造函数直接开始打字, 返回实例只是为了不写成裸 new
-  return new EasyTyper(typer, one ?? '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。', () => {}, () => {})
+  return new EasyTyper(typer, one, () => {}, () => {})
 }
 
 function scrollDown() {

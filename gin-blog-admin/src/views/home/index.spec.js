@@ -62,15 +62,29 @@ describe('后台首页', () => {
     expect(wrapper.text()).toContain('管理员')
   })
 
-  // 原来这句话来自 https://v1.hitokoto.cn, 现在从内置文案里随机取, 不再打外部请求
-  it('问候语从内置文案里取, 不发外部请求', async () => {
-    const fetchSpy = vi.fn()
-    globalThis.fetch = fetchSpy
+  it('一言接口正常时用接口返回的句子', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ json: () => Promise.resolve({ hitokoto: '接口给的一句话' }) })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.sentence).toBe('接口给的一句话'))
+  })
+
+  // 这个接口在部分网络下不通, 兜底要从内置文案里随机取, 而不是固定一句
+  it('一言接口挂了从内置文案里随机取', async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline'))
 
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.sentence).not.toBe(''))
 
-    expect(wrapper.vm.SENTENCES).toContain(wrapper.vm.sentence)
-    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(wrapper.vm.FALLBACK_SENTENCES).toContain(wrapper.vm.sentence)
+  })
+
+  it('一言接口返回空内容时也走兜底', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ json: () => Promise.resolve({}) })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.sentence).not.toBe(''))
+
+    expect(wrapper.vm.FALLBACK_SENTENCES).toContain(wrapper.vm.sentence)
   })
 })

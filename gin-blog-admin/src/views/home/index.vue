@@ -31,18 +31,31 @@ onMounted(async () => {
   }
 })
 
-// 一句话: 原来每次进后台都请求一次 https://v1.hitokoto.cn,
-// 这是页面上唯一的运行时外部依赖, 挂了就走兜底文案, 收益不如直接内置
-const SENTENCES = [
+// 一言: 每次进后台看到一句新的文案
+// 接口在部分网络下不通, 兜底从内置文案里随机取一句, 而不是固定显示同一句
+const FALLBACK_SENTENCES = [
   '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。',
+  '书山有路勤为径，学海无涯苦作舟。',
   '纸上得来终觉浅，绝知此事要躬行。',
   '不积跬步，无以至千里；不积小流，无以成江海。',
-  '业不可不勤，勤则百弊自去。',
   '路漫漫其修远兮，吾将上下而求索。',
+  '业不可不勤，勤则百弊自去。',
+  '博观而约取，厚积而薄发。',
 ]
+function randomSentence() {
+  return FALLBACK_SENTENCES[Math.floor(Math.random() * FALLBACK_SENTENCES.length)]
+}
+
 const sentence = ref('')
-function getOneSentence() {
-  sentence.value = SENTENCES[Math.floor(Math.random() * SENTENCES.length)]
+async function getOneSentence() {
+  try {
+    const resp = await fetch('https://v1.hitokoto.cn?c=i')
+    const data = await resp.json()
+    sentence.value = data?.hitokoto || randomSentence()
+  }
+  catch {
+    sentence.value = randomSentence()
+  }
 }
 </script>
 

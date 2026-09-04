@@ -406,6 +406,12 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-front/src/views/article/detail/components/BannerInfo.spec.js` — 字数统计去掉
   HTML 标签、按 400 字/分钟估算阅读时间、正文为空或缺失时不抛异常(以前直接对
   `article.content` 调 replace)
+- 一言(hitokoto)保留为运行时外部请求, 但兜底改成从内置文案里随机取一句(原来固定一句):
+  front 在 `utils/index.js` 的 `getOneSentence` 内部兜底(`FALLBACK_SENTENCES` /
+  `getRandomSentence`), `HomeBanner` 与 `TalkingCarousel` 不再各自写死文案;
+  admin 后台首页同样恢复请求 + 随机兜底。
+  测试: front `utils/index.spec.js` 5 条(接口正常/失败/返回空/一次加载只请求一次/随机文案
+  来自内置列表), admin `views/home/index.spec.js` 3 条
 - `gin-blog-front/src/views/article/detail/components/Catalogue.spec.js` — 按标题层级生成
   缩进、只有二三级标题时缩进从 0 开始、重名标题生成不同 id 并写回 DOM、空标题不进目录
   (原来层级用过滤后的列表算但循环用未过滤的, 空标题会占一行空白)、`previewRef` 为 null

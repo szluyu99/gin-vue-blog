@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { convertImgUrl, stripMarkdown } from '@/utils'
 import { hasMath } from '@/utils/mathjax'
 
@@ -73,5 +73,52 @@ describe('hasMath', () => {
     expect(hasMath('$$\n\\sum_{i=1}^n i\n$$')).toBe(true)
     expect(hasMath('用 \\(x^2\\) 表示')).toBe(true)
     expect(hasMath('\\[ x^2 \\]')).toBe(true)
+  })
+})
+
+describe('getOneSentence', () => {
+  beforeEach(() => {
+    // 模块内缓存了 Promise, 每个用例都重新加载一次模块
+    vi.resetModules()
+  })
+
+  it('接口正常时返回接口给的句子', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ json: () => Promise.resolve({ hitokoto: '接口给的一句话' }) })
+    const { getOneSentence } = await import('@/utils')
+
+    await expect(getOneSentence()).resolves.toBe('接口给的一句话')
+  })
+
+  // 这个接口在部分网络下不通, 兜底要从内置文案里随机取, 而不是固定一句
+  it('接口挂了从内置文案里取', async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline'))
+    const { getOneSentence, FALLBACK_SENTENCES } = await import('@/utils')
+
+    expect(FALLBACK_SENTENCES).toContain(await getOneSentence())
+  })
+
+  it('接口返回空内容时也走兜底', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ json: () => Promise.resolve({}) })
+    const { getOneSentence, FALLBACK_SENTENCES } = await import('@/utils')
+
+    expect(FALLBACK_SENTENCES).toContain(await getOneSentence())
+  })
+
+  it('一次页面加载只请求一次', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue({ json: () => Promise.resolve({ hitokoto: '只请求一次' }) })
+    globalThis.fetch = fetchSpy
+    const { getOneSentence } = await import('@/utils')
+
+    await Promise.all([getOneSentence(), getOneSentence(), getOneSentence()])
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('随机文案始终来自内置列表', async () => {
+    const { getRandomSentence, FALLBACK_SENTENCES } = await import('@/utils')
+
+    for (let i = 0; i < 20; i++) {
+      expect(FALLBACK_SENTENCES).toContain(getRandomSentence())
+    }
   })
 })

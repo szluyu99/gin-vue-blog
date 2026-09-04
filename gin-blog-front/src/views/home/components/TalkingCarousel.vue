@@ -1,14 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { getOneSentence } from '@/utils'
+import { getOneSentence, getRandomSentence } from '@/utils'
 
-const sentence = ref('书山有路勤为径，学海无涯苦作舟。')
+// 首屏先显示一句内置文案, 一言回来后再替换
+const sentence = ref(getRandomSentence())
 
 onMounted(async () => {
-  const one = await getOneSentence()
-  if (one) {
-    sentence.value = one
-  }
+  sentence.value = await getOneSentence()
 })
 </script>
 

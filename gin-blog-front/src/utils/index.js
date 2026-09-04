@@ -51,19 +51,36 @@ export function stripMarkdown(md) {
 }
 
 /**
- * 取一句"一言", 失败返回 null (由调用方决定兜底文案)
+ * 兜底文案: 一言接口不通时随机取一句, 而不是每次都显示同一句
+ */
+export const FALLBACK_SENTENCES = [
+  '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。',
+  '书山有路勤为径，学海无涯苦作舟。',
+  '纸上得来终觉浅，绝知此事要躬行。',
+  '不积跬步，无以至千里；不积小流，无以成江海。',
+  '路漫漫其修远兮，吾将上下而求索。',
+  '业不可不勤，勤则百弊自去。',
+  '博观而约取，厚积而薄发。',
+]
+
+export function getRandomSentence() {
+  return FALLBACK_SENTENCES[Math.floor(Math.random() * FALLBACK_SENTENCES.length)]
+}
+
+/**
+ * 取一句"一言", 接口不通时从内置文案里随机取一句
  *
  * 首页的 HomeBanner 和 TalkingCarousel 都要用, 以前各自 fetch 一次, 同一个接口请求了两遍;
  * 这里缓存 Promise, 一次页面加载只请求一次。这个接口在部分网络下不通, 所以内部吃掉异常。
- * @returns {Promise<string | null>}
+ * @returns {Promise<string>}
  */
 let sentencePromise = null
 export function getOneSentence() {
   if (!sentencePromise) {
     sentencePromise = fetch('https://v1.hitokoto.cn?c=i')
       .then(res => res.json())
-      .then(data => data?.hitokoto || null)
-      .catch(() => null)
+      .then(data => data?.hitokoto || getRandomSentence())
+      .catch(() => getRandomSentence())
   }
   return sentencePromise
 }
