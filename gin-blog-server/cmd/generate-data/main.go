@@ -21,7 +21,7 @@ const imgBase = "https://raw.githubusercontent.com/szluyu99/gin-vue-blog/main/im
 
 func main() {
 	configPath := flag.String("c", "../../config.yml", "配置文件路径")
-	typeName := flag.String("t", "all", "要初始化的数据类型: config | auth | page | all")
+	typeName := flag.String("t", "all", "要初始化的数据类型: config | auth | page | demo | all")
 	// 从 cmd/generate-data 目录运行时, sqlite 文件在上一级(与 server 的工作目录 cmd/ 一致);
 	// 容器里二进制和配置文件同级, 需要显式关掉
 	sqliteParent := flag.Bool("sqlite-parent", true, "sqlite 数据库文件是否在上级目录")
@@ -44,6 +44,8 @@ func main() {
 		generateDefaultAuths(db)
 	case "page":
 		generateDefaultPages(db)
+	case "demo":
+		generateDemoContent(db)
 	case "all":
 		fallthrough
 	default:
@@ -51,6 +53,18 @@ func main() {
 		generateDefaultPages(db)
 		generateDefaultAuths(db)
 	}
+}
+
+// 生成样例内容: 分类, 标签, 文章, 评论, 留言, 友链
+//
+// 只在库里一篇文章都没有时才灌, 所以可以重复执行。
+// 内容数据只是本地测试用, 不放进 all 里, 需要时显式 -t demo。
+func generateDemoContent(db *gorm.DB) {
+	slog.Info("-----初始化样例内容 start-----")
+	if err := model.SeedDemoContent(db); err != nil {
+		slog.Error("样例内容初始化失败: " + err.Error())
+	}
+	slog.Info("-----初始化样例内容 end-----")
 }
 
 // 生成验证相关信息: 角色, 用户, 资源, 菜单

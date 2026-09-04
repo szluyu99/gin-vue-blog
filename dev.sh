@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 本地端到端联调用: 一键启动 / 重启 Redis + 后端 + 博客前台 + 博客后台
-# 用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>]
+# 用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>] [--force] [--demo]
 # 日志与 pid 放在 .dev/ 下, 已 gitignore
 
 set -uo pipefail
@@ -20,6 +20,21 @@ ADMIN_PORT=8889
 REDIS_PORT=6379
 
 mkdir -p "$LOG_DIR"
+
+# --force: pid 文件丢了时按端口强杀; --demo: 灌基础数据时顺带灌样例内容
+FORCE=''
+DEMO=''
+parse_flags() {
+  local arg
+  for arg in "$@"; do
+    case "$arg" in
+      --force) FORCE='--force' ;;
+      --demo) DEMO=1 ;;
+      '') ;;
+      *) echo "未知参数: $arg" >&2; exit 1 ;;
+    esac
+  done
+}
 
 info() { printf '\033[32m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[33m==>\033[0m %s\n' "$*"; }
@@ -188,9 +203,17 @@ do_stop() {
 }
 
 # 初始化基础数据(菜单/资源/角色/默认用户/网站配置), 可重复执行, 已存在的会跳过
+#
+# --demo 再灌一批样例内容(分类/标签/文章/评论/留言/友链): 空库能验证"服务起得来",
+# 但列表分页、归档分组、评论回复这些必须有内容才看得出问题
 do_seed() {
   info "初始化基础数据"
   (cd "$ROOT/gin-blog-server/cmd" && sh generate_data.sh) || die "初始化基础数据失败"
+  if [ -n "$DEMO" ]; then
+    info "灌入样例内容"
+    (cd "$ROOT/gin-blog-server/cmd/generate-data" && go run main.go -t demo) \
+      || die "样例内容初始化失败"
+  fi
   info "默认账号: admin / 123456, guest / 123456"
 }
 
@@ -247,7 +270,7 @@ do_status() {
 # 手一抖就没了。*.db 已经在 gin-blog-server/.gitignore 里, 不会进仓库
 # 上传的图片留着不动, 数据库里对它们的引用没了, 但文件本身无害
 do_fresh() {
-  do_stop "${1:-}"
+  do_stop "$FORCE"
   if [ -f "$DB_FILE" ]; then
     mv -f "$DB_FILE" "$DB_FILE.bak"
     info "旧库已备份为 $(basename "$DB_FILE").bak, 要恢复就把它改回来"
@@ -266,25 +289,42 @@ do_fresh() {
   do_start
 }
 
-case "${1:-start}" in
-  start) do_start ;;
-  fresh) do_fresh "${2:-}" ;;
-  stop) do_stop "${2:-}" ;;
+cmd="${1:-start}"
+shift || true
+
+case "$cmd" in
+  start)
+    parse_flags "$@"
+    do_start
+    ;;
+  fresh)
+    parse_flags "$@"
+    do_fresh
+    ;;
+  stop)
+    parse_flags "$@"
+    do_stop "$FORCE"
+    ;;
   restart)
-    do_stop "${2:-}"
+    parse_flags "$@"
+    do_stop "$FORCE"
     do_start
     ;;
   status) do_status ;;
-  seed) do_seed ;;
+  seed)
+    parse_flags "$@"
+    do_seed
+    ;;
   logs)
-    name="${2:-server}"
+    name="${1:-server}"
     [ -f "$LOG_DIR/$name.log" ] || die "没有 $name 的日志"
     tail -f "$LOG_DIR/$name.log"
     ;;
   *)
-    echo "用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>]"
+    echo "用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>] [--force] [--demo]"
     echo "      fresh            从零启动: 旧库备份为 gvb.db.bak, 清 Redis, 重新建表灌数据"
     echo "      --force          stop / restart / fresh 可加, pid 文件丢了时按端口强杀"
+    echo "      --demo           start / fresh / seed 可加, 额外灌一批样例文章/评论/留言/友链"
     exit 1
     ;;
 esac

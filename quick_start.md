@@ -18,10 +18,12 @@
 ./dev.sh            # 启动 Redis + 后端 + 前台 + 后台
 ./dev.sh restart    # 改完代码重启
 ./dev.sh fresh      # 从零开始: 旧库备份成 gvb.db.bak, 清 Redis, 重新建表灌基础数据
+./dev.sh fresh --demo  # 同上, 并额外灌一批样例文章/评论/留言/友链
 ./dev.sh stop
 ./dev.sh status
 ./dev.sh logs server   # server | front | admin | redis
 ./dev.sh seed          # 单独重新灌一次基础数据
+./dev.sh seed --demo   # 往空内容的库里补一批样例内容
 ```
 
 几个实现上的点：
@@ -29,6 +31,7 @@
 - 两个前端的 `VITE_USE_MOCK` 由脚本在命令行覆盖为 `false`（vite 里 shell 环境变量优先级高于 `.env` 文件），所以不用改文件就能打到真后端。
 - Redis：端口上已经有就直接复用；否则优先本机 `redis-server`，都没有则用 docker 起 `redis:7.0-alpine`，`stop` 时一并清掉。
 - 首次启动（检测不到 `gin-blog-server/cmd/gvb.db`）会先执行一次 `generate_data.sh`，它自己会 AutoMigrate 建表，再正式启动。
+- `--demo` 在基础数据之外再灌一批样例内容（3 个分类、6 个标签、15 篇文章、评论与回复、留言、友链），可以加在 `start` / `fresh` / `seed` 后面。文章刻意超过前台每页 9 条并跨多个月份，分页、归档分组、标签云、评论回复这些必须有数据才看得出问题的地方才验证得到；库里只要已经有文章就跳过，不会灌重复。
 - `fresh` 用来从零验证一遍流程：把旧库改名成 `gvb.db.bak`（不是删除，测试数据攒久了手一抖就没了）、清掉 Redis 的 DB 7、然后走首次启动。要恢复就把 `.bak` 改回来。上传的图片不动。
 - 后端是先 `go build` 再跑二进制，记录的 pid 就是服务进程本身；前端用独立进程组启动，`stop` 整组杀，不会留下孤儿占端口。
 - 端口被别的进程占着会直接报错退出，不会让 vite 悄悄换到 8890。
@@ -94,7 +97,7 @@ cd gin-blog-admin && pnpm install && pnpm dev
 
 - **修改 `.env*` 没生效**：vite 不会热更环境变量，必须重启 dev server。注意 `pnpm dev` 只读 `.env` 和 `.env.development`，改 `.env.production` 对开发模式无效。
 - **`pnpm install` 报 `ERR_PNPM_IGNORED_BUILDS`**：pnpm 10+ 默认禁止依赖执行安装脚本，两个前端项目已在 `pnpm-workspace.yaml` 的 `allowBuilds` 中批准，如仍报错执行 `pnpm approve-builds` 并把选项全部设为 `true`。
-- **前台页面空白、没有文章**：`generate_data.sh` 只生成系统基础数据，不含文章/分类/标签等内容数据，需要在后台自行添加。
+- **前台页面空白、没有文章**：`generate_data.sh` 只生成系统基础数据，不含文章/分类/标签等内容数据。要么在后台自行添加，要么灌一批样例内容：`./dev.sh seed --demo`，或直接 `cd gin-blog-server/cmd/generate-data && go run main.go -t demo`。
 - **注册用户要不要配邮箱**：不用。`config.yml` 的 `Captcha.SendEmail` 默认 `false`，注册请求直接把用户建出来。想改成邮箱验证注册，把它设为 `true` 并把 `Email` 段（`Host` / `Port` / `From` / `SmtpPass` / `SmtpUser`）配全，否则注册会返回 `6101 发送邮件失败`。另外注意环境里若存在 `EMAIL` 变量会让整个 `Email` 段读不到（见 `code_audit.md` F12）。
 - **启动日志出现 `[警告] JWT.Secret 还是仓库里的示例值`**：本地开发可以忽略。`Server.Mode: release` 时这两项（`JWT.Secret` / `Session.Salt`）为空或仍是示例值会直接拒绝启动，用环境变量 `JWT_SECRET` / `SESSION_SALT` 注入即可；Docker 部署由 `deploy/bootstrap.sh` 自动生成。
 - **改了数据库但接口仍返回旧数据**：页面封面等缓存在 Redis 且无过期时间，执行 `redis-cli -n 7 del page` 清除。
