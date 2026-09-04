@@ -25,8 +25,6 @@ describe('后台首页', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     api.getHomeInfo.mockReset().mockResolvedValue({ code: 0, data: { ...homeInfo } })
-    // 一言是外部请求, 测试里直接失败, 走兜底文案
-    globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline'))
     window.$message = { success: vi.fn(), error: vi.fn(), info: vi.fn() }
   })
 
@@ -64,8 +62,15 @@ describe('后台首页', () => {
     expect(wrapper.text()).toContain('管理员')
   })
 
-  it('一言接口挂了走兜底文案', async () => {
+  // 原来这句话来自 https://v1.hitokoto.cn, 现在从内置文案里随机取, 不再打外部请求
+  it('问候语从内置文案里取, 不发外部请求', async () => {
+    const fetchSpy = vi.fn()
+    globalThis.fetch = fetchSpy
+
     const wrapper = mountPage()
-    await vi.waitFor(() => expect(wrapper.vm.sentence).toContain('宠辱不惊'))
+    await vi.waitFor(() => expect(wrapper.vm.sentence).not.toBe(''))
+
+    expect(wrapper.vm.SENTENCES).toContain(wrapper.vm.sentence)
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 })

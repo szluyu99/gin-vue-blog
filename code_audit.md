@@ -406,6 +406,13 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 - `gin-blog-front/src/views/article/detail/components/BannerInfo.spec.js` — 字数统计去掉
   HTML 标签、按 400 字/分钟估算阅读时间、正文为空或缺失时不抛异常(以前直接对
   `article.content` 调 replace)
+- `gin-blog-front/src/views/article/detail/components/Catalogue.spec.js` — 按标题层级生成
+  缩进、只有二三级标题时缩进从 0 开始、重名标题生成不同 id 并写回 DOM、空标题不进目录
+  (原来层级用过滤后的列表算但循环用未过滤的, 空标题会占一行空白)、`previewRef` 为 null
+  不抛、点击目录项滚动且找不到元素时直接返回。
+  注意: 原实现用 `innerText`, jsdom 不支持(返回 undefined), 所以这个组件在测试环境里
+  只能改用 `textContent` 才跑得起来 —— 这也是「回退后 6 条红」里大部分红的原因,
+  不代表原代码在浏览器里有 6 个 bug
 - `gin-blog-front/src/components/comment/Comment.spec.js` — 评论回复重构后的行为：
   点回复只打开该评论的回复框且带上正确的父评论、切换评论时上一个关掉、
   「点击查看」只隐藏自己那一条并按回复数决定分页、翻页与提交后重载都带对应评论 id 与当前页

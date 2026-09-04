@@ -31,13 +31,18 @@ onMounted(async () => {
   }
 })
 
-// 一言
+// 一句话: 原来每次进后台都请求一次 https://v1.hitokoto.cn,
+// 这是页面上唯一的运行时外部依赖, 挂了就走兜底文案, 收益不如直接内置
+const SENTENCES = [
+  '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。',
+  '纸上得来终觉浅，绝知此事要躬行。',
+  '不积跬步，无以至千里；不积小流，无以成江海。',
+  '业不可不勤，勤则百弊自去。',
+  '路漫漫其修远兮，吾将上下而求索。',
+]
 const sentence = ref('')
-async function getOneSentence() {
-  fetch('https://v1.hitokoto.cn?c=i')
-    .then(resp => resp.json())
-    .then(data => sentence.value = data.hitokoto)
-    .catch(() => sentence.value = '宠辱不惊，看庭前花开花落；去留无意，望天上云卷云舒。')
+function getOneSentence() {
+  sentence.value = SENTENCES[Math.floor(Math.random() * SENTENCES.length)]
 }
 </script>
 

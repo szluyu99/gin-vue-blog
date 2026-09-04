@@ -12,12 +12,15 @@ onMounted(() => {
 
 const selectAnchor = ref('')
 const anchors = ref([])
-const headings = Array.from(previewRef.querySelectorAll('h1,h2,h3,h4,h5,h6'))
+// 正文还没渲染出来时 previewRef 可能是 null, 直接 querySelectorAll 会抛
+// 空标题(markdown 里写了 ## 但没写文字)不进目录, 否则目录里会多出一行空白
+const headings = previewRef
+  ? Array.from(previewRef.querySelectorAll('h1,h2,h3,h4,h5,h6')).filter(t => !!t.textContent.trim())
+  : []
 
 function buildAnchors() {
   // 用于确认层级
-  const titleList = Array.from(headings).filter(t => !!t.innerText.trim())
-  const hTags = Array.from(new Set(titleList.map(t => t.tagName))).sort()
+  const hTags = Array.from(new Set(headings.map(t => t.tagName))).sort()
 
   let count = 0 // 解决重名问题
   for (let i = 0; i < headings.length; i++) {
@@ -26,7 +29,7 @@ function buildAnchors() {
     headings[i].id = `${anchor}-${count++}`
     anchors.value.push({
       id: headings[i].id,
-      name: headings[i].innerText,
+      name: anchor,
       indent: hTags.indexOf(headings[i].tagName),
     })
   }
@@ -34,6 +37,10 @@ function buildAnchors() {
 
 function handleClickAnchor(id) {
   const anchorElement = document.getElementById(id)
+  // 正文被重新渲染过时可能找不到对应元素
+  if (!anchorElement) {
+    return
+  }
   window.scrollTo({
     behavior: 'smooth',
     top: anchorElement.offsetTop - 40,
