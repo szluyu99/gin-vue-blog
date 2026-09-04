@@ -41,7 +41,7 @@ function mountPage() {
 describe('前台首页', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    api.getArticles.mockReset().mockResolvedValue({ code: 0, data: articles })
+    api.getArticles.mockReset().mockResolvedValue({ code: 0, data: { page_data: articles, total: 2 } })
   })
 
   it('首屏加载文章并去掉正文里的 Markdown 记号', async () => {
@@ -78,7 +78,7 @@ describe('前台首页', () => {
     await vi.waitFor(() => expect(wrapper.vm.articleList).toHaveLength(2))
 
     const state = { loaded: vi.fn(), complete: vi.fn(), error: vi.fn() }
-    api.getArticles.mockResolvedValue({ code: 0, data: [{ id: 3, title: '第三篇', content: '正文' }] })
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: [{ id: 3, title: '第三篇', content: '正文' }], total: 3 } })
     await wrapper.vm.getArticlesInfinite(state)
 
     expect(wrapper.vm.articleList).toHaveLength(3)
@@ -91,7 +91,7 @@ describe('前台首页', () => {
     await vi.waitFor(() => expect(wrapper.vm.articleList).toHaveLength(2))
 
     const state = { loaded: vi.fn(), complete: vi.fn(), error: vi.fn() }
-    api.getArticles.mockResolvedValue({ code: 0, data: [] })
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: [], total: 2 } })
     await wrapper.vm.getArticlesInfinite(state)
     expect(state.complete).toHaveBeenCalled()
 

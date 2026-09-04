@@ -359,6 +359,23 @@ definitions:
         description: 总条数
         type: integer
     type: object
+  handle.PageResult-model_Article:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
   handle.PageResult-model_CategoryVO:
     properties:
       page_data:
@@ -610,20 +627,6 @@ definitions:
         description: 响应消息
         type: string
     type: object
-  handle.Response-array_model_Article:
-    properties:
-      code:
-        description: 业务状态码
-        type: integer
-      data:
-        description: 响应数据
-        items:
-          $ref: '#/definitions/model.Article'
-        type: array
-      message:
-        description: 响应消息
-        type: string
-    type: object
   handle.Response-array_model_CategoryVO:
     properties:
       code:
@@ -783,6 +786,19 @@ definitions:
       data:
         allOf:
         - $ref: '#/definitions/handle.PageResult-handle_ArticleVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_Article:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_Article'
         description: 响应数据
       message:
         description: 响应消息
@@ -2291,7 +2307,7 @@ paths:
         "0":
           description: ""
           schema:
-            $ref: '#/definitions/handle.Response-array_model_Article'
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_Article'
       summary: 前台文章列表
       tags:
       - Front

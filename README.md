@@ -147,6 +147,8 @@ cd gin-blog-admin  && pnpm test
 
 ## 后续计划
 
+完整的规划与「为什么不做某些事」见 [roadmap.md](./roadmap.md)，下面是概览。
+
 功能：
 
 - 前台侧边信息收缩

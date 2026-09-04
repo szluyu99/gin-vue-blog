@@ -30,7 +30,7 @@ function mountPage() {
 describe('前台文章列表', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    api.getArticles.mockReset().mockResolvedValue({ code: 0, data: articles })
+    api.getArticles.mockReset().mockResolvedValue({ code: 0, data: { page_data: articles, total: 2 } })
   })
 
   it('渲染文章卡片, 图片走 convertImgUrl', async () => {
@@ -65,5 +65,44 @@ describe('前台文章列表', () => {
     await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
 
     expect(wrapper.vm.articleList).toEqual([])
+    expect(wrapper.vm.total).toBe(0)
+  })
+
+  // 以前接口把 total 丢掉, 前台只取第一页, 分类下超过一页的文章没有入口能看到
+  it('按分页参数请求, 并按总数算出页数', async () => {
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: articles, total: 25 } })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.total).toBe(25))
+
+    expect(api.getArticles).toHaveBeenCalledWith(expect.objectContaining({ page_num: 1, page_size: 9 }))
+    expect(wrapper.vm.pageCount).toBe(3)
+  })
+
+  it('切页会带上新的页码重新请求', async () => {
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: articles, total: 25 } })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.total).toBe(25))
+    window.scrollTo = vi.fn()
+
+    wrapper.vm.current = 2
+    await vi.waitFor(() => expect(api.getArticles).toHaveBeenCalledWith(expect.objectContaining({ page_num: 2 })))
+    expect(window.scrollTo).toHaveBeenCalled()
+  })
+
+  it('只有一页时不渲染分页器', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.total).toBe(2))
+
+    expect(wrapper.vm.pageCount).toBe(1)
+    expect(wrapper.text()).not.toContain('这里还没有文章')
+  })
+
+  it('没有文章时给出空列表提示', async () => {
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: [], total: 0 } })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.text()).toContain('这里还没有文章')
   })
 })

@@ -24,7 +24,7 @@ async function getArticlesInfinite($state) {
   if (!loading.value) {
     try {
       const resp = await api.getArticles(params)
-      const list = resp.data ?? []
+      const list = resp.data?.page_data ?? []
       // 加载完成
       if (!list.length) {
         $state.complete()
@@ -47,7 +47,7 @@ onMounted(async () => {
   // 停在 true 就等于首页彻底不再加载文章
   try {
     const resp = await api.getArticles(params)
-    articleList.value = (resp.data ?? []).map(e => ({ ...e, content: stripMarkdown(e.content) }))
+    articleList.value = (resp.data?.page_data ?? []).map(e => ({ ...e, content: stripMarkdown(e.content) }))
     params.page_num++
   }
   catch (err) {

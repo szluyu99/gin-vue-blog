@@ -138,7 +138,9 @@ const handlers = [
     if (params.tag_id) {
       list = list.filter(e => e.tag_ids.includes(Number(params.tag_id)))
     }
-    return ok(paginate(list, params).page_data.map(toListItem))
+    // 与后端一致: 返回分页结构, 前台靠 total 渲染分页器
+    const page = paginate(list, params)
+    return ok({ ...page, page_data: page.page_data.map(toListItem) })
   }],
 
   ['GET', /^\/front\/article\/archive$/, (params) => {

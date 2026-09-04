@@ -847,7 +847,7 @@ const docTemplate = `{
                     "0": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/handle.Response-array_model_Article"
+                            "$ref": "#/definitions/handle.Response-handle_PageResult-model_Article"
                         }
                     }
                 }
@@ -3454,6 +3454,30 @@ const docTemplate = `{
                 }
             }
         },
+        "handle.PageResult-model_Article": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Article"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
         "handle.PageResult-model_CategoryVO": {
             "type": "object",
             "properties": {
@@ -3812,26 +3836,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handle.Response-array_model_Article": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "业务状态码",
-                    "type": "integer"
-                },
-                "data": {
-                    "description": "响应数据",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Article"
-                    }
-                },
-                "message": {
-                    "description": "响应消息",
-                    "type": "string"
-                }
-            }
-        },
         "handle.Response-array_model_CategoryVO": {
             "type": "object",
             "properties": {
@@ -4067,6 +4071,27 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/handle.PageResult-handle_ArticleVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handle.Response-handle_PageResult-model_Article": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handle.PageResult-model_Article"
                         }
                     ]
                 },

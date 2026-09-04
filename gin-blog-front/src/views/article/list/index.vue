@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import api from '@/api'
@@ -13,14 +13,29 @@ const loading = ref(true)
 const articleList = ref([])
 const name = ref(route.query.name) // 标题上显示的 标签/分类 名称
 
-onMounted(async () => {
-  // 以前失败时 loading 永远停在 true, 页面卡在加载态; data 为空也不能让列表变成 null
+// 分页: 以前只取第一页, 分类/标签下超过一页的文章没有任何入口能看到
+const PAGE_SIZE = 9
+const current = ref(1)
+const total = ref(0)
+const pageCount = computed(() => Math.ceil(total.value / PAGE_SIZE))
+
+watch(current, () => {
+  getArticles()
+  window.scrollTo({ behavior: 'smooth', top: 0 })
+})
+
+async function getArticles() {
+  loading.value = true
+  // 失败时 loading 也要复位, 否则页面卡在加载态; data 为空也不能让列表变成 null
   try {
     const resp = await api.getArticles({
       category_id: route.params.categoryId,
       tag_id: route.params.tagId,
+      page_num: current.value,
+      page_size: PAGE_SIZE,
     })
-    articleList.value = resp.data ?? []
+    articleList.value = resp.data?.page_data ?? []
+    total.value = resp.data?.total ?? 0
   }
   catch (err) {
     console.error(err)
@@ -28,6 +43,10 @@ onMounted(async () => {
   finally {
     loading.value = false
   }
+}
+
+onMounted(() => {
+  getArticles()
 })
 </script>
 
@@ -80,6 +99,14 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+    </div>
+    <!-- 分页 -->
+    <div v-if="pageCount > 1" class="mt-8 flex justify-center">
+      <NPagination v-model:page="current" :page-count="pageCount" />
+    </div>
+    <!-- 空列表提示: 以前没有数据时页面是一片空白 -->
+    <div v-if="!loading && !articleList.length" class="py-20 text-center color-muted">
+      这里还没有文章
     </div>
   </BannerPage>
 </template>

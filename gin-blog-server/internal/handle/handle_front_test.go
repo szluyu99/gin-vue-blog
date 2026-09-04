@@ -214,19 +214,49 @@ func TestFrontGetArticleList(t *testing.T) {
 	assert.Nil(t, env.db.Create(&model.Article{Title: "私密", Status: model.STATUS_SECRET}).Error)
 	assert.Nil(t, env.db.Create(&model.Article{Title: "回收站", Status: model.STATUS_PUBLIC, IsDelete: true}).Error)
 
-	var list []model.Article
-	decodeData(t, env.do(t, http.MethodGet, "/front/article/list?page_num=1&page_size=10", nil).Data, &list)
-	assert.Len(t, list, 1)
-	assert.Equal(t, "公开", list[0].Title)
+	// 返回分页结构: 前台要靠 total 渲染分页器
+	var page PageResult[model.Article]
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/list?page_num=1&page_size=10", nil).Data, &page)
+	assert.Len(t, page.List, 1)
+	assert.Equal(t, int64(1), page.Total)
+	assert.Equal(t, "公开", page.List[0].Title)
 
 	// 分类 / 标签过滤
 	decodeData(t, env.do(t, http.MethodGet,
-		"/front/article/list?page_num=1&page_size=10&category_id="+itoa(category.ID), nil).Data, &list)
-	assert.Len(t, list, 1)
+		"/front/article/list?page_num=1&page_size=10&category_id="+itoa(category.ID), nil).Data, &page)
+	assert.Len(t, page.List, 1)
+	assert.Equal(t, int64(1), page.Total)
 
 	decodeData(t, env.do(t, http.MethodGet,
-		"/front/article/list?page_num=1&page_size=10&tag_id="+itoa(tag.ID), nil).Data, &list)
-	assert.Len(t, list, 1)
+		"/front/article/list?page_num=1&page_size=10&tag_id="+itoa(tag.ID), nil).Data, &page)
+	assert.Len(t, page.List, 1)
+}
+
+// 分页: 总数是过滤后的总数, 不是当页条数
+func TestFrontGetArticleListPaging(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.GET("/front/article/list", (&Front{}).GetArticleList)
+
+	for i := 0; i < 12; i++ {
+		assert.Nil(t, env.db.Create(&model.Article{
+			Title: "公开" + itoa(i), Status: model.STATUS_PUBLIC,
+		}).Error)
+	}
+
+	var page PageResult[model.Article]
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/list?page_num=1&page_size=5", nil).Data, &page)
+	assert.Len(t, page.List, 5)
+	assert.Equal(t, int64(12), page.Total)
+
+	// 第三页只剩 2 条, 但 total 不变
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/list?page_num=3&page_size=5", nil).Data, &page)
+	assert.Len(t, page.List, 2)
+	assert.Equal(t, int64(12), page.Total)
+
+	// 超出范围的页码返回空列表而不是报错
+	decodeData(t, env.do(t, http.MethodGet, "/front/article/list?page_num=99&page_size=5", nil).Data, &page)
+	assert.Empty(t, page.List)
+	assert.Equal(t, int64(12), page.Total)
 }
 
 // 文章详情: 附带上下篇/推荐/最新, 且浏览量 +1

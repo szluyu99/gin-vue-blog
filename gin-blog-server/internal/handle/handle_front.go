@@ -400,7 +400,7 @@ func (*Front) LikeComment(c *gin.Context) {
 // @Param tag_id query int false "标签 ID"
 // @Param page_num query int false "页码"
 // @Param page_size query int false "每页数量"
-// @Success 0 {object} Response[[]model.Article]
+// @Success 0 {object} Response[PageResult[model.Article]]
 // @Router /front/article/list [get]
 func (*Front) GetArticleList(c *gin.Context) {
 	var query FArticleQuery
@@ -409,13 +409,20 @@ func (*Front) GetArticleList(c *gin.Context) {
 		return
 	}
 
-	list, _, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
+	list, total, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
-	ReturnSuccess(c, list)
+	// 以前把 total 丢掉只返回当页数据, 前台拿不到总数也就做不了分页,
+	// 分类/标签下超过一页的文章等于没有入口能看到
+	ReturnSuccess(c, PageResult[model.Article]{
+		Page:  query.Page,
+		Size:  query.Size,
+		Total: total,
+		List:  list,
+	})
 }
 
 // @Summary 前台文章详情
