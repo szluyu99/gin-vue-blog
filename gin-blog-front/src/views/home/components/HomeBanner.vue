@@ -12,7 +12,7 @@ const { pageList, blogConfig } = storeToRefs(useAppStore())
 const typer = reactive({
   output: '',
   isEnd: false, // 全局控制是否终止
-  speed: 300, // 打字速度
+  speed: 100, // 打字速度(每字毫秒), 300 一句话要打七八秒, 太慢
   singleBack: false, // 单次的回滚
   sleep: 0, // 完整输出一句话后, 睡眠一定时候后触发回滚事件
   type: 'normal', // rollback, normal
@@ -53,7 +53,8 @@ const coverStyle = computed(() => {
       <h1 class="animate-zoom-in text-4xl font-bold lg:text-5xl">
         {{ blogConfig.website_name }}
       </h1>
-      <div class="text-lg lg:text-xl">
+      <!-- min-h: 打字过程中句子从 1 行变 2 行时不要把下面的内容顶下去 -->
+      <div class="min-h-14 text-lg lg:text-xl">
         {{ typer.output }}
         <span class="animate-ping"> | </span>
       </div>

@@ -18,44 +18,41 @@ import WebsiteInfo from './components/WebsiteInfo.vue'
 const articleList = ref([])
 const loading = ref(false)
 
-// 无限加载文章
-const params = reactive({ page_size: 5, page_num: 1 }) // 列表加载参数
+// 一页 8 条: 5 条太少, 一屏放得下 2~3 张卡片, 往下滚几下就要再请求一次,
+// 每次都要等一小会儿, 滚动看着就是一顿一顿的
+const params = reactive({ page_size: 8, page_num: 1 })
+
+// 追加一页, 返回这页拿到几条
+async function appendPage() {
+  const resp = await api.getArticles(params)
+  const list = resp.data?.page_data ?? []
+  // 摘要去掉 Markdown 记号
+  articleList.value.push(...list.map(e => ({ ...e, content: stripMarkdown(e.content) })))
+  params.page_num++
+  return list.length
+}
+
+// 首屏那次加载的 promise, 供无限加载等待
+let firstLoad = null
+
 async function getArticlesInfinite($state) {
-  if (!loading.value) {
-    try {
-      const resp = await api.getArticles(params)
-      const list = resp.data?.page_data ?? []
-      // 加载完成
-      if (!list.length) {
-        $state.complete()
-        return
-      }
-      // 非首次加载, 都是往列表中添加数据 (摘要去掉 Markdown 记号)
-      articleList.value.push(...list.map(e => ({ ...e, content: stripMarkdown(e.content) })))
-      params.page_num++
-      $state.loaded()
-    }
-    catch {
-      $state.error()
-    }
+  try {
+    // 首屏还没回来就先等它: 之前是用 !loading.value 直接跳过, 但跳过时
+    // 一个 $state.* 都没调, 组件会一直停在 loading 状态, 要等下一次相交才恢复
+    await firstLoad
+    const count = await appendPage()
+    count ? $state.loaded() : $state.complete()
+  }
+  catch {
+    $state.error()
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   loading.value = true
-  // 首屏失败时 loading 必须复位: 无限加载靠 !loading.value 才会继续请求,
-  // 停在 true 就等于首页彻底不再加载文章
-  try {
-    const resp = await api.getArticles(params)
-    articleList.value = (resp.data?.page_data ?? []).map(e => ({ ...e, content: stripMarkdown(e.content) }))
-    params.page_num++
-  }
-  catch (err) {
-    console.error(err)
-  }
-  finally {
-    loading.value = false
-  }
+  firstLoad = appendPage()
+    .catch(err => console.error(err))
+    .finally(() => (loading.value = false))
 })
 
 function backTop() {
@@ -78,9 +75,16 @@ function backTop() {
           <ArticleCard v-for="(item, idx) in articleList" :key="item.id" :article="item" :idx="idx" />
         </div>
         <!-- 无限加载 -->
-        <div class="f-c-c">
-          <InfiniteLoading class="mt-2 lg:mt-5" @infinite="getArticlesInfinite">
-            <!-- TODO: 优化界面 -->
+        <!-- min-h: 占位高度固定, 否则 loading / 完成提示切换时这一行会跳一下 -->
+        <!-- distance: 提前 600px 就开始取下一页, 等滚到底才发请求必然会看到等待 -->
+        <!-- firstload=false: 首屏由 onMounted 负责, 不让组件挂载时再打一次 -->
+        <div class="min-h-10 f-c-c">
+          <InfiniteLoading
+            class="mt-2 lg:mt-5"
+            :distance="600"
+            :firstload="false"
+            @infinite="getArticlesInfinite"
+          >
             <template #spinner>
               <span class="animate-pulse text-xl">
                 loading...
