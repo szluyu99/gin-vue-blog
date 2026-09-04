@@ -136,8 +136,13 @@ jobs:
 
       - name: Assemble web build context
         run: |
-          mv dist-gin-blog-front/dist deploy/build/web/dist_blog
-          mv dist-gin-blog-admin/dist deploy/build/web/dist_admin
+          # upload-artifact 会把上传路径的公共前缀剥掉, 所以下载下来的
+          # dist-gin-blog-front/ 里直接就是 index.html 和 assets/, 没有多一层 dist/
+          mv dist-gin-blog-front deploy/build/web/dist_blog
+          mv dist-gin-blog-admin deploy/build/web/dist_admin
+          # 目录结构一旦对不上, 在这里就报错, 而不是等 nginx 返回 404
+          test -f deploy/build/web/dist_blog/index.html
+          test -f deploy/build/web/dist_admin/index.html
 
       - name: Build web image
         uses: docker/build-push-action@v6
