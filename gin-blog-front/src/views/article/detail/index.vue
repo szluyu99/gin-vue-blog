@@ -1,4 +1,5 @@
 <script setup>
+import { useWindowScroll, useWindowSize } from '@vueuse/core'
 import hljs from 'highlight.js/lib/core'
 import bash from 'highlight.js/lib/languages/bash'
 import go from 'highlight.js/lib/languages/go'
@@ -12,6 +13,7 @@ import api from '@/api'
 import Comment from '@/components/comment/Comment.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { convertImgUrl } from '@/utils'
+import { addCopyButtons } from '@/utils/code-block'
 import { typesetMath } from '@/utils/mathjax'
 import BannerInfo from './components/BannerInfo.vue'
 import Catalogue from './components/Catalogue.vue'
@@ -77,6 +79,8 @@ onMounted(async () => {
     await nextTick()
     // highlight.js 代码高亮
     document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el))
+    // 代码块加「复制」按钮
+    addCopyButtons(previewRef.value)
     // 正文里有公式才加载 MathJax
     await typesetMath(data.value.content)
   }
@@ -88,6 +92,27 @@ onMounted(async () => {
   }
 })
 
+// 阅读进度: 顶部细线, 按滚动位置占可滚动高度的比例
+const { y } = useWindowScroll()
+const { height: windowHeight } = useWindowSize()
+const readProgress = computed(() => {
+  const total = document.documentElement.scrollHeight - windowHeight.value
+  if (total <= 0) {
+    return 0
+  }
+  return Math.min(100, Math.max(0, (y.value / total) * 100))
+})
+
+// 太久没更新的文章给个提示: 技术文章过期得快, 免得读者照着老内容踩坑
+const STALE_DAYS = 90
+const staleDays = computed(() => {
+  if (!data.value.updated_at) {
+    return 0
+  }
+  const days = Math.floor((Date.now() - new Date(data.value.updated_at).getTime()) / 86400000)
+  return days >= STALE_DAYS ? days : 0
+})
+
 const styleVal = computed(() =>
   data.value.img
     ? `background: url('${convertImgUrl(data.value.img)}') center center / cover no-repeat;`
@@ -96,6 +121,11 @@ const styleVal = computed(() =>
 </script>
 
 <template>
+  <!-- 阅读进度 -->
+  <div
+    class="fixed inset-x-0 top-0 z-999 h-0.5 bg-#49b1f5 transition-[width] duration-100"
+    :style="{ width: `${readProgress}%` }"
+  />
   <!-- 头部 -->
   <div :style="styleVal" class="banner-fade-down absolute inset-x-0 top-0 h-[360px] f-c-c lg:h-[400px]">
     <BannerInfo v-if="!loading" :article="data" />
@@ -106,6 +136,13 @@ const styleVal = computed(() =>
       <!-- 文章主体 -->
       <div class="card-view col-span-12 mx-2 pt-7 lg:col-span-9 lg:mx-0">
         <!-- 文章内容 -->
+        <!-- 老文章提示 -->
+        <div
+          v-if="!loading && staleDays"
+          class="mb-5 border-l-4 border-#f0ad4e rounded bg-#f0ad4e/10 px-4 py-2 text-sm lg:mx-10"
+        >
+          本文最后更新于 {{ staleDays }} 天前，部分内容可能已经过时。
+        </div>
         <article
           ref="previewRef"
           class="max-w-none prose prose-truegray lg:mx-10 dark:prose-invert"

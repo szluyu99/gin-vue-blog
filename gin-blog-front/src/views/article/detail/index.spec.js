@@ -112,6 +112,52 @@ describe('文章详情', () => {
     expect(wrapper.vm.data.content).toBe('')
   })
 
+  it('给代码块加上复制按钮', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      configurable: true,
+      writable: true,
+    })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('[data-copy-btn]').exists()).toBe(true)
+  })
+
+  // 技术文章过期得快, 太久没更新要提醒读者
+  it('文章太久没更新时给出提示', async () => {
+    const old = new Date(Date.now() - 200 * 86400000).toISOString()
+    api.getArticleDetail.mockResolvedValue({ code: 0, data: { ...article, updated_at: old } })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.staleDays).toBe(200)
+    expect(wrapper.text()).toContain('本文最后更新于 200 天前')
+  })
+
+  it('最近更新过的文章不提示', async () => {
+    const recent = new Date(Date.now() - 3 * 86400000).toISOString()
+    api.getArticleDetail.mockResolvedValue({ code: 0, data: { ...article, updated_at: recent } })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+
+    expect(wrapper.vm.staleDays).toBe(0)
+    expect(wrapper.text()).not.toContain('部分内容可能已经过时')
+  })
+
+  it('阅读进度按滚动比例计算, 不会越界', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+
+    // jsdom 里 scrollHeight 是 0, 算不出比例时退回 0 而不是 NaN
+    expect(wrapper.vm.readProgress).toBe(0)
+  })
+
   it('接口失败时 loading 复位, 数据保持默认结构', async () => {
     api.getArticleDetail.mockRejectedValue(new Error('boom'))
     const wrapper = mountPage()
