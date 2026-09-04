@@ -17,6 +17,7 @@
 ```bash
 ./dev.sh            # 启动 Redis + 后端 + 前台 + 后台
 ./dev.sh restart    # 改完代码重启
+./dev.sh fresh      # 从零开始: 旧库备份成 gvb.db.bak, 清 Redis, 重新建表灌基础数据
 ./dev.sh stop
 ./dev.sh status
 ./dev.sh logs server   # server | front | admin | redis
@@ -27,7 +28,8 @@
 
 - 两个前端的 `VITE_USE_MOCK` 由脚本在命令行覆盖为 `false`（vite 里 shell 环境变量优先级高于 `.env` 文件），所以不用改文件就能打到真后端。
 - Redis：端口上已经有就直接复用；否则优先本机 `redis-server`，都没有则用 docker 起 `redis:7.0-alpine`，`stop` 时一并清掉。
-- 首次启动（检测不到 `gin-blog-server/cmd/gvb.db`）会先建库、执行一次 `generate_data.sh`，再正式启动。
+- 首次启动（检测不到 `gin-blog-server/cmd/gvb.db`）会先执行一次 `generate_data.sh`，它自己会 AutoMigrate 建表，再正式启动。
+- `fresh` 用来从零验证一遍流程：把旧库改名成 `gvb.db.bak`（不是删除，测试数据攒久了手一抖就没了）、清掉 Redis 的 DB 7、然后走首次启动。要恢复就把 `.bak` 改回来。上传的图片不动。
 - 后端是先 `go build` 再跑二进制，记录的 pid 就是服务进程本身；前端用独立进程组启动，`stop` 整组杀，不会留下孤儿占端口。
 - 端口被别的进程占着会直接报错退出，不会让 vite 悄悄换到 8890。
 - 日志和 pid 在 `.dev/` 下（已 gitignore）。

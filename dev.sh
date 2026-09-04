@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 本地端到端联调用: 一键启动 / 重启 Redis + 后端 + 博客前台 + 博客后台
-# 用法: ./dev.sh [start|stop|restart|status|logs|seed]
+# 用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>]
 # 日志与 pid 放在 .dev/ 下, 已 gitignore
 
 set -uo pipefail
@@ -10,6 +10,9 @@ RUN_DIR="$ROOT/.dev"
 LOG_DIR="$RUN_DIR/log"
 REDIS_CONTAINER="gvb-dev-redis"
 REDIS_IMAGE="redis:7.0-alpine"
+
+# sqlite 库文件: 后端工作目录是 cmd/, 配置里写的是相对路径 gvb.db
+DB_FILE="$ROOT/gin-blog-server/cmd/gvb.db"
 
 SERVER_PORT=8765
 FRONT_PORT=8888
@@ -86,14 +89,10 @@ port_owner() {
 # 端口被别的进程占着就直接报错, 否则 vite 会自动换端口, 联调地址对不上
 ensure_free() {
   local port=$1 name=$2 owner
-  if port_open "$port" && ! alive "$name"; then
-    owner="$(port_owner "$port" || true)"
-    if [ -n "$owner" ]; then
-      die "端口 $port 已被 $owner 占用($name 要用), 处理掉再启动, 或 ./dev.sh stop --force"
-    fi
-    # 查不到占用者: 端口在本机可见但进程不在当前 PID 命名空间里(例如容器内外混用)
-    die "端口 $port 已被占用但查不到进程($name 要用), 可能不在当前 PID 命名空间, 需到对应环境里停掉"
-  fi
+  port_open "$port" && ! alive "$name" || return 0
+  # 查不到占用者说明进程不在当前 PID 命名空间里(容器内外混用), 只能到对应环境里停
+  owner="$(port_owner "$port" || echo '查不到进程, 可能不在当前 PID 命名空间')"
+  die "端口 $port 被 $owner 占用($name 要用), 处理掉再启动, 或 ./dev.sh stop --force"
 }
 
 # Redis: 已在跑就复用; 否则优先本机 redis-server, 再退回 docker
@@ -104,7 +103,7 @@ start_redis() {
   fi
   if command -v redis-server >/dev/null 2>&1; then
     info "启动本机 redis-server"
-    spawn redis "$ROOT" redis-server --port "$REDIS_PORT"
+    spawn redis "$ROOT" redis-server --port "$REDIS_PORT" --save ''
   elif command -v docker >/dev/null 2>&1; then
     info "本机没有 redis-server, 用 docker 起一个 ($REDIS_IMAGE)"
     docker image inspect "$REDIS_IMAGE" >/dev/null 2>&1 || docker pull "$REDIS_IMAGE" >/dev/null
@@ -190,7 +189,6 @@ do_stop() {
 
 # 初始化基础数据(菜单/资源/角色/默认用户/网站配置), 可重复执行, 已存在的会跳过
 do_seed() {
-  port_open "$REDIS_PORT" || start_redis
   info "初始化基础数据"
   (cd "$ROOT/gin-blog-server/cmd" && sh generate_data.sh) || die "初始化基础数据失败"
   info "默认账号: admin / 123456, guest / 123456"
@@ -200,16 +198,14 @@ do_start() {
   command -v go >/dev/null 2>&1 || die "未找到 go"
   command -v pnpm >/dev/null 2>&1 || die "未找到 pnpm"
 
-  local first_run=0
-  [ -f "$ROOT/gin-blog-server/cmd/gvb.db" ] || first_run=1
-
   start_redis
-  if [ "$first_run" = 1 ]; then
-    warn "没有 gvb.db, 视为首次启动, 先建库再灌基础数据"
-    start_server
-    stop_one server
+  # 没有库文件就先灌基础数据: generate-data 自己会 AutoMigrate 建表,
+  # 不用先把后端拉起来建表再停掉
+  [ -f "$DB_FILE" ] || {
+    warn "没有 $(basename "$DB_FILE"), 视为首次启动, 先建表灌基础数据"
     do_seed
-  fi
+  }
+
   ensure_free "$SERVER_PORT" server
   ensure_free "$FRONT_PORT" front
   ensure_free "$ADMIN_PORT" admin
@@ -245,8 +241,34 @@ do_status() {
   done
 }
 
+# 从零开始: 库文件挪走 + 清 Redis, 再走一遍首次启动(建表 + 灌基础数据)
+#
+# 库不删而是备份成 gvb.db.bak: 里面通常是攒了一阵子的测试数据(文章/评论),
+# 手一抖就没了。*.db 已经在 gin-blog-server/.gitignore 里, 不会进仓库
+# 上传的图片留着不动, 数据库里对它们的引用没了, 但文件本身无害
+do_fresh() {
+  do_stop "${1:-}"
+  if [ -f "$DB_FILE" ]; then
+    mv -f "$DB_FILE" "$DB_FILE.bak"
+    info "旧库已备份为 $(basename "$DB_FILE").bak, 要恢复就把它改回来"
+  fi
+
+  # 我们自己起的 Redis 已经随 do_stop 一起没了, 新起的就是空的;
+  # 复用的外部 Redis 得手动清掉 DB 7, 否则点赞/浏览量/在线用户还是旧的
+  if port_open "$REDIS_PORT"; then
+    if command -v redis-cli >/dev/null 2>&1; then
+      redis-cli -n 7 flushdb >/dev/null 2>&1 && info "已清空外部 Redis 的 DB 7"
+    else
+      warn "外部 Redis 在跑但没有 redis-cli, DB 7 里的旧数据(点赞/浏览量)还留着"
+    fi
+  fi
+
+  do_start
+}
+
 case "${1:-start}" in
   start) do_start ;;
+  fresh) do_fresh "${2:-}" ;;
   stop) do_stop "${2:-}" ;;
   restart)
     do_stop "${2:-}"
@@ -260,8 +282,9 @@ case "${1:-start}" in
     tail -f "$LOG_DIR/$name.log"
     ;;
   *)
-    echo "用法: ./dev.sh [start|stop|restart|status|seed|logs <name>]"
-    echo "      stop / restart 可加 --force: pid 文件丢了时按端口强杀占用进程"
+    echo "用法: ./dev.sh [start|stop|restart|fresh|status|seed|logs <name>]"
+    echo "      fresh            从零启动: 旧库备份为 gvb.db.bak, 清 Redis, 重新建表灌数据"
+    echo "      --force          stop / restart / fresh 可加, pid 文件丢了时按端口强杀"
     exit 1
     ;;
 esac
