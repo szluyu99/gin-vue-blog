@@ -57,8 +57,12 @@ spawn() {
   shift 2
   pf="$(pid_file "$name")"
   rm -f "$pf"
+  # 三处重定向都是必须的, 否则从脚本/工具里调用 ./dev.sh start 会看起来"卡住":
+  #   1. 被拉起的服务: stdin 接 /dev/null, stdout/stderr 进日志文件
+  #   2. 外层子 shell 自己也要脱开调用方的 stdout —— 实测这个子 shell 会残留下来
+  #      (ppid=1, 一直睡着), 手里还攥着调用方的 stdout 管道, 调用方等不到 EOF 就一直挂着
   (cd "$dir" && setsid bash -c 'echo $$ >"$1"; shift; exec "$@"' bash "$pf" "$@" \
-    >"$LOG_DIR/$name.log" 2>&1 &)
+    </dev/null >"$LOG_DIR/$name.log" 2>&1 &) </dev/null >/dev/null 2>&1
   while [ ! -s "$pf" ] && [ "$i" -lt 50 ]; do
     i=$((i + 1))
     sleep 0.1
