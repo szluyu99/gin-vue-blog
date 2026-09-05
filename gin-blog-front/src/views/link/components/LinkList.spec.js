@@ -13,16 +13,25 @@ function mountList(linkList = links) {
 }
 
 describe('友链列表', () => {
+  it('标题只说明数量, 不重复横幅上的"友情链接"', () => {
+    const text = mountList().text()
+
+    expect(text).toContain('共 2 位朋友')
+    expect(text).not.toContain('友情链接')
+  })
+
   it('渲染每个友链的名称、简介与外链', () => {
     const wrapper = mountList()
 
-    expect(wrapper.findAll('.link-wrapper')).toHaveLength(2)
+    expect(wrapper.findAll('a[target="_blank"]')).toHaveLength(2)
     expect(wrapper.text()).toContain('Gin')
     expect(wrapper.text()).toContain('Go 的 Web 框架')
 
     const a = wrapper.find('a')
     expect(a.attributes('href')).toBe('https://gin-gonic.com')
     expect(a.attributes('target')).toBe('_blank')
+    // target=_blank 必须配 noopener, 否则新窗口能通过 window.opener 操作原页面
+    expect(a.attributes('rel')).toContain('noopener')
   })
 
   // 头像原来只写了 w-[65px], 图床挂掉或网络不通时高度是 0(实测 65x0),
@@ -40,7 +49,7 @@ describe('友链列表', () => {
   it('没有友链时展示空状态', () => {
     const wrapper = mountList([])
 
-    expect(wrapper.findAll('.link-wrapper')).toHaveLength(0)
+    expect(wrapper.findAll('a[target="_blank"]')).toHaveLength(0)
     expect(wrapper.text()).toContain('暂无友情链接')
     expect(wrapper.find('img[alt="暂无友情链接"]').exists()).toBe(true)
   })
