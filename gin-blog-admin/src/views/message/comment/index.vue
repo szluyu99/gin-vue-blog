@@ -9,7 +9,7 @@ import CommonPage from '@/components/common/CommonPage.vue'
 import CrudTable from '@/components/crud/CrudTable.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import { convertImgUrl, formatDate } from '@/utils'
+import { convertImgUrl, formatDate, IMG_PLACEHOLDER } from '@/utils'
 
 defineOptions({ name: '评论管理' })
 
@@ -44,7 +44,7 @@ const columns = [
         'height': 40,
         'imgProps': { style: { 'border-radius': '3px' } },
         'src': convertImgUrl(row.user?.info?.avatar),
-        'fallback-src': 'https://dummyimage.com/400x400', // 加载失败
+        'fallback-src': IMG_PLACEHOLDER, // 加载失败时用内联占位图, 不再请求外网
         'show-toolbar-tooltip': true,
       })
     },

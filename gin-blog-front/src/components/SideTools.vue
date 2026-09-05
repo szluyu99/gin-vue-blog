@@ -1,5 +1,4 @@
 <script setup>
-import { Icon } from '@iconify/vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useAppStore } from '@/store'
@@ -14,15 +13,17 @@ watchThrottled(y, () => {
 
 const options = computed(() => [
   {
-    icon: appStore.isDark ? 'bi:sun-fill' : 'bi:moon-stars-fill',
+    // 图标名直接写成 UnoCSS 类名, 构建时就生成 CSS, 不再运行时去 iconify CDN 拉
+    // (bi / fluent / ph 三个集合只为几个图标而引入不值得, 换成已加载的 mdi 里的近似图标)
+    icon: appStore.isDark ? 'i-mdi:weather-sunny' : 'i-mdi:weather-night',
     fn: () => appStore.toggleTheme(),
   },
   {
-    icon: 'uiw:setting',
+    icon: 'i-uiw:setting',
     fn: () => window.$message?.info('设置开发中...'),
   },
   {
-    icon: 'fluent:arrow-up-12-filled',
+    icon: 'i-mdi:arrow-up-bold',
     fn: () => window.scrollTo({ behavior: 'smooth', top: 0 }),
   },
 ])
@@ -34,7 +35,7 @@ const options = computed(() => [
       v-for="item of options" :key="item.icon"
       class="f-c-c cursor-pointer rounded-sm bg-#49b1f5 p-1 duration-300 hover:bg-amber"
     >
-      <Icon class="h-5 w-5" :icon="item.icon" @click="item.fn" />
+      <span class="block h-5 w-5" :class="item.icon" @click="item.fn" />
     </div>
   </div>
 </template>

@@ -46,15 +46,20 @@ function randomSentence() {
   return FALLBACK_SENTENCES[Math.floor(Math.random() * FALLBACK_SENTENCES.length)]
 }
 
-const sentence = ref('')
+// 先用内置文案填上, 一言回来了再替换
+// 实测 v1.hitokoto.cn 要 0.9~1.5s, 之前这段时间这行是空的
+const sentence = ref(randomSentence())
 async function getOneSentence() {
   try {
-    const resp = await fetch('https://v1.hitokoto.cn?c=i')
+    // 超时就放弃, 不然接口挂着时这个 promise 一直悬着
+    const resp = await fetch('https://v1.hitokoto.cn?c=i', { signal: AbortSignal.timeout(2000) })
     const data = await resp.json()
-    sentence.value = data?.hitokoto || randomSentence()
+    if (data?.hitokoto) {
+      sentence.value = data.hitokoto
+    }
   }
   catch {
-    sentence.value = randomSentence()
+    // 保持内置文案
   }
 }
 </script>
@@ -71,23 +76,17 @@ async function getOneSentence() {
               {{ sentence }}
             </NGradientText>
           </div>
+          <!-- 原来这里是两张 badgen.net 的徽章图片, 实测要 3.3s 才回来, 而且没写宽高,
+               外网不通时高度塌成 0、整块跟着抖。改成一个普通链接, 不依赖外部服务 -->
           <div class="ml-auto flex items-center">
-            <NStatistic label="Stars" class="w-[80px]">
-              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank" rel="noopener noreferrer">
-                <img
-                  alt="stars"
-                  src="https://badgen.net/github/stars/szluyu99/gin-vue-blog"
-                >
-              </a>
-            </NStatistic>
-            <NStatistic label="Forks" class="ml-10 w-[100px]">
-              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank" rel="noopener noreferrer">
-                <img
-                  alt="forks"
-                  src="https://badgen.net/github/forks/szluyu99/gin-vue-blog"
-                >
-              </a>
-            </NStatistic>
+            <a
+              class="flex items-center gap-1 text-sm transition-300 hover:text-primary"
+              href="https://github.com/szluyu99/gin-vue-blog"
+              target="_blank" rel="noopener noreferrer"
+            >
+              <span class="i-mdi:github text-xl" />
+              项目仓库
+            </a>
           </div>
         </div>
       </NCard>

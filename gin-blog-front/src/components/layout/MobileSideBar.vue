@@ -1,5 +1,4 @@
 <script setup>
-import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 
 import { useRoute, useRouter } from 'vue-router'
@@ -13,14 +12,14 @@ const [route, router] = [useRoute(), useRouter()]
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
 const menuOptions = [
-  { text: '首页', icon: 'mdi:home', path: '/' },
-  { text: '归档', icon: 'mdi:archive', path: '/archives' },
-  { text: '分类', icon: 'mdi:menu', path: '/categories' },
-  { text: '标签', icon: 'mdi:tag', path: '/tags' },
-  { text: '相册', icon: 'mdi:view-gallery', path: '/albums' },
-  { text: '友链', icon: 'mdi:vector-link', path: '/links' },
-  { text: '关于', icon: 'mdi:information-outline', path: '/about' },
-  { text: '留言', icon: 'mdi:forum', path: '/message' },
+  { text: '首页', icon: 'i-mdi:home', path: '/' },
+  { text: '归档', icon: 'i-mdi:archive', path: '/archives' },
+  { text: '分类', icon: 'i-mdi:menu', path: '/categories' },
+  { text: '标签', icon: 'i-mdi:tag', path: '/tags' },
+  { text: '相册', icon: 'i-mdi:view-gallery', path: '/albums' },
+  { text: '友链', icon: 'i-mdi:vector-link', path: '/links' },
+  { text: '关于', icon: 'i-mdi:information-outline', path: '/about' },
+  { text: '留言', icon: 'i-mdi:forum', path: '/message' },
 ]
 
 async function logout() {
@@ -69,7 +68,7 @@ async function logout() {
       <!-- 菜单 -->
       <div v-for="item of menuOptions" :key="item.text" class="m-2 p-1">
         <RouterLink :to="item.path" class="flex items-center" @click="appStore.setCollapsed(false)">
-          <Icon :icon="item.icon" class="text-lg" />
+          <span :class="item.icon" class="text-lg" />
           <span class="ml-5"> {{ item.text }} </span>
         </RouterLink>
       </div>
@@ -77,19 +76,19 @@ async function logout() {
       <div>
         <template v-if="!userStore.userId">
           <div class="m-2 flex items-center p-1" @click="appStore.setLoginFlag(true)">
-            <Icon icon="ph:user-bold" class="text-lg" />
+            <span class="i-mdi:account text-lg" />
             <span class="ml-5"> 登录 </span>
           </div>
         </template>
         <template v-else>
           <RouterLink to="/user">
             <div class="m-2 flex items-center p-1" @click="appStore.setCollapsed(false)">
-              <Icon icon="mdi:account-circle" class="text-lg" />
+              <span class="i-mdi:account-circle text-lg" />
               <span class="ml-5"> 个人中心 </span>
             </div>
           </RouterLink>
           <div class="m-2 flex items-center p-1" @click="logout">
-            <Icon icon="mdi:logout" class="text-lg" />
+            <span class="i-mdi:logout text-lg" />
             <span class="ml-5"> 退出登录 </span>
           </div>
         </template>

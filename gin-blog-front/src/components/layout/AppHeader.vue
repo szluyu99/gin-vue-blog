@@ -1,5 +1,4 @@
 <script setup>
-import { Icon } from '@iconify/vue'
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -14,26 +13,26 @@ const router = useRouter()
 const route = useRoute()
 
 const menuOptions = [
-  { text: '首页', icon: 'mdi:home', path: '/' },
+  { text: '首页', icon: 'i-mdi:home', path: '/' },
   {
     text: '发现',
-    icon: 'mdi:apple-safari',
+    icon: 'i-mdi:apple-safari',
     subMenu: [
-      { text: '归档', icon: 'mdi:archive', path: '/archives' },
-      { text: '分类', icon: 'mdi:menu', path: '/categories' },
-      { text: '标签', icon: 'mdi:tag', path: '/tags' },
+      { text: '归档', icon: 'i-mdi:archive', path: '/archives' },
+      { text: '分类', icon: 'i-mdi:menu', path: '/categories' },
+      { text: '标签', icon: 'i-mdi:tag', path: '/tags' },
     ],
   },
   {
     text: '娱乐',
-    icon: 'mdi:gamepad-circle',
+    icon: 'i-mdi:gamepad-circle',
     subMenu: [
-      { text: '相册', icon: 'mdi:view-gallery', path: '/albums' },
+      { text: '相册', icon: 'i-mdi:view-gallery', path: '/albums' },
     ],
   },
-  { text: '友链', icon: 'mdi:vector-link', path: '/links' },
-  { text: '关于', icon: 'mdi:information-outline', path: '/about' },
-  { text: '留言', icon: 'mdi:forum', path: '/message' },
+  { text: '友链', icon: 'i-mdi:vector-link', path: '/links' },
+  { text: '关于', icon: 'i-mdi:information-outline', path: '/about' },
+  { text: '留言', icon: 'i-mdi:forum', path: '/message' },
 ]
 
 const navClass = ref('nav')
@@ -73,13 +72,13 @@ async function logout() {
       <!-- 右上角图标 -->
       <div class="flex items-center gap-2 text-2xl">
         <button :title="appStore.isDark ? '切换浅色模式' : '切换深色模式'" @click="appStore.toggleTheme()">
-          <Icon :icon="appStore.isDark ? 'mdi:weather-sunny' : 'mdi:weather-night'" />
+          <span :class="appStore.isDark ? 'i-mdi:weather-sunny' : 'i-mdi:weather-night'" />
         </button>
         <button @click="appStore.setSearchFlag(true)">
-          <Icon icon="ic:round-search" />
+          <span class="i-ic:round-search" />
         </button>
         <button @click="appStore.setCollapsed(true)">
-          <Icon icon="ic:sharp-menu" />
+          <span class="i-ic:sharp-menu" />
         </button>
       </div>
     </div>
@@ -99,27 +98,27 @@ async function logout() {
           <!-- 搜索 -->
           <div class="menus-item">
             <a class="menu-btn flex items-center" @click="appStore.setSearchFlag(true)">
-              <Icon icon="mdi:magnify" class="text-xl" />
+              <span class="i-mdi:magnify text-xl" />
               <span class="ml-1"> 搜索 </span>
             </a>
           </div>
           <div v-for="item of menuOptions" :key="item.text" class="menus-item">
             <!-- 不包含子菜单 -->
             <RouterLink v-if="!item.subMenu" :to="item.path" class="menu-btn flex items-center">
-              <Icon :icon="item.icon" class="text-xl" />
+              <span :class="item.icon" class="text-xl" />
               <span class="ml-1"> {{ item.text }} </span>
             </RouterLink>
             <!-- 包含子菜单 -->
             <div v-else class="menu-btn">
               <div class="flex items-center">
-                <Icon :icon="item.icon" class="text-xl" />
+                <span :class="item.icon" class="text-xl" />
                 <span class="mx-1"> {{ item.text }} </span>
-                <Icon icon="ep:arrow-down-bold" class="text-xl" />
+                <span class="i-ep:arrow-down-bold text-xl" />
               </div>
               <ul class="menus-submenu">
                 <RouterLink v-for="sub of item.subMenu" :key="sub.text" :to="sub.path">
                   <div class="flex items-center">
-                    <Icon :icon="sub.icon" class="text-xl" />
+                    <span :class="sub.icon" class="text-xl" />
                     <span class="ml-1"> {{ sub.text }} </span>
                   </div>
                 </RouterLink>
@@ -129,14 +128,14 @@ async function logout() {
           <!-- 主题切换 -->
           <div class="menus-item">
             <a class="menu-btn flex items-center" :title="appStore.isDark ? '切换浅色模式' : '切换深色模式'" @click="appStore.toggleTheme()">
-              <Icon :icon="appStore.isDark ? 'mdi:weather-sunny' : 'mdi:weather-night'" class="text-xl" />
+              <span :class="appStore.isDark ? 'i-mdi:weather-sunny' : 'i-mdi:weather-night'" class="text-xl" />
             </a>
           </div>
           <!-- 登录 -->
           <div class="menus-item">
             <a v-if="!userStore.userId" class="menu-btn" @click="appStore.setLoginFlag(true)">
               <div class="flex items-center">
-                <Icon icon="ph:user-bold" class="text-xl" />
+                <span class="i-mdi:account text-xl" />
                 <span class="ml-1"> 登录 </span>
               </div>
             </a>
@@ -145,12 +144,12 @@ async function logout() {
               <ul class="menus-submenu">
                 <RouterLink to="/user">
                   <div class="flex items-center">
-                    <Icon icon="mdi:account-circle" class="mr-1 text-xl" /> 个人中心
+                    <span class="i-mdi:account-circle mr-1 text-xl" /> 个人中心
                   </div>
                 </RouterLink>
                 <a @click="logout">
                   <div class="flex items-center">
-                    <Icon icon="mdi:logout" class="mr-1 text-xl" /> 退出登录
+                    <span class="i-mdi:logout mr-1 text-xl" /> 退出登录
                   </div>
                 </a>
               </ul>

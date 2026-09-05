@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
-    "@iconify/vue": "^5.0.1",
     "@vueuse/core": "^14.4.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",

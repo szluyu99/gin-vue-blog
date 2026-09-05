@@ -10,7 +10,7 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
-import { convertImgUrl, formatDate } from '@/utils'
+import { convertImgUrl, formatDate, IMG_PLACEHOLDER } from '@/utils'
 
 defineOptions({ name: '友链管理' })
 
@@ -58,7 +58,7 @@ const columns = [
         'imgProps': { style: { 'border-radius': '3px' } },
         // 本地上传的头像存的是相对路径, 不转换直接给 img 会裂图
         'src': convertImgUrl(row.avatar),
-        'fallback-src': 'https://dummyimage.com/400x400', // 加载失败
+        'fallback-src': IMG_PLACEHOLDER, // 加载失败时用内联占位图, 不再请求外网
         'show-toolbar-tooltip': true,
       })
     },
