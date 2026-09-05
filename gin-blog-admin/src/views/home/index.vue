@@ -1,13 +1,27 @@
 <script setup>
-import { NAvatar, NButton, NCard, NGi, NGradientText, NGrid, NStatistic } from 'naive-ui'
-import { onMounted, ref } from 'vue'
+import {
+  NAvatar,
+  NCard,
+  NEmpty,
+  NGi,
+  NGradientText,
+  NGrid,
+  NProgress,
+  NSkeleton,
+  NStatistic,
+  NTag,
+} from 'naive-ui'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import api from '@/api'
 import AppPage from '@/components/common/AppPage.vue'
 import { useUserStore } from '@/store'
+import { formatDate } from '@/utils'
 
 // 不解构 store: 解构后失去响应性, getUserInfo() 回来后这里的昵称和头像不会更新
 const userStore = useUserStore()
+const router = useRouter()
 
 const homeInfo = ref({
   view_count: 0,
@@ -16,8 +30,65 @@ const homeInfo = ref({
   message_count: 0,
 })
 
+// 待处理事项: 数字都来自各自列表接口的 total, 不需要新增后端接口
+const todo = ref({ comment: 0, message: 0, recycle: 0, online: 0 })
+const latestArticles = ref([])
+const categoryStat = ref([])
+const loginLogs = ref([])
+const loading = ref(true)
+
+const STATUS_MAP = {
+  1: { text: '公开', type: 'success' },
+  2: { text: '私密', type: 'warning' },
+  3: { text: '草稿', type: 'default' },
+}
+
+// 分类分布用条形图展示占比, 按最大值归一化(不是按总数), 差异看得更清楚
+const maxCategoryCount = computed(() =>
+  Math.max(1, ...categoryStat.value.map(c => c.article_count ?? 0)),
+)
+
+const todoItems = computed(() => [
+  { label: '待审核评论', value: todo.value.comment, path: '/message/comment' },
+  { label: '待审核留言', value: todo.value.message, path: '/message/leave-msg' },
+  { label: '回收站文章', value: todo.value.recycle, path: '/article/list' },
+  { label: '当前在线用户', value: todo.value.online, path: '/user/online' },
+])
+
+// 每块数据独立取, 用 allSettled: 某个接口挂了不该让整个面板空着
+async function fetchDashboard() {
+  loading.value = true
+  const [comment, message, recycle, articles, categories, logs, online] = await Promise.allSettled([
+    api.getComments({ page_num: 1, page_size: 1, is_review: false }),
+    api.getMessages({ page_num: 1, page_size: 1, is_review: false }),
+    api.getArticles({ page_num: 1, page_size: 1, is_delete: true }),
+    api.getArticles({ page_num: 1, page_size: 5, is_delete: false }),
+    api.getCategorys({ page_num: 1, page_size: 100 }),
+    api.getLoginLogs({ page_num: 1, page_size: 5 }),
+    api.getOnlineUsers({ keyword: '' }),
+  ])
+
+  const total = r => (r.status === 'fulfilled' ? r.value?.data?.total ?? 0 : 0)
+  const list = r => (r.status === 'fulfilled' ? r.value?.data?.page_data ?? [] : [])
+
+  todo.value = {
+    comment: total(comment),
+    message: total(message),
+    recycle: total(recycle),
+    online: online.status === 'fulfilled' ? (online.value?.data ?? []).length : 0,
+  }
+  latestArticles.value = list(articles)
+  loginLogs.value = list(logs)
+  categoryStat.value = list(categories)
+    .slice()
+    .sort((a, b) => (b.article_count ?? 0) - (a.article_count ?? 0))
+    .slice(0, 5)
+  loading.value = false
+}
+
 onMounted(async () => {
   getOneSentence()
+  fetchDashboard()
   // 裸 await 会在接口失败时留下未捕获的 rejection;
   // data 为空时也不能让 homeInfo 变成 null, 模板里要取它的字段
   try {
@@ -67,6 +138,7 @@ async function getOneSentence() {
 <template>
   <AppPage>
     <div class="flex-1">
+      <!-- 问候 -->
       <NCard>
         <div class="flex items-center">
           <NAvatar round :size="60" :src="userStore.avatar" />
@@ -91,47 +163,135 @@ async function getOneSentence() {
         </div>
       </NCard>
 
-      <NGrid class="mt-4" x-gap="12" :cols="4">
-        <template
+      <!-- 总量统计: 图标色改用语义色 token, 原来是四个硬编码 hex -->
+      <NGrid class="mt-4" x-gap="12" y-gap="12" cols="2 s:4" responsive="screen">
+        <NGi
           v-for="item of [
-            { icon: 'i-fa6-solid:users', color: 'text-[#40C9C6]', label: '访问量', key: 'view_count' },
-            { icon: 'i-heroicons:users-solid', color: 'text-[#34BFA3]', label: '用户量', key: 'user_count' },
-            { icon: 'i-material-symbols:article', color: 'text-[#F4516C]', label: '文章量', key: 'article_count' },
-            { icon: 'i-bxs:comment-dots', color: 'text-[#36A3F7]', label: '留言量', key: 'message_count' },
+            { icon: 'i-fa6-solid:users', color: 'text-primary', label: '访问量', key: 'view_count' },
+            { icon: 'i-heroicons:users-solid', color: 'text-success', label: '用户量', key: 'user_count' },
+            { icon: 'i-material-symbols:article', color: 'text-info', label: '文章量', key: 'article_count' },
+            { icon: 'i-bxs:comment-dots', color: 'text-warning', label: '留言量', key: 'message_count' },
           ]" :key="item.key"
         >
-          <NGi>
-            <NCard>
-              <span
-                class="text-[60px]"
-                :class="[item.icon, item.color]"
-              />
-              <NStatistic class="float-right" :label="item.label">
-                {{ homeInfo[item.key] ?? 'unknown' }}
-              </NStatistic>
-            </NCard>
-          </NGi>
-        </template>
+          <NCard>
+            <span class="text-[52px]" :class="[item.icon, item.color]" />
+            <NStatistic class="float-right" :label="item.label">
+              {{ homeInfo[item.key] ?? '-' }}
+            </NStatistic>
+          </NCard>
+        </NGi>
       </NGrid>
 
-      <!-- TODO: 完善首页设计 -->
-      <NCard title="项目" size="small" class="mt-4">
-        <template #header-extra>
-          <NButton text type="primary">
-            更多
-          </NButton>
-        </template>
-        <NCard
-          v-for="i in 5" :key="i"
-          class="my-2 w-[300px] flex-shrink-0 cursor-pointer hover:shadow-lg"
-          title="Gin Blog Admin"
-          size="small"
-        >
-          <p class="op-60">
-            这是个基于 gin 开发的博客管理后台
-          </p>
-        </NCard>
-      </NCard>
+      <!-- 待处理 + 最新文章 -->
+      <NGrid class="mt-4" x-gap="12" y-gap="12" cols="1 l:24" responsive="screen">
+        <NGi :span="8">
+          <NCard title="待处理" size="small" class="h-full">
+            <div class="space-y-1">
+              <div
+                v-for="item of todoItems" :key="item.label"
+                class="flex cursor-pointer items-center justify-between rounded px-2 py-2 transition-300 hover:bg-primary/8"
+                @click="router.push(item.path)"
+              >
+                <span class="text-sm">{{ item.label }}</span>
+                <NSkeleton v-if="loading" :width="24" text />
+                <!-- 0 的时候压暗, 有待办才醒目 -->
+                <span
+                  v-else class="text-lg font-bold"
+                  :class="item.value ? 'text-warning' : 'op-40'"
+                >
+                  {{ item.value }}
+                </span>
+              </div>
+            </div>
+          </NCard>
+        </NGi>
+
+        <NGi :span="16">
+          <NCard title="最新文章" size="small" class="h-full">
+            <template #header-extra>
+              <span class="cursor-pointer text-sm op-60 hover:text-primary" @click="router.push('/article/list')">
+                全部
+              </span>
+            </template>
+            <NSkeleton v-if="loading" :repeat="5" text class="my-2" />
+            <NEmpty v-else-if="!latestArticles.length" class="py-6" description="还没有文章" />
+            <div v-else class="space-y-1">
+              <div
+                v-for="article of latestArticles" :key="article.id"
+                class="flex cursor-pointer items-center gap-3 rounded px-2 py-2 transition-300 hover:bg-primary/8"
+                @click="router.push(`/article/write/${article.id}`)"
+              >
+                <span class="flex-1 truncate text-sm">{{ article.title }}</span>
+                <NTag v-if="article.category" size="small" :bordered="false">
+                  {{ article.category.name }}
+                </NTag>
+                <NTag size="small" :bordered="false" :type="(STATUS_MAP[article.status] || {}).type">
+                  {{ (STATUS_MAP[article.status] || {}).text || '未知' }}
+                </NTag>
+                <span class="w-[80px] text-right text-xs op-60">
+                  {{ formatDate(article.created_at) }}
+                </span>
+              </div>
+            </div>
+          </NCard>
+        </NGi>
+      </NGrid>
+
+      <!-- 分类分布 + 最近登录 -->
+      <NGrid class="mt-4" x-gap="12" y-gap="12" cols="1 l:2" responsive="screen">
+        <NGi>
+          <NCard title="分类分布" size="small" class="h-full">
+            <template #header-extra>
+              <span class="cursor-pointer text-sm op-60 hover:text-primary" @click="router.push('/article/category')">
+                全部
+              </span>
+            </template>
+            <NSkeleton v-if="loading" :repeat="4" text class="my-2" />
+            <NEmpty v-else-if="!categoryStat.length" class="py-6" description="还没有分类" />
+            <div v-else class="space-y-3">
+              <div v-for="c of categoryStat" :key="c.id">
+                <div class="mb-1 flex justify-between text-sm">
+                  <span class="truncate">{{ c.name }}</span>
+                  <span class="op-60">{{ c.article_count ?? 0 }} 篇</span>
+                </div>
+                <!-- 按最大值归一化, 不是按总数: 分类多的时候按总数算每条都是细线 -->
+                <NProgress
+                  type="line" :height="6" :border-radius="3"
+                  :percentage="Math.round((c.article_count ?? 0) / maxCategoryCount * 100)"
+                  :show-indicator="false"
+                />
+              </div>
+            </div>
+          </NCard>
+        </NGi>
+
+        <NGi>
+          <NCard title="最近登录" size="small" class="h-full">
+            <template #header-extra>
+              <span class="cursor-pointer text-sm op-60 hover:text-primary" @click="router.push('/log/login')">
+                全部
+              </span>
+            </template>
+            <NSkeleton v-if="loading" :repeat="5" text class="my-2" />
+            <NEmpty v-else-if="!loginLogs.length" class="py-6" description="还没有登录记录" />
+            <div v-else class="space-y-1">
+              <div
+                v-for="log of loginLogs" :key="log.id"
+                class="flex items-center gap-2 px-2 py-1.5 text-sm"
+              >
+                <span class="w-[70px] truncate">{{ log.nickname || log.username || '未知' }}</span>
+                <span class="flex-1 truncate text-xs op-60">{{ log.ip_address }} · {{ log.ip_source || '未知' }}</span>
+                <NTag size="small" :bordered="false" :type="log.status === 1 ? 'success' : 'error'">
+                  {{ log.status === 1 ? '成功' : '失败' }}
+                </NTag>
+                <span class="w-[125px] text-right text-xs op-60">
+                  {{ formatDate(log.created_at, 'MM-DD HH:mm:ss') }}
+                </span>
+              </div>
+            </div>
+          </NCard>
+        </NGi>
+      </NGrid>
     </div>
   </AppPage>
 </template>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { convertImgUrl, formatDate, formatJson, IMG_PLACEHOLDER, parseJson } from '@/utils'
+import { convertImgUrl, formatDate, formatJson, IMG_PLACEHOLDER, parseJson, setupThemeVars } from '@/utils'
 
 describe('convertImgUrl', () => {
   // 占位图从 dummyimage.com 换成内联 SVG: 图片本身挂了之后, 兜底不该再依赖一次外网
@@ -62,5 +62,32 @@ describe('formatJson', () => {
     expect(formatJson('')).toBe('')
     expect(formatJson(undefined)).toBe('')
     expect(formatJson('not json')).toBe('not json')
+  })
+})
+
+// uno.config.js 里声明了五组语义色都指向 CSS 变量, 但原来只有 --primary-color 有值,
+// 实测 --info-color / --success-color / --warning-color 全是空的,
+// 于是 text-info、bg-success 这类类名静默失效
+describe('setupThemeVars', () => {
+  it('把 naiveThemeOverrides.common 写成 CSS 变量', () => {
+    const el = document.createElement('div')
+    setupThemeVars(el)
+
+    expect(el.style.getPropertyValue('--primary-color')).toBe('#316C72FF')
+    expect(el.style.getPropertyValue('--info-color')).toBe('#2080F0FF')
+    expect(el.style.getPropertyValue('--success-color')).toBe('#18A058FF')
+    expect(el.style.getPropertyValue('--warning-color')).toBe('#F0A020FF')
+    expect(el.style.getPropertyValue('--error-color')).toBe('#D03050FF')
+  })
+
+  it('驼峰转短横线, naive 的 Suppl 映射成 uno 用的 active', () => {
+    const el = document.createElement('div')
+    setupThemeVars(el)
+
+    expect(el.style.getPropertyValue('--primary-color-hover')).toBe('#316C72E3')
+    expect(el.style.getPropertyValue('--primary-color-pressed')).toBe('#2B4C59FF')
+    // uno.config.js 里叫 primary_active, naive 里对应的是 primaryColorSuppl
+    expect(el.style.getPropertyValue('--primary-color-active')).toBe('#316C72E3')
+    expect(el.style.getPropertyValue('--primary-color-suppl')).toBe('')
   })
 })
