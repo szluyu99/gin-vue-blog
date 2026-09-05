@@ -66,12 +66,12 @@ const CONTENT = {
 
 // 手写的几篇: 正文各不相同, 用来看 Markdown / 代码高亮 / 公式渲染
 const HANDWRITTEN = [
-  { id: 6, title: '前端工程化里那些容易被忽略的细节', created_at: '2024-01-05T10:20:00.000Z', category_id: 2, tag_ids: [5, 2], is_top: 0 },
-  { id: 5, title: 'Vue3 组合式 API 的取舍', created_at: '2024-01-03T15:30:00.000Z', category_id: 2, tag_ids: [2, 5], is_top: 0 },
-  { id: 4, title: 'Gin 中间件是怎么串起来的', created_at: '2024-01-01T09:00:00.000Z', category_id: 1, tag_ids: [1, 4], is_top: 0 },
-  { id: 3, title: '项目介绍', created_at: '2023-12-27T22:48:43.727Z', category_id: 3, tag_ids: [1, 2], is_top: 1 },
-  { id: 2, title: '学习有捷径', created_at: '2023-12-27T22:47:47.513Z', category_id: 4, tag_ids: [3], is_top: 0 },
-  { id: 1, title: '项目运行成功', created_at: '2023-12-27T22:46:36.066Z', category_id: 3, tag_ids: [1, 2], is_top: 0 },
+  { id: 6, title: '前端工程化里那些容易被忽略的细节', created_at: '2024-01-05T10:20:00.000Z', category_id: 2, tag_ids: [5, 2], is_top: false },
+  { id: 5, title: 'Vue3 组合式 API 的取舍', created_at: '2024-01-03T15:30:00.000Z', category_id: 2, tag_ids: [2, 5], is_top: false },
+  { id: 4, title: 'Gin 中间件是怎么串起来的', created_at: '2024-01-01T09:00:00.000Z', category_id: 1, tag_ids: [1, 4], is_top: false },
+  { id: 3, title: '项目介绍', created_at: '2023-12-27T22:48:43.727Z', category_id: 3, tag_ids: [1, 2], is_top: true },
+  { id: 2, title: '学习有捷径', created_at: '2023-12-27T22:47:47.513Z', category_id: 4, tag_ids: [3], is_top: false },
+  { id: 1, title: '项目运行成功', created_at: '2023-12-27T22:46:36.066Z', category_id: 3, tag_ids: [1, 2], is_top: false },
 ]
 
 // 手写 6 篇翻不动页: 首页无限滚动一页 8 条, 文章列表页一页 9 条。
@@ -104,7 +104,7 @@ const FILLER = FILLER_TITLES.map((title, i) => ({
   created_at: new Date(Date.UTC(2024, 0, 8 + i * 3, 10, 0, 0)).toISOString(),
   category_id: (i % 4) + 1,
   tag_ids: [(i % 5) + 1, ((i + 2) % 5) + 1],
-  is_top: 0,
+  is_top: false,
   content: `## ${title}\n\n这是 Mock 模式下批量生成的样例文章, 用来验证列表分页和首页滚动加载。\n\n- 结论先写在前面\n- 代码片段尽量能直接跑\n- 需要注意的坑单独列出来\n\n\`\`\`go\nfmt.Println("mock article ${7 + i}")\n\`\`\`\n\n> ${title}\n`,
 }))
 

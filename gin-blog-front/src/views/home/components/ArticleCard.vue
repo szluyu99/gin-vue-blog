@@ -42,10 +42,11 @@ const enterIndex = computed(() => props.idx % PAGE_SIZE)
       </RouterLink>
       <div class="flex flex-wrap text-sm color-muted">
         <!-- 置顶 -->
-        <span v-if="article.is_top === 1" class="flex items-center text-accent">
+        <!-- 后端 Article.IsTop 是 bool, JSON 里是 true/false, 之前写的 === 1 永远为假 -->
+        <span v-if="article.is_top" class="flex items-center text-accent">
           <span class="i-carbon:align-vertical-top mr-1" /> 置顶
         </span>
-        <span v-if="article.is_top === 1" class="mx-1.5">|</span>
+        <span v-if="article.is_top" class="mx-1.5">|</span>
         <!-- 日期 -->
         <span class="flex items-center">
           <span class="i-mdi-calendar-month-outline mr-1" /> {{ dayjs(article.created_at).format('YYYY-MM-DD') }}
