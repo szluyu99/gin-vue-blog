@@ -14,6 +14,12 @@ const props = defineProps({
 
 const emit = defineEmits(['update:page'])
 
+// 样式全部写在模板的 class 上, 不要挪进 <style scoped> 里用 --uno 拼:
+// scoped 样式注入在 uno.css 之后, 同样是 0,1,0 特异度, 会把 :class 上条件加的
+// bg-primary 盖掉 —— 之前选中页就是这样变成白底白字的
+const BASE = 'h-9 min-w-9 f-c-c rounded-lg px-3 text-sm shadow-sm transition-300'
+const IDLE = 'bg-surface text-main hover:bg-primary hover:text-white hover:shadow-md'
+
 // 当前页附近的一段页码, 保证长度是 window(总页数不足时就全显示)
 const pages = computed(() => {
   const total = props.pageCount
@@ -22,6 +28,15 @@ const pages = computed(() => {
   start = Math.max(1, Math.min(start, total - size + 1))
   return Array.from({ length: size }, (_, i) => start + i)
 })
+
+function itemClass(active) {
+  return active ? `${BASE} bg-primary text-white font-bold shadow-md` : `${BASE} ${IDLE}`
+}
+
+// 禁用态不给 hover: 靠 disabled: 变体和 hover 抢特异度, 结果取决于生成顺序
+function arrowClass(disabled) {
+  return disabled ? `${BASE} bg-surface text-muted cursor-not-allowed opacity-50` : `${BASE} ${IDLE}`
+}
 
 function go(page) {
   if (page < 1 || page > props.pageCount || page === props.page) {
@@ -32,45 +47,42 @@ function go(page) {
 </script>
 
 <template>
-  <nav class="flex select-none items-center gap-1" aria-label="分页">
+  <nav class="flex select-none items-center gap-2" aria-label="分页">
     <button
-      class="btn" :disabled="page <= 1"
+      :class="arrowClass(page <= 1)" :disabled="page <= 1"
       aria-label="上一页" @click="go(page - 1)"
     >
       <span class="i-mdi:chevron-left block text-lg" />
     </button>
 
-    <button v-if="pages[0] > 1" class="btn" @click="go(1)">
-      1
-    </button>
-    <span v-if="pages[0] > 2" class="px-1 color-muted">...</span>
+    <template v-if="pages[0] > 1">
+      <button :class="itemClass(false)" @click="go(1)">
+        1
+      </button>
+      <span v-if="pages[0] > 2" class="px-1 text-muted">...</span>
+    </template>
 
     <button
       v-for="p of pages" :key="p"
-      class="btn" :class="p === page ? 'bg-#49b1f5 text-white' : ''"
+      :class="itemClass(p === page)"
       :aria-current="p === page ? 'page' : undefined"
       @click="go(p)"
     >
       {{ p }}
     </button>
 
-    <span v-if="pages[pages.length - 1] < pageCount - 1" class="px-1 color-muted">...</span>
-    <button v-if="pages[pages.length - 1] < pageCount" class="btn" @click="go(pageCount)">
-      {{ pageCount }}
-    </button>
+    <template v-if="pages[pages.length - 1] < pageCount">
+      <span v-if="pages[pages.length - 1] < pageCount - 1" class="px-1 text-muted">...</span>
+      <button :class="itemClass(false)" @click="go(pageCount)">
+        {{ pageCount }}
+      </button>
+    </template>
 
     <button
-      class="btn" :disabled="page >= pageCount"
+      :class="arrowClass(page >= pageCount)" :disabled="page >= pageCount"
       aria-label="下一页" @click="go(page + 1)"
     >
       <span class="i-mdi:chevron-right block text-lg" />
     </button>
   </nav>
 </template>
-
-<style scoped>
-.btn {
-  --uno: min-w-8 h-8 px-2 f-c-c rounded bg-surface text-sm shadow-sm transition-300;
-  --uno: hover:bg-#49b1f5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface disabled:hover:text-inherit;
-}
-</style>
