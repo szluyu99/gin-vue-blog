@@ -73,7 +73,7 @@ async function getOneSentence() {
           </div>
           <div class="ml-auto flex items-center">
             <NStatistic label="Stars" class="w-[80px]">
-              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
+              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank" rel="noopener noreferrer">
                 <img
                   alt="stars"
                   src="https://badgen.net/github/stars/szluyu99/gin-vue-blog"
@@ -81,7 +81,7 @@ async function getOneSentence() {
               </a>
             </NStatistic>
             <NStatistic label="Forks" class="ml-10 w-[100px]">
-              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank">
+              <a href="https://github.com/szluyu99/gin-vue-blog" target="_blank" rel="noopener noreferrer">
                 <img
                   alt="forks"
                   src="https://badgen.net/github/forks/szluyu99/gin-vue-blog"

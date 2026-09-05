@@ -192,10 +192,7 @@ const columns = [
                 size: 'small',
                 type: 'success',
                 secondary: true,
-                onClick: async () => {
-                  await api.softDeleteArticle([row.id], false)
-                  await $table.value?.handleSearch()
-                },
+                onClick: () => handleRestore(row),
               },
               { default: () => '恢复', icon: () => h('i', { class: 'i-majesticons:eye-line' }) },
             )
@@ -247,10 +244,29 @@ async function handleUpdateTop(row) {
     $table.value?.handleSearch()
   }
   catch (err) {
+    // 乐观更新后失败必须回滚, 否则开关显示已开、后端其实没变
+    // (菜单/接口/用户三个页面的同类开关都是这么写的)
+    row.is_top = !row.is_top
     console.error(err)
   }
   finally {
     row.publishing = false
+  }
+}
+
+// 从回收站恢复: 相邻的置顶/审核/删除都有提示, 只有这里原来既不 catch 也不提示,
+// 失败时是未捕获 rejection, 成功时只能靠列表刷新猜
+async function handleRestore(row) {
+  if (!row.id) {
+    return
+  }
+  try {
+    await api.softDeleteArticle([row.id], false)
+    $message?.success('已恢复该文章')
+    await $table.value?.handleSearch()
+  }
+  catch (err) {
+    console.error(err)
   }
 }
 

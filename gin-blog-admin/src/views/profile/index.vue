@@ -29,12 +29,18 @@ onMounted(async () => {
   }
 })
 
+// 两个提交按钮都要带 loading 并在请求期间禁用:
+// 改密码接口慢时连点两次, 第二次会带着已经失效的旧密码请求
+const infoLoading = ref(false)
+const passwordLoading = ref(false)
+
 async function updateProfile() {
   infoFormRef.value?.validate(async (err) => {
     if (err) {
       return
     }
     // 以前是裸 await: 更新失败会留下未捕获的 rejection
+    infoLoading.value = true
     try {
       await api.updateCurrent(infoForm.value)
       $message.success('更新成功!')
@@ -42,6 +48,9 @@ async function updateProfile() {
     }
     catch (err) {
       console.error(err)
+    }
+    finally {
+      infoLoading.value = false
     }
   })
 }
@@ -68,6 +77,7 @@ function updatePassword() {
     if (err) {
       return
     }
+    passwordLoading.value = true
     try {
       await api.updateCurrentPassword(passwordForm.value)
       $message.success('修改成功!')
@@ -76,6 +86,9 @@ function updatePassword() {
     }
     catch (err) {
       console.error(err)
+    }
+    finally {
+      passwordLoading.value = false
     }
   })
 }
@@ -161,7 +174,7 @@ function validatePasswordSame(rule, value) {
                 placeholder="请填写个人网站"
               />
             </NFormItem>
-            <NButton type="primary" @click="updateProfile">
+            <NButton type="primary" :loading="infoLoading" :disabled="infoLoading" @click="updateProfile">
               修改
             </NButton>
           </NForm>
@@ -203,7 +216,7 @@ function validatePasswordSame(rule, value) {
               placeholder="请再次输入新密码"
             />
           </NFormItem>
-          <NButton type="primary" @click="updatePassword">
+          <NButton type="primary" :loading="passwordLoading" :disabled="passwordLoading" @click="updatePassword">
             修改
           </NButton>
         </NForm>

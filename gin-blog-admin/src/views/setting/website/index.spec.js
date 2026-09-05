@@ -67,7 +67,8 @@ describe('网站管理', () => {
     await vi.waitFor(() => expect(wrapper.vm.form.website_name).toBe('线上的站名'))
 
     wrapper.vm.form.website_name = '改过的站名'
-    wrapper.vm.handleSave()
+    // handleSave 现在按 tab 收 ref: 三个表单原来都叫 formRef, 互相覆盖
+    wrapper.vm.handleSave(wrapper.vm.basicFormRef)
     await vi.waitFor(() => expect(api.updateConfig).toHaveBeenCalled())
 
     expect(api.updateConfig).toHaveBeenCalledWith(
@@ -82,7 +83,7 @@ describe('网站管理', () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.form.website_name).toBe('线上的站名'))
 
-    wrapper.vm.handleSave()
+    wrapper.vm.handleSave(wrapper.vm.basicFormRef)
     await vi.waitFor(() => expect(window.$loadingBar.error).toHaveBeenCalled())
 
     expect(window.$message.success).not.toHaveBeenCalled()

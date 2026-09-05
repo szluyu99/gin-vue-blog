@@ -9,7 +9,12 @@ import CommonPage from '@/components/common/CommonPage.vue'
 
 defineOptions({ name: '网站管理' })
 
-const formRef = ref(null)
+// 三个 tab 各自一个 ref: 原来四处(其中一处还是嵌套的)都叫 formRef,
+// 后挂载的实例覆盖前面的, handleSave 校验到的永远是最后那个。
+// 现在这些表单没有 rules 所以看不出问题, 以后任何一处加必填都会失效
+const basicFormRef = ref(null)
+const socialFormRef = ref(null)
+const otherFormRef = ref(null)
 const form = ref({
   website_avatar: '',
   website_name: '阵、雨的个人博客',
@@ -52,8 +57,9 @@ async function fetchData() {
   }
 }
 
-function handleSave() {
-  formRef.value?.validate(async (err) => {
+// 参数是表单实例本身(模板里的 basicFormRef 会自动解包), 不是 ref 对象
+function handleSave(formInst) {
+  formInst?.validate(async (err) => {
     if (!err) {
       try {
         $loadingBar?.start()
@@ -75,7 +81,7 @@ function handleSave() {
     <NTabs type="line" animated>
       <NTabPane name="website" tab="网站信息">
         <NForm
-          ref="formRef"
+          ref="basicFormRef"
           label-placement="left"
           label-align="left"
           :label-width="120"
@@ -125,14 +131,14 @@ function handleSave() {
               </n-space>
             </n-checkbox-group>
           </n-form-item> -->
-          <NButton type="primary" @click="handleSave">
+          <NButton type="primary" @click="handleSave(basicFormRef)">
             确认
           </NButton>
         </NForm>
       </NTabPane>
       <NTabPane name="contact" tab="社交信息">
         <NForm
-          ref="formRef"
+          ref="socialFormRef"
           label-placement="left"
           label-align="left"
           :label-width="120"
@@ -148,21 +154,23 @@ function handleSave() {
           <NFormItem label="Gitee" path="gitee">
             <NInput v-model:value="form.gitee" placeholder="请输入 Gitee" />
           </NFormItem>
-          <NButton type="primary" @click="handleSave">
+          <NButton type="primary" @click="handleSave(socialFormRef)">
             确认
           </NButton>
         </NForm>
       </NTabPane>
       <NTabPane name="other" tab="其他设置">
         <NForm
-          ref="formRef"
+          ref="otherFormRef"
           label-placement="left"
           label-align="left"
           :label-width="120"
           :model="form"
           class="mt-4"
         >
-          <NForm ref="formRef" label-align="left" :label-width="120" :model="form" inline>
+          <!-- 这里原来又套了一个表单, 只为让两个上传并排。表单嵌表单没有意义,
+               而且 ref 重名; 换成普通的 flex 容器 -->
+          <div class="flex flex-wrap gap-8">
             <NFormItem label="用户头像" path="user_avatar">
               <UploadOne
                 v-model:preview="form.user_avatar"
@@ -175,13 +183,7 @@ function handleSave() {
                 :width="120"
               />
             </NFormItem>
-            <!-- <n-form-item label="微信收款码" path="tourist_avatar">
-              <n-image border-dashed border-1 text-gray width="120" :src="form.tourist_avatar" />
-            </n-form-item>
-            <n-form-item label="支付宝收款码" path="tourist_avatar">
-              <n-image border-dashed border-1 text-gray width="120" :src="form.tourist_avatar" />
-            </n-form-item> -->
-          </NForm>
+          </div>
           <NFormItem label-placement="top" label="文章默认封面" path="article_cover">
             <UploadOne
               v-model:preview="form.article_cover"
@@ -218,7 +220,7 @@ function handleSave() {
               </NRadio>
             </NRadioGroup>
           </NFormItem> -->
-          <NButton type="primary" @click="handleSave">
+          <NButton type="primary" @click="handleSave(otherFormRef)">
             确认
           </NButton>
         </NForm>

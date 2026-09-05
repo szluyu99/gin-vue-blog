@@ -2,7 +2,7 @@
 import { NIcon } from 'naive-ui'
 
 function handleLinkClick() {
-  window.open('https://github.com/szluyu99/gin-vue-blog')
+  window.open('https://github.com/szluyu99/gin-vue-blog', '_blank', 'noopener,noreferrer')
 }
 </script>
 

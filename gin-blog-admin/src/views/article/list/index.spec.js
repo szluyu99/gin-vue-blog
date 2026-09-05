@@ -13,6 +13,7 @@ vi.mock('@/api', () => ({
     getTagOption: vi.fn().mockResolvedValue({ code: 0, data: [] }),
     deleteArticle: vi.fn().mockResolvedValue({ code: 0 }),
     softDeleteArticle: vi.fn().mockResolvedValue({ code: 0 }),
+    updateArticleTop: vi.fn().mockResolvedValue({ code: 0 }),
   },
 }))
 
@@ -68,6 +69,49 @@ describe('文章列表', () => {
     const ret = wrapper.vm.updateOrDeleteArticles(JSON.stringify([3]))
     expect(ret).toBeInstanceOf(Promise)
     await expect(ret).resolves.toMatchObject({ code: 0 })
+  })
+
+  // 乐观更新: 失败后必须回滚, 否则开关显示已置顶而后端没变
+  // (菜单/接口/用户三个页面的同类开关都在 catch 里回滚, 只有这里漏了)
+  it('置顶失败后回滚开关状态', async () => {
+    api.updateArticleTop.mockRejectedValue(new Error('boom'))
+    const wrapper = mountPage()
+    const row = { id: 3, is_top: false }
+
+    await wrapper.vm.handleUpdateTop(row)
+
+    expect(row.is_top).toBe(false)
+    expect(window.$message.success).not.toHaveBeenCalled()
+  })
+
+  it('置顶成功后保留新状态并提示', async () => {
+    api.updateArticleTop.mockResolvedValue({ code: 0 })
+    const wrapper = mountPage()
+    const row = { id: 3, is_top: false }
+
+    await wrapper.vm.handleUpdateTop(row)
+
+    expect(row.is_top).toBe(true)
+    expect(window.$message.success).toHaveBeenCalledWith('已成功置顶')
+  })
+
+  // 相邻的置顶/审核/删除都有提示, 只有恢复原来既不 catch 也不提示
+  it('从回收站恢复会提示成功', async () => {
+    api.softDeleteArticle.mockResolvedValue({ code: 0 })
+    const wrapper = mountPage()
+
+    await wrapper.vm.handleRestore({ id: 3 })
+
+    expect(api.softDeleteArticle).toHaveBeenCalledWith([3], false)
+    expect(window.$message.success).toHaveBeenCalledWith('已恢复该文章')
+  })
+
+  it('恢复失败不抛出未捕获的 rejection', async () => {
+    api.softDeleteArticle.mockRejectedValue(new Error('boom'))
+    const wrapper = mountPage()
+
+    await expect(wrapper.vm.handleRestore({ id: 3 })).resolves.toBeUndefined()
+    expect(window.$message.success).not.toHaveBeenCalled()
   })
 
   it('导入放行 .md 与 .markdown, 拦住其他后缀', async () => {

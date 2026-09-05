@@ -92,7 +92,7 @@ function getIcon(meta) {
 
 function handleMenuSelect(_, item) {
   if (isExternal(item.path)) {
-    window.open(item.path)
+    window.open(item.path, '_blank', 'noopener,noreferrer')
     return
   }
 
