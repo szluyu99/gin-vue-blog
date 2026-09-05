@@ -28,8 +28,11 @@ describe('分类列表', () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.categoryList).toHaveLength(2))
 
-    expect(wrapper.text()).toContain('分类 - 2')
+    expect(wrapper.text()).toContain('共 2 个分类')
     expect(wrapper.text()).toContain('项目')
+    // 每个分类一张卡片, 文章数以 badge 形式渲染出来
+    expect(wrapper.findAll('li')).toHaveLength(2)
+    expect(wrapper.text()).toContain('3')
   })
 
   it('接口失败时 loading 复位, 列表保持空数组', async () => {
@@ -47,6 +50,8 @@ describe('分类列表', () => {
     await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
 
     expect(wrapper.vm.categoryList).toEqual([])
-    expect(wrapper.text()).toContain('分类 - 0')
+    expect(wrapper.text()).toContain('共 0 个分类')
+    // 一个分类都没有时给提示, 而不是一张空白卡片
+    expect(wrapper.text()).toContain('还没有分类')
   })
 })

@@ -25,24 +25,31 @@ onMounted(async () => {
 
 <template>
   <BannerPage :loading="loading" title="分类" label="category" card>
-    <h2 class="text-center text-2xl leading-8 lg:text-3xl">
-      分类 - {{ categoryList.length }}
-    </h2>
-    <ul class="mt-4 px-5 space-y-2">
-      <li
-        v-for="c of categoryList" :key="c.id"
-        class="group cursor-pointer duration-300 hover:text-violet"
-      >
-        <RouterLink :to="`categories/${c.id}?name=${c.name}`">
-          <div class="flex items-center">
-            <span class="mr-2 inline-block h-4 w-4 rounded-full bg-[#49b1f5] group-hover:bg-[#ff7242]" />
-            <div>
-              <span class="text-lg"> {{ c.name }} </span>
-              <span class="ml-1 text-sm text-gray"> ({{ c.article_count ?? 0 }}) </span>
-            </div>
-          </div>
+    <!-- 横幅上已经写着"分类"了, 这里只说明数量 -->
+    <p class="text-center text-muted">
+      共 {{ categoryList.length }} 个分类
+    </p>
+    <!-- 原来是单列列表: 970px 宽的卡片里放几行左对齐文字, 大片空白。
+         改成响应式网格, 每项自成一张小卡片, 文章数用 badge 挂在右侧 -->
+    <ul class="grid grid-cols-1 mt-6 gap-4 lg:grid-cols-3 sm:grid-cols-2">
+      <li v-for="c of categoryList" :key="c.id">
+        <RouterLink
+          :to="`categories/${c.id}?name=${c.name}`"
+          class="group flex items-center justify-between gap-3 rounded-xl bg-surface-soft px-4 py-3 shadow-sm transition-300 hover:shadow-md hover:-translate-y-0.5"
+        >
+          <span class="flex items-center gap-2 truncate">
+            <span class="h-3 w-3 shrink-0 rounded-full bg-primary transition-300 group-hover:bg-#ff7242" />
+            <span class="truncate text-lg group-hover:text-primary">{{ c.name }}</span>
+          </span>
+          <span class="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+            {{ c.article_count ?? 0 }}
+          </span>
         </RouterLink>
       </li>
     </ul>
+
+    <div v-if="!loading && !categoryList.length" class="py-10 text-center text-muted">
+      还没有分类
+    </div>
   </BannerPage>
 </template>
