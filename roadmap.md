@@ -127,7 +127,7 @@ ReturnSuccess(c, list)
 - **第三方登录（QQ / 微信 / GitHub）**：暫时不需要
 - **国际化**：体力活为主，学习收益低
 - **后端日志切割**：目前日志量不需要
-- **`@iconify/vue` 换 UnoCSS 图标类**：菜单图标名存在数据库里，改动面不小，收益仅是省一次运行时图标请求
+- **后台的 `@iconify/vue` 换 UnoCSS 图标类**：前台已经换完（图标名都是静态字面量，改完运行时请求从 20 个降到 0）。后台不换：菜单图标名存在数据库的 `menu.icon` 字段里，编译期看不到，必须用 UnoCSS `safelist` 预生成 —— 要覆盖 `assets/icons.js` 里 IconPicker 提供的 228 个 `mdi-*` 加数据库现有的 24 个，其中 24 个还用到 7 个当前没加载的图标集（carbon / cib / el / icon-park-outline / iconoir / ph / tabler），dev server 启动要多解析约 15MB JSON，CSS 增加 30~40KB gzip。后台是自用工具，接受首屏图标晚 1~2 秒出现（不阻塞内容）
 
 ## 推荐顺序
 
