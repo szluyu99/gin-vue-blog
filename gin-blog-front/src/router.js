@@ -95,6 +95,14 @@ const basicRoutes = [
     },
   },
   {
+    name: 'Notification',
+    path: '/notifications',
+    component: () => import('@/views/notification/index.vue'),
+    meta: {
+      title: '站内通知',
+    },
+  },
+  {
     name: '404',
     path: '/404',
     component: () => import('@/views/error-page/404.vue'),

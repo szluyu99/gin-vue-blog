@@ -180,3 +180,39 @@ func TestNotifyOnComment(t *testing.T) {
 	// nil 不能 panic
 	assert.Nil(t, NotifyOnComment(db, nil))
 }
+
+// 审核通过时补发通知: 只挑真正 false -> true 的, 重复点"通过"不该重复通知
+func TestReviewCommentsApproved(t *testing.T) {
+	db := newModelDB(t)
+	author := seedNotifyUser(t, db, "author")
+	guest := seedNotifyUser(t, db, "guest")
+	article := seedArticle(t, db, Article{Title: "文章", Status: STATUS_PUBLIC, UserId: author.ID})
+
+	pending, err := AddComment(db, guest.ID, TYPE_ARTICLE, article.ID, "待审核的评论", false)
+	assert.Nil(t, err)
+	already, err := AddComment(db, guest.ID, TYPE_ARTICLE, article.ID, "已经过审的评论", true)
+	assert.Nil(t, err)
+
+	rows, approved, err := ReviewComments(db, []int{pending.ID, already.ID}, true)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(2), rows)
+	assert.Len(t, approved, 1, "只有原本待审核的那条需要补发通知")
+	assert.Equal(t, pending.ID, approved[0].ID)
+	assert.True(t, approved[0].IsReview, "查出来时是 false, 要补成新状态, 否则 NotifyOnComment 会跳过")
+
+	// 再点一次通过, 不该再返回任何需要通知的评论
+	_, approved, err = ReviewComments(db, []int{pending.ID, already.ID}, true)
+	assert.Nil(t, err)
+	assert.Empty(t, approved)
+
+	// 取消审核不产生通知
+	_, approved, err = ReviewComments(db, []int{pending.ID}, false)
+	assert.Nil(t, err)
+	assert.Empty(t, approved)
+
+	// 空 id 列表不发 SQL
+	rows, approved, err = ReviewComments(db, nil, true)
+	assert.Nil(t, err)
+	assert.Zero(t, rows)
+	assert.Empty(t, approved)
+}

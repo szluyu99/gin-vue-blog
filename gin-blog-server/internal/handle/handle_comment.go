@@ -3,6 +3,7 @@ package handle
 import (
 	g "gin-blog/internal/global"
 	"gin-blog/internal/model"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 )
@@ -59,14 +60,22 @@ func (*Comment) UpdateReview(c *gin.Context) {
 		ReturnError(c, g.ErrRequest, err)
 		return
 	}
-	maps := map[string]any{"is_review": req.IsReview}
-	result := GetDB(c).Model(model.Comment{}).Where("id in ?", req.Ids).Updates(maps)
-	if result.Error != nil {
-		ReturnError(c, g.ErrDbOp, result.Error)
+	db := GetDB(c)
+	rows, approved, err := model.ReviewComments(db, req.Ids, req.IsReview)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
 		return
 	}
 
-	ReturnSuccess(c, result.RowsAffected)
+	// 过审这一刻才补发通知: 评论待审核期间是不可见的, 当时没发
+	// 通知写失败不影响审核结果, 只记日志
+	for i := range approved {
+		if err := model.NotifyOnComment(db, &approved[i]); err != nil {
+			slog.Warn("审核通过后写站内通知失败", "err", err, "comment_id", approved[i].ID)
+		}
+	}
+
+	ReturnSuccess(c, rows)
 }
 
 // @Summary 条件查询评论列表

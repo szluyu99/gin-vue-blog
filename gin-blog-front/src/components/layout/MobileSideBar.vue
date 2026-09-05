@@ -4,12 +4,14 @@ import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
 import UDrawer from '@/components/ui/UDrawer.vue'
-import { useAppStore, useUserStore } from '@/store'
+import { useAppStore, useNotificationStore, useUserStore } from '@/store'
 
 const { collapsed, blogConfig, articleCount, categoryCount, tagCount } = storeToRefs(useAppStore())
 
 const [route, router] = [useRoute(), useRouter()]
 const [userStore, appStore] = [useUserStore(), useAppStore()]
+// 未读数由 AppHeader 挂载时拉取, 这里只读
+const notificationStore = useNotificationStore()
 
 const menuOptions = [
   { text: '首页', icon: 'i-mdi:home', path: '/' },
@@ -81,6 +83,19 @@ async function logout() {
           </div>
         </template>
         <template v-else>
+          <!-- 窄屏没有头部铃铛, 通知入口放在侧边栏里 -->
+          <RouterLink to="/notifications">
+            <div class="m-2 flex items-center p-1" @click="appStore.setCollapsed(false)">
+              <span class="i-mdi:bell-outline text-lg" />
+              <span class="ml-5"> 站内通知 </span>
+              <span
+                v-if="notificationStore.unreadCount"
+                class="ml-2 h-4 min-w-4 flex items-center justify-center rounded-full bg-accent px-1 text-[10px] text-white"
+              >
+                {{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}
+              </span>
+            </div>
+          </RouterLink>
           <RouterLink to="/user">
             <div class="m-2 flex items-center p-1" @click="appStore.setCollapsed(false)">
               <span class="i-mdi:account-circle text-lg" />

@@ -129,3 +129,33 @@ func TestSaveCommentCreatesNotification(t *testing.T) {
 	count, _ = model.GetUnreadNotificationCount(env.db, author.ID)
 	assert.Equal(t, int64(1), count)
 }
+
+// 后台审核通过时补发通知(评论待审核期间不可见, 当时没发)
+func TestUpdateCommentReviewNotifies(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.PUT("/comment/review", (&Comment{}).UpdateReview)
+
+	author := model.UserAuth{Model: model.Model{ID: 2}, Username: "author", Password: "x"}
+	assert.Nil(t, env.db.Create(&author).Error)
+	article := model.Article{Title: "文章", Status: model.STATUS_PUBLIC, UserId: author.ID}
+	assert.Nil(t, env.db.Create(&article).Error)
+
+	pending, err := model.AddComment(env.db, 1, model.TYPE_ARTICLE, article.ID, "待审核", false)
+	assert.Nil(t, err)
+
+	// 待审核期间没有通知
+	count, _ := model.GetUnreadNotificationCount(env.db, author.ID)
+	assert.Zero(t, count)
+
+	resp := env.do(t, http.MethodPut, "/comment/review", UpdateReviewReq{Ids: []int{pending.ID}, IsReview: true})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	count, _ = model.GetUnreadNotificationCount(env.db, author.ID)
+	assert.Equal(t, int64(1), count, "过审后作者应该收到通知")
+
+	// 重复点通过不重复发
+	resp = env.do(t, http.MethodPut, "/comment/review", UpdateReviewReq{Ids: []int{pending.ID}, IsReview: true})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+	count, _ = model.GetUnreadNotificationCount(env.db, author.ID)
+	assert.Equal(t, int64(1), count)
+}

@@ -218,6 +218,12 @@ async function logout() {
                   <span v-if="!item.is_read" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent" />
                 </li>
               </template>
+              <!-- 下拉只放最近 10 条, 更多的去通知页翻 -->
+              <li class="border-t border-color-divider">
+                <RouterLink to="/notifications" class="block px-3 py-2 text-center text-xs text-primary">
+                  查看全部
+                </RouterLink>
+              </li>
             </ul>
           </div>
           <!-- 登录 -->
