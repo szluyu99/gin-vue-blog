@@ -88,6 +88,32 @@ spawn() {
   [ -s "$pf" ] || die "$name 启动失败, 看日志: ./dev.sh logs $name"
 }
 
+# 只靠 /proc 找监听某端口的进程, 不依赖 ss / lsof
+#
+# 精简版 ss: /proc/net/tcp{,6} 里找 st=0A(LISTEN) 且本地端口匹配的行, 取它的 inode,
+# 再去 /proc/*/fd 里找哪个进程持有这个 socket inode。
+# 容器镜像里经常没装 ss 和 lsof, 之前这种环境下 port_owner 永远返回空,
+# 报错信息就变成"可能不在当前 PID 命名空间", 把人往错方向带
+port_owner_proc() {
+  local port=$1 hexport inode pid
+  hexport="$(printf '%04X' "$port")"
+  for f in /proc/net/tcp /proc/net/tcp6; do
+    [ -r "$f" ] || continue
+    while read -r _ local_addr _ st _ _ _ _ _ inode _; do
+      [ "$st" = "0A" ] || continue
+      [ "${local_addr##*:}" = "$hexport" ] || continue
+      for fd in /proc/[0-9]*/fd/*; do
+        if [ "$(readlink "$fd" 2>/dev/null)" = "socket:[$inode]" ]; then
+          pid="${fd#/proc/}"
+          echo "${pid%%/*}"
+          return 0
+        fi
+      done
+    done < "$f"
+  done
+  return 1
+}
+
 # 查端口被谁占着, 返回 "pid/命令" 或空串
 port_owner() {
   local port=$1 out=''
@@ -96,6 +122,9 @@ port_owner() {
   fi
   if [ -z "$out" ] && command -v lsof >/dev/null 2>&1; then
     out="$(lsof -ti "tcp:$port" -sTCP:LISTEN 2>/dev/null | head -1)"
+  fi
+  if [ -z "$out" ]; then
+    out="$(port_owner_proc "$port" || true)"
   fi
   [ -z "$out" ] && return 1
   echo "$out/$(ps -p "$out" -o comm= 2>/dev/null)"
@@ -168,6 +197,12 @@ stop_one() {
       sleep 1
     done
     kill -KILL "-$pid" 2>/dev/null
+    # 杀不掉就把 pid 文件留着: 删了之后 alive() 恒为假, status 会显示成
+    # "非本脚本启动", stop 也再也管不到它, 只能手动去找进程
+    if kill -0 "$pid" 2>/dev/null; then
+      warn "$name (pid $pid) 没有停掉, 保留 pid 文件; 需要时手动 kill -9 $pid"
+      return 1
+    fi
     info "已停止 $name (pid $pid)"
   fi
   rm -f "$f"

@@ -344,8 +344,11 @@ function afterUpload({ event }) {
         </template>
         新建文章
       </NButton>
+      <!-- 只有「新建文章」是主操作(填充), 其余三个用 secondary:
+           原来四个按钮四种填充色平铺, 看不出主次 -->
       <NButton
         type="error"
+        secondary
         :disabled="!$table?.selections.length"
         @click="handleDelete($table?.selections)"
       >
@@ -355,7 +358,7 @@ function afterUpload({ event }) {
         批量删除
       </NButton>
       <NButton
-        type="info"
+        secondary
         :disabled="!$table?.selections.length"
         @click="exportArticles($table?.selections)"
       >
@@ -373,7 +376,7 @@ function afterUpload({ event }) {
           @before-upload="beforeUpload"
           @finish="afterUpload"
         >
-          <NButton type="success">
+          <NButton secondary>
             <template #icon>
               <i class="i-mdi:import" />
             </template>

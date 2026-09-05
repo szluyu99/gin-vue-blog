@@ -1,5 +1,5 @@
 <script setup>
-import { NButton, NDropdown, NForm, NFormItem, NImage, NInput } from 'naive-ui'
+import { NButton, NDropdown, NEmpty, NForm, NFormItem, NImage, NInput } from 'naive-ui'
 import { h, onMounted, ref } from 'vue'
 
 import api from '@/api'
@@ -32,6 +32,8 @@ const {
 })
 
 const pageList = ref([])
+// 首屏拉取期间不显示空状态, 否则会闪一下「还没有页面」
+const loading = ref(true)
 const reloadFlag = ref(false)
 const uploadOneRef = ref(null) // 图片上传 ref 对象
 
@@ -41,12 +43,16 @@ onMounted(async () => {
 
 async function fetchData() {
   // 裸 await 会在接口失败时产生未捕获的 rejection; data 为空时也不能让 pageList 变成 undefined
+  loading.value = true
   try {
     const resp = await api.getPages()
     pageList.value = resp.data ?? []
   }
   catch (err) {
     console.error(err)
+  }
+  finally {
+    loading.value = false
   }
 }
 
@@ -94,10 +100,12 @@ const options = [
         新建页面
       </NButton>
     </template>
-    <div class="flex flex-wrap justify-between">
+    <!-- 原来是 flex + justify-between, 末尾还要垫三个空 div 才对得齐;
+         换成 grid, 列数按容器宽度自适应, 卡片数变化也不会跳 -->
+    <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))">
       <div
         v-for="page of pageList" :key="page.id"
-        class="relative my-2 w-[300px] cursor-pointer text-center"
+        class="relative my-2 cursor-pointer text-center"
       >
         <div class="absolute right-2 top-1 text-white">
           <NDropdown :options="options" @select="handleSelect($event, page)">
@@ -113,10 +121,9 @@ const options = [
           {{ page.name }}
         </p>
       </div>
-      <div class="h-0 w-[300px]" />
-      <div class="h-0 w-[300px]" />
-      <div class="h-0 w-[300px]" />
     </div>
+
+    <NEmpty v-if="!loading && !pageList.length" class="py-16" description="还没有页面, 点右上角新建" />
 
     <CrudModal
       v-model:visible="modalVisible"
