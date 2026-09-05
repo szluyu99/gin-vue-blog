@@ -1,16 +1,49 @@
 <script setup>
 import { useWindowScroll, watchThrottled } from '@vueuse/core'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAppStore, useUserStore } from '@/store'
+import { useAppStore, useNotificationStore, useUserStore } from '@/store'
 import { convertImgUrl } from '@/utils'
 import MobileSideBar from './MobileSideBar.vue'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
+const notificationStore = useNotificationStore()
 const router = useRouter()
 const route = useRoute()
+
+// 未读数只在登录后才有意义; 退出登录要连列表一起清掉, 否则下一个人登录
+// 会先看到上一个人的通知
+onMounted(() => {
+  if (userStore.userId) {
+    notificationStore.fetchUnreadCount()
+  }
+})
+
+watch(() => userStore.userId, (id) => {
+  if (id) {
+    notificationStore.fetchUnreadCount()
+  }
+  else {
+    notificationStore.reset()
+  }
+})
+
+// 列表按需拉: 鼠标移上铃铛才请求, 不做轮询
+function onBellEnter() {
+  notificationStore.fetchList()
+}
+
+// 点一条通知: 先标已读再跳到对应文章
+async function openNotification(item) {
+  if (!item.is_read) {
+    await notificationStore.read([item.id])
+  }
+  if (item.article_id) {
+    router.push(`/article/${item.article_id}`)
+  }
+}
 
 const menuOptions = [
   { text: '首页', icon: 'i-mdi:home', path: '/' },
@@ -130,6 +163,62 @@ async function logout() {
             <a class="menu-btn flex items-center" :title="appStore.isDark ? '切换浅色模式' : '切换深色模式'" @click="appStore.toggleTheme()">
               <span :class="appStore.isDark ? 'i-mdi:weather-sunny' : 'i-mdi:weather-night'" class="text-xl" />
             </a>
+          </div>
+          <!-- 站内通知: 未登录没有通知可看, 整块不渲染 -->
+          <div v-if="userStore.userId" class="menus-item" @mouseenter="onBellEnter">
+            <a class="menu-btn relative flex items-center" title="站内通知">
+              <span class="i-mdi:bell-outline text-xl" />
+              <!-- 未读红点: 数字超过 99 就显示 99+, 否则会把导航栏撑开 -->
+              <span
+                v-if="notificationStore.unreadCount"
+                class="absolute h-4 min-w-4 flex items-center justify-center rounded-full bg-accent px-1 text-[10px] text-white -right-2 -top-1"
+              >
+                {{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}
+              </span>
+            </a>
+            <ul class="menus-submenu w-[320px] text-left">
+              <li class="flex items-center justify-between border-b border-color-divider px-3 py-2">
+                <span class="text-sm font-bold">站内通知</span>
+                <span
+                  v-if="notificationStore.unreadCount"
+                  class="cursor-pointer text-xs text-primary" @click="notificationStore.read()"
+                >
+                  全部已读
+                </span>
+              </li>
+              <li v-if="notificationStore.loading" class="px-3 py-4 text-center text-sm color-muted">
+                加载中...
+              </li>
+              <li v-else-if="!notificationStore.list.length" class="px-3 py-6 text-center text-sm color-muted">
+                还没有通知
+              </li>
+              <template v-else>
+                <li
+                  v-for="item of notificationStore.list" :key="item.id"
+                  class="flex cursor-pointer gap-2 px-3 py-2 transition-300 hover:bg-surface-soft"
+                  :class="item.is_read ? 'op-60' : ''"
+                  @click="openNotification(item)"
+                >
+                  <img
+                    :src="convertImgUrl(item.from_avatar)" :alt="item.from_nickname"
+                    class="h-8 w-8 shrink-0 rounded-full bg-surface-soft object-cover"
+                  >
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm">
+                      <span class="font-bold">{{ item.from_nickname || '有人' }}</span>
+                      {{ item.type === 1 ? '回复了你' : '评论了你的文章' }}
+                    </p>
+                    <p class="truncate text-xs color-muted">
+                      {{ item.content }}
+                    </p>
+                    <p class="mt-0.5 text-xs color-muted">
+                      {{ item.article_title }}
+                    </p>
+                  </div>
+                  <span v-if="!item.is_read" class="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent" />
+                </li>
+              </template>
+            </ul>
           </div>
           <!-- 登录 -->
           <div class="menus-item">

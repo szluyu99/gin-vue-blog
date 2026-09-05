@@ -8,4 +8,5 @@ export const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
 export * from './app'
+export * from './notification'
 export * from './user'

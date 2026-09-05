@@ -32,7 +32,8 @@ var (
 
 	// 博客前台接口
 
-	frontAPI handle.Front // 博客前台接口汇总
+	frontAPI        handle.Front        // 博客前台接口汇总
+	notificationAPI handle.Notification // 站内通知(前台, 需登录)
 )
 
 // TODO: 前端修改 PUT 和 PATCH 请求
@@ -241,5 +242,14 @@ func registerBlogHandler(r *gin.Engine) {
 		base.POST("/comment", frontAPI.SaveComment)                 // 前台新增评论
 		base.GET("/comment/like/:comment_id", frontAPI.LikeComment) // 前台点赞评论
 		base.GET("/article/like/:article_id", frontAPI.LikeArticle) // 前台点赞文章
+
+		// 站内通知: 只能看/改自己的, handler 里从 token 取 user_id, 不接受前端传
+		notification := base.Group("/notification")
+		{
+			notification.GET("/list", notificationAPI.GetList)          // 通知列表
+			notification.GET("/unread", notificationAPI.GetUnreadCount) // 未读数
+			notification.PUT("/read", notificationAPI.Read)             // 标记已读(ids 为空则全部)
+			notification.DELETE("", notificationAPI.Delete)             // 删除通知
+		}
 	}
 }

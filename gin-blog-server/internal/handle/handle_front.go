@@ -248,6 +248,12 @@ func (*Front) SaveComment(c *gin.Context) {
 		return
 	}
 
+	// 站内通知: 写失败不影响发评论本身, 只记日志
+	// (邮件通知默认关闭, 这是「别人回复了你」唯一的出口)
+	if err := model.NotifyOnComment(db, comment); err != nil {
+		slog.Warn("写站内通知失败", "err", err, "comment_id", comment.ID)
+	}
+
 	ReturnSuccess(c, comment)
 }
 

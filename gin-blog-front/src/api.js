@@ -48,4 +48,10 @@ export default {
   saveLikeComment: id => request.get(`/comment/like/${id}`, { needToken: true }),
   /** 点赞文章 */
   saveLikeArticle: id => request.get(`/article/like/${id}`, { needToken: true }),
+  /** 站内通知列表 */
+  getNotifications: (params = {}) => request.get('/notification/list', { params, needToken: true }),
+  /** 未读通知数 */
+  getUnreadNotificationCount: () => request.get('/notification/unread', { needToken: true }),
+  /** 标记通知已读, ids 为空表示全部已读 */
+  readNotifications: (ids = []) => request.put('/notification/read', { ids }, { needToken: true }),
 }

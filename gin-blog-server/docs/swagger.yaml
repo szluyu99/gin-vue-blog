@@ -478,6 +478,23 @@ definitions:
         description: 总条数
         type: integer
     type: object
+  handle.PageResult-model_NotificationVO:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.NotificationVO'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
   handle.PageResult-model_OperationLog:
     properties:
       page_data:
@@ -545,6 +562,13 @@ definitions:
       total:
         description: 总条数
         type: integer
+    type: object
+  handle.ReadNotificationReq:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
     type: object
   handle.RegisterReq:
     properties:
@@ -894,6 +918,19 @@ definitions:
       data:
         allOf:
         - $ref: '#/definitions/handle.PageResult-model_Message'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_NotificationVO:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_NotificationVO'
         description: 响应数据
       message:
         description: 响应消息
@@ -1569,6 +1606,35 @@ definitions:
         type: integer
       updated_at:
         type: string
+    type: object
+  model.NotificationVO:
+    properties:
+      article_id:
+        type: integer
+      article_title:
+        type: string
+      comment_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      from_avatar:
+        type: string
+      from_nickname:
+        type: string
+      from_user_id:
+        type: integer
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      type:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   model.OperationLog:
     properties:
@@ -2560,6 +2626,97 @@ paths:
       summary: 前台留言列表
       tags:
       - Front
+  /front/notification:
+    delete:
+      consumes:
+      - application/json
+      description: 只能删自己的
+      parameters:
+      - description: 通知 ID 列表
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handle.ReadNotificationReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除通知
+      tags:
+      - Notification
+  /front/notification/list:
+    get:
+      description: 分页返回, 带触发者昵称头像与文章标题
+      parameters:
+      - description: 是否已读, 不传为全部
+        in: query
+        name: is_read
+        type: boolean
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_NotificationVO'
+      security:
+      - ApiKeyAuth: []
+      summary: 当前用户的站内通知列表
+      tags:
+      - Notification
+  /front/notification/read:
+    put:
+      consumes:
+      - application/json
+      description: ids 为空时标记当前用户的全部未读
+      parameters:
+      - description: 通知 ID 列表
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handle.ReadNotificationReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 标记通知为已读
+      tags:
+      - Notification
+  /front/notification/unread:
+    get:
+      description: 前台头部铃铛上的红点
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 当前用户的未读通知数
+      tags:
+      - Notification
   /front/page:
     get:
       description: 获取页面列表, 优先读 Redis 缓存
