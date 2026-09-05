@@ -184,12 +184,14 @@ function copyFormatCode(code) {
       </template>
     </CrudTable>
 
+    <!-- width 直接进 CrudModal 的 :style, 原来写的 "full" 不是合法 CSS 值,
+         会被浏览器丢弃并回落到默认 600px, 两段 JSON 挤在窄弹窗里 -->
     <CrudModal
       v-model:visible="modalVisible"
       title="日志详情"
       :show-footer="false"
       :loading="modalLoading"
-      width="full"
+      width="900px"
     >
       <NForm
         ref="modalFormRef"

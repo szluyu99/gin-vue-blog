@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { convertImgUrl, formatDate, formatJson, parseJson } from '@/utils'
+import { convertImgUrl, formatDate, formatJson, IMG_PLACEHOLDER, parseJson } from '@/utils'
 
 describe('convertImgUrl', () => {
-  it('空值返回占位图', () => {
-    expect(convertImgUrl('')).toBe('https://dummyimage.com/400x400')
-    expect(convertImgUrl(undefined)).toBe('https://dummyimage.com/400x400')
-    expect(convertImgUrl(null)).toBe('https://dummyimage.com/400x400')
+  // 占位图从 dummyimage.com 换成内联 SVG: 图片本身挂了之后, 兜底不该再依赖一次外网
+  it('空值返回内联占位图, 不请求外网', () => {
+    expect(convertImgUrl('')).toBe(IMG_PLACEHOLDER)
+    expect(convertImgUrl(undefined)).toBe(IMG_PLACEHOLDER)
+    expect(convertImgUrl(null)).toBe(IMG_PLACEHOLDER)
+    expect(IMG_PLACEHOLDER.startsWith('data:image/svg+xml')).toBe(true)
   })
 
   it('网络地址原样返回', () => {

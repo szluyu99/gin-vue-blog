@@ -11,7 +11,7 @@ import CrudTable from '@/components/crud/CrudTable.vue'
 import QueryItem from '@/components/crud/QueryItem.vue'
 import { useCRUD } from '@/composables'
 import { useAuthStore } from '@/store'
-import { convertImgUrl, downloadFile, formatDate, parseJson } from '@/utils'
+import { convertImgUrl, downloadFile, formatDate, IMG_PLACEHOLDER, parseJson } from '@/utils'
 
 // 需要 KeepAlive 必须写 name 属性, 并且和 router 中 name 对应
 defineOptions({ name: '文章列表' })
@@ -65,10 +65,21 @@ const columns = [
     width: 55,
     align: 'center',
     render(row) {
+      // 尺寸必须写死: 原来是 height/width 都给 100%, 而父容器高度又来自图片本身,
+      // 循环依赖, 实测这一列渲染出来是 0x0, 封面永远看不见。
+      // 同项目其他表格(留言/友链/用户)都是写死 40 / 30 的
       return h(NImage, {
-        imgProps: { style: { 'border-radius': '2px', 'height': '100%', 'width': '100%' } },
+        width: 40,
+        height: 40,
+        // object-fit 要走 NImage 自己的 prop: 写在 imgProps.style 里会被它
+        // 追加在后面的 object-fit(默认 fill) 覆盖掉 —— 实测过
+        objectFit: 'cover',
+        imgProps: {
+          alt: row.title,
+          style: { 'border-radius': '2px', 'width': '40px', 'height': '40px' },
+        },
         src: convertImgUrl(row.img),
-        fallbackSrc: 'https://dummyimage.com/400x400',
+        fallbackSrc: IMG_PLACEHOLDER,
         showToolbarTooltip: true,
       })
     },

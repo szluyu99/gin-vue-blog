@@ -29,7 +29,7 @@ const columns = [
     render(row) {
       return h(NImage, {
         'height': 30,
-        'src': convertImgUrl(row.info.avatar),
+        'src': convertImgUrl(row.info?.avatar),
         'fallback-src': 'https://dummyimage.com/400x400', // 加载失败
         'show-toolbar-tooltip': true,
       })
@@ -42,7 +42,9 @@ const columns = [
     align: 'center',
     ellipsis: { tooltip: true },
     render(row) {
-      return h('span', row.info.nickname || '未知')
+      // info 来自 Redis 里反序列化的 UserAuth, 没有 Preload("UserInfo"), 可能为空;
+      // 少一个可选链就会让整张表 render 抛错(user/list 那边写的是 row.info?.nickname)
+      return h('span', row.info?.nickname || '未知')
     },
   },
   {

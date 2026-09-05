@@ -107,7 +107,9 @@ export function setupNaiveDiscreteApi() {
   const themeStore = useThemeStore()
   const configProviderProps = computed(() => ({
     theme: themeStore.darkMode ? NaiveUI.darkTheme : undefined,
-    themeOverrides: themes.themeOverrides,
+    // themes.js 导出的键名是 naiveThemeOverrides(App.vue 用的就是这个),
+    // 原来写 themes.themeOverrides 取到 undefined, 离散 API 全部回落到 naive 默认绿
+    themeOverrides: themes.naiveThemeOverrides,
   }))
   const { message, dialog, notification, loadingBar } = NaiveUI.createDiscreteApi(
     ['message', 'dialog', 'notification', 'loadingBar'],

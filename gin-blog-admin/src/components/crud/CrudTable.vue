@@ -78,10 +78,15 @@ async function handleQuery() {
       ...props.extraParams,
       ...paginationParams,
     })
-    tableData.value = data?.page_data || data
-    pagination.itemCount = data?.total ?? data.length
+    // data 为 null 时原来会在 data.length 上抛 TypeError, 又被下面的空 catch 吞掉,
+    // 表现是「点了搜索什么都没发生」。这里显式当成空列表处理
+    const list = data?.page_data ?? data ?? []
+    tableData.value = Array.isArray(list) ? list : []
+    pagination.itemCount = data?.total ?? tableData.value.length
   }
-  catch {
+  catch (err) {
+    console.error(err)
+    window.$message?.error('数据加载失败, 请重试')
     tableData.value = []
     pagination.itemCount = 0
   }

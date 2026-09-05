@@ -59,6 +59,23 @@ async function loadOptions() {
   await Promise.all(tasks)
 }
 
+// 打开某个角色的权限弹窗
+//
+// 选项拉不回来时绝对不能照常打开: 保存走的是「整体替换角色关联」(见 handleUpdateDisable
+// 上方的注释), 树是空的时候用户点确定就把这个角色的权限清空了
+async function openPermission(row, menuMode) {
+  try {
+    await loadOptions()
+  }
+  catch (err) {
+    console.error(err)
+    $message?.error('权限选项加载失败, 请重试')
+    return
+  }
+  showMenu.value = menuMode
+  handleEdit(row)
+}
+
 // 新建角色: 后端 SaveRole 已经支持一并写入 role_resource / role_menu,
 // 所以这里把两棵树都给出来, 不用再走「先建角色, 再编辑权限」两趟
 async function handleAddRole() {
@@ -164,11 +181,7 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'info',
-            onClick: async () => {
-              showMenu.value = true
-              await api.getMenuOption().then(resp => (menuOption.value = resp.data))
-              handleEdit(row)
-            },
+            onClick: () => openPermission(row, true),
           },
           {
             default: () => '菜单权限',
@@ -181,11 +194,7 @@ const columns = [
             size: 'tiny',
             quaternary: true,
             type: 'info',
-            onClick: async () => {
-              showMenu.value = false
-              await api.getResourceOption().then(resp => (resourceOption.value = resp.data))
-              handleEdit(row)
-            },
+            onClick: () => openPermission(row, false),
           },
           {
             default: () => '资源权限',

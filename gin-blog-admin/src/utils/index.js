@@ -7,6 +7,10 @@ export * from './http'
 export * from './local'
 export * from './naiveTool'
 
+// 图片占位图: 内联 SVG, 不走网络
+// 原来这里返回 https://dummyimage.com/400x400 —— 图片本身挂了之后, 兜底又依赖一次外网
+export const IMG_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="%23f3f4f6"/><circle cx="30" cy="30" r="7" fill="%23d1d5db"/><path d="M16 60l16-20 11 13 9-9 12 16z" fill="%23d1d5db"/></svg>'
+
 // 相对图片地址 => 可访问的图片路径, 用于本地文件上传
 // 如果包含 http 说明是 Web 图片资源, 原样返回
 // 否则是后端服务器上的图片, 返回根相对路径, 由 vite dev proxy / nginx 转发到后端
@@ -14,7 +18,7 @@ export * from './naiveTool'
 // localhost 指的是浏览器所在的机器, 图片必然裂开
 export function convertImgUrl(imgUrl) {
   if (!imgUrl) {
-    return 'https://dummyimage.com/400x400'
+    return IMG_PLACEHOLDER
   }
   // 网络资源
   if (imgUrl.startsWith('http')) {

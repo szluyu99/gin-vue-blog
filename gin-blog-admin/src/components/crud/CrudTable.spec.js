@@ -49,4 +49,29 @@ describe('crudTable', () => {
     await wrapper.vm.handleQuery()
     expect(wrapper.vm.tableData).toEqual([])
   })
+
+  // 曾经的 bug: data 为 null 时 `data?.total ?? data.length` 抛 TypeError,
+  // 又被空 catch 吞掉, 表现是「点了搜索什么都没发生」
+  it('接口返回 data 为 null 时当成空列表, 并给出提示', async () => {
+    const error = vi.fn()
+    window.$message = { error }
+    const getData = vi.fn().mockResolvedValue({ code: 0, data: null })
+    const wrapper = mountTable(getData)
+
+    await wrapper.vm.handleQuery()
+
+    expect(wrapper.vm.tableData).toEqual([])
+    expect(wrapper.vm.pagination.itemCount).toBe(0)
+    expect(error).not.toHaveBeenCalled()
+  })
+
+  it('返回的 data 直接是数组时也能用', async () => {
+    const getData = vi.fn().mockResolvedValue({ code: 0, data: [{ id: 1 }, { id: 2 }] })
+    const wrapper = mountTable(getData)
+
+    await wrapper.vm.handleQuery()
+
+    expect(wrapper.vm.tableData).toHaveLength(2)
+    expect(wrapper.vm.pagination.itemCount).toBe(2)
+  })
 })
