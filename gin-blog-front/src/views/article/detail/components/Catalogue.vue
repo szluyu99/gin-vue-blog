@@ -71,8 +71,8 @@ watchThrottled(y, () => {
       <ul>
         <li v-for="anchor of anchors" :key="anchor.id">
           <div
-            class="cursor-pointer border-l-4 border-transparent rounded py-1 text-sm color-muted hover:bg-#00c4b6 hover:bg-opacity-30"
-            :class="anchor.id === selectAnchor && 'bg-#00c4b6 text-white border-l-#009d92'"
+            class="cursor-pointer border-l-4 border-transparent rounded py-1 text-sm color-muted hover:bg-primary hover:bg-opacity-30"
+            :class="anchor.id === selectAnchor && 'bg-primary text-white border-l-accent'"
             :style="{ paddingLeft: `${5 + anchor.indent * 15}px` }" @click="handleClickAnchor(anchor.id)"
           >
             {{ anchor.name }}
