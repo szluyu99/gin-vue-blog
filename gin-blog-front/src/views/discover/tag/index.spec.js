@@ -28,7 +28,7 @@ describe('标签列表', () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.tagList).toHaveLength(2))
 
-    expect(wrapper.text()).toContain('标签 - 2')
+    expect(wrapper.text()).toContain('共 2 个标签')
     expect(wrapper.text()).toContain('Go')
   })
 
@@ -72,6 +72,16 @@ describe('标签列表', () => {
 
     expect(wrapper.vm.fontSize(wrapper.vm.tagList[0])).toBe(15)
     expect(wrapper.vm.fontSize(wrapper.vm.tagList[1])).toBe(30)
+  })
+
+  it('没有标签时给出空状态提示', async () => {
+    api.getTags.mockResolvedValue({ code: 0, data: [] })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.text()).toContain('共 0 个标签')
+    expect(wrapper.text()).toContain('还没有标签')
   })
 
   // 原来是 `#${Math.floor(Math.random() * 16777215).toString(16)}`,

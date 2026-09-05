@@ -64,18 +64,25 @@ function color(tag) {
 
 <template>
   <BannerPage :loading="loading" title="标签" label="tag" card>
-    <h2 class="text-center text-2xl leading-8 lg:text-3xl">
-      标签 - {{ tagList.length }}
-    </h2>
+    <!-- 横幅上已经写着"标签"了, 这里只说明数量 -->
+    <p class="text-center text-muted">
+      共 {{ tagList.length }} 个标签
+    </p>
     <div class="mt-6 text-center">
+      <!-- hover 从 scale-130 收到 110: 站内其他地方都是 110, 放大三成在标签云里
+           会把相邻标签挤开; 悬停色也从 lightblue(在白底上几乎看不清)换成强调色 -->
       <RouterLink
         v-for="t of tagList" :key="t.id" :to="`tags/${t.id}?name=${t.name}`"
         :style="{ 'font-size': `${fontSize(t)}px`, 'color': color(t) }"
         :title="`${t.name} - ${t.article_count ?? 0} 篇`"
-        class="inline-block px-2 leading-11 transition-300 hover:scale-130 !hover:text-lightblue"
+        class="inline-block px-2 leading-11 transition-300 hover:scale-110 !hover:text-accent"
       >
         {{ t.name }}
       </RouterLink>
+    </div>
+
+    <div v-if="!loading && !tagList.length" class="py-10 text-center text-muted">
+      还没有标签
     </div>
   </BannerPage>
 </template>

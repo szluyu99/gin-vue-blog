@@ -42,7 +42,7 @@ const enterIndex = computed(() => props.idx % PAGE_SIZE)
       </RouterLink>
       <div class="flex flex-wrap text-sm color-muted">
         <!-- 置顶 -->
-        <span v-if="article.is_top === 1" class="flex items-center color-[#ff7242]">
+        <span v-if="article.is_top === 1" class="flex items-center text-accent">
           <span class="i-carbon:align-vertical-top mr-1" /> 置顶
         </span>
         <span v-if="article.is_top === 1" class="mx-1.5">|</span>

@@ -45,6 +45,8 @@ export default defineConfig({
   theme: {
     colors: {
       'primary': '#49b1f5',
+      // 强调色: 置顶标记、hover 高亮等处用, 原来散落在各处硬编码
+      'accent': '#ff7242',
       'surface': 'var(--c-surface)',
       'surface-soft': 'var(--c-surface-soft)',
       'main': 'var(--c-text)',

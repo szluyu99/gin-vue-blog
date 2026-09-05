@@ -38,7 +38,7 @@ onMounted(async () => {
           class="group flex items-center justify-between gap-3 rounded-xl bg-surface-soft px-4 py-3 shadow-sm transition-300 hover:shadow-md hover:-translate-y-0.5"
         >
           <span class="flex items-center gap-2 truncate">
-            <span class="h-3 w-3 shrink-0 rounded-full bg-primary transition-300 group-hover:bg-#ff7242" />
+            <span class="h-3 w-3 shrink-0 rounded-full bg-primary transition-300 group-hover:bg-accent" />
             <span class="truncate text-lg group-hover:text-primary">{{ c.name }}</span>
           </span>
           <span class="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
