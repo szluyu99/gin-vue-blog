@@ -43,6 +43,8 @@ describe('归档', () => {
     expect(api.getArchives).toHaveBeenCalledWith({ page_num: 1, page_size: 50 })
     expect(wrapper.vm.total).toBe(60)
     expect(wrapper.text()).toContain('第一篇')
+    // 计数文案要用 total: 以前用的是当页条数(page_size=50), 分页后会少报
+    expect(wrapper.text()).toContain('目前共计 60 篇文章')
   })
 
   it('切换页数会重新拉取', async () => {

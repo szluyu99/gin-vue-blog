@@ -521,7 +521,7 @@ func (*Front) GetArchiveList(c *gin.Context) {
 		return
 	}
 
-	list, total, err := model.GetBlogArticleList(GetDB(c), query.Page, query.Size, query.CategoryId, query.TagId)
+	list, total, err := model.GetBlogArticleArchiveList(GetDB(c), query.Page, query.Size)
 	if err != nil {
 		ReturnError(c, g.ErrDbOp, err)
 		return

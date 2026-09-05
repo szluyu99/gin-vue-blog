@@ -112,6 +112,25 @@ func GetBlogArticleList(db *gorm.DB, page, size, categoryId, tagId int) (data []
 	return data, total, result.Error
 }
 
+// 前台归档列表: 按发布时间倒序
+//
+// 不复用 GetBlogArticleList: 它按 "is_top DESC, id DESC" 排,
+// 用在归档上会把置顶文章顶到时间轴最前面, 其余文章也是按 id 而不是发布时间排 ——
+// 后补旧文或导入历史文章后, id 顺序和时间顺序就不一致了。
+// created_at 相同时再按 id 兜底, 保证分页边界稳定。
+func GetBlogArticleArchiveList(db *gorm.DB, page, size int) (data []Article, total int64, err error) {
+	data = make([]Article, 0)
+	db = db.Model(Article{}).Where("is_delete = 0 AND status = 1")
+
+	db = db.Count(&total)
+	result := db.Select("id", "title", "created_at").
+		Order("created_at DESC, id DESC").
+		Scopes(Paginate(page, size)).
+		Find(&data)
+
+	return data, total, result.Error
+}
+
 func GetArticleList(db *gorm.DB, page, size int, title string, isDelete *bool, status, typ, categoryId, tagId int) (list []Article, total int64, err error) {
 	// 零行时 gorm 会把 list 留成 nil, 调用方容易把"查不到"误判成出错, 这里统一给空切片
 	list = make([]Article, 0)

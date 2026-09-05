@@ -62,7 +62,8 @@ onMounted(() => {
 <template>
   <BannerPage title="归档" label="archive" :loading="loading" card>
     <p class="pb-5 text-lg lg:text-2xl">
-      目前共计 {{ archiveList.length }} 篇文章，继续加油！
+      <!-- 用 total 而不是 archiveList.length: 后者只是当页条数, 分页后会少报 -->
+      目前共计 {{ total }} 篇文章，继续加油！
     </p>
     <template v-for="(item, idx) of archiveList" :key="item.id">
       <div class="flex items-center gap-2">

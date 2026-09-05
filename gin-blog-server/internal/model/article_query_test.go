@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -79,6 +81,45 @@ func TestGetBlogArticleList(t *testing.T) {
 	_, total, err = GetBlogArticleList(db, 1, 10, 0, tag.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), total)
+}
+
+// 归档按发布时间倒序, 不受置顶影响, 也不跟着 id 走
+//
+// 曾经的 bug: 归档直接复用 GetBlogArticleList("is_top DESC, id DESC"),
+// 于是置顶文章跑到时间轴最前, 而 id 顺序和发布时间不一致时整条时间轴都是乱的
+func TestGetBlogArticleArchiveList(t *testing.T) {
+	db := newModelDB(t)
+
+	// 刻意让 id 递增方向和发布时间相反
+	newest := seedArticle(t, db, Article{
+		Title: "最新", Status: STATUS_PUBLIC,
+		Model: Model{CreatedAt: time.Date(2026, 3, 1, 0, 0, 0, 0, time.UTC)},
+	})
+	middle := seedArticle(t, db, Article{
+		Title: "中间", Status: STATUS_PUBLIC, IsTop: true,
+		Model: Model{CreatedAt: time.Date(2026, 2, 1, 0, 0, 0, 0, time.UTC)},
+	})
+	oldest := seedArticle(t, db, Article{
+		Title: "最早", Status: STATUS_PUBLIC,
+		Model: Model{CreatedAt: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)},
+	})
+	seedArticle(t, db, Article{Title: "私密", Status: STATUS_SECRET})
+	seedArticle(t, db, Article{Title: "已删除", Status: STATUS_PUBLIC, IsDelete: true})
+
+	list, total, err := GetBlogArticleArchiveList(db, 1, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(3), total, "私密和已删除的不进归档")
+	assert.Equal(t,
+		[]int{newest.ID, middle.ID, oldest.ID},
+		[]int{list[0].ID, list[1].ID, list[2].ID},
+		"按时间倒序, 置顶的那篇(中间)不该被顶到最前",
+	)
+
+	// 分页也按同一个顺序切
+	page2, _, err := GetBlogArticleArchiveList(db, 2, 2)
+	assert.Nil(t, err)
+	assert.Len(t, page2, 1)
+	assert.Equal(t, oldest.ID, page2[0].ID)
 }
 
 func TestGetArticleDetail(t *testing.T) {
