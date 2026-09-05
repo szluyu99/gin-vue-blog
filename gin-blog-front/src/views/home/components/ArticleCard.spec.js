@@ -42,6 +42,15 @@ describe('首页文章卡片', () => {
     expect(wrapper.find('a').attributes('href')).toBe('/article/1')
   })
 
+  // 封面原来是默认的 object-fit: fill(实测), 比例不一致的封面会被拉伸变形
+  it('封面图不拉伸, 并给出 alt', () => {
+    const img = mountCard().find('img')
+
+    expect(img.classes()).toContain('object-cover')
+    expect(img.attributes('alt')).toBe('第一篇')
+    expect(img.attributes('loading')).toBe('lazy')
+  })
+
   // 奇偶下标决定封面图在左还是在右
   it('按下标交替封面图位置', () => {
     expect(mountCard({ idx: 0 }).html()).toContain('md:order-0')

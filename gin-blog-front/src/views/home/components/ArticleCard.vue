@@ -28,9 +28,14 @@ const enterIndex = computed(() => props.idx % PAGE_SIZE)
     :style="{ '--i': enterIndex }"
   >
     <!-- 封面图 -->
-    <div :class="isRightClass" class="h-[230px] w-full overflow-hidden md:h-full md:w-45/100">
+    <!-- 图区给个底色: 封面没加载出来时(图床挂了/懒加载还没到)这里是一块白洞 -->
+    <div :class="isRightClass" class="h-[230px] w-full overflow-hidden bg-surface-soft md:h-full md:w-45/100">
       <RouterLink :to="`/article/${article.id}`">
-        <img class="h-full w-full transition-600 hover:scale-110" loading="lazy" :src="convertImgUrl(article.img)">
+        <!-- object-cover: 原来是默认的 fill(实测), 封面比例和容器不一致时会被拉伸变形 -->
+        <img
+          class="h-full w-full object-cover transition-600 hover:scale-110"
+          loading="lazy" :src="convertImgUrl(article.img)" :alt="article.title"
+        >
       </RouterLink>
     </div>
     <!-- 文章信息 -->
