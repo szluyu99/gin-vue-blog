@@ -46,6 +46,24 @@ describe('关于我', () => {
     expect(wrapper2.vm.html).toBe('')
   })
 
+  // 后台还没填「关于我」时, 页面上只剩一张头像, 看着像坏了
+  it('内容为空时给出提示', async () => {
+    api.about.mockResolvedValue({ code: 0, data: '' })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(api.about).toHaveBeenCalled())
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.text()).toContain('博主还没有填写关于信息')
+  })
+
+  it('有内容时不显示空状态提示', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.html).toContain('<h1'))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.text()).not.toContain('博主还没有填写关于信息')
+  })
+
   // 回归: 以前是 const { blogConfig } = useAppStore(), blogConfig 是 getter 且
   // store 里 blog_config 整体重新赋值, 解构后拿到的是旧对象, 接口回来后头像不更新
   it('站点配置后到也能更新头像', async () => {

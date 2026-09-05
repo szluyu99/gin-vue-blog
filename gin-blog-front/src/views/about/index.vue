@@ -54,5 +54,9 @@ onMounted(async () => {
         <div v-html="html" />
       </article>
     </div>
+    <!-- 后台还没填「关于我」时, 页面上只剩一张头像, 看着像坏了 -->
+    <p v-if="!html" class="py-8 text-center text-muted">
+      博主还没有填写关于信息
+    </p>
   </BannerPage>
 </template>

@@ -18,22 +18,26 @@ defineProps({
     </p>
     <!-- 链接列表 -->
     <!-- 友链数量不为 0 -->
-    <div v-if="linkList.length" class="grid grid-cols-3 gap-3">
+    <!-- 只到两列: 外层卡片宽度固定在 970px 左右, 三列时每格只有 279px,
+         65px 头像加上名称简介很挤。按视口断点再加一档没用, 卡片宽度不跟视口变 -->
+    <div v-if="linkList.length" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div
         v-for="link of linkList" :key="link.id"
-        class="group link-wrapper relative col-span-3 rounded-8 transition-300 sm:col-span-1"
+        class="group link-wrapper relative rounded-8 transition-300"
       >
-        <a :href="link.address" target="_blank" class="flex flex-row p-1 hover:text-white">
-          <!-- 头像 -->
-          <div class="z-10 mr-5 w-[120px] f-c-c">
-            <img :src="convertImgUrl(link.avatar)" class="w-[65px] rounded-full duration-600 group-hover:rotate-360" loading="lazy">
-          </div>
-          <!-- 描述 -->
-          <div class="z-10 h-[95px] w-[260px] f-c-c">
-            <div class="text-center">
-              <p class="text-lg font-bold"> {{ link.name }} </p>
-              <p class="flex-1"> {{ link.intro }} </p>
-            </div>
+        <a :href="link.address" target="_blank" class="flex flex-row items-center gap-4 p-3 hover:text-white">
+          <!-- 头像: 必须同时写宽高。只写 w- 时图片没加载出来(图床挂了/网络不通)
+               高度就是 0, 整行文字会跟着塌上去 —— 实测过 65x0 -->
+          <img
+            :src="convertImgUrl(link.avatar)"
+            class="z-10 h-[65px] w-[65px] shrink-0 rounded-full bg-surface-soft object-cover duration-600 group-hover:rotate-360"
+            loading="lazy" :alt="link.name"
+          >
+          <!-- 描述: 原来写死 260px 宽, 三列下靠 flex 收缩才没溢出;
+               改成占满剩余空间, min-w-0 才能让 truncate 生效 -->
+          <div class="z-10 min-w-0 flex-1">
+            <p class="truncate text-lg font-bold"> {{ link.name }} </p>
+            <p class="truncate text-sm"> {{ link.intro }} </p>
           </div>
         </a>
       </div>
