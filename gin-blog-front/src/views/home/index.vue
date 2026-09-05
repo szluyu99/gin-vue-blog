@@ -69,7 +69,9 @@ function backTop() {
       <!-- 左半部分 -->
       <div class="col-span-12 lg:col-span-9 space-y-5">
         <!-- 说说轮播 -->
-        <TalkingCarousel />
+        <!-- --i 是入场错峰的序号, 见 styles/animate.css 的 card-enter。
+             顺序由页面决定, 所以写在这里而不是各个组件里 -->
+        <TalkingCarousel :style="{ '--i': 0 }" />
         <!-- 文章列表 -->
         <div class="space-y-5">
           <ArticleCard v-for="(item, idx) in articleList" :key="item.id" :article="item" :idx="idx" />
@@ -106,11 +108,11 @@ function backTop() {
         <!-- sticky 实现悬浮固定效果 -->
         <div class="sticky top-5 space-y-5">
           <!-- 博主信息 -->
-          <AuthorInfo />
+          <AuthorInfo :style="{ '--i': 0 }" />
           <!-- 公告 -->
-          <Announcement />
+          <Announcement :style="{ '--i': 1 }" />
           <!-- 网站资讯 -->
-          <WebsiteInfo />
+          <WebsiteInfo :style="{ '--i': 2 }" />
         </div>
       </div>
     </div>

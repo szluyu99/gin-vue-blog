@@ -11,7 +11,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="card-view animate-zoom-in animate-duration-600">
+  <div class="card-view card-enter">
     <div class="flex text-center">
       <button class="i-mdi-chat-outline text-xl" />
       <div class="flex-1">

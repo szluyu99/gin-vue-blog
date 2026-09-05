@@ -80,14 +80,20 @@
  * backwards: 延迟期间保持首帧(透明), 不然会先闪一下全不透明再开始动。
  */
 .card-enter {
-  animation: card-enter-anim 0.34s ease-out backwards;
-  animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+  /* 手感就调这三个:
+   * duration 单张卡片淡入多久, step 相邻两张之间错开多久, shift 起始位置往下偏多少 */
+  --card-enter-duration: 0.7s;
+  --card-enter-step: 80ms;
+  --card-enter-shift: 14px;
+
+  animation: card-enter-anim var(--card-enter-duration) ease-out backwards;
+  animation-delay: calc(min(var(--i, 0), 8) * var(--card-enter-step));
 }
 
 @keyframes card-enter-anim {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(var(--card-enter-shift));
   }
 
   to {

@@ -41,7 +41,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="card-view hidden animate-zoom-in animate-duration-600 lg:block space-y-2">
+  <div class="card-view card-enter hidden lg:block space-y-2">
     <p class="flex items-center text-lg">
       <span class="i-icon-park:analysis mr-1.5" />
       <span> 网站资讯 </span>
