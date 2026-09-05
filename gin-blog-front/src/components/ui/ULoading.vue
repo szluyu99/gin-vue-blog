@@ -8,7 +8,7 @@ defineProps({
   },
   color: {
     type: String,
-    default: 'green',
+    default: '#49b1f5', // 主题色, 原来是 green
   },
   thickness: {
     type: Number,

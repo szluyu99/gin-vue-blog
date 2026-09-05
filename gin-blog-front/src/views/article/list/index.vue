@@ -57,7 +57,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerPage :loading="loading" :title="`${route.meta?.title} - ${name}`" label="article_list">
+  <!-- 骨架屏只在首屏(手里还没有任何数据时)显示。翻页时列表已经有内容,
+       本地请求几十毫秒就回来, 再闪一次骨架反而更晃 -->
+  <BannerPage
+    :loading="loading && !articleList.length"
+    :title="`${route.meta?.title} - ${name}`" label="article_list"
+  >
     <div class="grid grid-cols-12 gap-4">
       <div v-for="(article, idx) of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
         <!-- 卡片: card-enter 见 styles/animate.css, --i 用来错峰入场 -->

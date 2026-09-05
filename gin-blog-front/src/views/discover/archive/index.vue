@@ -65,7 +65,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <BannerPage title="归档" label="archive" :loading="loading" card>
+  <!-- 骨架屏只在首屏显示, 翻页时保留旧内容, 见 article/list 里的同一处说明 -->
+  <BannerPage title="归档" label="archive" :loading="loading && !archiveList.length" card>
     <p class="pb-5 text-lg lg:text-2xl">
       <!-- 用 total 而不是 archiveList.length: 后者只是当页条数, 分页后会少报 -->
       目前共计 {{ total }} 篇文章，继续加油！
