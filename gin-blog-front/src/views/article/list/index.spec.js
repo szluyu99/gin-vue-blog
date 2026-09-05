@@ -106,6 +106,22 @@ describe('前台文章列表', () => {
     await vi.waitFor(() => expect(api.getArticles).toHaveBeenCalledWith(expect.objectContaining({ page_num: 2 })))
   })
 
+  it('卡片错峰入场, 翻页后不再错峰', async () => {
+    api.getArticles.mockResolvedValue({ code: 0, data: { page_data: articles, total: 25 } })
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.total).toBe(25))
+    await wrapper.vm.$nextTick()
+
+    const delays = () => wrapper.findAll('.card-enter').map(c => c.attributes('style'))
+    expect(delays()).toEqual(['--i: 0;', '--i: 1;'])
+
+    wrapper.vm.current = 2
+    await vi.waitFor(() => expect(wrapper.vm.staggered).toBe(false))
+    await wrapper.vm.$nextTick()
+
+    expect(delays()).toEqual(['--i: 0;', '--i: 0;'])
+  })
+
   it('只有一页时不渲染分页器', async () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.total).toBe(2))

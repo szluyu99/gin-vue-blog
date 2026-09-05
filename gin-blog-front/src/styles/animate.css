@@ -68,3 +68,37 @@
     transform: translateY(0);
   }
 }
+
+/* 列表卡片入场
+ *
+ * 原来用的是 animate.css 的 zoomIn(从 scale(0.3) 弹到 1, 650~700ms), 一屏九张卡片
+ * 同时弹一次, 每翻一页又来一遍, 看久了很累。改成小幅上移 + 淡入, 幅度和时长都收敛,
+ * 并按序号错峰出现, 让人眼有个扫过去的顺序而不是"整屏一起炸开"。
+ *
+ * --i: 卡片在当前这批里的序号。错峰最多排到第 8 个, 再往后一起出来,
+ * 否则末尾的卡片要等半秒以上才现身。
+ * backwards: 延迟期间保持首帧(透明), 不然会先闪一下全不透明再开始动。
+ */
+.card-enter {
+  animation: card-enter-anim 0.34s ease-out backwards;
+  animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+}
+
+@keyframes card-enter-anim {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 系统里关掉了动效就不要硬演 */
+@media (prefers-reduced-motion: reduce) {
+  .card-enter {
+    animation: none;
+  }
+}

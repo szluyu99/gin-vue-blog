@@ -20,7 +20,12 @@ const current = ref(1)
 const total = ref(0)
 const pageCount = computed(() => Math.ceil(total.value / PAGE_SIZE))
 
+// 错峰入场只在首次进页面时来一次: 翻页时九张卡片一起淡入(delay 全 0),
+// 读起来是"整块内容换了一下", 而不是每翻一页都重新演一遍逐个出现
+const staggered = ref(true)
+
 watch(current, () => {
+  staggered.value = false
   getArticles()
   window.scrollTo({ behavior: 'smooth', top: 0 })
 })
@@ -54,9 +59,12 @@ onMounted(() => {
 <template>
   <BannerPage :loading="loading" :title="`${route.meta?.title} - ${name}`" label="article_list">
     <div class="grid grid-cols-12 gap-4">
-      <div v-for="article of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
-        <!-- 卡片 -->
-        <div class="animate-zoom-in animate-duration-650 rounded-xl bg-surface pb-2 shadow-md transition-300 hover:shadow-2xl">
+      <div v-for="(article, idx) of articleList" :key="article.id" class="col-span-12 lg:col-span-4 md:col-span-6">
+        <!-- 卡片: card-enter 见 styles/animate.css, --i 用来错峰入场 -->
+        <div
+          class="card-enter rounded-xl bg-surface pb-2 shadow-md transition-300 hover:shadow-2xl"
+          :style="{ '--i': staggered ? idx : 0 }"
+        >
           <!-- 图片 -->
           <div class="overflow-hidden">
             <RouterLink :to="`/article/${article.id}`">
