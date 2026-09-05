@@ -91,6 +91,23 @@ ReturnSuccess(c, list)
 
 空库能验证「服务起得来」，但验证不了分页、归档分组、评论回复这些必须有内容才看得出问题的地方。`internal/model/seed_demo.go` 灌一批可控的样例内容（3 分类 / 6 标签 / 15 篇文章 / 评论与回复 / 留言 / 友链），入口是 `generate-data -t demo`，或 `./dev.sh fresh --demo`。只在库里一篇文章都没有时才灌。
 
+### 前台界面统一 — 已完成
+
+分三轮把前台各页面过了一遍, 沉淀出几条约定, 后续加页面照着来:
+
+- 颜色只用 `uno.config.js` 里的语义 token: `primary`(#49b1f5) 主色、`accent`(#ff7242) 强调/激活态、
+  `surface`/`surface-soft` 底色、`main`/`muted` 文字、`divider` 分隔。不要再写死 hex ——
+  硬编码在暗色模式下不跟随 CSS 变量
+- `<img>` 必须同时写宽高并加 `object-cover`: 只写宽度时图片加载失败高度会塌成 0,
+  整行布局跟着散(友链头像、最新文章缩略图、首页封面都踩过); 再给容器一个 `bg-surface-soft` 占位
+- 卡片手感统一: 常态 `bg-surface-soft` + `shadow-sm`, 悬停上浮 + `shadow-md`,
+  不要用「常态透明、悬停整块变色」那种跳变
+- 列表入场动画用 `card-enter`(见 `styles/animate.css`), 三个参数在那里调; 翻页时不重复错峰
+- 改完 `uno.config.js` 必须重启 dev server, UnoCSS 的 vite 插件不热更新 config;
+  新增语义色只用在状态分支里时要留静态兜底, 否则规则没生成会静默变成不可见元素
+- 外链一律 `target="_blank"` + `rel="noopener noreferrer"`
+- 横幅已经有页面标题时, 卡片里不要再重复一遍, 改成说明数量
+
 ## 三、技术架构
 
 结论：**当前架构对这个规模是合适的，不要提前优化。**

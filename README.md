@@ -45,7 +45,8 @@
 - 暗色模式：首次访问跟随系统偏好，可手动切换并记住选择，刷新无闪屏
 - 文章详情支持目录锚点、推荐文章
 - 阅读体验：顶部阅读进度条、代码块一键复制、超过 90 天的文章提示内容可能过时
-- 文章列表分页（分类 / 标签下同样分页）
+- 文章列表分页（分类 / 标签下同样分页）；首页文章流滚动加载, 提前预取下一页
+- 归档按年月分组的时间轴；标签云字号按文章数映射
 - 评论 + 回复，留言弹幕墙
 - 点赞、访客统计（Redis）
 - 用户注册：默认直接建号，可开启邮箱验证码注册（`config.yml` 的 `Captcha.SendEmail`）
@@ -138,7 +139,7 @@ cd gin-vue-blog/deploy
 
 ```bash
 cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
-cd gin-blog-front  && pnpm test       # 前台: vitest, 19 个文件 120 条
+cd gin-blog-front  && pnpm test       # 前台: vitest, 22 个文件 151 条
 cd gin-blog-admin  && pnpm test       # 后台: vitest, 26 个文件 144 条
 ```
 
