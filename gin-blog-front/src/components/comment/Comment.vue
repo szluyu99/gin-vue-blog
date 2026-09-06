@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import api from '@/api'
@@ -105,6 +105,19 @@ onMounted(async () => {
   await getComments()
   if (targetCommentId) {
     await locateComment(targetCommentId)
+  }
+})
+
+/*
+已经在这篇文章页上时再点通知, 只有 query 变了
+
+App.vue 的 <RouterView :key="route.path"> 不含 query, 所以路径相同这一跳不会重建组件,
+onMounted 不会再跑一次 —— 得靠 watch 补上, 否则表现就是"点了没反应"。
+*/
+watch(() => route.query.comment, (val) => {
+  const id = +(val ?? 0)
+  if (id) {
+    locateComment(id)
   }
 })
 

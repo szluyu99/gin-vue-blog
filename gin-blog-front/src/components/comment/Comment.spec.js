@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { reactive } from 'vue'
 
 import api from '@/api'
 import Comment from './Comment.vue'
@@ -16,8 +17,9 @@ vi.mock('@/api', () => ({
   },
 }))
 
-// 路由可变: 站内通知点进来时 url 上会带 ?comment=xxx
-const route = { params: { id: '7' }, query: {} }
+// 路由可变且响应式: 站内通知点进来时 url 上会带 ?comment=xxx,
+// 已经在这篇文章上时只有 query 会变, 组件不会重建
+const route = reactive({ params: { id: '7' }, query: {} })
 vi.mock('vue-router', async importOriginal => ({
   ...await importOriginal(),
   useRoute: () => route,
@@ -233,5 +235,38 @@ describe('前台评论列表', () => {
     // 已经加载完全部评论, 不再继续请求
     expect(api.getComments).toHaveBeenCalledTimes(1)
     expect(wrapper.find('#comment-1').classes()).not.toContain('ring-primary/40')
+  })
+
+  // 回归: 已经在这篇文章页上时点通知, 只有 query 变, 组件不会重建,
+  // 原来只在 onMounted 里定位, 表现就是"点了没反应"
+  it('已在本页时 query 变化也会重新定位', async () => {
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
+
+    const root = makeComment(1, 1)
+    root.reply_list = [{
+      id: 33,
+      user_id: 99,
+      reply_user_id: 10,
+      content: '同一篇文章里的回复',
+      created_at: '2026-09-01T00:00:00Z',
+      like_count: 0,
+      user: { info: { nickname: 'admin', avatar: '' } },
+      reply_user: { info: { nickname: 'guest', avatar: '' } },
+    }]
+    api.getComments.mockResolvedValue({ code: 0, data: { page_data: [root], total: 1 } })
+
+    const wrapper = mount(Comment, { props: { type: 1 }, attachTo: document.body })
+    await vi.advanceTimersByTimeAsync(900)
+    await wrapper.vm.$nextTick()
+    expect(scrollIntoView).not.toHaveBeenCalled()
+
+    // 模拟点通知: 路径没变, 只加了 ?comment=33
+    route.query = { comment: '33' }
+    await vi.advanceTimersByTimeAsync(0)
+    await wrapper.vm.$nextTick()
+
+    expect(scrollIntoView).toHaveBeenCalled()
+    expect(wrapper.find('#comment-33').classes()).toContain('ring-primary/40')
   })
 })

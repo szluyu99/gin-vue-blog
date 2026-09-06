@@ -122,7 +122,9 @@ export const router = createRouter({
     ? createWebHashHistory()
     : createWebHistory(import.meta.env.VITE_PUBLIC_PATH || '/'),
   routes: basicRoutes,
-  scrollBehavior: () => ({ left: 0, top: 0 }),
+  // 带 ?comment= 的跳转是站内通知定位到某条评论, 位置交给评论组件自己滚 ——
+  // 这里再返回 top: 0 会把它刚滚到的位置拉回顶部(同一篇文章内点通知时尤其明显)
+  scrollBehavior: to => (to.query.comment ? false : { left: 0, top: 0 }),
 })
 
 router.afterEach((to) => {

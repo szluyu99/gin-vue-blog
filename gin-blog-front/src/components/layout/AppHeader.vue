@@ -320,6 +320,11 @@ html.dark .nav-fixed {
   box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.5);
   background-color: var(--c-surface);
   animation: submenu 0.3s 0.1s ease both;
+  // 面板底色是 --c-surface, 文字必须自己定成 --c-text:
+  // 否则会继承 .nav 的白字(横幅上是白的), 落到白色面板上就看不见了。
+  // 原来只给 a 定了颜色, 通知下拉里是 li/p/span, 所以只有那一块是白字
+  color: var(--c-text);
+  text-shadow: none;
 
   &::before {
     position: absolute;
