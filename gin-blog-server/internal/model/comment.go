@@ -180,10 +180,13 @@ func GetCommentVOList(db *gorm.DB, page, size, topic, typ int) (data []CommentVO
 		ids = append(ids, v.ID)
 	}
 
+	// 回复要带上 ReplyUser: 前台那句 "@某人" 是被回复者的昵称,
+	// 不 Preload 的话只能退化成显示回复者自己(看起来就是永远 @ 自己)
 	var replies []Comment
 	if err := db.Model(&Comment{}).
 		Where("parent_id IN ? AND is_review = ?", ids, true).
 		Preload("User").Preload("User.UserInfo").
+		Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Order("id DESC").
 		Find(&replies).Error; err != nil {
 		return nil, 0, err
@@ -214,6 +217,7 @@ func GetCommentReplyList(db *gorm.DB, id, page, size int) (data []Comment, err e
 	result := db.Model(&Comment{}).
 		Where("parent_id = ? AND is_review = ?", id, true).
 		Preload("User").Preload("User.UserInfo").
+		Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Order("id DESC").
 		Scopes(Paginate(page, size)).
 		Find(&data)

@@ -144,4 +144,37 @@ describe('前台评论列表', () => {
 
     expect(api.getCommentReplies).toHaveBeenCalledWith(1, { page_size: 5, page_num: 2 })
   })
+
+  // 回归: 原来 "@名称" 取的是 reply.user(回复者自己), 于是 admin 回复别人也显示 "@admin"
+  it('回复里的 "@名称" 显示被回复者, 回复自己时不显示', async () => {
+    const root = makeComment(1, 2)
+    root.reply_list = [
+      // admin(user_id 99) 回复 guest(user_id 10)
+      {
+        id: 11,
+        user_id: 99,
+        reply_user_id: 10,
+        content: '回复内容',
+        created_at: '2026-09-01T00:00:00Z',
+        like_count: 0,
+        user: { info: { nickname: 'admin', avatar: '' } },
+        reply_user: { info: { nickname: 'guest', avatar: '' } },
+      },
+      // 自己回复自己: 不该出现 "@"
+      {
+        id: 12,
+        user_id: 99,
+        reply_user_id: 99,
+        content: '补充一下',
+        created_at: '2026-09-01T00:00:00Z',
+        like_count: 0,
+        user: { info: { nickname: 'admin', avatar: '' } },
+        reply_user: { info: { nickname: 'admin', avatar: '' } },
+      },
+    ]
+    const wrapper = await mountComment([root])
+
+    expect(wrapper.text()).toContain('@guest')
+    expect(wrapper.text()).not.toContain('@admin')
+  })
 })

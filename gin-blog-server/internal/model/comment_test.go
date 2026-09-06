@@ -5,6 +5,7 @@ import (
 
 	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
@@ -109,6 +110,40 @@ func TestGetCommentVOList(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, data[0].ReplyList)
 	assert.Empty(t, data[0].ReplyList)
+}
+
+// 回归: 前台回复只 Preload 了 User, 拿不到被回复者, 那句 "@某人" 只能显示回复者自己
+func TestGetCommentRepliesPreloadReplyUser(t *testing.T) {
+	db := newModelDB(t)
+
+	guest := UserAuth{Username: "guest", Password: "123456", UserInfo: &UserInfo{Nickname: "guest"}}
+	assert.Nil(t, db.Create(&guest).Error)
+	admin := UserAuth{Username: "admin", Password: "123456", UserInfo: &UserInfo{Nickname: "admin"}}
+	assert.Nil(t, db.Create(&admin).Error)
+	article := Article{Title: "title"}
+	assert.Nil(t, db.Create(&article).Error)
+
+	// guest 发评论, admin 回复 guest
+	root, err := AddComment(db, guest.ID, TYPE_ARTICLE, article.ID, "guest 的评论", true)
+	assert.Nil(t, err)
+	_, err = ReplyComment(db, admin.ID, guest.ID, root.ID, "admin 的回复", true)
+	assert.Nil(t, err)
+
+	data, _, err := GetCommentVOList(db, 1, 10, article.ID, TYPE_ARTICLE)
+	assert.Nil(t, err)
+	assert.Len(t, data, 1)
+	assert.Len(t, data[0].ReplyList, 1)
+	reply := data[0].ReplyList[0]
+	assert.Equal(t, "admin", reply.User.UserInfo.Nickname, "回复者")
+	// 用 require: 没预加载时直接取 UserInfo 会 panic, 那样看不出是哪条断言挂的
+	require.NotNil(t, reply.ReplyUser, "被回复者要预加载, 否则前台的 @ 名称只能退化成回复者自己")
+	assert.Equal(t, "guest", reply.ReplyUser.UserInfo.Nickname, "被回复者")
+
+	replies, err := GetCommentReplyList(db, root.ID, 1, 10)
+	assert.Nil(t, err)
+	assert.Len(t, replies, 1)
+	require.NotNil(t, replies[0].ReplyUser)
+	assert.Equal(t, "guest", replies[0].ReplyUser.UserInfo.Nickname)
 }
 
 // 未审核的评论和回复都不能出现在前台

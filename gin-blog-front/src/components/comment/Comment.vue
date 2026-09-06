@@ -253,13 +253,14 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
               </div>
               <!-- 回复内容 -->
               <div>
-                <!-- 回复用户名: 自己回复自己不显示 "@名称" -->
-                <template v-if="reply.user_id !== comment.user_id">
-                  <a v-if="reply.user?.info?.website" :href="reply.reply_website" target="_blank">
-                    @{{ reply.user?.info?.nickname }}
+                <!-- "@名称" 是被回复者(reply_user), 不是回复者自己;
+                     回复自己 / 直接回复顶级评论(reply_user_id 为空)时不显示 -->
+                <template v-if="reply.reply_user_id && reply.reply_user_id !== reply.user_id">
+                  <a v-if="reply.reply_user?.info?.website" :href="reply.reply_user?.info?.website" target="_blank" class="color-#1abc9c">
+                    @{{ reply.reply_user?.info?.nickname }}
                   </a>
                   <span v-else>
-                    @{{ reply.user?.info?.nickname }}
+                    @{{ reply.reply_user?.info?.nickname }}
                   </span>，
                 </template>
                 <span class="my-3" v-html="reply.content" />
