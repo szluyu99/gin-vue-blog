@@ -7,7 +7,7 @@ import api from '@/api'
 import BannerPage from '@/components/BannerPage.vue'
 import UPagination from '@/components/ui/UPagination.vue'
 import { useAppStore, useNotificationStore, useUserStore } from '@/store'
-import { convertImgUrl } from '@/utils'
+import { convertImgUrl, notificationTarget } from '@/utils'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -46,14 +46,15 @@ async function getNotifications() {
   }
 }
 
-// 点一条: 先标已读再跳到文章
+// 点一条: 先标已读再跳到文章里的那条评论
 async function open(item) {
   if (!item.is_read) {
     await notificationStore.read([item.id])
     item.is_read = true
   }
-  if (item.article_id) {
-    router.push(`/article/${item.article_id}`)
+  const target = notificationTarget(item)
+  if (target) {
+    router.push(target)
   }
 }
 

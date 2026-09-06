@@ -16,9 +16,11 @@ vi.mock('@/api', () => ({
   },
 }))
 
+// 路由可变: 站内通知点进来时 url 上会带 ?comment=xxx
+const route = { params: { id: '7' }, query: {} }
 vi.mock('vue-router', async importOriginal => ({
   ...await importOriginal(),
-  useRoute: () => ({ params: { id: '7' } }),
+  useRoute: () => route,
 }))
 
 function makeComment(id, replyCount = 0) {
@@ -50,6 +52,8 @@ describe('前台评论列表', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     setActivePinia(createPinia())
+    route.query = {}
+    api.getComments.mockReset()
     api.getCommentReplies.mockReset().mockResolvedValue({ code: 0, data: [] })
     window.$message = { success: vi.fn(), error: vi.fn(), info: vi.fn() }
   })
@@ -176,5 +180,58 @@ describe('前台评论列表', () => {
 
     expect(wrapper.text()).toContain('@guest')
     expect(wrapper.text()).not.toContain('@admin')
+  })
+
+  // 站内通知点进来: 目标评论可能在第二页往后, 要自动翻到它
+  it('带 ?comment= 时翻页找到那条回复, 滚过去并高亮', async () => {
+    route.query = { comment: '22' }
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
+
+    const second = makeComment(3, 1)
+    second.reply_list = [{
+      id: 22,
+      user_id: 99,
+      reply_user_id: 30,
+      content: '通知里的那条回复',
+      created_at: '2026-09-01T00:00:00Z',
+      like_count: 0,
+      user: { info: { nickname: 'admin', avatar: '' } },
+      reply_user: { info: { nickname: 'guest', avatar: '' } },
+    }]
+
+    api.getComments
+      .mockResolvedValueOnce({ code: 0, data: { page_data: [makeComment(1), makeComment(2)], total: 3 } })
+      .mockResolvedValueOnce({ code: 0, data: { page_data: [second], total: 3 } })
+
+    // 定位靠 document.getElementById, 必须真的挂到页面上
+    const wrapper = mount(Comment, { props: { type: 1 }, attachTo: document.body })
+    await vi.advanceTimersByTimeAsync(900) // 第一页
+    await vi.advanceTimersByTimeAsync(900) // 第二页
+    await wrapper.vm.$nextTick()
+
+    expect(api.getComments).toHaveBeenCalledTimes(2)
+    expect(scrollIntoView).toHaveBeenCalled()
+    expect(wrapper.find('#comment-22').classes()).toContain('ring-primary/40')
+
+    // 高亮几秒后自己褪去, 不然一直挂着很吵
+    await vi.advanceTimersByTimeAsync(4100)
+    expect(wrapper.find('#comment-22').classes()).not.toContain('ring-primary/40')
+  })
+
+  it('目标 id 不存在时停止翻页, 不报错', async () => {
+    route.query = { comment: '999' }
+    api.getComments.mockResolvedValue({
+      code: 0,
+      data: { page_data: [makeComment(1)], total: 1 },
+    })
+
+    const wrapper = mount(Comment, { props: { type: 1 } })
+    await vi.advanceTimersByTimeAsync(900)
+    await wrapper.vm.$nextTick()
+
+    // 已经加载完全部评论, 不再继续请求
+    expect(api.getComments).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('#comment-1').classes()).not.toContain('ring-primary/40')
   })
 })

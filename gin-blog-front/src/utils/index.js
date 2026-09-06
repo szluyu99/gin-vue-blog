@@ -85,4 +85,20 @@ export function getOneSentence() {
   return sentencePromise
 }
 
+/**
+ * 通知点进去的目标地址: 带上 comment 参数, 文章页会自动定位并高亮那条评论
+ *
+ * 头部铃铛和通知页两处都要用, 放这里免得两边跳法不一致。
+ * @param {{ article_id?: number, comment_id?: number }} item
+ * @returns {string|null} 没有关联文章时返回 null, 表示不跳转
+ */
+export function notificationTarget(item) {
+  if (!item?.article_id) {
+    return null
+  }
+  return item.comment_id
+    ? `/article/${item.article_id}?comment=${item.comment_id}`
+    : `/article/${item.article_id}`
+}
+
 export * from './http'

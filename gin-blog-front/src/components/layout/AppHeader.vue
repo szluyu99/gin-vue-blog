@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAppStore, useNotificationStore, useUserStore } from '@/store'
-import { convertImgUrl } from '@/utils'
+import { convertImgUrl, notificationTarget } from '@/utils'
 import MobileSideBar from './MobileSideBar.vue'
 
 const appStore = useAppStore()
@@ -35,13 +35,14 @@ function onBellEnter() {
   notificationStore.fetchList()
 }
 
-// 点一条通知: 先标已读再跳到对应文章
+// 点一条通知: 先标已读再跳到对应文章的那条评论
 async function openNotification(item) {
   if (!item.is_read) {
     await notificationStore.read([item.id])
   }
-  if (item.article_id) {
-    router.push(`/article/${item.article_id}`)
+  const target = notificationTarget(item)
+  if (target) {
+    router.push(target)
   }
 }
 
