@@ -1,6 +1,6 @@
 <script setup>
-import { NButton, NDropdown, NEmpty, NForm, NFormItem, NImage, NInput } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { NButton, NEmpty, NForm, NFormItem, NImage, NInput } from 'naive-ui'
+import { onMounted, ref } from 'vue'
 
 import api from '@/api'
 import UploadOne from '@/components//UploadOne.vue'
@@ -66,28 +66,6 @@ function refreshImg(img) {
   uploadOneRef.value.previewImg = img
   setTimeout(() => reloadFlag.value = false, 600)
 }
-
-function handleSelect(key, page) {
-  if (key === 'edit') {
-    handleEdit(page)
-  }
-  else if (key === 'delete') {
-    handleDelete([page.id])
-  }
-}
-
-const options = [
-  {
-    label: '编辑',
-    key: 'edit',
-    icon: () => h('i', { class: 'i-mingcute:edit-2-line' }),
-  },
-  {
-    label: '删除',
-    key: 'delete',
-    icon: () => h('i', { class: 'i-mingcute:delete-back-line' }),
-  },
-]
 </script>
 
 <template>
@@ -107,10 +85,22 @@ const options = [
         v-for="page of pageList" :key="page.id"
         class="relative my-2 cursor-pointer text-center"
       >
-        <div class="absolute right-2 top-1 text-white">
-          <NDropdown :options="options" @select="handleSelect($event, page)">
-            <span class="i-ion:ellipsis-horizontal h-5 w-5 text-white hover:text-blue" />
-          </NDropdown>
+        <div class="absolute right-2 top-1 flex gap-1">
+          <!-- 直接放两个按钮, 比藏在下拉里的「···」显眼 -->
+          <button
+            class="h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-300 hover:bg-blue"
+            title="编辑"
+            @click="handleEdit(page)"
+          >
+            <i class="i-mingcute:edit-2-line text-base" />
+          </button>
+          <button
+            class="h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-300 hover:bg-red"
+            title="删除"
+            @click="handleDelete([page.id])"
+          >
+            <i class="i-mingcute:delete-back-line text-base" />
+          </button>
         </div>
         <NImage
           :src="convertImgUrl(page.cover)"
