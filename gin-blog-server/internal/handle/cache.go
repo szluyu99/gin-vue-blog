@@ -16,6 +16,19 @@ import (
 var rctx = context.Background()
 
 /*
+读穿缓存的过期时间
+
+只给「数据库是真源、Redis 只是副本」的键用 —— 目前是 page 和 config。
+写操作会主动删缓存, TTL 是给绕过接口的改动兜底: 直接 UPDATE 数据库、跑
+generate-data 灌种子、或者换一个后端进程写库, 这些路径都不会触发主动失效,
+以前只能手动 redis-cli del 再重启。
+
+注意不要给点赞数/浏览数/访客地域那几个键加 TTL: 它们只在 Redis 里累加,
+数据库没有对应字段, Redis 就是唯一数据源, 过期等于丢数据。
+*/
+const cacheTTL = 10 * time.Minute
+
+/*
 按 id 批量取计数
 
 列表接口以前用 HGetAll / ZRange(0, -1) 把整个计数集合拉回来, 只为给当页十几条
@@ -75,13 +88,13 @@ func zsetCounts(rdb *redis.Client, key string, ids []int) map[int]int {
 
 // Page
 
-// 将页面列表缓存到 Redis 中
+// 将页面列表缓存到 Redis 中, 带 TTL
 func addPageCache(rdb *redis.Client, pages []model.Page) error {
 	data, err := json.Marshal(pages)
 	if err != nil {
 		return err
 	}
-	return rdb.Set(rctx, g.PAGE, string(data), 0).Err()
+	return rdb.Set(rctx, g.PAGE, string(data), cacheTTL).Err()
 }
 
 // 删除 Redis 中页面列表缓存
@@ -106,13 +119,23 @@ func getPageCache(rdb *redis.Client) (cache []model.Page, err error) {
 
 // Config
 
-// 将博客配置缓存到 Redis 中
+// 将博客配置缓存到 Redis 中, 带 TTL
+//
+// config 是 Hash, HMSet 不像 Set 那样能顺手带过期时间, 要单独 Expire 一次。
+// 两条命令放进 pipeline: 分开发的话中间失败会留下一个永不过期的 key,
+// 又退回到「只能手动 del」的状态
 func addConfigCache(rdb *redis.Client, config map[string]string) error {
 	// HMSET 不接受空的 field-value 列表, 配置表为空时直接跳过
 	if len(config) == 0 {
 		return nil
 	}
-	return rdb.HMSet(rctx, g.CONFIG, config).Err()
+
+	_, err := rdb.TxPipelined(rctx, func(pipe redis.Pipeliner) error {
+		pipe.HMSet(rctx, g.CONFIG, config)
+		pipe.Expire(rctx, g.CONFIG, cacheTTL)
+		return nil
+	})
+	return err
 }
 
 // 删除 Redis 中博客配置缓存

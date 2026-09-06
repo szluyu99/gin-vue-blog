@@ -172,6 +172,13 @@ func (*BlogInfo) UpdateAbout(c *gin.Context) {
 		return
 	}
 
+	// about 也是 config 表里的一行, 会被 GetConfigMap 一起缓存起来,
+	// 这里不清缓存的话 /config 会一直返回改之前的「关于我」
+	if err := removeConfigCache(GetRDB(c)); err != nil {
+		ReturnError(c, g.ErrRedisOp, err)
+		return
+	}
+
 	ReturnSuccess(c, req.Content)
 }
 

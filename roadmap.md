@@ -111,9 +111,20 @@ ReturnSuccess(c, list)
 
 结论：**当前架构对这个规模是合适的，不要提前优化。**
 
+### 缓存加 TTL 并主动失效 — 已完成
+
+`page` / `config` 是「数据库为真源、Redis 只是副本」的读穿缓存，原来过期时间写的是 `0`（永不过期），改了库只能手动 `redis-cli del` 再重启后端 —— 换说说封面时实际踩到过。
+
+- `internal/handle/cache.go` 加 `cacheTTL = 10 * time.Minute`，`addPageCache` / `addConfigCache` 都带上
+- `config` 是 Hash，`HMSet` 不像 `Set` 那样能顺手带过期时间，要单独 `Expire`；两条命令放进 `TxPipelined`，否则中间失败会留下一个永不过期的 key，又退回原样
+- 补上漏掉的主动失效：`UpdateAbout` 只写库没清缓存，而 about 就是 `config` 表里的一行、会被 `GetConfigMap` 一起缓存，导致前台 `/config` 一直返回旧的「关于我」
+
+**故意没给点赞数 / 浏览数 / 访客地域加 TTL**：那几个键只在 Redis 里累加，数据库没有对应字段，Redis 就是唯一数据源，过期等于丢数据。TTL 只对「有真源可回落」的缓存成立，这条区分比 TTL 本身更重要。
+
+测试：`TestCacheHasTTL`（string 与 hash 两种类型都断言有 TTL，并用 miniredis 快进到过期后确认回落成未命中）、`TestUpdateAboutClearsConfigCache`。两条都验证过「去掉修复就会失败」。
+
 ### 可以考虑
 
-- **缓存加 TTL 并主动失效**：页面封面等缓存在 Redis 里没有过期时间，改了数据库还得手动 `redis-cli del page`（这条已经写进 `quick_start.md` 的 FAQ —— 需要 FAQ 解释的问题，通常说明设计有毛病）
 - **CI 自动发布镜像到 GHCR**：现在只构建验证、不发布，加上之后部署可以直接 pull 而不用在服务器上 build
 - **极简前端错误上报**：现在前端异常只进浏览器 console。`window.onerror` + `unhandledrejection` 收集后 POST 到后端一张表，后台加个列表页，不引 Sentry 也能解决问题
 

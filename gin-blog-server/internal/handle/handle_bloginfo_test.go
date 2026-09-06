@@ -64,3 +64,37 @@ func TestBlogInfoAbout(t *testing.T) {
 	env.db.Model(&model.Config{}).Where("`key` = ?", g.CONFIG_ABOUT).Count(&count)
 	assert.Equal(t, int64(1), count)
 }
+
+/*
+改「关于我」要连带清掉 config 缓存
+
+about 就是 config 表里的一行, GetConfigMap 会把它一起缓存进 g.CONFIG。
+以前 UpdateAbout 只写库不清缓存, 前台读 /config 拿到的还是旧的「关于我」,
+得等别的写操作顺带把缓存清掉才会更新。
+*/
+func TestUpdateAboutClearsConfigCache(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.PUT("/setting/about", (&BlogInfo{}).UpdateAbout)
+	env.engine.GET("/config", (&BlogInfo{}).GetConfigMap)
+
+	assert.Nil(t, env.db.Create(&model.Config{Key: g.CONFIG_ABOUT, Value: "旧的关于我"}).Error)
+
+	// 先读一次把缓存建起来
+	resp := env.do(t, http.MethodGet, "/config", nil)
+	assert.Equal(t, g.SUCCESS, resp.Code)
+	cached, err := getConfigCache(env.rdb)
+	assert.Nil(t, err)
+	assert.Equal(t, "旧的关于我", cached[g.CONFIG_ABOUT])
+
+	// 改完之后缓存要没了, 下次读会回落到数据库
+	resp = env.do(t, http.MethodPut, "/setting/about", map[string]any{"content": "新的关于我"})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	cached, err = getConfigCache(env.rdb)
+	assert.Nil(t, err)
+	assert.Empty(t, cached, "写完 about 要清掉 config 缓存")
+
+	var configMap map[string]string
+	decodeData(t, env.do(t, http.MethodGet, "/config", nil).Data, &configMap)
+	assert.Equal(t, "新的关于我", configMap[g.CONFIG_ABOUT])
+}
