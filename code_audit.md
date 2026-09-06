@@ -323,27 +323,38 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 接口级验证（`PUT /front/user/info`）：先写满四个字段，再只传 nickname、其余留空，
 返回 `code 0` 且 `GET` 读回来头像/简介/网站都还在。
 
-### F14 评论审核开关的语义是反的 — 待确认
+### F14 评论审核开关的名字是反的（行为是对的）— 已澄清
 
-`internal/handle/handle_front.go` 的 `SaveComment`:
+原判断是「语义反了，开启审核反而让评论直接可见」。把整条链读完后结论要改：
+**行为是自洽的，反的只有名字和描述。**
+
+`internal/handle/handle_front.go` 的 `SaveComment` 把配置值直接当 `Comment.IsReview` 写库：
 
 ```go
 isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
 comment, err = model.AddComment(db, auth.ID, req.Type, req.TopicId, req.Content, isReview)
 ```
 
-`isReview` 直接当成 `Comment.IsReview` 写进去。但两边语义对不上:
+核实过的四个点：
 
-- 配置 `is_comment_review` 的 Desc 是「评论默认审核」, 即 true = 需要人工审核
-- 查询侧 `GetCommentVOList` / `GetCommentReplyList` 都是 `WHERE is_review = true`,
-  也就是 `IsReview = true` 表示「已过审、前台可见」
+- 前台查询 `GetCommentVOList` / `GetCommentReplyList` 都是 `WHERE is_review = true`，即 true = 已过审可见
+- 后台评论管理（`views/message/comment/index.vue`）把 `is_review` 渲染成「通过 / 审核中」，「通过」按钮置 true
+- 后台设置页（`views/setting/website/index.vue`）的单选把 **`value="true"` 标成「关闭」**，即 true = 关闭审核
+- 种子数据默认 `true`，也就是默认不审核
 
-两者组合起来就成了「开启审核 → 新评论直接可见」「关闭审核 → 新评论全部不可见」,
-正好反了。留言 `SaveMessage` 那一路要一起看, 写法相同。
+所以 `is_comment_review = true` 的真实含义是「**免**审核，新评论直接展示」，上下游一致；
+只有 key 名和 Desc「评论默认审核」读起来像「需要审核」。留言（`is_message_review`）完全同构。
 
-需要先确认后端到底想要哪种语义(可能后台的审核开关/按钮也依赖当前行为),
-再决定是改 handler 还是改配置项的含义, 所以先记下不动。
-发现于做站内通知时: 通知只在评论可见(`IsReview == true`)时才发, 顺着这条链读到的。
+照名字取反是这里最容易犯的错，代价是把所有新评论藏起来。所以没动行为，只让它不再误导：
+
+- `SaveComment` 上方写明语义，并点出「别照名字取反」
+- 种子 Desc 改成「评论免审核(true 新评论直接展示, false 需后台通过)」（`cmd/generate-data/main.go`；
+  已建库的旧数据不受影响，Desc 只是给人看的）
+- 后台设置页选项改成「关闭(新评论直接展示) / 开启(需在评论管理里通过)」，不再只写「关闭 / 开启」
+- `TestFrontSaveComment` 补两条断言钉住语义：无配置 → `IsReview=false`；配置 `true` → `IsReview=true`。
+  验证过把 handler 改成 `!GetConfigBool(...)` 这两条会红
+
+没有改 key 名：要改就得迁移已有部署的配置行，收益只是名字好看，不值得。
 
 ## 组件测试
 

@@ -232,6 +232,15 @@ func (*Front) SaveComment(c *gin.Context) {
 		return
 	}
 	db := GetDB(c)
+	/*
+		这个开关的语义是「免审核」, 不是「要审核」:
+		  true  → 新评论直接 IsReview = true, 前台立刻可见
+		  false → IsReview = false, 要在后台点「通过」才可见(那一刻才补发站内通知)
+
+		key 叫 is_comment_review, 读起来像「需要审核」, 但后台设置页的选项(true 对应
+		「关闭审核」)和前台查询(WHERE is_review = true 才展示)都按上面这套走, 整条链是自洽的。
+		别看着名字就把它取反 —— 那会把所有新评论藏起来。
+	*/
 	isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
 
 	var comment *model.Comment

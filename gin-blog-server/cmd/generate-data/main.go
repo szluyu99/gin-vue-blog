@@ -123,8 +123,10 @@ func generateDefaultConfigs(db *gorm.DB) {
 		{Key: "tourist_avatar", Value: imgBase + "/config/tourist_avatar.jpeg", Desc: "默认游客头像"},
 		{Key: "user_avatar", Value: imgBase + "/config/user_avatar.jpeg", Desc: "默认用户头像"},
 		{Key: "article_cover", Value: imgBase + "/config/default_article_cover.png", Desc: "默认文章封面"},
-		{Key: "is_comment_review", Value: "true", Desc: "评论默认审核"},
-		{Key: "is_message_review", Value: "true", Desc: "留言默认审核"},
+		// 名字读起来像「需要审核」, 实际语义是「免审核」: true = 新内容直接展示,
+		// false = 要在后台点「通过」。Desc 写清楚, 免得照名字理解反了
+		{Key: "is_comment_review", Value: "true", Desc: "评论免审核(true 新评论直接展示, false 需后台通过)"},
+		{Key: "is_message_review", Value: "true", Desc: "留言免审核(true 新留言直接展示, false 需后台通过)"},
 	}
 
 	for _, config := range configs {

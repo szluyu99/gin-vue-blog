@@ -190,23 +190,24 @@ function handleSave(formInst) {
               :width="300"
             />
           </NFormItem>
-          <NFormItem label="评论默认审核" path="is_comment_review">
+          <!-- 值的含义反着读: is_comment_review = true 表示免审核(直接展示) -->
+          <NFormItem label="评论审核" path="is_comment_review">
             <NRadioGroup v-model:value="form.is_comment_review" name="is_comment_review">
               <NRadio value="true">
-                关闭
+                关闭(新评论直接展示)
               </NRadio>
               <NRadio value="false">
-                开启
+                开启(需在评论管理里通过)
               </NRadio>
             </NRadioGroup>
           </NFormItem>
-          <NFormItem label="留言默认审核" path="is_message_review">
+          <NFormItem label="留言审核" path="is_message_review">
             <NRadioGroup v-model:value="form.is_message_review" name="is_message_review">
               <NRadio value="true">
-                关闭
+                关闭(新留言直接展示)
               </NRadio>
               <NRadio value="false">
-                开启
+                开启(需在留言管理里通过)
               </NRadio>
             </NRadioGroup>
           </NFormItem>

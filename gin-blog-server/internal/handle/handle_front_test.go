@@ -484,6 +484,27 @@ func TestFrontSaveComment(t *testing.T) {
 	assert.Equal(t, comment.ID, reply.ParentId)
 	assert.Equal(t, user.ID, reply.ReplyUserId)
 
+	/*
+		审核开关的语义: is_comment_review 是「免审核」而不是「要审核」
+
+		上面没建配置行, GetConfigBool 取到 false, 所以新评论是待审核状态。
+		这两条断言是给以后的人看的 —— 名字很像「需要审核」, 真照名字取反会把所有新评论
+		藏起来(后台设置页里 true 对应「关闭审核」, 前台又只展示 is_review = true)。
+	*/
+	assert.False(t, comment.IsReview, "没有配置时按需要审核处理")
+
+	assert.Nil(t, env.db.Create(&model.Config{Key: g.CONFIG_IS_COMMENT_REVIEW, Value: "true"}).Error)
+	resp = env.do(t, http.MethodPost, "/front/comment", map[string]any{
+		"topic_id": article.ID,
+		"type":     1,
+		"content":  "关掉审核以后发的",
+	})
+	assert.Equal(t, g.SUCCESS, resp.Code)
+
+	var visible model.Comment
+	decodeData(t, resp.Data, &visible)
+	assert.True(t, visible.IsReview, "true 表示免审核, 新评论直接可见")
+
 	// 未登录不能评论
 	env.user = nil
 	resp = env.do(t, http.MethodPost, "/front/comment", map[string]any{
