@@ -86,4 +86,21 @@ describe('登录页', () => {
     expect(window.$message.warning).toHaveBeenCalledWith('请输入用户名和密码')
     expect(api.login).not.toHaveBeenCalled()
   })
+
+  // 连真后端时预填账号密码等于把凭据写在页面上; 演示站(mock)才预填
+  // vitest.config.js 里 VITE_USE_MOCK 固定为 'false', 所以这里应该是空的
+  it('非 mock 模式下不预填演示账号', () => {
+    const wrapper = mountPage()
+
+    expect(wrapper.vm.loginForm.username).toBe('')
+    expect(wrapper.vm.loginForm.password).toBe('')
+  })
+
+  it('记住的账号仍会回填', async () => {
+    setLocal('loginInfo', { username: 'admin', password: '123456' })
+    const wrapper = mountPage()
+
+    expect(wrapper.vm.loginForm.username).toBe('admin')
+    expect(wrapper.vm.loginForm.password).toBe('123456')
+  })
 })

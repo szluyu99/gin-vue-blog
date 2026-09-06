@@ -19,9 +19,17 @@ const authStore = useAuthStore()
 const router = useRouter()
 const { query } = useRoute()
 
+/*
+  Mock 模式(GitHub Pages 演示站)预填演示账号, 真实部署留空
+
+  演示站没有后端, 随便什么账号都能登进去, 预填是为了让访客少输两下;
+  但连了真后端时预填账号/密码等于把凭据写在页面上, 所以只在 mock 下给。
+*/
+const isMock = import.meta.env.VITE_USE_MOCK === 'true'
+
 const loginForm = reactive({
-  username: 'guest',
-  password: '123456',
+  username: isMock ? 'guest' : '',
+  password: isMock ? '123456' : '',
 })
 
 initLoginInfo()
@@ -109,7 +117,7 @@ async function handleLogin() {
           v-model:value="loginForm.username"
           class="h-[50px] items-center pl-2"
           autofocus
-          placeholder="test@qq.com"
+          placeholder="用户名"
           :maxlength="20"
         />
         <NInput
@@ -117,7 +125,7 @@ async function handleLogin() {
           class="h-[50px] items-center pl-2"
           type="password"
           show-password-on="mousedown"
-          placeholder="11111"
+          placeholder="密码"
           :maxlength="20"
           @keydown.enter="handleLogin"
         />

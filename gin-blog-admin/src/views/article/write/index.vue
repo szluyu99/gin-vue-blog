@@ -24,7 +24,9 @@ const tagOptions = ref([]) // 标签选项
 let backTagOptions = [] // 备份标签选项
 
 // 解决同时查看多篇文章, 切换标签不刷新的问题
-watch(route, async () => tagStore.reloadTag())
+// watch 的必须是 getter 而不是 route 本身: useRoute() 返回的是响应式对象的浅代理,
+// 直接传进 watch 会报 "Invalid watch source" 并且完全不触发
+watch(() => route.fullPath, async () => tagStore.reloadTag())
 
 onMounted(async () => {
   fetchData()
