@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { convertImgUrl, stripMarkdown } from '@/utils'
+import { convertImgUrl, notificationTarget, stripMarkdown } from '@/utils'
 import { hasMath } from '@/utils/mathjax'
 
 describe('convertImgUrl', () => {
@@ -120,5 +120,20 @@ describe('getOneSentence', () => {
     for (let i = 0; i < 20; i++) {
       expect(FALLBACK_SENTENCES).toContain(getRandomSentence())
     }
+  })
+})
+
+describe('notificationTarget', () => {
+  it('带上 comment 参数, 文章页才能定位到那条评论', () => {
+    expect(notificationTarget({ article_id: 7, comment_id: 12 })).toBe('/article/7?comment=12')
+  })
+
+  it('没有 comment_id 时只跳文章', () => {
+    expect(notificationTarget({ article_id: 7, comment_id: 0 })).toBe('/article/7')
+  })
+
+  it('没有关联文章时不跳转', () => {
+    expect(notificationTarget({ article_id: 0, comment_id: 3 })).toBeNull()
+    expect(notificationTarget(null)).toBeNull()
   })
 })

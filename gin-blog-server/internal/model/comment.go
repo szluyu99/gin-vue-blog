@@ -72,6 +72,41 @@ func ReplyComment(db *gorm.DB, userId, replyUserId, parentId int, content string
 	return &comment, result.Error
 }
 
+/*
+批量修改审核状态
+
+返回本次「由待审核变为已审核」的评论, 交给调用方补发站内通知 ——
+发评论时如果配置要求审核, 那条评论是不可见的, 当时不发通知(否则等于把没过审的
+内容推给对方), 所以过审这一刻才是通知该发出去的时机。
+
+只挑真正发生 false -> true 的: 对已经是已审核的评论再点一次"通过"不该重复通知。
+通知本身不在这里发, model 层不该关心日志和降级策略。
+*/
+func ReviewComments(db *gorm.DB, ids []int, isReview bool) (rows int64, approved []Comment, err error) {
+	approved = make([]Comment, 0)
+	if len(ids) == 0 {
+		return 0, approved, nil
+	}
+
+	if isReview {
+		if err := db.Where("id IN ? AND is_review = ?", ids, false).Find(&approved).Error; err != nil {
+			return 0, nil, err
+		}
+	}
+
+	result := db.Model(Comment{}).Where("id IN ?", ids).Update("is_review", isReview)
+	if result.Error != nil {
+		return 0, nil, result.Error
+	}
+
+	// 查出来时还是待审核状态, 这里补上新状态, NotifyOnComment 才会认
+	for i := range approved {
+		approved[i].IsReview = true
+	}
+
+	return result.RowsAffected, approved, nil
+}
+
 // 获取后台评论列表
 func GetCommentList(db *gorm.DB, page, size, typ int, isReview *bool, nickname string) (data []Comment, total int64, err error) {
 
@@ -145,10 +180,13 @@ func GetCommentVOList(db *gorm.DB, page, size, topic, typ int) (data []CommentVO
 		ids = append(ids, v.ID)
 	}
 
+	// 回复要带上 ReplyUser: 前台那句 "@某人" 是被回复者的昵称,
+	// 不 Preload 的话只能退化成显示回复者自己(看起来就是永远 @ 自己)
 	var replies []Comment
 	if err := db.Model(&Comment{}).
 		Where("parent_id IN ? AND is_review = ?", ids, true).
 		Preload("User").Preload("User.UserInfo").
+		Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Order("id DESC").
 		Find(&replies).Error; err != nil {
 		return nil, 0, err
@@ -179,6 +217,7 @@ func GetCommentReplyList(db *gorm.DB, id, page, size int) (data []Comment, err e
 	result := db.Model(&Comment{}).
 		Where("parent_id = ? AND is_review = ?", id, true).
 		Preload("User").Preload("User.UserInfo").
+		Preload("ReplyUser").Preload("ReplyUser.UserInfo").
 		Order("id DESC").
 		Scopes(Paginate(page, size)).
 		Find(&data)

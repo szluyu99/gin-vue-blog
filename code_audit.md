@@ -323,6 +323,28 @@ _, _, _, err = model.CreateNewUser(GetDB(c), username, password)
 接口级验证（`PUT /front/user/info`）：先写满四个字段，再只传 nickname、其余留空，
 返回 `code 0` 且 `GET` 读回来头像/简介/网站都还在。
 
+### F14 评论审核开关的语义是反的 — 待确认
+
+`internal/handle/handle_front.go` 的 `SaveComment`:
+
+```go
+isReview := model.GetConfigBool(db, g.CONFIG_IS_COMMENT_REVIEW)
+comment, err = model.AddComment(db, auth.ID, req.Type, req.TopicId, req.Content, isReview)
+```
+
+`isReview` 直接当成 `Comment.IsReview` 写进去。但两边语义对不上:
+
+- 配置 `is_comment_review` 的 Desc 是「评论默认审核」, 即 true = 需要人工审核
+- 查询侧 `GetCommentVOList` / `GetCommentReplyList` 都是 `WHERE is_review = true`,
+  也就是 `IsReview = true` 表示「已过审、前台可见」
+
+两者组合起来就成了「开启审核 → 新评论直接可见」「关闭审核 → 新评论全部不可见」,
+正好反了。留言 `SaveMessage` 那一路要一起看, 写法相同。
+
+需要先确认后端到底想要哪种语义(可能后台的审核开关/按钮也依赖当前行为),
+再决定是改 handler 还是改配置项的含义, 所以先记下不动。
+发现于做站内通知时: 通知只在评论可见(`IsReview == true`)时才发, 顺着这条链读到的。
+
 ## 组件测试
 
 2026-09-03 两个前端都接入了 `@vue/test-utils@2.5.0`。此前只有 store 和 utils 有测试，

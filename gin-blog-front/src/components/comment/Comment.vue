@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import api from '@/api'
@@ -22,22 +22,27 @@ const { type } = defineProps({
 
 const [userStore, appStore] = [useUserStore(), useAppStore()]
 
-onMounted(() => {
-  getComments()
-})
+const route = useRoute()
 
 // url 中存在 id 参数则为 topic_id, 否则为 0
-const topicId = +(useRoute().params.id ?? 0)
+const topicId = +(route.params.id ?? 0)
+// 站内通知点进来时带 ?comment=xxx, 要翻到那条评论并高亮
+const targetCommentId = +(route.query.comment ?? 0)
 
 // 加载评论
 const commentList = ref([]) // 评论列表 (分页加载)
 const commentCount = ref(0) // 评论总数量
 const listLoading = ref(false) // 列表加载状态
+const highlightId = ref(0) // 通知定位到的评论, 高亮几秒后自动褪去
 const params = reactive({ type, page_size: 10, page_num: 1, topic_id: topicId }) // 加载评论的参数
 
 // 延时定时器: 卸载时清掉, 否则会在组件销毁后改状态
 let loadTimer = null
-onUnmounted(() => clearTimeout(loadTimer))
+let highlightTimer = null
+onUnmounted(() => {
+  clearTimeout(loadTimer)
+  clearTimeout(highlightTimer)
+})
 
 async function getComments() {
   listLoading.value = true
@@ -45,14 +50,17 @@ async function getComments() {
     const resp = await api.getComments(params)
 
     // * 全局加载更多, 0.8s 延时
-    loadTimer = setTimeout(() => {
-      params.page_num === 1
-        ? commentList.value = resp.data.page_data
-        : commentList.value.push(...resp.data.page_data)
-      commentCount.value = resp.data.total
-      params.page_num++
-      listLoading.value = false
-    }, 800)
+    await new Promise((resolve) => {
+      loadTimer = setTimeout(() => {
+        params.page_num === 1
+          ? commentList.value = resp.data.page_data
+          : commentList.value.push(...resp.data.page_data)
+        commentCount.value = resp.data.total
+        params.page_num++
+        listLoading.value = false
+        resolve()
+      }, 800)
+    })
   }
   catch (err) {
     // 不复位 listLoading 的话, "点击加载更多" (v-if="!listLoading") 会永久消失
@@ -60,6 +68,45 @@ async function getComments() {
     console.error(err)
   }
 }
+
+// 这条评论(或某条回复)是否已经加载出来了
+function isLoaded(id) {
+  return commentList.value.some(
+    c => c.id === id || (c.reply_list ?? []).some(r => r.id === id),
+  )
+}
+
+/*
+定位到通知里那条评论: 它可能在第二页往后, 所以一页页加载直到找到
+
+翻页上限防的是 id 对不上的情况(评论被删、或者手改 url), 否则会一直翻到底。
+找不到就静默放弃, 停在文章页顶部, 不比原来更差。
+*/
+async function locateComment(id) {
+  for (let i = 0; i < 10; i++) {
+    if (isLoaded(id) || commentList.value.length >= commentCount.value) {
+      break
+    }
+    await getComments()
+  }
+
+  await nextTick()
+  const el = document.getElementById(`comment-${id}`)
+  if (!el) {
+    return
+  }
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  highlightId.value = id
+  // 4s: 平滑滚动本身要花掉一点时间, 太短的话滚到位高亮就快没了
+  highlightTimer = setTimeout(() => (highlightId.value = 0), 4000)
+}
+
+onMounted(async () => {
+  await getComments()
+  if (targetCommentId) {
+    await locateComment(targetCommentId)
+  }
+})
 
 // 重新加载评论(提交评论以后)
 function reloadComments() {
@@ -184,7 +231,12 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
         />
       </p>
       <!-- 评论列表 -->
-      <div v-for="(comment, idx) of commentList" :key="comment.id" class="my-1 flex">
+      <div
+        v-for="(comment, idx) of commentList" :id="`comment-${comment.id}`"
+        :key="comment.id"
+        class="my-1 flex scroll-mt-24 rounded-lg p-1 transition-300"
+        :class="highlightId === comment.id ? 'bg-primary/8 ring-2 ring-primary/40' : ''"
+      >
         <img :src="convertImgUrl(comment.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360" loading="lazy">
         <div class="ml-3 flex flex-1 flex-col">
           <!-- 评论人名称: 根据是否有 website 显示不同效果 -->
@@ -219,7 +271,12 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
           <!-- 评论内容 -->
           <div class="my-1" v-html="comment.content" />
           <!-- 评论回复 start -->
-          <div v-for="reply of comment.reply_list" :key="reply.id" class="mt-2 flex">
+          <div
+            v-for="reply of comment.reply_list" :id="`comment-${reply.id}`"
+            :key="reply.id"
+            class="mt-2 flex scroll-mt-24 rounded-lg p-1 transition-300"
+            :class="highlightId === reply.id ? 'bg-primary/8 ring-2 ring-primary/40' : ''"
+          >
             <img :src="convertImgUrl(reply.user?.info?.avatar)" class="h-[40px] w-[40px] duration-600 hover:rotate-360" loading="lazy">
             <div class="ml-2 flex flex-1 flex-col">
               <!-- 回复人名称 -->
@@ -253,13 +310,14 @@ const isLike = computed(() => id => userStore.commentLikeSet.includes(id))
               </div>
               <!-- 回复内容 -->
               <div>
-                <!-- 回复用户名: 自己回复自己不显示 "@名称" -->
-                <template v-if="reply.user_id !== comment.user_id">
-                  <a v-if="reply.user?.info?.website" :href="reply.reply_website" target="_blank">
-                    @{{ reply.user?.info?.nickname }}
+                <!-- "@名称" 是被回复者(reply_user), 不是回复者自己;
+                     回复自己 / 直接回复顶级评论(reply_user_id 为空)时不显示 -->
+                <template v-if="reply.reply_user_id && reply.reply_user_id !== reply.user_id">
+                  <a v-if="reply.reply_user?.info?.website" :href="reply.reply_user?.info?.website" target="_blank" class="color-#1abc9c">
+                    @{{ reply.reply_user?.info?.nickname }}
                   </a>
                   <span v-else>
-                    @{{ reply.user?.info?.nickname }}
+                    @{{ reply.reply_user?.info?.nickname }}
                   </span>，
                 </template>
                 <span class="my-3" v-html="reply.content" />

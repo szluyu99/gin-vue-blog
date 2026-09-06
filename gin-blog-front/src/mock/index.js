@@ -10,6 +10,7 @@ import {
   currentUser,
   links,
   messages,
+  notifications,
   pages,
   tags,
 } from './data.js'
@@ -21,6 +22,7 @@ const state = {
   articles: articles.map(e => ({ ...e })),
   comments: comments.map(e => ({ ...e })),
   messages: messages.map(e => ({ ...e })),
+  notifications: notifications.map(e => ({ ...e })),
   user: { ...currentUser },
 }
 
@@ -66,6 +68,17 @@ function toComment(c) {
     reply_count: replies.length,
     reply_list: replies.slice(0, 5).map(toReply),
     user: { info: commentUsers[c.user_id] ?? commentUsers[2] },
+  }
+}
+
+// 后端这几个字段是查询时 join 出来的, mock 里同样现算, 不在数据里存快照
+function toNotification(n) {
+  const from = commentUsers[n.from_user_id] ?? commentUsers[2]
+  return {
+    ...n,
+    from_nickname: from?.nickname ?? '未知用户',
+    from_avatar: from?.avatar ?? '',
+    article_title: state.articles.find(a => a.id === n.article_id)?.title ?? '',
   }
 }
 
@@ -249,6 +262,29 @@ const handlers = [
     const set = state.user.comment_like_set
     toggleLike(set, comment)
     return ok(null)
+  }],
+
+  ['GET', /^\/front\/notification\/list$/, (params) => {
+    let list = state.notifications
+    if (params.is_read !== undefined && params.is_read !== '') {
+      const isRead = params.is_read === true || params.is_read === 'true'
+      list = list.filter(e => e.is_read === isRead)
+    }
+    const page = paginate(list, params)
+    return ok({ ...page, page_data: page.page_data.map(toNotification) })
+  }],
+  ['GET', /^\/front\/notification\/unread$/, () => ok(state.notifications.filter(e => !e.is_read).length)],
+  ['PUT', /^\/front\/notification\/read$/, (params, body) => {
+    const ids = body?.ids ?? []
+    let rows = 0
+    for (const n of state.notifications) {
+      // ids 为空表示全部已读, 与后端一致
+      if ((!ids.length || ids.includes(n.id)) && !n.is_read) {
+        n.is_read = true
+        rows++
+      }
+    }
+    return ok(rows)
   }],
 
   ['GET', /^\/front\/user\/info$/, () => ok(state.user)],

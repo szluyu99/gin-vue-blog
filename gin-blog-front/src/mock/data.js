@@ -166,6 +166,13 @@ export const comments = [
   { id: 5, type: 3, topic_id: 0, parent_id: 0, user_id: 3, reply_user_id: 0, content: '留言板测试', like_count: 0, created_at: '2024-01-04T08:00:00.000Z' },
 ]
 
+// 站内通知 (mock 模式下给当前用户几条, 便于看铃铛和列表)
+export const notifications = [
+  { id: 1, user_id: 1, from_user_id: 2, type: 1, article_id: 3, comment_id: 2, content: '我也跑通了', is_read: false, created_at: '2024-01-05T10:00:00.000Z' },
+  { id: 2, user_id: 1, from_user_id: 3, type: 2, article_id: 1, comment_id: 1, content: '跑起来了, 感谢分享!', is_read: false, created_at: '2024-01-04T09:00:00.000Z' },
+  { id: 3, user_id: 1, from_user_id: 2, type: 2, article_id: 6, comment_id: 3, content: '项目结构很清晰', is_read: true, created_at: '2024-01-03T08:00:00.000Z' },
+]
+
 // 评论用户信息, key 为 user_id
 export const commentUsers = {
   1: { nickname: 'Mock 用户', avatar: AVATAR, website: 'https://github.com/szluyu99' },
