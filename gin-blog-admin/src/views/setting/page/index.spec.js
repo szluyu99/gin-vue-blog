@@ -59,15 +59,20 @@ describe('页面管理', () => {
     expect(wrapper.vm.pageList).toEqual([])
   })
 
-  it('下拉菜单选编辑带上行数据, 选删除调删除接口', async () => {
+  // 编辑/删除是封面右上角两个独立按钮(以前藏在「···」下拉里, 浅色封面上看不见)
+  it('点编辑按钮带上行数据, 点删除按钮调删除接口', async () => {
     const wrapper = mountPage()
     await vi.waitFor(() => expect(wrapper.vm.pageList).toHaveLength(2))
 
-    wrapper.vm.handleSelect('edit', pages[0])
-    await wrapper.vm.$nextTick()
+    const editBtns = wrapper.findAll('button[title="编辑"]')
+    const delBtns = wrapper.findAll('button[title="删除"]')
+    expect(editBtns).toHaveLength(2)
+    expect(delBtns).toHaveLength(2)
+
+    await editBtns[0].trigger('click')
     expect(wrapper.vm.modalForm).toMatchObject({ id: 1, label: 'home' })
 
-    wrapper.vm.handleSelect('delete', pages[1])
+    await delBtns[1].trigger('click')
     await vi.waitFor(() => expect(api.deletePage).toHaveBeenCalled())
     expect(api.deletePage).toHaveBeenCalledWith(JSON.stringify([2]))
   })
