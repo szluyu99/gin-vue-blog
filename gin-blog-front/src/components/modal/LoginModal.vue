@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import api from '@/api'
 import UModal from '@/components/ui/UModal.vue'
@@ -19,8 +19,24 @@ const loginFlag = computed({
 })
 
 const form = ref({
-  username: 'test@qq.com',
-  password: '11111',
+  username: userStore.lastUsername || '',
+  password: '',
+})
+
+/*
+每次打开登录框都重新填一次用户名, 优先级: 刚注册的邮箱 > 上次登录成功的用户名 > 空
+
+密码一律不填也不存。用户名是刚注册 / 登录成功过才有, 没成功过的话
+prefillUsername 只活在内存里, 刷新就是空的 —— 不会再出现写死的示例账号。
+*/
+watch(loginFlag, (open) => {
+  if (!open) {
+    return
+  }
+  form.value = {
+    username: appStore.prefillUsername || userStore.lastUsername || '',
+    password: '',
+  }
 })
 
 // 登录
@@ -35,10 +51,14 @@ async function handleLogin() {
     const resp = await api.login({ username, password })
     window.$notify?.success('登录成功!')
     userStore.setToken(resp.data.token)
+    // 登录成功就记住用户名, 放在 getUserInfo 之前:
+    // 拉用户信息失败也不该让这次成功的登录白记一次
+    userStore.setLastUsername(username)
+    appStore.setPrefillUsername('')
     // 加载用户信息, 更新 pinia 中信息, 刷新页面
     await userStore.getUserInfo()
-    // 清空表单
-    form.value = { username: 'test@qq.com', password: '11111' }
+    // 清空表单: 密码不留
+    form.value = { username, password: '' }
     loginFlag.value = false
   }
 

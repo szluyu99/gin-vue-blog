@@ -42,6 +42,8 @@ async function handleRegister() {
   }
   window.$message?.success('注册成功, 请登录')
   form.value = { email: '', password: '' }
+  // 刚注册的邮箱带给登录框填上, 免得再输一遍
+  appStore.setPrefillUsername(email)
   openLogin()
 }
 

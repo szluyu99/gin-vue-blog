@@ -20,6 +20,8 @@ export const useAppStore = defineStore('app', {
     registerFlag: false,
     collapsed: false, // 侧边栏折叠（移动端）
     theme: 'light', // light | dark, 由 initTheme 校正
+    // 刚注册完带过去给登录框填的用户名: 只在本次会话有效, 刷新就没了
+    prefillUsername: '',
 
     page_list: [], // 页面数据
     // TODO: 优化
@@ -52,6 +54,7 @@ export const useAppStore = defineStore('app', {
     setLoginFlag(flag) { this.loginFlag = flag },
     setRegisterFlag(flag) { this.registerFlag = flag },
     setSearchFlag(flag) { this.searchFlag = flag },
+    setPrefillUsername(username) { this.prefillUsername = username ?? '' },
 
     // 入口处调用一次, 把 store 和 <html> 的 class 对齐
     initTheme() {

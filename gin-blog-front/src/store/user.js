@@ -7,7 +7,7 @@ const DEFAULT_AVATAR = 'https://raw.githubusercontent.com/szluyu99/gin-vue-blog/
 export const useUserStore = defineStore('user', {
   persist: {
     key: 'gvb_blog_user',
-    pick: ['token'],
+    pick: ['token', 'lastUsername'],
   },
   state: () => ({
     userInfo: {
@@ -21,6 +21,8 @@ export const useUserStore = defineStore('user', {
       commentLikeSet: [],
     },
     token: null,
+    // 上次登录成功的用户名, 只做登录框回填用
+    lastUsername: '',
   }),
   getters: {
     userId: state => state.userInfo.id ?? '',
@@ -38,12 +40,23 @@ export const useUserStore = defineStore('user', {
     setToken(token) {
       this.token = token
     },
+    // 只在登录成功后记, 所以从没登录成功过的机器上永远是空的
+    setLastUsername(username) {
+      this.lastUsername = username ?? ''
+    },
     resetLoginState() {
-      this.$reset()
+      this.keepLastUsername(() => this.$reset())
     },
     async logout() {
       await api.logout()
-      this.$reset()
+      this.keepLastUsername(() => this.$reset())
+    },
+    // $reset 会把 lastUsername 一起清掉, 但退出登录不该忘记用户名 ——
+    // 下次进来还是给他填好, 只是要重新输密码
+    keepLastUsername(reset) {
+      const last = this.lastUsername
+      reset()
+      this.lastUsername = last
     },
     async getUserInfo() {
       if (!this.token) {
