@@ -88,6 +88,7 @@ func generateDefaultPages(db *gorm.DB) {
 		{Name: "留言", Label: "message", Cover: imgBase + "/page/message.jpeg"},
 		{Name: "个人中心", Label: "user", Cover: imgBase + "/page/user.jpg"},
 		{Name: "相册", Label: "album", Cover: imgBase + "/page/album.png"},
+		{Name: "说说", Label: "talk", Cover: imgBase + "/page/home.jpg"},
 		{Name: "错误页面", Label: "404", Cover: imgBase + "/page/404.jpg"},
 		{Name: "文章列表", Label: "article_list", Cover: imgBase + "/page/article_list.jpg"},
 	}

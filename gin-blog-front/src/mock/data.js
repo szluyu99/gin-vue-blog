@@ -35,6 +35,7 @@ export const pages = [
   { id: 7, name: '留言', label: 'message', cover: `${IMG_BASE}/page/message.jpeg` },
   { id: 8, name: '个人中心', label: 'user', cover: `${IMG_BASE}/page/user.jpg` },
   { id: 9, name: '相册', label: 'album', cover: `${IMG_BASE}/page/album.png` },
+  { id: 12, name: '说说', label: 'talk', cover: `${IMG_BASE}/page/home.jpg` },
   { id: 10, name: '错误页面', label: '404', cover: `${IMG_BASE}/page/404.jpg` },
   { id: 11, name: '文章列表', label: 'article_list', cover: `${IMG_BASE}/page/article_list.jpg` },
 ]
