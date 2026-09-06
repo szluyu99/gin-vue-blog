@@ -49,6 +49,15 @@ var AdminResources = []ResourceModule{
 		},
 	},
 	{
+		Name: "说说模块",
+		Items: []ResourceItem{
+			{Name: "说说列表", Url: "/talk/list", Method: "GET"},
+			{Name: "说说详情", Url: "/talk/:id", Method: "GET"},
+			{Name: "新增/编辑说说", Url: "/talk", Method: "POST"},
+			{Name: "删除说说", Url: "/talk", Method: "DELETE"},
+		},
+	},
+	{
 		Name: "页面模块",
 		Items: []ResourceItem{
 			{Name: "页面列表", Url: "/page/list", Method: "GET"},

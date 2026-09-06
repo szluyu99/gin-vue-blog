@@ -18,6 +18,7 @@ const menuOptions = [
   { text: '归档', icon: 'i-mdi:archive', path: '/archives' },
   { text: '分类', icon: 'i-mdi:menu', path: '/categories' },
   { text: '标签', icon: 'i-mdi:tag', path: '/tags' },
+  { text: '说说', icon: 'i-mdi:message-text-outline', path: '/talks' },
   { text: '相册', icon: 'i-mdi:view-gallery', path: '/albums' },
   { text: '友链', icon: 'i-mdi:vector-link', path: '/links' },
   { text: '关于', icon: 'i-mdi:information-outline', path: '/about' },

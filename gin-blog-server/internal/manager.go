@@ -19,6 +19,7 @@ var (
 	userAPI         handle.User         // 用户
 	userAuthAPI     handle.UserAuth     // 用户账号
 	commentAPI      handle.Comment      // 评论
+	talkAPI         handle.Talk         // 说说
 	uploadAPI       handle.Upload       // 文件上传
 	messageAPI      handle.Message      // 留言
 	linkAPI         handle.Link         // 友情链接
@@ -128,6 +129,14 @@ func registerAdminHandler(r *gin.Engine) {
 		comment.DELETE("", commentAPI.Delete)           // 删除评论
 		comment.PUT("/review", commentAPI.UpdateReview) // 修改评论审核
 	}
+	// 说说模块
+	talk := auth.Group("/talk")
+	{
+		talk.GET("/list", talkAPI.GetList)  // 说说列表
+		talk.GET("/:id", talkAPI.GetDetail) // 说说详情
+		talk.POST("", talkAPI.SaveOrUpdate) // 新增/编辑说说
+		talk.DELETE("", talkAPI.Delete)     // 删除说说
+	}
 	// 留言模块
 	message := auth.Group("/message")
 	{
@@ -230,6 +239,11 @@ func registerBlogHandler(r *gin.Engine) {
 	{
 		comment.GET("/list", frontAPI.GetCommentList)                         // 前台评论列表
 		comment.GET("/replies/:comment_id", frontAPI.GetReplyListByCommentId) // 根据评论 id 查询回复
+	}
+	talk := base.Group("/talk")
+	{
+		talk.GET("/list", frontAPI.GetTalkList) // 前台说说列表
+		talk.GET("/:id", frontAPI.GetTalk)      // 前台说说详情
 	}
 
 	// 需要登录才能进行的操作(由 handler 内的 MustCurrentUserAuth 兜底)

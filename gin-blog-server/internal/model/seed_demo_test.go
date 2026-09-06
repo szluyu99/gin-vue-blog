@@ -31,9 +31,10 @@ func TestSeedDemoContent(t *testing.T) {
 	assert.Equal(t, int64(demoArticleCount), count(&Article{}))
 	assert.Equal(t, int64(3), count(&Category{}))
 	assert.Equal(t, int64(6), count(&Tag{}))
-	assert.Equal(t, int64(6), count(&Comment{}))
+	assert.Equal(t, int64(8), count(&Comment{})) // 6 条文章/友链评论 + 2 条说说评论
 	assert.Equal(t, int64(4), count(&Message{}))
 	assert.Equal(t, int64(3), count(&FriendLink{}))
+	assert.Equal(t, int64(4), count(&Talk{}))
 
 	// 前台列表只认公开且未删除的文章, 数量要超过每页 9 条才能翻页
 	_, total, err := GetBlogArticleList(db, 1, 9, 0, 0)
@@ -53,6 +54,13 @@ func TestSeedDemoContent(t *testing.T) {
 		assert.Contains(t, a.Content, "```go", a.Title)
 	}
 
+	// 说说: 前台只看到公开的, 置顶排最前, 第一条带评论
+	talks, talkTotal, err := GetBlogTalkList(db, 1, 10)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(3), talkTotal, "4 条里有 1 条私密")
+	assert.True(t, talks[0].IsTop)
+	assert.Equal(t, int64(2), talks[0].CommentCount, "置顶那条挂了 1 条评论 + 1 条回复")
+
 	// 归档按月分组, 文章时间必须跨多个月份
 	months := make(map[string]bool)
 	for _, a := range articles {
@@ -63,10 +71,10 @@ func TestSeedDemoContent(t *testing.T) {
 	// 回复评论的 topic_id / type 跟随父评论
 	var replies []Comment
 	assert.Nil(t, db.Where("parent_id > 0").Find(&replies).Error)
-	assert.Len(t, replies, 2)
+	assert.Len(t, replies, 3) // 2 条文章回复 + 1 条说说回复
 	for _, r := range replies {
 		assert.NotZero(t, r.TopicId)
-		assert.Equal(t, TYPE_ARTICLE, r.Type)
+		assert.Contains(t, []int{TYPE_ARTICLE, TYPE_TALK}, r.Type)
 		assert.NotZero(t, r.ReplyUserId)
 	}
 

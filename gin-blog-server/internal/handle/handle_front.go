@@ -162,10 +162,61 @@ func (*Front) GetLinkList(c *gin.Context) {
 	ReturnSuccess(c, list)
 }
 
+// @Summary 前台说说列表
+// @Description 只返回公开的说说, 置顶排前面, 带评论数
+// @Tags Front
+// @Produce json
+// @Param page_num query int false "页码"
+// @Param page_size query int false "每页数量"
+// @Success 0 {object} Response[PageResult[model.TalkVO]]
+// @Router /front/talk/list [get]
+func (*Front) GetTalkList(c *gin.Context) {
+	var query PageQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		ReturnError(c, g.ErrRequest, err)
+		return
+	}
+
+	list, total, err := model.GetBlogTalkList(GetDB(c), query.Page, query.Size)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
+		return
+	}
+
+	ReturnSuccess(c, PageResult[model.TalkVO]{
+		Total: total,
+		List:  list,
+		Size:  query.Size,
+		Page:  query.Page,
+	})
+}
+
+// @Summary 前台说说详情
+// @Description 私密说说当作不存在
+// @Tags Front
+// @Produce json
+// @Param id path int true "说说 ID"
+// @Success 0 {object} Response[model.TalkVO]
+// @Router /front/talk/{id} [get]
+func (*Front) GetTalk(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		ReturnError(c, g.ErrRequest, err)
+		return
+	}
+
+	talk, err := model.GetBlogTalk(GetDB(c), id)
+	if err != nil {
+		ReturnError(c, g.ErrDbOp, err)
+		return
+	}
+
+	ReturnSuccess(c, talk)
+}
+
 /*
 以下接口需要登录
 */
-
 // TODO: 添加自定义头像和昵称留言功能（即可以不登录留言）
 // @Summary 新增留言
 // @Description 新增留言, 需要登录, 是否需要审核取决于博客配置

@@ -61,6 +61,7 @@ const menuOptions = [
     text: '娱乐',
     icon: 'i-mdi:gamepad-circle',
     subMenu: [
+      { text: '说说', icon: 'i-mdi:message-text-outline', path: '/talks' },
       { text: '相册', icon: 'i-mdi:view-gallery', path: '/albums' },
     ],
   },

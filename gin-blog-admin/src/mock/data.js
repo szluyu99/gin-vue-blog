@@ -19,6 +19,7 @@ export const menus = [
   { id: 10, parent_id: 2, name: '文章列表', path: 'list', component: '/article/list', icon: 'material-symbols:format-list-bulleted', order_num: 2, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 11, parent_id: 2, name: '分类管理', path: 'category', component: '/article/category', icon: 'tabler:category', order_num: 3, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 12, parent_id: 2, name: '标签管理', path: 'tag', component: '/article/tag', icon: 'tabler:tag', order_num: 4, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
+  { id: 55, parent_id: 2, name: '说说管理', path: 'talk', component: '/article/talk', icon: 'mdi:message-text-outline', order_num: 5, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 13, parent_id: 2, name: '修改文章', path: 'write/:id', component: '/article/write', icon: 'icon-park-outline:write', order_num: 1, redirect: '', is_catalogue: false, is_hidden: true, keep_alive: false, is_external: false, external_link: '' },
   { id: 14, parent_id: 3, name: '菜单管理', path: 'menu', component: '/auth/menu', icon: 'ic:twotone-menu-book', order_num: 1, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 15, parent_id: 3, name: '接口管理', path: 'resource', component: '/auth/resource', icon: 'mdi:api', order_num: 2, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
@@ -247,6 +248,13 @@ export const links = [
   { id: 2, name: 'Vue', avatar: SAMPLE_IMG, address: 'https://cn.vuejs.org', intro: '渐进式 JavaScript 框架', created_at: '2024-01-01T10:05:00.000Z', updated_at: '2024-01-01T10:05:00.000Z' },
   { id: 3, name: 'Vite', avatar: SAMPLE_IMG, address: 'https://cn.vitejs.dev', intro: '下一代前端工具链', created_at: '2024-01-01T10:10:00.000Z', updated_at: '2024-01-01T10:10:00.000Z' },
   { id: 4, name: 'UnoCSS', avatar: SAMPLE_IMG, address: 'https://unocss.dev', intro: '即时按需原子 CSS 引擎', created_at: '2024-01-01T10:15:00.000Z', updated_at: '2024-01-01T10:15:00.000Z' },
+]
+
+// 说说: status 1-公开 2-私密, 后台列表要能看到私密的
+export const talks = [
+  { id: 1, user_id: 1, content: '新版说说上线了, 支持置顶和评论。', status: 1, is_top: true, created_at: '2024-01-06T10:00:00.000Z', updated_at: '2024-01-06T10:00:00.000Z' },
+  { id: 2, user_id: 1, content: '今天把评论的 N+1 查询顺手改掉了。', status: 1, is_top: false, created_at: '2024-01-05T09:30:00.000Z', updated_at: '2024-01-05T09:30:00.000Z' },
+  { id: 3, user_id: 1, content: '这条是私密说说, 只有后台看得到。', status: 2, is_top: false, created_at: '2024-01-04T08:00:00.000Z', updated_at: '2024-01-04T08:00:00.000Z' },
 ]
 
 // 操作日志

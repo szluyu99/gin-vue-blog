@@ -55,6 +55,13 @@ func SeedDemoContent(db *gorm.DB) error {
 		if err := seedDemoComments(tx, articles, admin.ID, guest.ID); err != nil {
 			return err
 		}
+		talks, err := seedDemoTalks(tx, admin.ID)
+		if err != nil {
+			return err
+		}
+		if err := seedDemoTalkComments(tx, talks, admin.ID, guest.ID); err != nil {
+			return err
+		}
 		if err := seedDemoMessages(tx); err != nil {
 			return err
 		}
@@ -272,6 +279,71 @@ func seedDemoComments(tx *gorm.DB, articles []Article, adminId, guestId int) err
 	}
 
 	return nil
+}
+
+// 说说: 一条置顶、一条私密(用来验证前台看不到、后台能编辑)
+func seedDemoTalks(tx *gorm.DB, adminId int) ([]Talk, error) {
+	now := time.Now()
+	specs := []struct {
+		content string
+		status  int
+		isTop   bool
+	}{
+		{content: "新版说说上线了, 支持置顶和评论, 暂时不做图片。", status: STATUS_PUBLIC, isTop: true},
+		{content: "今天把评论的 N+1 查询顺手改掉了, 一页评论从 11 条 SQL 降到 2 条。", status: STATUS_PUBLIC},
+		{content: "周末读完了《Designing Data-Intensive Applications》第五章, 复制这块讲得真好。", status: STATUS_PUBLIC},
+		{content: "这条是私密说说, 只有后台看得到。", status: STATUS_SECRET},
+	}
+
+	talks := make([]Talk, 0, len(specs))
+	for i, s := range specs {
+		createdAt := now.AddDate(0, 0, i-len(specs))
+		talk := Talk{
+			Model:   Model{CreatedAt: createdAt, UpdatedAt: createdAt},
+			UserId:  adminId,
+			Content: s.content,
+			Status:  s.status,
+			IsTop:   s.isTop,
+		}
+		if err := tx.Create(&talk).Error; err != nil {
+			return nil, err
+		}
+		talks = append(talks, talk)
+	}
+
+	return talks, nil
+}
+
+// 说说评论: 走的是同一张评论表(Type = TYPE_TALK), 留一条回复验证 @ 显示
+func seedDemoTalkComments(tx *gorm.DB, talks []Talk, adminId, guestId int) error {
+	if len(talks) < 2 {
+		return fmt.Errorf("样例说说不足, 无法生成说说评论")
+	}
+
+	now := time.Now()
+	root := Comment{
+		Model:    Model{CreatedAt: now.AddDate(0, 0, -2), UpdatedAt: now.AddDate(0, 0, -2)},
+		UserId:   guestId,
+		TopicId:  talks[0].ID,
+		Content:  "说说也能评论了, 挺方便。",
+		Type:     TYPE_TALK,
+		IsReview: true,
+	}
+	if err := tx.Create(&root).Error; err != nil {
+		return err
+	}
+
+	reply := Comment{
+		Model:       Model{CreatedAt: now.AddDate(0, 0, -1), UpdatedAt: now.AddDate(0, 0, -1)},
+		UserId:      adminId,
+		ReplyUserId: guestId,
+		ParentId:    root.ID,
+		TopicId:     root.TopicId,
+		Content:     "评论和文章共用一张表, 所以这块几乎没写新代码。",
+		Type:        TYPE_TALK,
+		IsReview:    true,
+	}
+	return tx.Create(&reply).Error
 }
 
 // 留言(弹幕): speed 影响滚动速度, 留一条未审核的

@@ -55,6 +55,23 @@ const basicRoutes = [
     },
   },
   {
+    name: 'Talk',
+    path: '/talks',
+    component: () => import('@/views/entertainment/talking/index.vue'),
+    meta: {
+      title: '说说',
+    },
+  },
+  {
+    // 说说详情单独一页: 评论组件按 route.params.id 取 topic_id, 沿用文章那套
+    name: 'TalkDetail',
+    path: '/talk/:id',
+    component: () => import('@/views/entertainment/talking/detail.vue'),
+    meta: {
+      title: '说说',
+    },
+  },
+  {
     name: 'Album',
     path: '/albums',
     component: () => import('@/views/entertainment/album/index.vue'),

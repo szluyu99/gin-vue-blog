@@ -143,6 +143,14 @@ export const links = [
   { id: 4, name: 'UnoCSS', avatar: AVATAR, address: 'https://unocss.dev', intro: '即时按需原子 CSS 引擎' },
 ]
 
+// 说说: 纯文本, 一条置顶 + 一条私密(前台不该看到私密的)
+export const talks = [
+  { id: 1, user_id: 1, content: '新版说说上线了, 支持置顶和评论, 暂时不做图片。', status: 1, is_top: true, created_at: '2024-01-06T10:00:00.000Z' },
+  { id: 2, user_id: 1, content: '把评论的 N+1 查询顺手改掉了, 一页评论从 11 条 SQL 降到 2 条。', status: 1, is_top: false, created_at: '2024-01-05T09:30:00.000Z' },
+  { id: 3, user_id: 1, content: '周末读完了《Designing Data-Intensive Applications》第五章, 复制这块讲得真好。', status: 1, is_top: false, created_at: '2024-01-03T20:00:00.000Z' },
+  { id: 4, user_id: 1, content: '这条是私密说说, 只有后台看得到。', status: 2, is_top: false, created_at: '2024-01-02T08:00:00.000Z' },
+]
+
 export const about = '## 关于本站\n\n这是 Mock 模式下的关于页面内容, 可以在 `src/mock/data.js` 中修改。\n\n- 技术栈: Vue3 + Vite + UnoCSS\n- 后端: Gin + GORM\n'
 
 // 当前登录用户 (mock 登录后返回)
@@ -157,13 +165,13 @@ export const currentUser = {
   comment_like_set: [],
 }
 
-// 评论: type 1-文章 2-友链 3-留言, topic_id 为 0 表示非文章页面
+// 评论: type 1-文章 2-友链 3-说说
 export const comments = [
   { id: 1, type: 1, topic_id: 1, parent_id: 0, user_id: 2, reply_user_id: 0, content: '跑起来了, 感谢分享!', like_count: 3, created_at: '2023-12-28T10:00:00.000Z' },
   { id: 2, type: 1, topic_id: 1, parent_id: 1, user_id: 3, reply_user_id: 2, content: '我也跑通了', like_count: 1, created_at: '2023-12-28T10:30:00.000Z' },
   { id: 3, type: 1, topic_id: 3, parent_id: 0, user_id: 3, reply_user_id: 0, content: '项目结构很清晰', like_count: 0, created_at: '2023-12-29T14:00:00.000Z' },
   { id: 4, type: 2, topic_id: 0, parent_id: 0, user_id: 2, reply_user_id: 0, content: '申请友链: https://example.com', like_count: 2, created_at: '2024-01-02T08:00:00.000Z' },
-  { id: 5, type: 3, topic_id: 0, parent_id: 0, user_id: 3, reply_user_id: 0, content: '留言板测试', like_count: 0, created_at: '2024-01-04T08:00:00.000Z' },
+  { id: 5, type: 3, topic_id: 1, parent_id: 0, user_id: 3, reply_user_id: 0, content: '说说也能评论了, 挺方便。', like_count: 0, created_at: '2024-01-04T08:00:00.000Z' },
 ]
 
 // 站内通知 (mock 模式下给当前用户几条, 便于看铃铛和列表)

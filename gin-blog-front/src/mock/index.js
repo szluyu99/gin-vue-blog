@@ -13,6 +13,7 @@ import {
   notifications,
   pages,
   tags,
+  talks,
 } from './data.js'
 
 const DELAY = 200 // 模拟网络延迟 (ms)
@@ -23,6 +24,7 @@ const state = {
   comments: comments.map(e => ({ ...e })),
   messages: messages.map(e => ({ ...e })),
   notifications: notifications.map(e => ({ ...e })),
+  talks: talks.map(e => ({ ...e })),
   user: { ...currentUser },
 }
 
@@ -92,6 +94,18 @@ function toReply(c) {
     reply_user_id: c.reply_user_id,
     user: { info: commentUsers[c.user_id] ?? commentUsers[2] },
     reply_user: { info: commentUsers[c.reply_user_id] ?? commentUsers[2] },
+  }
+}
+
+// 说说列表项: 昵称头像和评论数都是现算的, 与后端 join 出来的结构一致
+function toTalk(t) {
+  const user = commentUsers[t.user_id] ?? commentUsers[2]
+  const count = state.comments.filter(e => e.type === 3 && e.topic_id === t.id).length
+  return {
+    ...t,
+    nickname: user.nickname,
+    avatar: user.avatar,
+    comment_count: count,
   }
 }
 
@@ -223,6 +237,19 @@ const handlers = [
   }],
 
   ['GET', /^\/front\/link\/list$/, () => ok(links)],
+
+  ['GET', /^\/front\/talk\/list$/, (params) => {
+    const list = state.talks
+      .filter(e => e.status === 1)
+      .sort((a, b) => Number(b.is_top) - Number(a.is_top) || new Date(b.created_at) - new Date(a.created_at))
+    const page = paginate(list, params)
+    return ok({ ...page, page_data: page.page_data.map(toTalk) })
+  }],
+
+  ['GET', /^\/front\/talk\/(\d+)$/, (params, body, [id]) => {
+    const talk = state.talks.find(e => e.id === Number(id) && e.status === 1)
+    return talk ? ok(toTalk(talk)) : fail('说说不存在')
+  }],
 
   ['GET', /^\/front\/comment\/list$/, (params) => {
     const type = Number(params.type ?? 1)

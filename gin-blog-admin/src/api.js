@@ -43,6 +43,12 @@ export default {
   getLinks: (params = {}) => request.get('/link/list', { params }),
   deleteLinks: (data = []) => request.delete('/link', { data }),
   saveOrUpdateLink: data => request.post('/link', data),
+
+  // 说说相关接口
+  getTalks: (params = {}) => request.get('/talk/list', { params }),
+  getTalkById: id => request.get(`/talk/${id}`),
+  saveOrUpdateTalk: data => request.post('/talk', data),
+  deleteTalks: (data = []) => request.delete('/talk', { data }),
   // 日志相关接口
   getOperationLogs: (params = {}) => request.get('/operation/log/list', { params }),
   deleteOperationLogs: (data = []) => request.delete('/operation/log', { data }),

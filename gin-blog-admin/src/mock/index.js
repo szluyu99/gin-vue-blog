@@ -15,6 +15,7 @@ import {
   resources,
   roles,
   tags,
+  talks,
   users,
 } from './data.js'
 
@@ -28,6 +29,7 @@ const state = {
   comments: comments.map(e => ({ ...e })),
   messages: messages.map(e => ({ ...e })),
   links: links.map(e => ({ ...e })),
+  talks: talks.map(e => ({ ...e })),
   logs: operationLogs.map(e => ({ ...e })),
   loginLogs: loginLogs.map(e => ({ ...e })),
   users: users.map(e => ({ ...e })),
@@ -300,6 +302,18 @@ const handlers = [
   ['GET', /^\/link\/list$/, params => ok(paginate(filterList(state.links, params, { name: e => e.name }), params))],
   ['POST', /^\/link$/, (params, body) => upsert(state.links, body)],
   ['DELETE', /^\/link$/, (params, body) => removeByIds(state.links, body)],
+
+  // 说说: 后台能看到私密的, status=0 表示全部
+  ['GET', /^\/talk\/list$/, (params) => {
+    const list = Number(params.status) ? state.talks.filter(e => e.status === Number(params.status)) : state.talks
+    return ok(paginate(list, params))
+  }],
+  ['GET', /^\/talk\/(\d+)$/, (params, body, [id]) => {
+    const talk = state.talks.find(e => e.id === Number(id))
+    return talk ? ok(talk) : fail('说说不存在')
+  }],
+  ['POST', /^\/talk$/, (params, body) => upsert(state.talks, body)],
+  ['DELETE', /^\/talk$/, (params, body) => removeByIds(state.talks, body)],
 
   // 操作日志
   ['GET', /^\/operation\/log\/list$/, (params) => {

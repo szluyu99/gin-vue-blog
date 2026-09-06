@@ -55,7 +55,7 @@ func main() {
 	}
 }
 
-// 生成样例内容: 分类, 标签, 文章, 评论, 留言, 友链
+// 生成样例内容: 分类, 标签, 文章, 评论, 留言, 友链, 说说
 //
 // 只在库里一篇文章都没有时才灌, 所以可以重复执行。
 // 内容数据只是本地测试用, 不放进 all 里, 需要时显式 -t demo。
@@ -358,6 +358,7 @@ func generateDefaultMenus(db *gorm.DB) {
 		{Name: "文章列表", Path: "list", Component: "/article/list", Icon: "material-symbols:format-list-bulleted", OrderNum: 2, ParentId: parents[1].ID},
 		{Name: "分类管理", Path: "category", Component: "/article/category", Icon: "tabler:category", OrderNum: 3, ParentId: parents[1].ID},
 		{Name: "标签管理", Path: "tag", Component: "/article/tag", Icon: "tabler:tag", OrderNum: 4, ParentId: parents[1].ID},
+		{Name: "说说管理", Path: "talk", Component: "/article/talk", Icon: "mdi:message-text-outline", OrderNum: 5, ParentId: parents[1].ID},
 		{Name: "修改文章", Path: "write/:id", Component: "/article/write", Icon: "icon-park-outline:write", OrderNum: 1, ParentId: parents[1].ID, Hidden: true},
 		// 权限管理
 		{Name: "菜单管理", Path: "menu", Component: "/auth/menu", Icon: "ic:twotone-menu-book", OrderNum: 1, ParentId: parents[2].ID},

@@ -30,6 +30,10 @@ export default {
   getMessages: () => request.get('/message/list'),
   /** 友链列表 */
   getLinks: () => request.get('/link/list'),
+  /** 说说列表 */
+  getTalks: (params = {}) => request.get('/talk/list', { params }),
+  /** 说说详情 */
+  getTalk: id => request.get(`/talk/${id}`),
   /** 评论列表 */
   getComments: (params = {}) => request.get('/comment/list', { params }),
   /** 评论回复列表 */
