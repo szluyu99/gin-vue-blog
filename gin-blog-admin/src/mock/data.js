@@ -30,6 +30,7 @@ export const menus = [
   { id: 20, parent_id: 5, name: '在线用户', path: 'online', component: '/user/online', icon: 'ic:outline-online-prediction', order_num: 2, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 21, parent_id: 6, name: '操作日志', path: 'operation', component: '/log/operation', icon: 'mdi:book-open-page-variant-outline', order_num: 1, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 22, parent_id: 6, name: '登录日志', path: 'login', component: '/log/login', icon: 'material-symbols:login', order_num: 2, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
+  { id: 56, parent_id: 6, name: '前端错误', path: 'error', component: '/log/error', icon: 'mdi:bug-outline', order_num: 3, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 23, parent_id: 7, name: '网站管理', path: 'website', component: '/setting/website', icon: 'el:website', order_num: 1, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 24, parent_id: 7, name: '页面管理', path: 'page', component: '/setting/page', icon: 'iconoir:journal-page', order_num: 2, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
   { id: 25, parent_id: 7, name: '友链管理', path: 'link', component: '/setting/link', icon: 'mdi:telegram', order_num: 3, redirect: '', is_catalogue: false, is_hidden: false, keep_alive: false, is_external: false, external_link: '' },
@@ -273,6 +274,13 @@ export const loginLogs = [
   { id: 3, user_id: 2, username: 'guest', nickname: 'guest', ip_address: '10.0.0.8', ip_source: '内网IP', status: 2, message: '用户名或密码错误', created_at: '2024-01-04T18:19:00.000Z' },
   { id: 4, user_id: 0, username: 'root', nickname: '', ip_address: '1.2.3.4', ip_source: '美国', status: 2, message: '用户名或密码错误', created_at: '2024-01-03T03:10:00.000Z' },
   { id: 5, user_id: 0, username: 'root', nickname: '', ip_address: '1.2.3.4', ip_source: '美国', status: 2, message: '登录失败次数过多', created_at: '2024-01-03T03:11:00.000Z' },
+]
+
+// 前端错误日志: 同类错误聚合成一行, count 是出现次数
+export const errorLogs = [
+  { id: 1, source: 'front', message: 'Cannot read properties of undefined (reading \'nickname\')', stack: 'at Comment.vue:229:31\nat renderList (runtime-core.js:1:1)', url: 'http://localhost:8888/article/3', user_agent: 'Mozilla/5.0', ip_address: '10.0.0.8', user_id: 0, fingerprint: 'demo1', count: 12, created_at: '2024-01-05T09:00:00.000Z', updated_at: '2024-01-05T18:30:00.000Z' },
+  { id: 2, source: 'admin', message: 'Invalid watch source', stack: 'at write/index.vue:27:1', url: 'http://localhost:8889/article/write', user_agent: 'Mozilla/5.0', ip_address: '127.0.0.1', user_id: 1, fingerprint: 'demo2', count: 3, created_at: '2024-01-04T11:00:00.000Z', updated_at: '2024-01-04T15:20:00.000Z' },
+  { id: 3, source: 'front', message: 'Failed to fetch', stack: '', url: 'http://localhost:8888/talks', user_agent: 'Mozilla/5.0', ip_address: '10.0.0.9', user_id: 2, fingerprint: 'demo3', count: 1, created_at: '2024-01-03T20:00:00.000Z', updated_at: '2024-01-03T20:00:00.000Z' },
 ]
 
 // 关于我 (Markdown)

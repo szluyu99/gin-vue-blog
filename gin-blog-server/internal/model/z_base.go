@@ -28,6 +28,7 @@ func MakeMigrate(db *gorm.DB) error {
 		&Config{},       // 网站设置
 		&OperationLog{}, // 操作日志
 		&LoginLog{},     // 登录日志
+		&ErrorLog{},     // 前端错误日志
 		&Notification{}, // 站内通知
 		&UserInfo{},     // 用户信息
 

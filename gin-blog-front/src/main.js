@@ -5,6 +5,7 @@ import { router } from './router'
 
 import { pinia } from './store'
 import { useAppStore } from './store/app'
+import { setupErrorReport } from './utils/error-report'
 import { setupMock } from './utils/http'
 // custom style
 import './styles/index.css'
@@ -18,6 +19,7 @@ import '@unocss/reset/tailwind.css'
 
 async function bootstrap() {
   await setupMock() // mock 模式下需要在发出请求前装上适配器
+  setupErrorReport('front') // 越早挂越好, 启动过程里的异常也要收得到
 
   const app = createApp(App)
   app.use(router)

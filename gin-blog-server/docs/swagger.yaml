@@ -444,6 +444,23 @@ definitions:
         description: 总条数
         type: integer
     type: object
+  handle.PageResult-model_ErrorLog:
+    properties:
+      page_data:
+        description: 分页数据
+        items:
+          $ref: '#/definitions/model.ErrorLog'
+        type: array
+      page_num:
+        description: 每页条数
+        type: integer
+      page_size:
+        description: 上次页数
+        type: integer
+      total:
+        description: 总条数
+        type: integer
+    type: object
   handle.PageResult-model_FriendLink:
     properties:
       page_data:
@@ -632,6 +649,19 @@ definitions:
     required:
     - email
     - password
+    type: object
+  handle.ReportErrorReq:
+    properties:
+      message:
+        type: string
+      source:
+        type: string
+      stack:
+        type: string
+      url:
+        type: string
+    required:
+    - message
     type: object
   handle.ResourceTreeVO:
     properties:
@@ -930,6 +960,19 @@ definitions:
       data:
         allOf:
         - $ref: '#/definitions/handle.PageResult-model_CommentVO'
+        description: 响应数据
+      message:
+        description: 响应消息
+        type: string
+    type: object
+  handle.Response-handle_PageResult-model_ErrorLog:
+    properties:
+      code:
+        description: 业务状态码
+        type: integer
+      data:
+        allOf:
+        - $ref: '#/definitions/handle.PageResult-model_ErrorLog'
         description: 响应数据
       message:
         description: 响应消息
@@ -1571,6 +1614,33 @@ definitions:
         description: Belongs To
       user_id:
         description: 评论者
+        type: integer
+    type: object
+  model.ErrorLog:
+    properties:
+      count:
+        type: integer
+      created_at:
+        type: string
+      fingerprint:
+        type: string
+      id:
+        type: integer
+      ip_address:
+        type: string
+      message:
+        type: string
+      source:
+        type: string
+      stack:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+      user_agent:
+        type: string
+      user_id:
         type: integer
     type: object
   model.FriendLink:
@@ -2476,6 +2546,64 @@ paths:
       summary: 邮箱验证
       tags:
       - UserAuth
+  /error/log:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 数组删除
+      parameters:
+      - description: 错误日志 ID 数组
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-int64'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除前端错误日志（批量）
+      tags:
+      - ErrorLog
+  /error/log/list:
+    get:
+      description: 按最近出现时间倒序, 关键字匹配错误信息与页面地址
+      parameters:
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      - description: 来源(front/admin)
+        in: query
+        name: source
+        type: string
+      - description: 页码
+        in: query
+        name: page_num
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-handle_PageResult-model_ErrorLog'
+      security:
+      - ApiKeyAuth: []
+      summary: 前端错误日志列表
+      tags:
+      - ErrorLog
   /front/about:
     get:
       description: 获取关于我的内容
@@ -2712,6 +2840,28 @@ paths:
           schema:
             $ref: '#/definitions/handle.Response-array_model_CommentVO'
       summary: 获取评论的回复列表
+      tags:
+      - Front
+  /front/error/report:
+    post:
+      consumes:
+      - application/json
+      description: 前端未捕获异常上报, 允许匿名访问; 同类错误按指纹聚合只累加次数
+      parameters:
+      - description: 错误信息
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/handle.ReportErrorReq'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: ""
+          schema:
+            $ref: '#/definitions/handle.Response-any'
+      summary: 上报前端错误
       tags:
       - Front
   /front/home:

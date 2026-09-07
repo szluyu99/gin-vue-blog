@@ -160,4 +160,12 @@ var AdminResources = []ResourceModule{
 			{Name: "删除登录日志", Url: "/login/log", Method: "DELETE"},
 		},
 	},
+	{
+		// 上报接口 /front/error/report 是匿名的, 不在资源表里
+		Name: "前端错误日志模块",
+		Items: []ResourceItem{
+			{Name: "前端错误日志列表", Url: "/error/log/list", Method: "GET"},
+			{Name: "删除前端错误日志", Url: "/error/log", Method: "DELETE"},
+		},
+	},
 }

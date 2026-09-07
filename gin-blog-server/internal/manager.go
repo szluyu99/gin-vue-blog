@@ -29,6 +29,7 @@ var (
 	blogInfoAPI     handle.BlogInfo     // 博客设置
 	operationLogAPI handle.OperationLog // 操作日志
 	loginLogAPI     handle.LoginLog     // 登录日志
+	errorLogAPI     handle.ErrorLog     // 前端错误日志(上报匿名, 管理需登录)
 	pageAPI         handle.Page         // 页面
 
 	// 博客前台接口
@@ -189,6 +190,13 @@ func registerAdminHandler(r *gin.Engine) {
 		operationLog.GET("/list", operationLogAPI.GetList) // 操作日志列表
 		operationLog.DELETE("", operationLogAPI.Delete)    // 删除操作日志
 	}
+
+	// 前端错误日志: 上报接口在前台(匿名), 这里只有查看和删除
+	errorLog := auth.Group("/error/log")
+	{
+		errorLog.GET("/list", errorLogAPI.GetList) // 前端错误日志列表
+		errorLog.DELETE("", errorLogAPI.Delete)    // 删除前端错误日志
+	}
 	// 页面模块
 	page := auth.Group("/page")
 	{
@@ -245,6 +253,9 @@ func registerBlogHandler(r *gin.Engine) {
 		talk.GET("/list", frontAPI.GetTalkList) // 前台说说列表
 		talk.GET("/:id", frontAPI.GetTalk)      // 前台说说详情
 	}
+
+	// 前端错误上报: 访客没有登录态, 必须匿名可访问; 防滥用靠 handler 里的按 IP 配额
+	base.POST("/error/report", errorLogAPI.Report)
 
 	// 需要登录才能进行的操作(由 handler 内的 MustCurrentUserAuth 兜底)
 	{

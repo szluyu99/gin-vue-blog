@@ -712,6 +712,99 @@
                 }
             }
         },
+        "/error/log": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据 ID 数组删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ErrorLog"
+                ],
+                "summary": "删除前端错误日志（批量）",
+                "parameters": [
+                    {
+                        "description": "错误日志 ID 数组",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handle.Response-int64"
+                        }
+                    }
+                }
+            }
+        },
+        "/error/log/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "按最近出现时间倒序, 关键字匹配错误信息与页面地址",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ErrorLog"
+                ],
+                "summary": "前端错误日志列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "来源(front/admin)",
+                        "name": "source",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page_num",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handle.Response-handle_PageResult-model_ErrorLog"
+                        }
+                    }
+                }
+            }
+        },
         "/front/about": {
             "get": {
                 "description": "获取关于我的内容",
@@ -1078,6 +1171,40 @@
                         "description": "",
                         "schema": {
                             "$ref": "#/definitions/handle.Response-array_model_CommentVO"
+                        }
+                    }
+                }
+            }
+        },
+        "/front/error/report": {
+            "post": {
+                "description": "前端未捕获异常上报, 允许匿名访问; 同类错误按指纹聚合只累加次数",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Front"
+                ],
+                "summary": "上报前端错误",
+                "parameters": [
+                    {
+                        "description": "错误信息",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handle.ReportErrorReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handle.Response-any"
                         }
                     }
                 }
@@ -4024,6 +4151,30 @@
                 }
             }
         },
+        "handle.PageResult-model_ErrorLog": {
+            "type": "object",
+            "properties": {
+                "page_data": {
+                    "description": "分页数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ErrorLog"
+                    }
+                },
+                "page_num": {
+                    "description": "每页条数",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "上次页数",
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "总条数",
+                    "type": "integer"
+                }
+            }
+        },
         "handle.PageResult-model_FriendLink": {
             "type": "object",
             "properties": {
@@ -4289,6 +4440,26 @@
                     "type": "string",
                     "maxLength": 20,
                     "minLength": 4
+                }
+            }
+        },
+        "handle.ReportErrorReq": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "stack": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
         },
@@ -4736,6 +4907,27 @@
                     "allOf": [
                         {
                             "$ref": "#/definitions/handle.PageResult-model_CommentVO"
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "响应消息",
+                    "type": "string"
+                }
+            }
+        },
+        "handle.Response-handle_PageResult-model_ErrorLog": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "业务状态码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "响应数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handle.PageResult-model_ErrorLog"
                         }
                     ]
                 },
@@ -5734,6 +5926,47 @@
                 },
                 "user_id": {
                     "description": "评论者",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.ErrorLog": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "fingerprint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "stack": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
