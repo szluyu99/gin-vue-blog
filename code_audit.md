@@ -813,8 +813,9 @@ Vue 不保证 `v-for` 的模板 ref 数组顺序与源数组一致，文件里�
 ### 测试
 
 `src/utils/index.spec.js` 新增 `parseJson` / `formatJson` 的 9 个断言，覆盖 A4 与 A2 的
-空串、非法 JSON、HTML 响应场景。A1/A3/A5/A6 都在组件内部，要验证需要
-`@vue/test-utils`（当前未引入），暂时只靠 `pnpm build` + 人工点检。
+空串、非法 JSON、HTML 响应场景。A1/A3/A5/A6 在组件内部，当时还没接入 `@vue/test-utils`，
+只靠 `pnpm build` + 人工点检；后来（2026-09-03）两个前端都接入了组件测试，
+这四条各自的回归用例见上面「组件测试」一节。
 
 ### 待处理
 

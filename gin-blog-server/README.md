@@ -44,11 +44,14 @@ sh create_superadmin.sh
 
 ## 需要注意的缓存
 
-页面封面等数据会缓存到 Redis 且**没有过期时间**。如果直接改了数据库但接口仍返回旧值，删掉对应缓存即可：
+`page`（页面封面）和 `config`（博客配置，含「关于我」）在 Redis 里是 10 分钟的读穿缓存。走后台接口改动会立即失效；直接改库或跑 `generate-data` 灌种子不会触发失效，等 TTL 到期即可，急的话手动删：
 
 ```bash
-redis-cli -n 7 del page
+redis-cli -n 7 del page config
 ```
+
+点赞数 / 浏览数 / 访客地域 / 按天访问量**故意不设过期时间**（按天的那个例外，30 天）：这些计数只在 Redis 里累加，数据库没有对应字段，Redis 就是唯一数据源，过期等于丢数据。
+
 
 ## 前端不想启动后端？
 
@@ -57,7 +60,8 @@ redis-cli -n 7 del page
 ## 测试
 
 ```bash
-go test ./...              # model / handle / middleware 层测试
+go test ./...              # 8 个包: model / handle / middleware / global / utils / 路由注册
+
 go test ./... -cover       # 看覆盖率
 ```
 

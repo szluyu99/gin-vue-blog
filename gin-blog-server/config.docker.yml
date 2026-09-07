@@ -3,6 +3,7 @@ Server:
   Port: :8765
   DbType: "mysql" # mysql | sqlite
   DbAutoMigrate: true # 是否自动迁移数据库表结构 (表结构没变可以不迁移, 提高启动速度)
+  DbLogMode: "error" # GORM 日志级别 silent, error, warn, info, 默认 info
   # 只有来自这些网段的请求才采信 X-Real-IP / X-Forwarded-For, 留空默认只信任内网
   # (compose 里 nginx 和后端在同一 docker 网络, 内网兜底就够)
   trusted-proxies: []
@@ -20,7 +21,6 @@ Mysql:
   Dbname: "gvb"
   Username: "root"
   Password: "123456"
-  LogMode: "error" # 日志级别 silent, error, warn, info, 默认 info
 Sqlite:
   Dsn: "gvb.db"
 Redis:
