@@ -6,6 +6,7 @@ import {
   categories,
   comments,
   config,
+  errorLogs,
   links,
   loginLogs,
   menus,
@@ -32,6 +33,7 @@ const state = {
   talks: talks.map(e => ({ ...e })),
   logs: operationLogs.map(e => ({ ...e })),
   loginLogs: loginLogs.map(e => ({ ...e })),
+  errorLogs: errorLogs.map(e => ({ ...e })),
   users: users.map(e => ({ ...e })),
   menus: menus.map(e => ({ ...e })),
   resources: resources.map(e => ({ ...e })),
@@ -334,6 +336,19 @@ const handlers = [
     return ok(paginate(list, params))
   }],
   ['DELETE', /^\/login\/log$/, (params, body) => removeByIds(state.loginLogs, body)],
+
+  // 前端错误日志: 上报接口不在后台, 这里只有查看和删除
+  ['GET', /^\/error\/log\/list$/, (params) => {
+    let list = state.errorLogs
+    if (params.source) {
+      list = list.filter(e => e.source === params.source)
+    }
+    if (params.keyword) {
+      list = list.filter(e => `${e.message}${e.url}`.includes(params.keyword))
+    }
+    return ok(paginate(list, params))
+  }],
+  ['DELETE', /^\/error\/log$/, (params, body) => removeByIds(state.errorLogs, body)],
 
   // 用户
   ['GET', /^\/user\/info$/, () => {

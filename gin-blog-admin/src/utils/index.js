@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { NIcon } from 'naive-ui'
 import { h } from 'vue'
 
+export * from './error-report'
 export * from './http'
 export * from './local'
 export * from './naiveTool'

@@ -347,6 +347,17 @@ func generateDefaultMenus(db *gorm.DB) {
 		if err := db.Create(&parents[i]).Error; err != nil {
 			if isDuplicate(err) {
 				slog.Debug(parents[i].Name + " 菜单已经存在")
+				/*
+					把已存在的父菜单查回来, 拿到真实 ID
+
+					Create 撞唯一索引时 parents[i].ID 会留在 0, 下面的子菜单
+					ParentId 就成了 0 —— 菜单变成孤儿, 前端菜单树不渲染它,
+					对应路由直接 404。首次灌库时父子一起建所以看不出问题,
+					往已有库里加新子菜单才会暴露(「前端错误」就是这么踩到的)。
+				*/
+				if err := db.Where("name = ?", parents[i].Name).First(&parents[i]).Error; err != nil {
+					slog.Error(parents[i].Name + " 菜单已存在但查询失败" + err.Error())
+				}
 			} else {
 				slog.Error(parents[i].Name + " 菜单初始化失败" + err.Error())
 			}
@@ -374,6 +385,7 @@ func generateDefaultMenus(db *gorm.DB) {
 		// 日志管理
 		{Name: "操作日志", Path: "operation", Component: "/log/operation", Icon: "mdi:book-open-page-variant-outline", OrderNum: 1, ParentId: parents[5].ID},
 		{Name: "登录日志", Path: "login", Component: "/log/login", Icon: "material-symbols:login", OrderNum: 2, ParentId: parents[5].ID},
+		{Name: "前端错误", Path: "error", Component: "/log/error", Icon: "mdi:bug-outline", OrderNum: 3, ParentId: parents[5].ID},
 		// 系统管理
 		{Name: "网站管理", Path: "website", Component: "/setting/website", Icon: "el:website", OrderNum: 1, ParentId: parents[6].ID},
 		{Name: "页面管理", Path: "page", Component: "/setting/page", Icon: "iconoir:journal-page", OrderNum: 2, ParentId: parents[6].ID},

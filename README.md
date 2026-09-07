@@ -60,6 +60,7 @@
 - 前端菜单由后端下发（动态路由）
 - Markdown 文章编辑，支持 `.md` / `.markdown` 导入、`.md` 导出
 - 操作日志、登录日志（含失败记录）、在线用户监听与强制下线
+- 前端错误日志：前后台的未捕获异常自动上报到后台列表，同类错误按指纹聚合只累加次数（不引 Sentry）
 - 用户与角色可禁用：禁用后登录被拒、已签发的 token 立即失效、只靠该角色拿到的权限被收回
 - 文件上传支持本地和七牛云
 - CRUD 操作封装为通用 Hook
@@ -142,8 +143,8 @@ cd gin-vue-blog/deploy
 
 ```bash
 cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
-cd gin-blog-front  && pnpm test       # 前台: vitest, 29 个文件 184 条
-cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 158 条
+cd gin-blog-front  && pnpm test       # 前台: vitest, 30 个文件 192 条
+cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 160 条
 ```
 
 前端测试以回归为主：每条都验证过「把修复回退后会变红」，覆盖的具体缺陷见 `code_audit.md` 的「组件测试」一节。

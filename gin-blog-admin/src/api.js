@@ -55,6 +55,10 @@ export default {
   getLoginLogs: (params = {}) => request.get('/login/log/list', { params }),
   deleteLoginLogs: (data = []) => request.delete('/login/log', { data }),
 
+  // 前端错误日志 (上报接口在前台, 匿名访问, 见 utils/error-report.js)
+  getErrorLogs: (params = {}) => request.get('/error/log/list', { params }),
+  deleteErrorLogs: (data = []) => request.delete('/error/log', { data }),
+
   // 用户相关接口
   getUserInfo: () => request.get('/user/info'),
   updateCurrent: data => request.put('/user/current', data), // 更新当前用户信息

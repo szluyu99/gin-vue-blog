@@ -11,6 +11,10 @@ const (
 	VISITOR_AREA = "visitor_area"  // 地域统计
 	VIEW_COUNT   = "view_count"    // 访问数量
 
+	// 前端错误上报的按 IP 配额 (error_report:<IP>), 带 TTL。
+	// 上报接口匿名可访问, 没有配额等于开了个无鉴权的写库入口
+	ERROR_REPORT = "error_report:"
+
 	KEY_UNIQUE_VISITOR_SET = "unique_visitor" // 唯一用户记录 set
 
 	ARTICLE_USER_LIKE_SET = "article_user_like:" // 文章点赞 Set
