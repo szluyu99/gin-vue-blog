@@ -142,7 +142,7 @@ cd gin-vue-blog/deploy
 ## 测试与 CI
 
 ```bash
-cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
+cd gin-blog-server && go test ./...   # 后端: model / handle / middleware / global / utils / 路由注册, 8 个包
 cd gin-blog-front  && pnpm test       # 前台: vitest, 32 个文件 197 条
 cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 165 条
 ```
@@ -158,12 +158,13 @@ cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 165 条
 
 ## 后续计划
 
-完整的规划与「为什么不做某些事」见 [roadmap.md](./roadmap.md)，下面是概览。
+完整的规划与「为什么不做某些事」见 [roadmap.md](./roadmap.md)，下次接手先看那里的「当前状态」一节。下面是概览。
 
 功能：
 
+- 前台侧边信息模块（`AuthorInfo` / `Announcement` / `WebsiteInfo`）需要重新设计：窄屏下整列消失，手机上看不到公告和网站资讯
+- 文章分享元信息：只设了 `document.title`，没有 `meta description` 和 `og:*`
 - 前台「相册」页目前是「禁止访问」占位页（`views/entertainment/album`），导航里两个入口都还在
-- 前台侧边信息收缩
 - 说说的图片支持（第一版只做纯文本 + 评论，图片要一起解决存储与缩略图）
 - 通知定位目前靠前端逐页加载找目标评论，评论量大了要后端补一个「按评论 id 算页码」的接口
 

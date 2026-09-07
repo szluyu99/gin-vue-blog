@@ -128,6 +128,10 @@ docker compose up -d --build
 
 > 前提是 `start/.env.secrets` 已经存在（第一次跑 `bootstrap.sh` 时生成），否则 compose 会报错。
 
+> 重启是安全的：后端收到 `SIGTERM` 会先把 Redis 里的点赞数 / 浏览数 / 访问量落库再退出，
+> 启动时又会把 Redis 里缺的键从 `counter_snapshot` 表补回去。所以 `docker compose restart`
+> 或重建容器都不会把这些计数清零，详见 `gin-blog-server/README.md` 的「需要注意的缓存」。
+
 ## 线上部署的注意事项
 
 线上部署，其实就是在服务器上运行起这个项目，有两个地方的参数推荐调整一下。
