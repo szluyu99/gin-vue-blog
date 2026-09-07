@@ -6,14 +6,14 @@
 
 状态说明：`待处理` / `已修复` / `暂缓`（明确决定先不做）/ `潜在`（当前代码路径打不到）。
 
-当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S4、S8 已修复，
-S2、S3、S5、S6、S7 暂缓（项目初期，安全要求不高，上线前必须回来处理）；潜在问题 P1 已修复。
+当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S2、S3、S4、S5、S8 已修复，
+S6、S7 暂缓（都只在启用邮件注册时才成立，当前 `Captcha.SendEmail: false`）；潜在问题 P1 已修复。
 admin 的 A1–A21 已全部修复。
 front 的 FE1–FE5 已修复。
 
 ## 安全
 
-按项目当前阶段（初期，安全要求不高）整体**暂缓**，但风险是真实的，上线前必须回来处理。
+剩下的 S6、S7 都挂在邮件注册链路上，当前配置没启用；其余已经修完。
 
 ### S1 JWT 密钥与 Session 盐是仓库里的固定值，启动不校验 — 已修复
 
@@ -46,7 +46,7 @@ Session cookie 同理，`internal/handle/base.go` 的 `CurrentUserAuth` 信任 s
 debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注入环境变量后正常启动；
 本机 debug 启动打出两条 `[警告]`。
 
-### S2 X-Real-IP 可伪造，登录锁定被绕过 — 暂缓
+### S2 X-Real-IP 可伪造，登录锁定被绕过 — 已修复
 
 `cmd/main.go:37` `r.SetTrustedProxies([]string{"*"})`，
 `internal/utils/ip.go:26` 直接 `c.Request.Header.Get("X-Real-IP")`，不判断来源是否可信。
@@ -55,7 +55,25 @@ debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注
 `g.LOGIN_FAIL + utils.MD5(req.Username+"|"+clientIP(c))`，
 轮换这个请求头即可对同一账号无限次尝试密码。同时污染 `user_auth.ip_address` 与访客地域统计。
 
-### S3 CORS 放行所有来源且允许携带凭证 — 暂缓
+已改为：
+
+- `GetIpAddress` 换成 `c.ClientIP()`：gin 会先判断直连对端是否落在可信代理名单里，
+  只有可信时才读 `X-Forwarded-For` / `X-Real-IP`。原来手写的一串
+  `Proxy-Client-IP` / `WL-Proxy-Client-IP` 兜底一并删掉——这几个头本项目的部署里没人会设，
+  留着只是多几个可伪造的入口
+- 可信名单走配置 `server.trusted-proxies`，留空时默认只信任内网
+  （`127.0.0.1/8`、`10/8`、`172.16/12`、`192.168/16`、`::1`、`fc00::/7`）：
+  反向代理通常和后端同机或同一 docker 网络，公网访客伪造请求头不会被采信。
+  名单写错时启动直接失败，不静默退回全放行
+- 顺带修掉：返回值不再带端口。原来没有转发头时直接返回 `RemoteAddr`（`1.2.3.4:54321`），
+  端口每次请求都变，`handle/base.go` 的 `clientIP` 虽然会剥，但绕过它的调用点
+  （`user_auth.ip_address`、操作日志）存的是带端口的地址
+
+回归测试：`TestGetIpAddressTrustsProxyHeader`、`TestGetIpAddressIgnoresSpoofedHeader`、
+`TestGetIpAddressHasNoPort`。端到端：把 `trusted-proxies` 改成一个不含本机的网段后，
+带 `X-Real-IP: 8.8.8.8` 的上报落库 IP 是本机地址而不是 8.8.8.8；改回默认（信任内网）则采信。
+
+### S3 CORS 放行所有来源且允许携带凭证 — 已修复
 
 `internal/middleware/base.go:54` `AllowOriginFunc` 恒 `return true` + `AllowCredentials: true`。
 上方注释说明了为何不能用 `AllowOrigins: ["*"]`（那个判断是对的：`*` 与凭证请求冲突），
@@ -64,7 +82,18 @@ debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注
 `WithCookieStore`（`internal/middleware/base.go:62`）的 `sessions.Options` 只设了 `Path` 与 `MaxAge`，
 没有 `SameSite` / `Secure` / `HttpOnly`。任意第三方站点可带访客凭证调用评论、留言、上传、改资料。
 
-修法：来源白名单走配置。
+已改为：
+
+- 来源白名单走配置 `server.allowed-origins`（精确匹配，忽略大小写与末尾斜杠）。
+  留空时退回「只放行本机与内网来源」：开发和内网自用场景照旧能跨域，
+  公网站点一律拿不到 `Access-Control-Allow-Origin`。启动时会告警提醒没配白名单
+- session cookie 补上 `HttpOnly`（XSS 读不到会话）与 `SameSite=Lax`（第三方站点发起的请求不带它）；
+  `Secure` 走配置 `session.secure`，默认关——本地 http 调试下置 true 浏览器会直接丢掉 cookie
+- `WithCookieStore` 与 `WithMemStore` 共用同一份 `sessionOptions()`，避免两处漂移
+
+回归测试：`TestCORSRejectsForeignOrigin`、`TestOriginAllowed`（白名单命中/不命中、
+留空时内网放行公网拒绝）、`TestCookieStoreOptions`。端到端：
+`Origin: https://evil.example.com` 拿不到跨域头，`Origin: http://localhost:8888` 正常回显。
 
 ### S4 `is_disable` 只写不读，封禁功能是空的 — 已修复
 
@@ -85,7 +114,7 @@ debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注
 回归测试：`TestAuthLoginDisabledUser`、`TestJWTAuthRejectsDisabledUser`、
 `TestJWTAuthOptionalLoginRejectsDisabledUser`、`TestPermissionCheckSkipsDisabledRole`。
 
-### S5 操作日志把请求体原文永久落库，含明文密码 — 暂缓
+### S5 操作日志把请求体原文永久落库，含明文密码 — 已修复
 
 `internal/middleware/operation_log.go:83` `body, _ := io.ReadAll(c.Request.Body)` →
 `RequestParam: string(body)`，`:104` 还存了响应体。
@@ -94,7 +123,20 @@ debug 只告警）。端到端：release 配置 + 示例密钥启动 panic，注
 而 `manager.go:88` 的 `PUT /user/current/password` 就在这个组里，
 所以旧密码与新密码明文写入 `operation_log.request_param`（`longtext`）。
 
-修法：按路由或字段名做脱敏白名单。
+已改为：请求体和响应体都过一遍 `maskSensitive`，按字段名（`password` / `token` / `secret` /
+`access_key` / `captcha`，小写子串匹配）把值换成 `******`。三种情况：
+
+- 不含敏感字段：**原样返回，不重新序列化**。否则字段顺序会变，日志详情看着和实际请求对不上
+- 合法 JSON 且命中：只替换那几个值，其余保留，日志仍然有排查价值
+- 不是合法 JSON 却带敏感字样（如表单编码的 `password=xxx`）：整体丢弃。
+  宁可少记一条日志，也不能把明文密码留在库里
+
+选按字段名而不是按路由白名单：路由会新增，漏登记就又泄一次；字段名是跟着数据走的。
+
+回归测试：`TestOperationLogMasksPassword`、`TestMaskSensitive`。已验证「去掉修复就会失败」。
+端到端：调 `PUT /user/current/password` 后查操作日志列表，
+`request_param` 是 `{"new_password":"******","old_password":"******"}`，
+同期的 `/api/talk`、`/api/setting/about` 两条记录内容完整未受影响。
 
 ### S6 注册链接携带明文密码，且该串直接作为 Redis key — 暂缓
 

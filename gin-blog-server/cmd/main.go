@@ -34,7 +34,11 @@ func main() {
 	// 初始化 gin 服务
 	gin.SetMode(conf.Server.Mode)
 	r := gin.New()
-	r.SetTrustedProxies([]string{"*"})
+	// 只信任配置里的代理网段: 之前是 "*", 访客随手加个 X-Real-IP 就能伪造来源 IP
+	if err := r.SetTrustedProxies(conf.TrustedProxies()); err != nil {
+		slog.Error("可信代理网段配置有误", "trusted-proxies", conf.TrustedProxies(), "err", err)
+		os.Exit(1)
+	}
 	// 开发模式使用 gin 自带的日志和恢复中间件, 生产模式使用自定义的中间件
 	if conf.Server.Mode == "debug" {
 		r.Use(gin.Logger(), gin.Recovery()) // gin 自带的日志和恢复中间件, 挺好用的

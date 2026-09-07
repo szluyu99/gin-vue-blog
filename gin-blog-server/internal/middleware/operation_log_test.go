@@ -97,6 +97,47 @@ func TestOperationLogRequestBodyReusable(t *testing.T) {
 	assert.Equal(t, "hello", got)
 }
 
+// 改密码接口就挂在这个中间件下, 明文密码不能落库
+func TestOperationLogMasksPassword(t *testing.T) {
+	e := newMwEnv(t)
+	e.handle(http.MethodPut, "/user/current/password", OperationLog())
+
+	body := `{"old_password":"111111","new_password":"222222"}`
+	w := e.request(http.MethodPut, "/api/user/current/password", body, nil)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var log model.OperationLog
+	assert.Nil(t, e.db.First(&log).Error)
+	assert.NotContains(t, log.RequestParam, "111111")
+	assert.NotContains(t, log.RequestParam, "222222")
+	assert.Contains(t, log.RequestParam, sensitiveMask)
+	// handler 拿到的仍是原文
+	assert.Contains(t, w.Body.String(), `"code":0`)
+}
+
+func TestMaskSensitive(t *testing.T) {
+	// 不含敏感字段: 原样返回, 不重新序列化
+	plain := `{"title":"hello","desc":"world"}`
+	assert.Equal(t, plain, maskSensitive(plain))
+	assert.Equal(t, "", maskSensitive(""))
+
+	// 嵌套与数组里的敏感字段同样要脱敏, 非敏感字段保留
+	got := maskSensitive(`{"user":{"name":"n","password":"p"},"list":[{"token":"t"}]}`)
+	assert.NotContains(t, got, `"p"`)
+	assert.NotContains(t, got, `"t"`)
+	assert.Contains(t, got, `"name":"n"`)
+
+	// 大小写与变体字段名都算敏感
+	assert.NotContains(t, maskSensitive(`{"Password":"p","secretKey":"s"}`), `"p"`)
+
+	// 不是合法 JSON 又带敏感字样(表单编码): 整体丢弃
+	assert.Equal(t, sensitiveMask, maskSensitive("password=111111&name=x"))
+
+	// 不是 JSON 也不含敏感字样: 保持原样
+	assert.Equal(t, "[1,2", maskSensitive("[1,2"))
+}
+
 func TestGetOptString(t *testing.T) {
 	assert.Equal(t, "新增或修改", GetOptString(http.MethodPost))
 	assert.Equal(t, "删除", GetOptString(http.MethodDelete))

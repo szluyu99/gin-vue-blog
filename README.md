@@ -169,10 +169,8 @@ cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 160 条
 
 工程：
 
-- 补齐安全项：X-Real-IP 可伪造、CORS 与 Cookie 属性收紧、操作日志不再原文落库（含明文密码）、注册链接不再携带明文密码、邮件模块的日志与 TLS。见 `code_audit.md` 的 S2、S3、S5、S6、S7，均已评估为暂缓
-- 缓存加 TTL 并主动失效（改了数据库还得手动 `redis-cli del`）
+- 注册链接携带明文密码、邮件模块的日志与 TLS（`code_audit.md` 的 S6、S7）——只在启用邮件注册时成立，当前配置没开，暂缓
 - CI 自动发布镜像到 GHCR（现在只构建验证、不发布）
-- 极简前端错误上报（`window.onerror` + `unhandledrejection` 落一张表）
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档
 

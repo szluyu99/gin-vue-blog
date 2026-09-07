@@ -4,6 +4,10 @@ Server:
   DbType: "sqlite" # mysql | sqlite
   DbAutoMigrate: true # 是否自动迁移数据库表结构 (表结构没变可以不迁移, 提高启动速度)
   DbLogMode: "error" # 日志级别 silent, error, warn, info, 默认 info
+  # 只有来自这些网段的请求才采信 X-Real-IP / X-Forwarded-For, 留空默认只信任内网
+  trusted-proxies: []
+  # 允许跨域的前端来源, 如 ["https://blog.example.com"], 留空只放行本机与内网
+  allowed-origins: []
 JWT:
   Secret: "abc123321"
   Expire: 24 # hour
@@ -25,6 +29,7 @@ Session:
   Name: "mysession"
   Salt: "salt"
   MaxAge: 600 # second
+  Secure: false # 部署在 https 之后时置 true, session cookie 只走加密连接
 Log:
   Level: "debug" # debug | info | warn | error
   Format: "text" # text | json

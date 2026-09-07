@@ -14,6 +14,11 @@ type Config struct {
 		DbType        string // mysql | sqlite
 		DbAutoMigrate bool   // 是否自动迁移数据库表结构
 		DbLogMode     string // silent | error | warn | info
+		// 可信代理网段, 只有来自这些地址的请求才认 X-Forwarded-For / X-Real-IP。
+		// 留空时用内网网段兜底, 见 TrustedProxies()
+		TrustedProxies []string `mapstructure:"trusted-proxies"`
+		// 允许跨域的前端来源, 如 https://blog.example.com。留空时只放行本机与内网, 见 AllowedOrigins()
+		AllowedOrigins []string `mapstructure:"allowed-origins"`
 	}
 	Log struct {
 		Level     string // debug | info | warn | error
@@ -46,6 +51,7 @@ type Config struct {
 		Name   string
 		Salt   string
 		MaxAge int
+		Secure bool // 部署在 https 之后时置 true, session cookie 只走加密连接
 	}
 	Email struct {
 		From     string // 发件人 要发邮件的邮箱
@@ -168,6 +174,34 @@ func CheckSecrets(conf *Config) {
 		}
 		log.Println("[警告] " + msg)
 	}
+}
+
+/*
+可信代理网段
+
+留空时默认只信任内网(反向代理通常和后端在同一台机器或同一 docker 网络),
+这样公网访客伪造 X-Real-IP / X-Forwarded-For 不会被采信。
+原来是 SetTrustedProxies("*") —— 任何人都能自称任意 IP。
+如果代理在别的网段, 在 config.yml 里写 server.trusted-proxies。
+*/
+func (*Config) TrustedProxies() []string {
+	if Conf != nil && len(Conf.Server.TrustedProxies) > 0 {
+		return Conf.Server.TrustedProxies
+	}
+	return []string{"127.0.0.1/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "::1/128", "fc00::/7"}
+}
+
+// 允许跨域的前端来源白名单, 留空时由中间件退回「只放行本机与内网」, 见 middleware.CORS
+func (*Config) AllowedOrigins() []string {
+	if Conf == nil {
+		return nil
+	}
+	return Conf.Server.AllowedOrigins
+}
+
+// session cookie 是否只走 https
+func (*Config) SessionSecure() bool {
+	return Conf != nil && Conf.Session.Secure
 }
 
 // 数据库类型

@@ -133,3 +133,59 @@ func TestWithCookieStore(t *testing.T) {
 
 	assert.Contains(t, w2.Body.String(), `"data":1`)
 }
+
+// session cookie 必须带 HttpOnly 与 SameSite: 前者防 XSS 读走会话, 后者防第三方站点自动带上
+func TestCookieStoreOptions(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	r.Use(WithCookieStore("test-session", "test-salt"))
+	r.GET("/set", func(c *gin.Context) {
+		session := sessions.Default(c)
+		session.Set(g.CTX_USER_AUTH, 1)
+		_ = session.Save()
+		c.JSON(http.StatusOK, gin.H{"code": 0})
+	})
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/set", nil))
+
+	cookie := w.Header().Get("Set-Cookie")
+	assert.Contains(t, cookie, "HttpOnly")
+	assert.Contains(t, cookie, "SameSite=Lax")
+	// 本地 http 调试默认不加 Secure, 否则浏览器会直接丢掉 cookie
+	assert.NotContains(t, cookie, "Secure")
+}
+
+// 跨域白名单: 不在名单里的站点不能带着访客登录态调接口
+func TestCORSRejectsForeignOrigin(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	r.Use(CORS())
+	r.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"code": 0}) })
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+	req.Header.Set("Origin", "https://evil.example.com")
+	r.ServeHTTP(w, req)
+
+	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+}
+
+func TestOriginAllowed(t *testing.T) {
+	// 配了白名单: 只认名单里的, 末尾斜杠和大小写不影响
+	allowed := []string{"https://blog.example.com/"}
+	assert.True(t, originAllowed("https://blog.example.com", allowed))
+	assert.True(t, originAllowed("https://BLOG.example.com", allowed))
+	assert.False(t, originAllowed("https://evil.example.com", allowed))
+	// 白名单里有域名时, 内网来源也不再自动放行
+	assert.False(t, originAllowed("http://localhost:3333", allowed))
+
+	// 没配白名单: 本机与内网放行, 公网拒绝
+	assert.True(t, originAllowed("http://localhost:3333", nil))
+	assert.True(t, originAllowed("http://127.0.0.1:8080", nil))
+	assert.True(t, originAllowed("http://10.27.244.168:8889", nil))
+	assert.True(t, originAllowed("http://192.168.1.5", nil))
+	assert.False(t, originAllowed("https://evil.example.com", nil))
+	assert.False(t, originAllowed("http://8.8.8.8", nil))
+	assert.False(t, originAllowed("", nil))
+}
