@@ -161,9 +161,25 @@ ReturnSuccess(c, list)
 - `config` 是 Hash，`HMSet` 不像 `Set` 那样能顺手带过期时间，要单独 `Expire`；两条命令放进 `TxPipelined`，否则中间失败会留下一个永不过期的 key，又退回原样
 - 补上漏掉的主动失效：`UpdateAbout` 只写库没清缓存，而 about 就是 `config` 表里的一行、会被 `GetConfigMap` 一起缓存，导致前台 `/config` 一直返回旧的「关于我」
 
-**故意没给点赞数 / 浏览数 / 访客地域加 TTL**：那几个键只在 Redis 里累加，数据库没有对应字段，Redis 就是唯一数据源，过期等于丢数据。TTL 只对「有真源可回落」的缓存成立，这条区分比 TTL 本身更重要。
+**故意没给点赞数 / 浏览数 / 访客地域加 TTL**：那几个键只在 Redis 里累加，数据库没有对应字段，Redis 就是唯一数据源，过期等于丢数据。TTL 只对「有真源可回落」的缓存成立，这条区分比 TTL 本身更重要。（后来给这几个键加了落库备份，见下一节。）
 
 测试：`TestCacheHasTTL`（string 与 hash 两种类型都断言有 TTL，并用 miniredis 快进到过期后确认回落成未命中）、`TestUpdateAboutClearsConfigCache`。两条都验证过「去掉修复就会失败」。
+
+### Redis 计数落库备份 — 已完成
+
+上一条留下的那个「Redis 是唯一数据源」现在有了兜底。点赞数、浏览数、站点访问量、访客地域清一次 Redis 就归零，而前台列表展示和推荐排序都靠这两个数字。
+
+- 新表 `counter_snapshot`（`key` + `member` + `count`，`(key, member)` 唯一索引）。**故意不给 `article` 表加 `like_count` / `view_count` 列**：那样就有了两个数据源，每个查询都得决定信哪一个；备份表只有 flush / restore 两个入口碰它，查询路径完全不变
+- 落库用 upsert 而不是「清表再插」：清表和插入之间进程被杀，等于把备份弄丢了，而那正是这张表要防的事
+- 每 10 分钟落一次，**收到 SIGTERM / SIGINT 时再落一次**。正常重启（`docker restart` / `systemctl restart`）走的都是 SIGTERM，不补这一次就会丢掉上个周期之后的所有点赞和浏览。为此 `main.go` 从 `r.Run()` 改成 `http.Server` + `signal.NotifyContext` + `Shutdown`；关闭流程用独立的 context，信号那个已经被取消了，拿它发 Redis 请求会立刻失败
+- 回填**只补 Redis 里不存在的键**。Redis 还在时它的值一定比备份新（备份最多是上个周期的快照），覆盖回去等于把这段时间的增量抹掉。判断的是「键在不在」而不是逐个成员比大小——键存在就说明这份数据是活的，一个成员都不动
+- 按天的访问量（`view_count:2006-01-02`）不备份：那是趋势图的原料，只留 30 天，丢一天不影响任何业务判断，备份反而要处理「哪些天已经过期」
+
+**踩到的坑**：一开始把三个计数键都当 ZSet 处理，单测因为用同样的假设灌数据所以全绿，端到端时 `ZSCORE article_like_count 1` 直接报 `WRONGTYPE`。实际类型是——Hash：文章点赞数、评论点赞数、访客地域；ZSet：只有文章浏览数；String：站点访问量。测试跟着改成按真实类型灌数据。
+
+顺带修掉：访客地域把内网访问记成了一个名字叫「0」的省份。ip2region 定位不到的字段是字面量 `"0"`，内网地址整条是 `0|0|0|内网IP|内网IP`，而原来直接取第 3 段。现在取不到省份就归「未知」，内网则用城市位上的「内网IP」。
+
+测试：`internal/counter_test.go` 5 条（落库各类型、反复落库是 upsert 不堆行、清空 Redis 后恢复且类型正确、**Redis 有数据时一个字节都不动**、空库空 Redis 不报错）、`TestVisitorProvince`。端到端：造点赞/浏览/访客后 `./dev.sh stop`，日志出现「收到退出信号 → Redis 计数已落库 rows=5 → 已退出」，备份表 5 行；然后 Redis 容器整个重建（真的空了），重启后日志四条「从备份恢复计数」，Redis 里的值和关停前一致。
 
 ### CI 发布镜像到 GHCR — 已完成（只做发布）
 

@@ -32,6 +32,8 @@ func MakeMigrate(db *gorm.DB) error {
 		&Notification{}, // 站内通知
 		&UserInfo{},     // 用户信息
 
+		&CounterSnapshot{}, // Redis 计数的落库备份
+
 		&UserAuth{},     // 用户验证
 		&Role{},         // 角色
 		&Menu{},         // 菜单

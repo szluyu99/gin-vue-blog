@@ -251,6 +251,35 @@ func getViewTrend(rdb *redis.Client, now time.Time) ([]ViewTrendVO, error) {
 	return trend, nil
 }
 
+/*
+从 IP 解析出用于地域统计的省份
+
+ip2region 的返回是「国家|区域|省份|城市|ISP」, 定位不到的字段是字面量 "0",
+内网地址整条是 "0|0|0|内网IP|内网IP"。原来直接取 address[2], 内网访问就在
+仪表盘上留下一个名字叫「0」的条目。取不到省份时统一归到「未知」。
+*/
+func visitorProvince(ipAddress string) string {
+	region := utils.IP.GetIpSource(ipAddress)
+	if region == "" {
+		return "未知"
+	}
+
+	fields := strings.Split(region, "|")
+	if len(fields) < 3 {
+		return "未知"
+	}
+
+	province := strings.ReplaceAll(fields[2], "省", "")
+	if province == "" || province == "0" {
+		// 内网地址在城市位上写的是「内网IP」, 拿它比「未知」更有信息量
+		if len(fields) > 3 && fields[3] != "" && fields[3] != "0" {
+			return fields[3]
+		}
+		return "未知"
+	}
+	return province
+}
+
 // @Summary 获取关于我
 // @Description 获取关于我的内容
 // @Tags BlogInfo
@@ -311,14 +340,7 @@ func (*BlogInfo) Report(c *gin.Context) {
 	// 当前用户没有统计过访问人数 (不在 用户set 中)
 	if !rdb.SIsMember(ctx, g.KEY_UNIQUE_VISITOR_SET, uuid).Val() {
 		// 统计地域信息
-		ipSource := utils.IP.GetIpSource(ipAddress)
-		if ipSource != "" { // 获取到具体的位置, 提取出其中的 省份
-			address := strings.Split(ipSource, "|")
-			province := strings.ReplaceAll(address[2], "省", "")
-			rdb.HIncrBy(ctx, g.VISITOR_AREA, province, 1)
-		} else {
-			rdb.HIncrBy(ctx, g.VISITOR_AREA, "未知", 1)
-		}
+		rdb.HIncrBy(ctx, g.VISITOR_AREA, visitorProvince(ipAddress), 1)
 		// 访问数量 + 1
 		rdb.Incr(ctx, g.VIEW_COUNT)
 		// 将当前用户记录到 用户set

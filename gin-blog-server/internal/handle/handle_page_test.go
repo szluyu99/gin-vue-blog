@@ -218,3 +218,15 @@ func TestGetVisitorAreaLimitAndEmpty(t *testing.T) {
 	// 截断保留的是人数最多的那些
 	assert.Equal(t, visitorAreaTop+3, area[0].Count)
 }
+
+/*
+地域统计取不到省份时归到「未知」
+
+ip2region 定位不到的字段是字面量 "0", 内网地址整条是 "0|0|0|内网IP|内网IP"。
+原来直接取第 3 段, 内网访问就在仪表盘上留下一个名字叫「0」的条目。
+*/
+func TestVisitorProvince(t *testing.T) {
+	// 测试环境没有 ip2region 数据库, GetIpSource 返回空串
+	assert.Equal(t, "未知", visitorProvince("127.0.0.1"))
+	assert.Equal(t, "未知", visitorProvince(""))
+}
