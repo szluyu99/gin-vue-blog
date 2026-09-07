@@ -153,7 +153,7 @@ cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 160 条
 
 - Server：`gofmt` / `go vet` / `go test`，并校验 `docs/` 与 Swagger 注解是否一致
 - Frontend：两个前端各跑 `pnpm lint` / `pnpm test` / `pnpm build`
-- Docker：构建 web 与 server 镜像并启动做健康检查。web 镜像直接用 Frontend job 的产物 + `deploy/build/web/Dockerfile`（不在容器里重新打包前端），server 镜像走 buildx + GitHub Actions 缓存
+- Docker：构建 web 与 server 镜像并启动做健康检查。web 镜像直接用 Frontend job 的产物 + `deploy/build/web/Dockerfile`（不在容器里重新打包前端），server 镜像走 buildx + GitHub Actions 缓存。main 有新提交时，冒烟测试通过后把两个镜像推到 GHCR（`latest` 与 `main-<短 sha>`）
 - Deploy：起完整的 compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦，重复执行不新增资源）
 
 ## 后续计划
@@ -170,7 +170,7 @@ cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 160 条
 工程：
 
 - 注册链接携带明文密码、邮件模块的日志与 TLS（`code_audit.md` 的 S6、S7）——只在启用邮件注册时成立，当前配置没开，暂缓
-- CI 自动发布镜像到 GHCR（现在只构建验证、不发布）
+- 部署侧改成拉 GHCR 镜像（CI 已经在发布，但 compose 仍是本地 `build:`）
 - 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
 - 完善接口文档
 

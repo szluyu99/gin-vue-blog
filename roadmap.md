@@ -140,9 +140,22 @@ ReturnSuccess(c, list)
 
 测试：`TestCacheHasTTL`（string 与 hash 两种类型都断言有 TTL，并用 miniredis 快进到过期后确认回落成未命中）、`TestUpdateAboutClearsConfigCache`。两条都验证过「去掉修复就会失败」。
 
+### CI 发布镜像到 GHCR — 已完成（只做发布）
+
+原来 docker job 用 `load: true` 把镜像装进 runner 本地、跑完冒烟测试就随 runner 销毁。现在 main 有新提交时，会把 `gvb-web` / `gvb-server` 推到 `ghcr.io/szluyu99/`，两个 tag：`latest` 给部署用，`main-<短 sha>` 用于回滚到具体某次提交。
+
+几个刻意的选择：
+
+- **冒烟测试通过之后才推**，不是把 `load: true` 换成 `push: true`。反过来的话，测失败时坏镜像已经在仓库里了
+- 用 `if: github.event_name == 'push' && github.ref == 'refs/heads/main'` 圈住。PR（尤其 fork 来的）拿不到 `packages: write`，不加这个条件 PR 一律红
+- 镜像名过一遍 `tr 'A-Z' 'a-z'`：owner 带大写字母时 `docker push` 直接拒绝
+- 凭证用默认的 `GITHUB_TOKEN` + job 级 `permissions: packages: write`，不额外配 secret
+
+**没有一起改 compose**：`deploy/start/docker-compose.yml` 里 server 和 web 仍是 `build:`，web 的 context 还是 `build_web.sh` 现场拼出来的 `${WEB_BUILD_CONTEXT}`，换成 `image: ghcr.io/...` 等于把本地构建链路一起换掉。等确实会去 pull 了再动。另外首次推完要在 GitHub 上把两个 package 设为 public，否则 pull 需要先 login——这一步只能在网页上点。
+
 ### 可以考虑
 
-- **CI 自动发布镜像到 GHCR**：现在只构建验证、不发布，加上之后部署可以直接 pull 而不用在服务器上 build
+- **部署侧改成拉 GHCR 镜像**：见上，收益取决于是否真的在别的机器上部署
 
 ### 不做
 

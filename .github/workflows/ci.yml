@@ -124,6 +124,10 @@ jobs:
     name: Docker
     runs-on: ubuntu-latest
     needs: frontend
+    # 发布镜像要写 packages, 默认的 GITHUB_TOKEN 只有读权限
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v5
 
@@ -191,6 +195,33 @@ jobs:
           # 先打日志: 健康检查失败时日志才是有用的那部分
           docker logs gvb-server
           curl -sf http://127.0.0.1:8765/api/config > /dev/null
+
+      # 发布只在 main 有新提交时做:
+      # PR(尤其是 fork 来的)拿不到 packages 写权限, 不加这个条件 PR 一律红。
+      # 而且冒烟测试通过之后才推 —— 反过来的话, 测失败时坏镜像已经在仓库里了
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push images to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # 镜像名必须全小写, 仓库 owner 带大写字母时 docker push 会直接拒绝
+          owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
+          sha=$(echo "${{ github.sha }}" | cut -c1-7)
+          # 两个 tag: latest 给部署用, main-<sha> 用于回滚到具体某次提交
+          for name in web server; do
+            src="gvb-$name:ci"
+            dst="ghcr.io/$owner/gvb-$name"
+            docker tag "$src" "$dst:latest"
+            docker tag "$src" "$dst:main-$sha"
+            docker push "$dst:latest"
+            docker push "$dst:main-$sha"
+          done
 
   # 一键部署的端到端验证: 起完整的 compose 栈, 校验权限种子数据的不变式
   deploy:
