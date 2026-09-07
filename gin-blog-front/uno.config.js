@@ -57,7 +57,18 @@ export default defineConfig({
   },
   presets: [
     presetUno(),
-    presetIcons({ warn: true, collections: iconCollections }),
+    /*
+      extraProperties 里的 display 不能省: presetIcons 生成的规则只有 width/height +
+      mask, 没有 display。图标 span 落在非 flex 的父元素里时仍是 inline,
+      inline 元素不吃 width/height, 盒子塌成 0x0 —— 元素还在 DOM 里、计算样式也是 24px,
+      但既看不见也点不到。移动端顶栏的主题/搜索/菜单三个按钮就是这么消失的
+      (按钮里只有一个图标 span, button 本身不是 flex, 于是整个按钮 0x0)。
+    */
+    presetIcons({
+      warn: true,
+      collections: iconCollections,
+      extraProperties: { display: 'inline-block' },
+    }),
     presetTypography(),
   ],
   transformers: [

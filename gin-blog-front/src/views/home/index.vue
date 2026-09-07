@@ -64,7 +64,10 @@ function backTop() {
   <!-- 首页封面图 -->
   <HomeBanner />
   <!-- 内容 -->
-  <div class="mx-auto mb-8 max-w-[1230px] flex flex-col justify-center px-3" style="margin-top: calc(100vh + 30px)">
+  <!-- margin-top 要跳过整屏高的封面图(封面是 absolute, 不占文档流)。
+       窄屏下留 12px 就够: 手机上封面正文只占中间一小条, 底部本来就空着一大片,
+       再加 30px 看着像内容掉队了 -->
+  <div class="mx-auto mb-8 mt-[calc(100vh_+_12px)] max-w-[1230px] flex flex-col justify-center px-3 lg:mt-[calc(100vh_+_30px)]">
     <div class="grid grid-cols-12 gap-4">
       <!-- 左半部分 -->
       <div class="col-span-12 lg:col-span-9 space-y-5">

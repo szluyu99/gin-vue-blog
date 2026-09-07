@@ -9,7 +9,7 @@
 当前进度：server 功能 BUG F1–F13 全部已修复；server 安全 S1、S2、S3、S4、S5、S8 已修复，
 S6、S7 暂缓（都只在启用邮件注册时才成立，当前 `Captcha.SendEmail: false`）；潜在问题 P1 已修复。
 admin 的 A1–A21 已全部修复。
-front 的 FE1–FE5 已修复。
+front 的 FE1–FE7 已修复。
 
 ## 安全
 
@@ -723,6 +723,36 @@ Vue 不保证 `v-for` 的模板 ref 数组顺序与源数组一致，文件里�
 测试见「组件测试」一节的 `Comment.spec.js`（5 条，回退到重构前全红）。
 端到端只验到接口层（发评论 → 发 7 条回复 → 分页两页取回 5 + 2 条 → 删除清理），
 浏览器交互本机无法自测（playwright 起不来）。
+
+### FE6 移动端顶栏三个按钮点不到，等于手机上没有导航 — 已修复
+
+`components/layout/AppHeader.vue:109-117` 的主题切换 / 搜索 / 菜单三个按钮里只有一个图标 span，
+`button` 本身不是 flex 容器。而 `presetIcons` 生成的规则只有 `width` / `height` / `mask`，
+**没有 `display`** —— 图标 span 在非 flex 父元素里仍是 `inline`，inline 元素不吃 width/height，
+盒子塌成 0×0。元素在 DOM 里、计算样式也是 24px，但既看不见也点不到，
+所以手机上打不开侧边栏，整个导航等于消失（浏览器实测：Playwright 点击那个按钮报
+`element is not visible`，`getBoundingClientRect()` 全 0）。
+
+桌面端同样的写法没暴露，是因为那些图标的父元素是 `flex items-center`，flex 子元素会被 blockify。
+
+修法不是给这三处补 `inline-block`，而是在 `uno.config.js` 的 `presetIcons` 里加
+`extraProperties: { display: 'inline-block' }`：这类「图标静默变成不可见元素」的坑
+在 `roadmap.md` 里已经记过一次，逐处补 class 只能治当下这三个。
+
+回归测试：`src/utils/uno-icons.spec.js` 直接跑 UnoCSS 生成器，断言三个图标类的规则里都有
+`display:inline-block`（去掉配置就变红，已验证）。
+端到端：手机视口下三个按钮的盒子从 0×0 变成 24×32，点菜单能拉出侧边栏并看到
+首页/归档/分类/标签/说说/相册/友链/关于/留言全部入口；
+另外扫了 6 个页面 × 手机/桌面两种视口，已无「应该显示却塌成 0」的图标。
+
+### FE7 手机上封面图与内容之间空得太多 — 已修复
+
+`views/home/index.vue` 的内容区原来写死 `style="margin-top: calc(100vh + 30px)"`
+（要跳过整屏高的封面，封面是 `absolute` 不占文档流）。桌面端 30px 合适，
+手机上封面正文只占屏幕中间一小条、底部本来就空着一大片，再加 30px 看着像内容掉队了。
+
+改成 `mt-[calc(100vh_+_12px)] lg:mt-[calc(100vh_+_30px)]`，顺手把内联 style 换成类，
+和文件里其它响应式写法一致。实测手机视口间距 12px、桌面仍是 30px。
 
 ## gin-blog-admin
 后台管理端的全量审查。A1–A6 是「当前就会坏」的，已修复；A7 之后待处理。

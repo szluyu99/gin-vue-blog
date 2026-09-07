@@ -143,7 +143,7 @@ cd gin-vue-blog/deploy
 
 ```bash
 cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
-cd gin-blog-front  && pnpm test       # 前台: vitest, 31 个文件 196 条
+cd gin-blog-front  && pnpm test       # 前台: vitest, 32 个文件 197 条
 cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 163 条
 ```
 
