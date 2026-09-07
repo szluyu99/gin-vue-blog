@@ -11,6 +11,15 @@ const (
 	VISITOR_AREA = "visitor_area"  // 地域统计
 	VIEW_COUNT   = "view_count"    // 访问数量
 
+	/*
+		按天的访问量 (view_count:2006-01-02), 带 30 天 TTL
+
+		和 VIEW_COUNT 不是一个口径: 那个是历史独立访客累计(同一访客只算一次),
+		这个是当天的访问次数(每次打开前台算一次), 所以按天的加起来不等于累计值。
+		只用来画趋势图, 过期即丢 —— 数据库里没有对应字段, 不必长期保留。
+	*/
+	VIEW_COUNT_DAY = "view_count:"
+
 	// 前端错误上报的按 IP 配额 (error_report:<IP>), 带 TTL。
 	// 上报接口匿名可访问, 没有配额等于开了个无鉴权的写库入口
 	ERROR_REPORT = "error_report:"

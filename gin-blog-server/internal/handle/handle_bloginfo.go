@@ -6,7 +6,9 @@ import (
 	"gin-blog/internal/model"
 	"gin-blog/internal/utils"
 	"log/slog"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -14,16 +16,30 @@ import (
 
 type BlogInfo struct{}
 
+// 趋势图上的一天
+type ViewTrendVO struct {
+	Date  string `json:"date"`  // 2006-01-02
+	Count int    `json:"count"` // 当天访问量
+}
+
 type BlogHomeVO struct {
 	ArticleCount int `json:"article_count"` // 文章数量
 	UserCount    int `json:"user_count"`    // 用户数量
 	MessageCount int `json:"message_count"` // 留言数量
 	ViewCount    int `json:"view_count"`    // 访问量
+	// 最近 viewTrendDays 天的访问量, 按日期升序, 没有数据的那天补 0
+	ViewTrend []ViewTrendVO `json:"view_trend"`
 	// CategoryCount int64 `json:"category_count"` // 分类数量
 	// TagCount      int64 `json:"tag_count"`      // 标签数量
 	// BlogConfig    model.BlogConfigDetail `json:"blog_config"`    // 博客信息
 	// PageList      []Page                 `json:"pageList"`
 }
+
+const (
+	viewTrendDays = 14 // 趋势图展示的天数
+	viewDayTTL    = 30 * 24 * 60 * 60 * time.Second
+	viewDayLayout = "2006-01-02"
+)
 
 type AboutReq struct {
 	Content string `json:"content"`
@@ -131,12 +147,53 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 		return
 	}
 
+	trend, err := getViewTrend(rdb, time.Now())
+	if err != nil {
+		ReturnError(c, g.ErrRedisOp, err)
+		return
+	}
+
 	ReturnSuccess(c, BlogHomeVO{
 		ArticleCount: articleCount,
 		UserCount:    userCount,
 		MessageCount: messageCount,
 		ViewCount:    viewCount,
+		ViewTrend:    trend,
 	})
+}
+
+/*
+最近 viewTrendDays 天的访问量
+
+一次 MGet 取回所有天, 不逐天 Get: 前者是一个来回, 后者 14 个。
+没有数据的那天必须补 0 而不是跳过, 否则前端画出来横轴会缺格、趋势看着是错的。
+*/
+func getViewTrend(rdb *redis.Client, now time.Time) ([]ViewTrendVO, error) {
+	dates := make([]string, 0, viewTrendDays)
+	keys := make([]string, 0, viewTrendDays)
+	for i := viewTrendDays - 1; i >= 0; i-- {
+		date := now.AddDate(0, 0, -i).Format(viewDayLayout)
+		dates = append(dates, date)
+		keys = append(keys, g.VIEW_COUNT_DAY+date)
+	}
+
+	values, err := rdb.MGet(rctx, keys...).Result()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	trend := make([]ViewTrendVO, 0, viewTrendDays)
+	for i, date := range dates {
+		count := 0
+		if i < len(values) {
+			// MGet 的元素是 string 或 nil(该 key 不存在)
+			if s, ok := values[i].(string); ok {
+				count, _ = strconv.Atoi(s)
+			}
+		}
+		trend = append(trend, ViewTrendVO{Date: date, Count: count})
+	}
+	return trend, nil
 }
 
 // @Summary 获取关于我
@@ -213,7 +270,32 @@ func (*BlogInfo) Report(c *gin.Context) {
 		rdb.SAdd(ctx, g.KEY_UNIQUE_VISITOR_SET, uuid)
 	}
 
+	// 按天计数不做去重: 累计值统计的是"来过多少人", 趋势要看的是"每天来了多少次",
+	// 放在上面的 if 里就只会记新访客, 老访客再来趋势图上看不到
+	if err := incrViewCountOfDay(ctx, rdb, time.Now()); err != nil {
+		// 趋势数据丢一天不影响访问本身, 只告警
+		slog.Warn("按天访问量记录失败", "err", err)
+	}
+
 	ReturnSuccess(c, nil)
+}
+
+/*
+当天访问量 +1, 并保证这个 key 带上 TTL
+
+Incr 建出来的 key 是没有过期时间的, 必须单独 Expire。两条命令放进 TxPipelined:
+中间失败会留下一个永不过期的 key, 30 天后就成了永久垃圾(和 config 缓存踩过的坑一样)。
+每次都 Expire 而不是只在首次: 少一次 Exists 往返, 代价只是把过期时间往后顶,
+反正同一天内顶到的还是同一个时间点。
+*/
+func incrViewCountOfDay(ctx context.Context, rdb *redis.Client, now time.Time) error {
+	key := g.VIEW_COUNT_DAY + now.Format(viewDayLayout)
+	_, err := rdb.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.Incr(ctx, key)
+		pipe.Expire(ctx, key, viewDayTTL)
+		return nil
+	})
+	return err
 }
 
 // 获取博客设置

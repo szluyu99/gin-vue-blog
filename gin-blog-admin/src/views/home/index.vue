@@ -28,6 +28,7 @@ const homeInfo = ref({
   user_count: 0,
   article_count: 0,
   message_count: 0,
+  view_trend: [],
 })
 
 // 待处理事项: 数字都来自各自列表接口的 total, 不需要新增后端接口
@@ -47,6 +48,16 @@ const STATUS_MAP = {
 const maxCategoryCount = computed(() =>
   Math.max(1, ...categoryStat.value.map(c => c.article_count ?? 0)),
 )
+
+/*
+访问趋势: 后端返回最近 14 天, 缺的日期已经补成 0, 直接按顺序画
+
+不引图表库, 用 div 高度百分比画柱状, 和分类分布同一套做法。
+同样按最大值归一化: 按总数算的话平峰期每根柱子都是一条细线。
+*/
+const viewTrend = computed(() => homeInfo.value.view_trend ?? [])
+const maxTrendCount = computed(() => Math.max(1, ...viewTrend.value.map(d => d.count ?? 0)))
+const trendTotal = computed(() => viewTrend.value.reduce((sum, d) => sum + (d.count ?? 0), 0))
 
 const todoItems = computed(() => [
   { label: '待审核评论', value: todo.value.comment, path: '/message/comment' },
@@ -181,6 +192,30 @@ async function getOneSentence() {
           </NCard>
         </NGi>
       </NGrid>
+
+      <!-- 访问趋势: 数据源是 Redis 里按天的计数, 只保留 30 天 -->
+      <NCard class="mt-4" size="small" title="访问趋势">
+        <template #header-extra>
+          <span class="text-sm op-60">近 {{ viewTrend.length }} 天共 {{ trendTotal }} 次</span>
+        </template>
+        <NEmpty v-if="!trendTotal" class="py-6" description="最近还没有访问记录" />
+        <!-- items-end: 柱子从底部往上长 -->
+        <div v-else class="h-[140px] flex items-end gap-1">
+          <div
+            v-for="day of viewTrend" :key="day.date"
+            class="h-full flex flex-1 flex-col items-center justify-end gap-1"
+            :title="`${day.date} · ${day.count} 次`"
+          >
+            <span class="text-xs op-60">{{ day.count || '' }}</span>
+            <!-- 0 的那天也留一条 2% 的底, 否则横轴上会缺一格, 看着像日期断了 -->
+            <div
+              class="w-full rounded-t bg-primary transition-300 hover:bg-primary/80"
+              :style="{ height: `${Math.max(2, Math.round((day.count ?? 0) / maxTrendCount * 100))}%` }"
+            />
+            <span class="whitespace-nowrap text-xs op-50">{{ day.date.slice(5) }}</span>
+          </div>
+        </div>
+      </NCard>
 
       <!-- 待处理 + 最新文章 -->
       <NGrid class="mt-4" x-gap="12" y-gap="12" cols="1 l:24" responsive="screen">

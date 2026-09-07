@@ -144,6 +144,8 @@ const handlers = [
   ['POST', /^\/register$/, () => ok(null)],
   ['GET', /^\/logout$/, () => ok(null)],
   ['GET', /^\/code$/, () => ok(null)],
+  // 访客上报: 演示站没有真实统计, 直接成功, 免得 App 挂载时报未匹配的请求
+  ['POST', /^\/report$/, () => ok(null)],
 
   ['GET', /^\/front\/about$/, () => ok(about)],
   ['GET', /^\/front\/page$/, () => ok(pages)],

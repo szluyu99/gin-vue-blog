@@ -3817,6 +3817,13 @@ const docTemplate = `{
                 "view_count": {
                     "description": "访问量",
                     "type": "integer"
+                },
+                "view_trend": {
+                    "description": "最近 viewTrendDays 天的访问量, 按日期升序, 没有数据的那天补 0",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handle.ViewTrendVO"
+                    }
                 }
             }
         },
@@ -5587,6 +5594,19 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "handle.ViewTrendVO": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "description": "当天访问量",
+                    "type": "integer"
+                },
+                "date": {
+                    "description": "2006-01-02",
+                    "type": "string"
                 }
             }
         },

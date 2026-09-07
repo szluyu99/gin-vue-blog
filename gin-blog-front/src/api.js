@@ -6,6 +6,8 @@ export default {
   logout: () => baseRequest.get('/logout'),
   /** 发送验证码 */
   sendCode: params => baseRequest.get('/code', { params }),
+  /** 上报访客信息: 统计访问量与访客地域, 匿名接口 */
+  report: () => baseRequest.post('/report'),
 
   /** 关于我 */
   about: () => request.get('/about'),

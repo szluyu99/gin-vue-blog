@@ -158,6 +158,20 @@ function findCategory(id) {
   return category ? { ...category, Articles: null } : null
 }
 
+// 访问趋势: 造 14 天的假数据, 保持和后端一样的形状(日期升序, 每天都有值)
+function viewTrend(days = 14) {
+  const today = new Date()
+  return Array.from({ length: days }, (_, i) => {
+    const d = new Date(today)
+    d.setDate(d.getDate() - (days - 1 - i))
+    return {
+      date: d.toISOString().slice(0, 10),
+      // 掺一个 0 进去, 好验证「没有访问的那天也要占一格」
+      count: i % 7 === 3 ? 0 : 20 + ((i * 13) % 60),
+    }
+  })
+}
+
 // 文章列表项: 携带分类与标签
 function toArticle(a) {
   const { tag_ids, ...rest } = a
@@ -194,6 +208,7 @@ const handlers = [
     user_count: state.users.length,
     message_count: state.messages.length,
     view_count: state.articles.reduce((sum, e) => sum + e.view_count, 0),
+    view_trend: viewTrend(),
   })],
 
   // 文章

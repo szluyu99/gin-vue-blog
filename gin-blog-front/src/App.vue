@@ -7,6 +7,7 @@ import SideTools from '@/components/SideTools.vue'
 import UToast from '@/components/ui/UToast.vue'
 
 import { useAppStore, useUserStore } from '@/store'
+import { reportVisit } from '@/utils/visit-report'
 
 const appStore = useAppStore()
 const userStore = useUserStore()
@@ -18,6 +19,7 @@ onMounted(() => {
   appStore.getPageList()
   appStore.getBlogInfo()
   userStore.getUserInfo()
+  reportVisit()
 
   // 挂载全局提示
   window.$message = messageRef.value

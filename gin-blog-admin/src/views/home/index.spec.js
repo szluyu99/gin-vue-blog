@@ -164,4 +164,51 @@ describe('后台首页', () => {
 
     expect(wrapper.vm.FALLBACK_SENTENCES).toContain(wrapper.vm.sentence)
   })
+
+  // 访问趋势: 柱子按最大值归一化, 0 的那天也要占一格
+  it('访问趋势按最大值归一化并统计总数', async () => {
+    api.getHomeInfo.mockResolvedValue({
+      code: 0,
+      data: {
+        ...homeInfo,
+        view_trend: [
+          { date: '2026-09-05', count: 4 },
+          { date: '2026-09-06', count: 0 },
+          { date: '2026-09-07', count: 12 },
+        ],
+      },
+    })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.viewTrend).toHaveLength(3))
+
+    expect(wrapper.vm.maxTrendCount).toBe(12)
+    expect(wrapper.vm.trendTotal).toBe(16)
+    expect(wrapper.text()).toContain('近 3 天共 16 次')
+    // 三天都要渲染出来, 包括 0 的那天
+    expect(wrapper.findAll('[title$="次"]')).toHaveLength(3)
+    expect(wrapper.text()).toContain('09-06')
+  })
+
+  // 后端返回的字段缺失或全是 0 时, 不能画出一堆 NaN 高度的柱子
+  it('没有访问记录时趋势图给出空状态', async () => {
+    api.getHomeInfo.mockResolvedValue({
+      code: 0,
+      data: { ...homeInfo, view_trend: [{ date: '2026-09-07', count: 0 }] },
+    })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.viewTrend).toHaveLength(1))
+
+    expect(wrapper.vm.maxTrendCount).toBe(1)
+    expect(wrapper.text()).toContain('最近还没有访问记录')
+  })
+
+  it('接口没返回 view_trend 时不报错', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.homeInfo.view_count).toBe(10))
+
+    expect(wrapper.vm.viewTrend).toEqual([])
+    expect(wrapper.vm.trendTotal).toBe(0)
+  })
 })

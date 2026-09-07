@@ -6,6 +6,7 @@ import (
 	"gin-blog/internal/model"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -116,4 +117,64 @@ func TestBlogInfoReport(t *testing.T) {
 	// 测试环境读不到 ip2region 数据库, 地域会落到 "未知"
 	area := env.rdb.HGetAll(rctx, g.VISITOR_AREA).Val()
 	assert.Equal(t, "1", area["未知"])
+}
+
+/*
+按天的访问量不做访客去重
+
+累计值统计"来过多少人"(同一访客只算一次), 趋势要看的是"每天来了多少次"。
+所以上面同一访客第二次上报累计值不变, 而按天的会 +1。
+*/
+func TestBlogInfoReportCountsEveryVisitPerDay(t *testing.T) {
+	env := newTestEnv(t)
+	env.engine.POST("/report", (&BlogInfo{}).Report)
+
+	dayKey := g.VIEW_COUNT_DAY + time.Now().Format(viewDayLayout)
+
+	env.do(t, http.MethodPost, "/report", nil)
+	env.do(t, http.MethodPost, "/report", nil)
+	env.do(t, http.MethodPost, "/report", nil)
+
+	// 累计值只认第一次(同一个访客指纹), 按天的三次都算
+	count, _ := env.rdb.Get(rctx, g.VIEW_COUNT).Int()
+	assert.Equal(t, 1, count)
+	dayCount, err := env.rdb.Get(rctx, dayKey).Int()
+	assert.Nil(t, err)
+	assert.Equal(t, 3, dayCount)
+
+	// 必须带上 TTL: Incr 建出来的 key 默认永不过期, 30 天后就是永久垃圾
+	ttl := env.rdb.TTL(rctx, dayKey).Val()
+	assert.Greater(t, ttl, time.Duration(0), "按天的 key 要有过期时间")
+	assert.LessOrEqual(t, ttl, viewDayTTL)
+
+	// 过期之后这一天就没了, 趋势图上补 0
+	env.mr.FastForward(viewDayTTL + time.Second)
+	assert.False(t, env.mr.Exists(dayKey))
+}
+
+// 趋势: 固定天数, 按日期升序, 没数据的那天补 0 而不是跳过
+func TestGetViewTrend(t *testing.T) {
+	env := newTestEnv(t)
+	now := time.Now()
+
+	today := now.Format(viewDayLayout)
+	twoDaysAgo := now.AddDate(0, 0, -2).Format(viewDayLayout)
+	env.rdb.Set(rctx, g.VIEW_COUNT_DAY+today, 7, 0)
+	env.rdb.Set(rctx, g.VIEW_COUNT_DAY+twoDaysAgo, 3, 0)
+	// 超出窗口的那天不该出现在结果里
+	env.rdb.Set(rctx, g.VIEW_COUNT_DAY+now.AddDate(0, 0, -viewTrendDays).Format(viewDayLayout), 99, 0)
+
+	trend, err := getViewTrend(env.rdb, now)
+	assert.Nil(t, err)
+	assert.Len(t, trend, viewTrendDays)
+
+	// 升序: 最后一项是今天
+	assert.Equal(t, today, trend[viewTrendDays-1].Date)
+	assert.Equal(t, 7, trend[viewTrendDays-1].Count)
+	assert.Equal(t, 3, trend[viewTrendDays-3].Count)
+	assert.Equal(t, 0, trend[viewTrendDays-2].Count, "没有数据的那天要补 0")
+
+	for _, day := range trend {
+		assert.NotEqual(t, 99, day.Count, "窗口外的日期不该被带进来")
+	}
 }

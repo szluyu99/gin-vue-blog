@@ -31,6 +31,9 @@ func TestBlogInfoGetHomeInfo(t *testing.T) {
 	assert.Equal(t, 1, data.UserCount)
 	assert.Equal(t, 1, data.MessageCount)
 	assert.Zero(t, data.ViewCount)
+	// 一天数据都没有时也要返回完整的窗口, 全是 0
+	assert.Len(t, data.ViewTrend, viewTrendDays)
+	assert.Zero(t, data.ViewTrend[0].Count)
 
 	env.rdb.Set(rctx, g.VIEW_COUNT, 66, 0)
 	decodeData(t, env.do(t, http.MethodGet, "/home", nil).Data, &data)
