@@ -211,4 +211,34 @@ describe('后台首页', () => {
     expect(wrapper.vm.viewTrend).toEqual([])
     expect(wrapper.vm.trendTotal).toBe(0)
   })
+
+  // 访客地域: 后端已排好序, 前端只负责按最大值归一化
+  it('访客地域按最大值归一化', async () => {
+    api.getHomeInfo.mockResolvedValue({
+      code: 0,
+      data: {
+        ...homeInfo,
+        visitor_area: [
+          { area: '江苏', count: 20 },
+          { area: '广东', count: 5 },
+        ],
+      },
+    })
+
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.visitorArea).toHaveLength(2))
+
+    expect(wrapper.vm.maxAreaCount).toBe(20)
+    expect(wrapper.text()).toContain('江苏')
+    expect(wrapper.text()).toContain('20 人')
+  })
+
+  it('没有访客记录时地域块给出空状态', async () => {
+    const wrapper = mountPage()
+    await vi.waitFor(() => expect(wrapper.vm.loading).toBe(false))
+
+    expect(wrapper.vm.visitorArea).toEqual([])
+    expect(wrapper.vm.maxAreaCount).toBe(1)
+    expect(wrapper.text()).toContain('还没有访客记录')
+  })
 })

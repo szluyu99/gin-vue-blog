@@ -6,6 +6,7 @@ import (
 	"gin-blog/internal/model"
 	"gin-blog/internal/utils"
 	"log/slog"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +23,12 @@ type ViewTrendVO struct {
 	Count int    `json:"count"` // 当天访问量
 }
 
+// 访客地域分布的一项
+type VisitorAreaVO struct {
+	Area  string `json:"area"`  // 省份, 取不到时是 "未知"
+	Count int    `json:"count"` // 独立访客数
+}
+
 type BlogHomeVO struct {
 	ArticleCount int `json:"article_count"` // 文章数量
 	UserCount    int `json:"user_count"`    // 用户数量
@@ -29,6 +36,8 @@ type BlogHomeVO struct {
 	ViewCount    int `json:"view_count"`    // 访问量
 	// 最近 viewTrendDays 天的访问量, 按日期升序, 没有数据的那天补 0
 	ViewTrend []ViewTrendVO `json:"view_trend"`
+	// 访客地域分布, 按人数倒序, 最多 visitorAreaTop 项
+	VisitorArea []VisitorAreaVO `json:"visitor_area"`
 	// CategoryCount int64 `json:"category_count"` // 分类数量
 	// TagCount      int64 `json:"tag_count"`      // 标签数量
 	// BlogConfig    model.BlogConfigDetail `json:"blog_config"`    // 博客信息
@@ -36,9 +45,10 @@ type BlogHomeVO struct {
 }
 
 const (
-	viewTrendDays = 14 // 趋势图展示的天数
-	viewDayTTL    = 30 * 24 * 60 * 60 * time.Second
-	viewDayLayout = "2006-01-02"
+	viewTrendDays  = 14 // 趋势图展示的天数
+	visitorAreaTop = 8  // 地域分布最多展示几项, 再多在小卡片里挤不下
+	viewDayTTL     = 30 * 24 * 60 * 60 * time.Second
+	viewDayLayout  = "2006-01-02"
 )
 
 type AboutReq struct {
@@ -153,13 +163,58 @@ func (*BlogInfo) GetHomeInfo(c *gin.Context) {
 		return
 	}
 
+	area, err := getVisitorArea(rdb)
+	if err != nil {
+		ReturnError(c, g.ErrRedisOp, err)
+		return
+	}
+
 	ReturnSuccess(c, BlogHomeVO{
 		ArticleCount: articleCount,
 		UserCount:    userCount,
 		MessageCount: messageCount,
 		ViewCount:    viewCount,
 		ViewTrend:    trend,
+		VisitorArea:  area,
 	})
+}
+
+/*
+访客地域分布
+
+数据是 Report 里按省份累加的 Hash, 之前没有任何接口读它 —— 前台一直没调上报,
+这个键一直是空的, 所以后台也就没做展示。上报接通之后它才有意义。
+Hash 的遍历顺序不保证, 这里按人数倒序并截断到 visitorAreaTop, 不然刷新一次顺序就变一次。
+*/
+func getVisitorArea(rdb *redis.Client) ([]VisitorAreaVO, error) {
+	all, err := rdb.HGetAll(rctx, g.VISITOR_AREA).Result()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	list := make([]VisitorAreaVO, 0, len(all))
+	for area, count := range all {
+		n, convErr := strconv.Atoi(count)
+		if convErr != nil {
+			// 单个值坏掉不该让整个仪表盘失败
+			slog.Warn("访客地域计数不是数字", "area", area, "value", count)
+			continue
+		}
+		list = append(list, VisitorAreaVO{Area: area, Count: n})
+	}
+
+	// 人数相同时按名字排, 保证同样的数据每次返回同样的顺序
+	sort.Slice(list, func(i, j int) bool {
+		if list[i].Count != list[j].Count {
+			return list[i].Count > list[j].Count
+		}
+		return list[i].Area < list[j].Area
+	})
+
+	if len(list) > visitorAreaTop {
+		list = list[:visitorAreaTop]
+	}
+	return list, nil
 }
 
 /*

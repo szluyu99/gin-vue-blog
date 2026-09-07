@@ -56,7 +56,7 @@
 后台（`gin-blog-admin`）：
 
 - JWT 鉴权 + 基于角色的权限控制，菜单和接口权限均可在后台动态配置
-- 首页仪表盘：待审核评论 / 留言、最新文章、分类分布、最近登录、近 14 天访问趋势，接口并行拉取且单个失败不拖垮整页
+- 首页仪表盘：待审核评论 / 留言、最新文章、分类分布、访客地域、最近登录、近 14 天访问趋势，接口并行拉取且单个失败不拖垮整页
 - 前端菜单由后端下发（动态路由）
 - Markdown 文章编辑，支持 `.md` / `.markdown` 导入、`.md` 导出
 - 操作日志、登录日志（含失败记录）、在线用户监听与强制下线
@@ -144,7 +144,7 @@ cd gin-vue-blog/deploy
 ```bash
 cd gin-blog-server && go test ./...   # 后端: model / handle / middleware 层, 8 个包
 cd gin-blog-front  && pnpm test       # 前台: vitest, 32 个文件 197 条
-cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 163 条
+cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 165 条
 ```
 
 前端测试以回归为主：每条都验证过「把修复回退后会变红」，覆盖的具体缺陷见 `code_audit.md` 的「组件测试」一节。

@@ -178,3 +178,43 @@ func TestGetViewTrend(t *testing.T) {
 		assert.NotEqual(t, 99, day.Count, "窗口外的日期不该被带进来")
 	}
 }
+
+// 访客地域: 按人数倒序, 坏数据跳过而不是让整个仪表盘失败
+func TestGetVisitorArea(t *testing.T) {
+	env := newTestEnv(t)
+
+	env.rdb.HSet(rctx, g.VISITOR_AREA, map[string]any{
+		"江苏": 5, "广东": 12, "北京": 12, "未知": 1, "坏数据": "abc",
+	})
+
+	area, err := getVisitorArea(env.rdb)
+	assert.Nil(t, err)
+
+	// 人数相同(广东/北京 都是 12)时按名字排: Hash 遍历顺序不保证,
+	// 不定序的话每次刷新仪表盘这几项都会跳
+	assert.Equal(t, []VisitorAreaVO{
+		{Area: "北京", Count: 12},
+		{Area: "广东", Count: 12},
+		{Area: "江苏", Count: 5},
+		{Area: "未知", Count: 1},
+	}, area)
+}
+
+func TestGetVisitorAreaLimitAndEmpty(t *testing.T) {
+	env := newTestEnv(t)
+
+	// 一条数据都没有时返回空而不是报错
+	area, err := getVisitorArea(env.rdb)
+	assert.Nil(t, err)
+	assert.Empty(t, area)
+
+	for i := 0; i < visitorAreaTop+3; i++ {
+		env.rdb.HSet(rctx, g.VISITOR_AREA, "省"+itoa(i), i+1)
+	}
+
+	area, err = getVisitorArea(env.rdb)
+	assert.Nil(t, err)
+	assert.Len(t, area, visitorAreaTop)
+	// 截断保留的是人数最多的那些
+	assert.Equal(t, visitorAreaTop+3, area[0].Count)
+}

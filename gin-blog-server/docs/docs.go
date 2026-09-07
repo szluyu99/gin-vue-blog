@@ -3824,6 +3824,13 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/handle.ViewTrendVO"
                     }
+                },
+                "visitor_area": {
+                    "description": "访客地域分布, 按人数倒序, 最多 visitorAreaTop 项",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handle.VisitorAreaVO"
+                    }
                 }
             }
         },
@@ -5607,6 +5614,19 @@ const docTemplate = `{
                 "date": {
                     "description": "2006-01-02",
                     "type": "string"
+                }
+            }
+        },
+        "handle.VisitorAreaVO": {
+            "type": "object",
+            "properties": {
+                "area": {
+                    "description": "省份, 取不到时是 \"未知\"",
+                    "type": "string"
+                },
+                "count": {
+                    "description": "独立访客数",
+                    "type": "integer"
                 }
             }
         },

@@ -209,6 +209,12 @@ const handlers = [
     message_count: state.messages.length,
     view_count: state.articles.reduce((sum, e) => sum + e.view_count, 0),
     view_trend: viewTrend(),
+    visitor_area: [
+      { area: '江苏', count: 42 },
+      { area: '广东', count: 31 },
+      { area: '北京', count: 18 },
+      { area: '未知', count: 7 },
+    ],
   })],
 
   // 文章

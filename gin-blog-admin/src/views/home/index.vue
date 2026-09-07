@@ -29,6 +29,7 @@ const homeInfo = ref({
   article_count: 0,
   message_count: 0,
   view_trend: [],
+  visitor_area: [],
 })
 
 // 待处理事项: 数字都来自各自列表接口的 total, 不需要新增后端接口
@@ -58,6 +59,10 @@ const maxCategoryCount = computed(() =>
 const viewTrend = computed(() => homeInfo.value.view_trend ?? [])
 const maxTrendCount = computed(() => Math.max(1, ...viewTrend.value.map(d => d.count ?? 0)))
 const trendTotal = computed(() => viewTrend.value.reduce((sum, d) => sum + (d.count ?? 0), 0))
+
+// 访客地域: 后端已按人数倒序并截断, 这里只负责归一化画条形
+const visitorArea = computed(() => homeInfo.value.visitor_area ?? [])
+const maxAreaCount = computed(() => Math.max(1, ...visitorArea.value.map(a => a.count ?? 0)))
 
 const todoItems = computed(() => [
   { label: '待审核评论', value: todo.value.comment, path: '/message/comment' },
@@ -272,8 +277,8 @@ async function getOneSentence() {
         </NGi>
       </NGrid>
 
-      <!-- 分类分布 + 最近登录 -->
-      <NGrid class="mt-4" x-gap="12" y-gap="12" cols="1 l:2" responsive="screen">
+      <!-- 分类分布 + 访客地域 + 最近登录 -->
+      <NGrid class="mt-4" x-gap="12" y-gap="12" cols="1 l:3" responsive="screen">
         <NGi>
           <NCard title="分类分布" size="small" class="h-full">
             <template #header-extra>
@@ -293,6 +298,30 @@ async function getOneSentence() {
                 <NProgress
                   type="line" :height="6" :border-radius="3"
                   :percentage="Math.round((c.article_count ?? 0) / maxCategoryCount * 100)"
+                  :show-indicator="false"
+                />
+              </div>
+            </div>
+          </NCard>
+        </NGi>
+
+        <NGi>
+          <NCard title="访客地域" size="small" class="h-full">
+            <template #header-extra>
+              <span class="text-sm op-60">按独立访客数</span>
+            </template>
+            <NSkeleton v-if="loading" :repeat="4" text class="my-2" />
+            <!-- 取不到 IP 归属时会记成「未知」, 一条都没有说明还没人访问过 -->
+            <NEmpty v-else-if="!visitorArea.length" class="py-6" description="还没有访客记录" />
+            <div v-else class="space-y-3">
+              <div v-for="item of visitorArea" :key="item.area">
+                <div class="mb-1 flex justify-between text-sm">
+                  <span class="truncate">{{ item.area }}</span>
+                  <span class="op-60">{{ item.count }} 人</span>
+                </div>
+                <NProgress
+                  type="line" :height="6" :border-radius="3"
+                  :percentage="Math.round((item.count ?? 0) / maxAreaCount * 100)"
                   :show-indicator="false"
                 />
               </div>

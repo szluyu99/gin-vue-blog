@@ -213,6 +213,11 @@ definitions:
         items:
           $ref: '#/definitions/handle.ViewTrendVO'
         type: array
+      visitor_area:
+        description: 访客地域分布, 按人数倒序, 最多 visitorAreaTop 项
+        items:
+          $ref: '#/definitions/handle.VisitorAreaVO'
+        type: array
     type: object
   handle.EditAnonymousReq:
     properties:
@@ -1399,6 +1404,15 @@ definitions:
       date:
         description: "2006-01-02"
         type: string
+    type: object
+  handle.VisitorAreaVO:
+    properties:
+      area:
+        description: 省份, 取不到时是 "未知"
+        type: string
+      count:
+        description: 独立访客数
+        type: integer
     type: object
   map_string_string:
     additionalProperties:
