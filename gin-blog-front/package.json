@@ -42,6 +42,6 @@
     "unocss": "^66.8.1",
     "vite": "^8.2.2",
     "vite-plugin-compression": "^0.5.1",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   }
 }
