@@ -25,7 +25,7 @@
 
 同类学习项目常见的功能这里都有（见下面的「功能」），下面几条是不太常见的：
 
-- **有测试**：后端 8 个包，前端 362 条组件与工具测试。回归测试都验证过「把修复回退后会变红」，而不是只验证当前实现
+- **有测试**：后端 8 个包，前端 368 条组件与工具测试。回归测试都验证过「把修复回退后会变红」，而不是只验证当前实现
 - **CI 不止跑测试**：还会起完整的 Docker Compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦、重复灌种子不新增资源），并把镜像发布到 GHCR
 - **不启动后端也能跑**：两个前端内置 mock 模式，GitHub Pages 上有在线演示
 - **决策有记录**：[code_audit.md](./code_audit.md) 逐条记录审查出的问题、成因与修法，[roadmap.md](./roadmap.md) 记录做了什么、以及为什么不做某些事
@@ -132,7 +132,7 @@ cd gin-vue-blog/deploy
 
 ```bash
 cd gin-blog-server && go test ./...   # 后端: model / handle / middleware / global / utils / 路由注册, 8 个包
-cd gin-blog-front  && pnpm test       # 前台: vitest, 32 个文件 197 条
+cd gin-blog-front  && pnpm test       # 前台: vitest, 33 个文件 203 条
 cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 165 条
 ```
 

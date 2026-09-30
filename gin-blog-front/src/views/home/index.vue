@@ -7,13 +7,10 @@ import { onMounted, reactive, ref } from 'vue'
 import api from '@/api'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { stripMarkdown } from '@/utils'
-import Announcement from './components/Announcement.vue'
 import ArticleCard from './components/ArticleCard.vue'
-import AuthorInfo from './components/AuthorInfo.vue'
 import HomeBanner from './components/HomeBanner.vue'
+import SiteInfoCard from './components/SiteInfoCard.vue'
 import TalkingCarousel from './components/TalkingCarousel.vue'
-
-import WebsiteInfo from './components/WebsiteInfo.vue'
 
 const articleList = ref([])
 const loading = ref(false)
@@ -106,16 +103,11 @@ function backTop() {
           </InfiniteLoading>
         </div>
       </div>
-      <!-- 右半部分 -->
-      <div class="col-span-0 lg:col-span-3">
-        <!-- sticky 实现悬浮固定效果 -->
-        <div class="sticky top-5 space-y-5">
-          <!-- 博主信息 -->
-          <AuthorInfo :style="{ '--i': 0 }" />
-          <!-- 公告 -->
-          <Announcement :style="{ '--i': 1 }" />
-          <!-- 网站资讯 -->
-          <WebsiteInfo :style="{ '--i': 2 }" />
+      <!-- 侧边信息: 窄屏下也要能看到, 所以占满一行落到文章流下方, 而不是整列隐藏 -->
+      <div class="col-span-12 lg:col-span-3">
+        <!-- sticky 只在宽屏有意义: 窄屏它在文章流下面, 悬浮反而会挡住内容 -->
+        <div class="lg:sticky lg:top-5">
+          <SiteInfoCard :style="{ '--i': 0 }" />
         </div>
       </div>
     </div>

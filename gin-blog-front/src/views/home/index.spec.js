@@ -26,9 +26,7 @@ function mountPage() {
     global: {
       stubs: {
         HomeBanner: true,
-        AuthorInfo: true,
-        WebsiteInfo: true,
-        Announcement: true,
+        SiteInfoCard: true,
         TalkingCarousel: true,
         ArticleCard: true,
         AppFooter: true,
