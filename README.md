@@ -13,13 +13,22 @@
   <img src="https://img.shields.io/badge/UnoCSS-v66-green"/>
 </p>
 
-一个前后端分离的博客项目：Go + Gin 后端，Vue 3 前台 + Vue 3 后台。代码轻量、注释完善，适合学习全栈开发。
+一个前后端分离的博客项目：Go + Gin 后端，Vue 3 前台 + Vue 3 后台。
 
 - Github: [szluyu99/gin-vue-blog](https://github.com/szluyu99/gin-vue-blog)
 - Gitee: [szluyu99/gin-vue-blog](https://gitee.com/szluyu99/gin-vue-blog)
 - 交流 QQ 群: 777260310
 
 欢迎 Star 和 PR。
+
+## 特点
+
+同类学习项目常见的功能这里都有（见下面的「功能」），下面几条是不太常见的：
+
+- **有测试**：后端 8 个包，前端 362 条组件与工具测试。回归测试都验证过「把修复回退后会变红」，而不是只验证当前实现
+- **CI 不止跑测试**：还会起完整的 Docker Compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦、重复灌种子不新增资源），并把镜像发布到 GHCR
+- **不启动后端也能跑**：两个前端内置 mock 模式，GitHub Pages 上有在线演示
+- **决策有记录**：[code_audit.md](./code_audit.md) 逐条记录审查出的问题、成因与修法，[roadmap.md](./roadmap.md) 记录做了什么、以及为什么不做某些事
 
 ## 在线预览
 
@@ -49,19 +58,19 @@
 - 文章列表分页（分类 / 标签下同样分页）；首页文章流滚动加载, 提前预取下一页
 - 归档按年月分组的时间轴；标签云字号按文章数映射
 - 评论 + 回复，留言弹幕墙
-- 站内通知：评论被回复 / 自己的文章被评论时头部铃铛提醒，有独立通知页；点通知直接跳到文章里那条评论并高亮（开了评论审核时，在后台点「通过」那一刻才补发通知）
-- 点赞、访客统计（在 Redis 里累加，每 10 分钟与退出前落库备份，启动时补回缺的键）
+- 站内通知：评论被回复 / 自己的文章被评论时头部铃铛提醒，有独立通知页；点通知直接跳到文章里那条评论并高亮
+- 点赞与访客统计
 - 用户注册：默认直接建号，可开启邮箱验证码注册（`config.yml` 的 `Captcha.SendEmail`）
 
 后台（`gin-blog-admin`）：
 
 - JWT 鉴权 + 基于角色的权限控制，菜单和接口权限均可在后台动态配置
-- 首页仪表盘：待审核评论 / 留言、最新文章、分类分布、访客地域、最近登录、近 14 天访问趋势，接口并行拉取且单个失败不拖垮整页
+- 首页仪表盘：待审核评论 / 留言、最新文章、分类分布、访客地域、最近登录、近 14 天访问趋势
 - 前端菜单由后端下发（动态路由）
 - Markdown 文章编辑，支持 `.md` / `.markdown` 导入、`.md` 导出
 - 操作日志、登录日志（含失败记录）、在线用户监听与强制下线
 - 前端错误日志：前后台的未捕获异常自动上报到后台列表，同类错误按指纹聚合只累加次数（不引 Sentry）
-- 用户与角色可禁用：禁用后登录被拒、已签发的 token 立即失效、只靠该角色拿到的权限被收回
+- 用户与角色可禁用：禁用后登录被拒、已签发的 token 立即失效
 - 文件上传支持本地和七牛云
 - CRUD 操作封装为通用 Hook
 
@@ -88,34 +97,14 @@ gin-vue-blog
 ```bash
 gin-blog-server
 ├── cmd                 # 程序入口, 数据初始化脚本
-├── internal
-│   ├── handle          # 接口处理
-│   ├── model           # 数据模型 + 数据库操作
-│   ├── middleware      # 中间件
-│   ├── global          # 全局配置、错误码
-│   └── utils           # 工具方法
+├── internal            # handle 接口 / model 数据 / middleware 中间件 / global 配置与错误码 / utils
 ├── docs                # Swagger 文档
 ├── assets              # 资源文件
 ├── config.yml          # 配置文件
 └── Dockerfile
 ```
 
-前端（两个项目大体一致，后台额外有 `layout`、`composables`）：
-
-```bash
-├── src
-│   ├── api.js          # 接口
-│   ├── assets          # 静态资源（仅后台）
-│   ├── components      # 组件
-│   ├── mock            # Mock 数据
-│   ├── router          # 路由（前台为单文件 router.js）
-│   ├── store           # 状态管理
-│   ├── utils           # 工具方法
-│   └── views           # 页面
-├── .env.*              # 环境变量（development / production / mock）
-├── uno.config.js       # UnoCSS 配置
-└── vite.config.js      # Vite 配置
-```
+前端两个项目结构一致（`src` 下 api / components / mock / router / store / utils / views，后台额外有 `layout`、`composables`），细节见各自 README。
 
 ## 快速开始
 
@@ -147,32 +136,12 @@ cd gin-blog-front  && pnpm test       # 前台: vitest, 32 个文件 197 条
 cd gin-blog-admin  && pnpm test       # 后台: vitest, 27 个文件 165 条
 ```
 
-前端测试以回归为主：每条都验证过「把修复回退后会变红」，覆盖的具体缺陷见 `code_audit.md` 的「组件测试」一节。
+前端测试以回归为主：每条都验证过「把修复回退后会变红」，覆盖的具体缺陷见 [code_audit.md](./code_audit.md) 的「组件测试」一节。
 
-`.github/workflows/ci.yml` 在 push 和 PR 时跑四组任务：
-
-- Server：`gofmt` / `go vet` / `go test`，并校验 `docs/` 与 Swagger 注解是否一致
-- Frontend：两个前端各跑 `pnpm lint` / `pnpm test` / `pnpm build`
-- Docker：构建 web 与 server 镜像并启动做健康检查。web 镜像直接用 Frontend job 的产物 + `deploy/build/web/Dockerfile`（不在容器里重新打包前端），server 镜像走 buildx + GitHub Actions 缓存。main 有新提交时，冒烟测试通过后把两个镜像推到 GHCR（`latest` 与 `main-<短 sha>`）
-- Deploy：起完整的 compose 栈，校验权限种子数据的不变式（admin 能改配置、guest 不能、未登录被拦，重复执行不新增资源）
+`.github/workflows/ci.yml` 在 push 和 PR 时跑四组任务：**Server**（`gofmt` / `go vet` / `go test`，并校验 `docs/` 与 Swagger 注解一致）、**Frontend**（两个前端各跑 lint / test / build）、**Docker**（用 Frontend 的产物构建两个镜像并启动做健康检查，main 有新提交时冒烟通过后推到 GHCR）、**Deploy**（起完整 compose 栈，校验权限种子数据的不变式）。
 
 ## 后续计划
 
-完整的规划与「为什么不做某些事」见 [roadmap.md](./roadmap.md)，下次接手先看那里的「当前状态」一节。下面是概览。
+计划、取舍与「为什么不做某些事」都在 [roadmap.md](./roadmap.md)，接手先看那里的「当前状态」一节。
 
-功能：
-
-- 前台侧边信息模块（`AuthorInfo` / `Announcement` / `WebsiteInfo`）需要重新设计：窄屏下整列消失，手机上看不到公告和网站资讯
-- 文章分享元信息：只设了 `document.title`，没有 `meta description` 和 `og:*`
-- 前台「相册」页目前是「禁止访问」占位页（`views/entertainment/album`），导航里两个入口都还在
-- 说说的图片支持（第一版只做纯文本 + 评论，图片要一起解决存储与缩略图）
-- 通知定位目前靠前端逐页加载找目标评论，评论量大了要后端补一个「按评论 id 算页码」的接口
-
-工程：
-
-- 注册链接携带明文密码、邮件模块的日志与 TLS（`code_audit.md` 的 S6、S7）——只在启用邮件注册时成立，当前配置没开，暂缓
-- 部署侧改成拉 GHCR 镜像（CI 已经在发布，但 compose 仍是本地 `build:`）
-- 拆分 `gin-blog-front` 和 `gin-blog-admin` 为独立仓库
-- 完善接口文档
-
-明确不做的（理由见 [roadmap.md](./roadmap.md)）：ElasticSearch 搜索、SSR / SSG、第三方登录、国际化、RSS / sitemap、后端日志切割、把 `@iconify/vue` 换成 UnoCSS 图标类。
+明确不做的：ElasticSearch 搜索、SSR / SSG、第三方登录、国际化、RSS / sitemap、后端日志切割、把后台的 `@iconify/vue` 换成 UnoCSS 图标类 —— 每条的理由见 roadmap。
