@@ -3,13 +3,13 @@ module gin-blog
 go 1.26.0
 
 require (
-	github.com/alicebob/miniredis/v2 v2.38.0
-	github.com/gin-contrib/cors v1.7.7
+	github.com/alicebob/miniredis/v2 v2.39.0
+	github.com/gin-contrib/cors v1.7.9
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/k3a/html2text v1.4.0
-	github.com/qiniu/go-sdk/v7 v7.27.0
+	github.com/k3a/html2text v1.5.0
+	github.com/qiniu/go-sdk/v7 v7.29.0
 	github.com/redis/go-redis/v9 v9.22.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
@@ -17,16 +17,16 @@ require (
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
 	github.com/thanhpk/randstr v1.0.6
-	github.com/vanng822/go-premailer v1.35.0
-	golang.org/x/crypto v0.55.0
+	github.com/vanng822/go-premailer v1.36.0
+	golang.org/x/crypto v0.56.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.2
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.12.0 // indirect
-	github.com/andybalholm/cascadia v1.3.3 // indirect
+	github.com/PuerkitoBio/goquery v1.13.0 // indirect
+	github.com/andybalholm/cascadia v1.3.4 // indirect
 	github.com/bytedance/sonic v1.15.3 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/vanng822/css v1.0.1 // indirect
@@ -100,7 +100,7 @@ require (
 )
 
 require (
-	github.com/gin-contrib/sessions v1.1.0
+	github.com/gin-contrib/sessions v1.1.2
 	github.com/gin-contrib/sse v1.1.1 // indirect
 	github.com/go-sql-driver/mysql v1.10.0 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
