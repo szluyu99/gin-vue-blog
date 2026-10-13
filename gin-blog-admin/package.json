@@ -40,6 +40,6 @@
     "taze": "^21.1.0",
     "vite": "^8.2.2",
     "vite-plugin-compression": "^0.5.1",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   }
 }
